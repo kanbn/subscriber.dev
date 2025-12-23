@@ -1,0 +1,188 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/users/me": {
+      "get": {
+        "operationId": "getCurrentUser",
+        "summary": "Get current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/users": {
+      "put": {
+        "operationId": "updateCurrentUser",
+        "summary": "Update current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/test": {
+      "get": {
+        "operationId": "getTest",
+        "summary": "Get test message",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createTest",
+        "summary": "Post test data",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Subscriber API",
+    "description": "REST API for Subscriber - Customer.io alternative",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Development"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "Enter JWT token"
+      },
+      "api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Enter API key"
+      }
+    },
+    "schemas": {
+      "TestResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "echo": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Test name",
+                "type": "string"
+              },
+              "message": {
+                "description": "Optional message",
+                "type": "string"
+              }
+            },
+            "selfRequired": false
+          }
+        },
+        "required": [
+          "message",
+          "timestamp",
+          "success",
+          "echo"
+        ]
+      },
+      "TestRequestDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Test name",
+            "type": "string"
+          },
+          "message": {
+            "description": "Optional message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    }
+  }
+}

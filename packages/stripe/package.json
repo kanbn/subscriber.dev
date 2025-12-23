@@ -1,0 +1,30 @@
+{
+  "name": "@subscriber.dev/stripe",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "devDependencies": {
+    "@subscriber.dev/eslint-config": "workspace:*",
+    "@subscriber.dev/prettier-config": "workspace:*",
+    "@subscriber.dev/tsconfig": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": "@subscriber.dev/prettier-config",
+  "dependencies": {
+    "stripe": "^18.2.0"
+  }
+}

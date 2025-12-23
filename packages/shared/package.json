@@ -1,0 +1,44 @@
+{
+  "name": "@subscriber.dev/shared",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./src/utils/index.ts"
+    },
+    "./constants": {
+      "types": "./dist/constants/index.d.ts",
+      "default": "./src/constants/index.ts"
+    }
+  },
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "devDependencies": {
+    "@subscriber.dev/eslint-config": "workspace:*",
+    "@subscriber.dev/prettier-config": "workspace:*",
+    "@subscriber.dev/tsconfig": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": "@subscriber.dev/prettier-config",
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "jose": "^6.1.2",
+    "nanoid": "^5.0.9",
+    "next-runtime-env": "^1.7.2"
+  }
+}

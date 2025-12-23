@@ -1,0 +1,42 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "subscriber.dev",
+  "logo": {
+    "href": "https://subscriber.dev"
+  },
+  "favicon": "./favicon.png",
+  "colors": {
+    "primary": "#000000",
+    "light": "#EDEDED",
+    "dark": "#161616",
+    "anchors": {
+      "from": "#000000",
+      "to": "#161616"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Sign in",
+      "url": "https://subscriber.dev/login"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Go to dashboard",
+    "url": "https://subscriber.dev/dashboard"
+  },
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": ["introduction"]
+    },
+    {
+      "group": "API Documentation",
+      "pages": ["api-reference/introduction"]
+    }
+  ],
+  "openapi": "https://subscriber.dev/api/v1/openapi.json",
+  "footerSocials": {
+    "discord": "https://discord.gg/e6ejRb6CmT",
+    "github": "https://github.com/kanbn"
+  }
+}

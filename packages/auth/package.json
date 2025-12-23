@@ -1,0 +1,43 @@
+{
+  "name": "@subscriber.dev/auth",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./src/client.ts"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "default": "./src/server.ts"
+    }
+  },
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "devDependencies": {
+    "@subscriber.dev/db": "workspace:*",
+    "@subscriber.dev/email": "workspace:*",
+    "@subscriber.dev/eslint-config": "workspace:*",
+    "@subscriber.dev/prettier-config": "workspace:*",
+    "@subscriber.dev/shared": "workspace:*",
+    "@subscriber.dev/stripe": "workspace:*",
+    "@subscriber.dev/tsconfig": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": "@subscriber.dev/prettier-config",
+  "dependencies": {
+    "@better-auth/stripe": "^1.4.6",
+    "better-auth": "^1.4.6"
+  }
+}
