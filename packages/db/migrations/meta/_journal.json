@@ -8,6 +8,13 @@
       "when": 1766484035953,
       "tag": "20251223100035_Init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766526598029,
+      "tag": "20251223214958_AddWorkspacesAndEnvironmentsTables",
+      "breakpoints": true
     }
   ]
 }

@@ -11,8 +11,9 @@ import {
 import { generateUID } from "@subscriber.dev/shared/utils";
 
 import { apikey } from "./auth";
+import { workspaceMembers } from "./workspaces";
 
-export const users = pgTable("user", {
+export const users = pgTable("users", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
   publicId: text("publicId")
     .notNull()
@@ -25,8 +26,9 @@ export const users = pgTable("user", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
-}).enableRLS();
+});
 
 export const usersRelations = relations(users, ({ many }) => ({
   apiKeys: many(apikey),
+  workspaceMemberships: many(workspaceMembers),
 }));

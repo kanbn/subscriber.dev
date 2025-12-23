@@ -14,7 +14,7 @@ import { env } from "next-runtime-env";
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as userRepo from "@subscriber.dev/db/repository/user.repo";
 import * as schema from "@subscriber.dev/db/schema";
-import { notificationClient, sendEmail } from "@subscriber.dev/email";
+import { sendEmail } from "@subscriber.dev/email";
 import { createStripeClient } from "@subscriber.dev/stripe";
 
 export const configuredProviders = socialProviderList.reduce<
