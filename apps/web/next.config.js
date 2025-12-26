@@ -10,6 +10,7 @@ configureRuntimeEnv();
 
 /** @type {import("next").NextConfig} */
 const config = {
+  devIndicators: false,
   output:
     env("NEXT_PUBLIC_USE_STANDALONE_OUTPUT") === "true"
       ? "standalone"

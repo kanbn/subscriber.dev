@@ -102,6 +102,71 @@
           }
         ]
       }
+    },
+    "/workspaces": {
+      "get": {
+        "operationId": "getWorkspaces",
+        "summary": "Get user's workspaces",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetWorkspaceResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Workspaces"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createWorkspace",
+        "summary": "Create a new workspace",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkspaceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateWorkspaceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Workspaces"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -181,6 +246,109 @@
         },
         "required": [
           "name"
+        ]
+      },
+      "GetWorkspaceResponseDto": {
+        "type": "object",
+        "properties": {
+          "workspace": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "publicId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "selfRequired": true
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "publicId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "selfRequired": true
+          }
+        },
+        "required": [
+          "workspace",
+          "environment"
+        ]
+      },
+      "CreateWorkspaceDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "CreateWorkspaceResponseDto": {
+        "type": "object",
+        "properties": {
+          "workspace": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "publicId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "selfRequired": true
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "publicId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "selfRequired": true
+          }
+        },
+        "required": [
+          "workspace",
+          "environment"
         ]
       }
     }

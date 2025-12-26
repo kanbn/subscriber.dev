@@ -161,6 +161,10 @@ export const initAuth = (db: dbClient) => {
         enabled: true,
       },
       additionalFields: {
+        publicId: {
+          type: "string",
+          required: true,
+        },
         stripeCustomerId: {
           type: "string",
           required: false,

@@ -10,7 +10,7 @@ export const getCount = async (db: dbClient) => {
   return result[0]?.count ?? 0;
 };
 
-export const getById = async (db: dbClient, publicId: string) => {
+export const getById = async (db: dbClient, id: number) => {
   return await db.query.users.findFirst({
     columns: {
       publicId: true,
@@ -30,7 +30,7 @@ export const getById = async (db: dbClient, publicId: string) => {
         limit: 1,
       },
     },
-    where: eq(users.publicId, publicId),
+    where: eq(users.id, id),
   });
 };
 

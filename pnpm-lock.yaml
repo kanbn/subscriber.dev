@@ -6,37 +6,12 @@ settings:
 
 catalogs:
   default:
-    '@tanstack/react-query':
-      specifier: ^5.59.15
-      version: 5.85.6
-    eslint:
-      specifier: ^9.12.0
-      version: 9.34.0
     prettier:
       specifier: ^3.3.3
       version: 3.6.2
-    tailwindcss:
-      specifier: ^3.4.14
-      version: 3.4.17
     typescript:
       specifier: ^5.6.3
       version: 5.9.2
-    zod:
-      specifier: ^3.23.8
-      version: 3.25.76
-  react18:
-    '@types/react':
-      specifier: ^18.3.11
-      version: 18.3.24
-    '@types/react-dom':
-      specifier: ^18.3.1
-      version: 18.3.7
-    react:
-      specifier: 18.3.1
-      version: 18.3.1
-    react-dom:
-      specifier: 18.3.1
-      version: 18.3.1
 
 overrides:
   '@types/minimatch': npm:minimatch@*
@@ -12936,7 +12911,7 @@ snapshots:
   '@types/glob@8.1.0':
     dependencies:
       '@types/minimatch': minimatch@10.1.1
-      '@types/node': 20.19.26
+      '@types/node': 25.0.0
 
   '@types/hast@2.3.10':
     dependencies:

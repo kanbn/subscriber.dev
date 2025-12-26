@@ -28,14 +28,9 @@ export class AuthGuard implements CanActivate {
     }
 
     const db = createDrizzleClient();
-    const baseAuth = initAuth(db);
-    const auth = {
-      api: {
-        getSession: () => baseAuth.api.getSession({ headers }),
-      },
-    };
+    const auth = initAuth(db);
 
-    const session = await auth.api.getSession();
+    const session = await auth.api.getSession({ headers });
 
     if (!session?.user) {
       throw new UnauthorizedException("User not authenticated");

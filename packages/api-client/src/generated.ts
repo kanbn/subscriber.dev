@@ -45,6 +45,52 @@ export interface TestRequestDto {
   message?: string;
 }
 
+export type GetWorkspaceResponseDtoWorkspace = {
+  id?: number;
+  publicId?: string;
+  name?: string;
+  slug?: string;
+};
+
+export type GetWorkspaceResponseDtoEnvironment = {
+  id?: number;
+  publicId?: string;
+  name?: string;
+  slug?: string;
+};
+
+export interface GetWorkspaceResponseDto {
+  workspace: GetWorkspaceResponseDtoWorkspace;
+  environment: GetWorkspaceResponseDtoEnvironment;
+}
+
+export interface CreateWorkspaceDto {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: string;
+}
+
+export type CreateWorkspaceResponseDtoWorkspace = {
+  id?: number;
+  publicId?: string;
+  name?: string;
+  slug?: string;
+};
+
+export type CreateWorkspaceResponseDtoEnvironment = {
+  id?: number;
+  publicId?: string;
+  name?: string;
+  slug?: string;
+};
+
+export interface CreateWorkspaceResponseDto {
+  workspace: CreateWorkspaceResponseDtoWorkspace;
+  environment: CreateWorkspaceResponseDtoEnvironment;
+}
+
 /**
  * @summary Get current user
  */
@@ -462,6 +508,217 @@ export const useCreateTest = <TError = unknown,
       > => {
 
       const mutationOptions = getCreateTestMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get user's workspaces
+ */
+export type getWorkspacesResponse200 = {
+  data: GetWorkspaceResponseDto[]
+  status: 200
+}
+    
+export type getWorkspacesResponseSuccess = (getWorkspacesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getWorkspacesResponse = (getWorkspacesResponseSuccess)
+
+export const getGetWorkspacesUrl = () => {
+
+
+  
+
+  return `http://localhost:3001/workspaces`
+}
+
+export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspacesResponse> => {
+  
+  const res = await fetch(getGetWorkspacesUrl(),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: getWorkspacesResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getWorkspacesResponse
+}
+
+
+
+
+
+export const getGetWorkspacesQueryKey = () => {
+    return [
+    `http://localhost:3001/workspaces`
+    ] as const;
+    }
+
+    
+export const getGetWorkspacesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, fetch?: RequestInit}
+) => {
+
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaces>>> = ({ signal }) => getWorkspaces({ signal, ...fetchOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetWorkspacesQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspaces>>>
+export type GetWorkspacesQueryError = unknown
+
+
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspaces>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspaces>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspaces>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspaces>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary Get user's workspaces
+ */
+
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getGetWorkspacesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a new workspace
+ */
+export type createWorkspaceResponse201 = {
+  data: CreateWorkspaceResponseDto
+  status: 201
+}
+    
+export type createWorkspaceResponseSuccess = (createWorkspaceResponse201) & {
+  headers: Headers;
+};
+;
+
+export type createWorkspaceResponse = (createWorkspaceResponseSuccess)
+
+export const getCreateWorkspaceUrl = () => {
+
+
+  
+
+  return `http://localhost:3001/workspaces`
+}
+
+export const createWorkspace = async (createWorkspaceDto: CreateWorkspaceDto, options?: RequestInit): Promise<createWorkspaceResponse> => {
+  
+  const res = await fetch(getCreateWorkspaceUrl(),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createWorkspaceDto,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: createWorkspaceResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createWorkspaceResponse
+}
+
+
+
+
+export const getCreateWorkspaceMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext> => {
+
+const mutationKey = ['createWorkspace'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkspace>>, {data: CreateWorkspaceDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createWorkspace(data,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateWorkspaceMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkspace>>>
+    export type CreateWorkspaceMutationBody = CreateWorkspaceDto
+    export type CreateWorkspaceMutationError = unknown
+
+    /**
+ * @summary Create a new workspace
+ */
+export const useCreateWorkspace = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createWorkspace>>,
+        TError,
+        {data: CreateWorkspaceDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateWorkspaceMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

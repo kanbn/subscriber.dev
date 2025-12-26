@@ -1,12 +1,10 @@
-import { Module } from '@nestjs/common';
-import { UserModule } from './modules/user/user.module.js';
-import { TestModule } from './modules/test/test.module.js';
+import { Module } from "@nestjs/common";
+
+import { TestModule } from "./modules/test/test.module.js";
+import { UserModule } from "./modules/user/user.module.js";
+import { WorkspaceModule } from "./modules/workspace/workspace.module.js";
 
 @Module({
-  imports: [
-    UserModule,
-    TestModule,
-  ],
+  imports: [UserModule, TestModule, WorkspaceModule],
 })
 export class AppModule {}
-

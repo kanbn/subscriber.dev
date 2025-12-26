@@ -5,7 +5,7 @@ import * as userRepo from "@subscriber.dev/db/repository/user.repo";
 
 @Injectable()
 export class UserService {
-  async getUser(db: dbClient, userId: string) {
+  async getUser(db: dbClient, userId: number) {
     const result = await userRepo.getById(db, userId);
 
     if (!result) {
