@@ -167,6 +167,60 @@
           }
         ]
       }
+    },
+    "/environments/{environmentId}/subscribers": {
+      "post": {
+        "operationId": "createSubscriber",
+        "summary": "Create a new subscriber",
+        "description": "Creates a new subscriber in the specified environment and initialises their preferences",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the environment",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscriberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Subscriber created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSubscriberResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error or duplicate subscriber"
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "tags": [
+          "Subscribers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -349,6 +403,126 @@
         "required": [
           "workspace",
           "environment"
+        ]
+      },
+      "CreateSubscriberDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {},
+            "selfRequired": false
+          },
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "boolean",
+                "default": true
+              }
+            },
+            "default": {
+              "email": true
+            },
+            "selfRequired": false
+          }
+        },
+        "required": [
+          "attributes",
+          "preferences"
+        ]
+      },
+      "CreateSubscriberResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscriber": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "publicId": {
+                "type": "string"
+              },
+              "environmentId": {
+                "type": "number"
+              },
+              "email": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
+              "externalId": {
+                "type": "string",
+                "nullable": true
+              },
+              "firstName": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastName": {
+                "type": "string",
+                "nullable": true
+              },
+              "name": {
+                "type": "string",
+                "nullable": true
+              },
+              "attributes": {
+                "type": "object",
+                "additionalProperties": {},
+                "nullable": true
+              },
+              "createdAt": {},
+              "updatedAt": {}
+            },
+            "selfRequired": true
+          },
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "subscriberId": {
+                "type": "number"
+              },
+              "email": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "number"
+              },
+              "createdAt": {}
+            },
+            "selfRequired": true
+          }
+        },
+        "required": [
+          "subscriber",
+          "preferences"
         ]
       }
     }

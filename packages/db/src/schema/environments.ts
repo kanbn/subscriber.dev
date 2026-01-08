@@ -12,6 +12,7 @@ import {
 
 import { generateUID } from "@subscriber.dev/shared/utils";
 
+import { subscribers } from "./subscribers";
 import { users } from "./users";
 import { workspaces } from "./workspaces";
 
@@ -56,9 +57,13 @@ export const environments = pgTable(
   ],
 );
 
-export const environmentsRelations = relations(environments, ({ one }) => ({
-  workspace: one(workspaces, {
-    fields: [environments.workspaceId],
-    references: [workspaces.id],
+export const environmentsRelations = relations(
+  environments,
+  ({ one, many }) => ({
+    workspace: one(workspaces, {
+      fields: [environments.workspaceId],
+      references: [workspaces.id],
+    }),
+    subscribers: many(subscribers),
   }),
-}));
+);

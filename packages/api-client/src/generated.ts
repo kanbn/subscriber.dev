@@ -91,6 +91,63 @@ export interface CreateWorkspaceResponseDto {
   environment: CreateWorkspaceResponseDtoEnvironment;
 }
 
+export type CreateSubscriberDtoAttributes = {[key: string]: unknown};
+
+export type CreateSubscriberDtoPreferences = {
+  email?: boolean;
+};
+
+export interface CreateSubscriberDto {
+  email?: string;
+  phone?: string;
+  externalId?: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  attributes: CreateSubscriberDtoAttributes;
+  preferences: CreateSubscriberDtoPreferences;
+}
+
+/**
+ * @nullable
+ */
+export type CreateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+
+export type CreateSubscriberResponseDtoSubscriber = {
+  id?: number;
+  publicId?: string;
+  environmentId?: number;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  externalId?: string | null;
+  /** @nullable */
+  firstName?: string | null;
+  /** @nullable */
+  lastName?: string | null;
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  attributes?: CreateSubscriberResponseDtoSubscriberAttributes;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+};
+
+export type CreateSubscriberResponseDtoPreferences = {
+  id?: number;
+  subscriberId?: number;
+  email?: boolean;
+  version?: number;
+  createdAt?: unknown;
+};
+
+export interface CreateSubscriberResponseDto {
+  subscriber: CreateSubscriberResponseDtoSubscriber;
+  preferences: CreateSubscriberResponseDtoPreferences;
+}
+
 /**
  * @summary Get current user
  */
@@ -719,6 +776,111 @@ export const useCreateWorkspace = <TError = unknown,
       > => {
 
       const mutationOptions = getCreateWorkspaceMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Creates a new subscriber in the specified environment and initialises their preferences
+ * @summary Create a new subscriber
+ */
+export type createSubscriberResponse201 = {
+  data: CreateSubscriberResponseDto
+  status: 201
+}
+
+export type createSubscriberResponse400 = {
+  data: void
+  status: 400
+}
+
+export type createSubscriberResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type createSubscriberResponseSuccess = (createSubscriberResponse201) & {
+  headers: Headers;
+};
+export type createSubscriberResponseError = (createSubscriberResponse400 | createSubscriberResponse404) & {
+  headers: Headers;
+};
+
+export type createSubscriberResponse = (createSubscriberResponseSuccess | createSubscriberResponseError)
+
+export const getCreateSubscriberUrl = (environmentId: string,) => {
+
+
+  
+
+  return `http://localhost:3001/environments/${environmentId}/subscribers`
+}
+
+export const createSubscriber = async (environmentId: string,
+    createSubscriberDto: CreateSubscriberDto, options?: RequestInit): Promise<createSubscriberResponse> => {
+  
+  const res = await fetch(getCreateSubscriberUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createSubscriberDto,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: createSubscriberResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createSubscriberResponse
+}
+
+
+
+
+export const getCreateSubscriberMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext> => {
+
+const mutationKey = ['createSubscriber'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSubscriber>>, {environmentId: string;data: CreateSubscriberDto}> = (props) => {
+          const {environmentId,data} = props ?? {};
+
+          return  createSubscriber(environmentId,data,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSubscriberMutationResult = NonNullable<Awaited<ReturnType<typeof createSubscriber>>>
+    export type CreateSubscriberMutationBody = CreateSubscriberDto
+    export type CreateSubscriberMutationError = void
+
+    /**
+ * @summary Create a new subscriber
+ */
+export const useCreateSubscriber = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createSubscriber>>,
+        TError,
+        {environmentId: string;data: CreateSubscriberDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateSubscriberMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
