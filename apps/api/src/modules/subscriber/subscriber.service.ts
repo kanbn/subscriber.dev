@@ -21,18 +21,35 @@ interface CreateSubscriberData {
   createdBy: number;
 }
 
+interface UpdatePreferencesData {
+  subscriberId: number;
+  email?: boolean;
+}
+
 @Injectable()
 export class SubscriberService {
   async createSubscriber(
     db: dbClient,
     data: CreateSubscriberData,
   ): Promise<{
-    subscriber: NonNullable<
-      Awaited<ReturnType<typeof subscriberRepo.createSubscriber>>
-    >;
-    preferences: NonNullable<
-      Awaited<ReturnType<typeof subscriberRepo.createSubscriberPreferences>>
-    >;
+    subscriber: {
+      publicId: string;
+      email: string | null;
+      phone: string | null;
+      externalId: string | null;
+      firstName: string | null;
+      lastName: string | null;
+      name: string | null;
+      attributes: Record<string, unknown> | null;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+    preferences: {
+      publicId: string;
+      email: boolean;
+      version: number;
+      createdAt: Date;
+    };
   }> {
     // Verify environment exists
     const environment = await subscriberRepo.getEnvironmentById(
@@ -111,8 +128,76 @@ export class SubscriberService {
     }
 
     return {
-      subscriber,
-      preferences,
+      subscriber: {
+        publicId: subscriber.publicId,
+        email: subscriber.email,
+        phone: subscriber.phone,
+        externalId: subscriber.externalId,
+        firstName: subscriber.firstName,
+        lastName: subscriber.lastName,
+        name: subscriber.name,
+        attributes: subscriber.attributes,
+        createdAt: subscriber.createdAt,
+        updatedAt: subscriber.updatedAt,
+      },
+      preferences: {
+        publicId: preferences.publicId,
+        email: preferences.email,
+        version: preferences.version,
+        createdAt: preferences.createdAt,
+      },
+    };
+  }
+
+  async updatePreferences(
+    db: dbClient,
+    data: UpdatePreferencesData,
+  ): Promise<{
+    preferences: {
+      publicId: string;
+      subscriberPublicId: string;
+      email: boolean;
+      version: number;
+      createdAt: Date;
+    };
+  }> {
+    // Verify subscriber exists
+    const subscriber = await subscriberRepo.getSubscriberById(
+      db,
+      data.subscriberId,
+    );
+    if (!subscriber) {
+      throw new NotFoundException("Subscriber not found");
+    }
+
+    // Get latest preferences to merge with new values
+    const latestPreferences = await subscriberRepo.getLatestPreferences(
+      db,
+      data.subscriberId,
+    );
+
+    if (!latestPreferences) {
+      throw new NotFoundException("Subscriber preferences not found");
+    }
+
+    // Create new preference record with updated values
+    const preferences = await subscriberRepo.createSubscriberPreferences(db, {
+      subscriberId: data.subscriberId,
+      email: data.email ?? latestPreferences.email,
+    });
+
+    if (!preferences) {
+      throw new InternalServerErrorException("Failed to update preferences");
+    }
+
+    return {
+      preferences: {
+        publicId: preferences.publicId,
+        subscriberPublicId: subscriber.publicId,
+        email: preferences.email,
+        version: preferences.version,
+        createdAt: preferences.createdAt,
+      },
     };
   }
 }

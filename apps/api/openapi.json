@@ -221,6 +221,66 @@
           }
         ]
       }
+    },
+    "/environments/{environmentId}/subscribers/{subscriberId}/preferences": {
+      "patch": {
+        "operationId": "updateSubscriberPreferences",
+        "summary": "Update subscriber preferences",
+        "description": "Creates a new preference record with updated values (immutable pattern)",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the environment",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "description": "The public ID of the subscriber",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePreferencesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferences updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdatePreferencesResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscriber or preferences not found"
+          }
+        },
+        "tags": [
+          "Subscribers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -457,14 +517,8 @@
           "subscriber": {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "number"
-              },
               "publicId": {
                 "type": "string"
-              },
-              "environmentId": {
-                "type": "number"
               },
               "email": {
                 "type": "string",
@@ -503,11 +557,8 @@
           "preferences": {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "number"
-              },
-              "subscriberId": {
-                "type": "number"
+              "publicId": {
+                "type": "string"
               },
               "email": {
                 "type": "boolean"
@@ -522,6 +573,41 @@
         },
         "required": [
           "subscriber",
+          "preferences"
+        ]
+      },
+      "UpdatePreferencesDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdatePreferencesResponseDto": {
+        "type": "object",
+        "properties": {
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "subscriberPublicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "number"
+              },
+              "createdAt": {}
+            },
+            "selfRequired": true
+          }
+        },
+        "required": [
           "preferences"
         ]
       }

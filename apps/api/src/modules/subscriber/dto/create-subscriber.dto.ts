@@ -18,9 +18,7 @@ export const CreateSubscriberSchema = z.object({
 });
 
 export const SubscriberSchema = z.object({
-  id: z.number(),
   publicId: z.string(),
-  environmentId: z.number(),
   email: z.string().nullable(),
   phone: z.string().nullable(),
   externalId: z.string().nullable(),
@@ -33,8 +31,7 @@ export const SubscriberSchema = z.object({
 });
 
 export const SubscriberPreferencesSchema = z.object({
-  id: z.number(),
-  subscriberId: z.number(),
+  publicId: z.string(),
   email: z.boolean(),
   version: z.number(),
   createdAt: z.date(),

@@ -6,6 +6,7 @@ import {
   subscriberPreferences,
   subscribers,
 } from "@subscriber.dev/db/schema";
+import { generateUID } from "@subscriber.dev/shared/utils";
 
 export const getEnvironmentById = async (
   db: dbClient,
@@ -76,6 +77,7 @@ export const createSubscriber = async (
   const [result] = await db
     .insert(subscribers)
     .values({
+      publicId: generateUID(),
       environmentId: data.environmentId,
       email: data.email ?? null,
       phone: data.phone ?? null,
@@ -118,6 +120,7 @@ export const createSubscriberPreferences = async (
   const [result] = await db
     .insert(subscriberPreferences)
     .values({
+      publicId: generateUID(),
       subscriberId: data.subscriberId,
       email: data.email,
       version: nextVersion,

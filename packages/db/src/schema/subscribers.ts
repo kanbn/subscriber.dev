@@ -85,6 +85,10 @@ export const subscriberPreferences = pgTable(
   "subscriber_preferences",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
+    publicId: text("publicId")
+      .notNull()
+      .unique()
+      .$defaultFn(() => generateUID()),
     subscriberId: bigserial("subscriberId", { mode: "number" })
       .notNull()
       .references(() => subscribers.id, { onDelete: "cascade" }),
@@ -98,6 +102,7 @@ export const subscriberPreferences = pgTable(
       table.version,
     ),
     index("subscriber_preferences_subscriberId_idx").on(table.subscriberId),
+    index("subscriber_preferences_publicId_idx").on(table.publicId),
   ],
 );
 

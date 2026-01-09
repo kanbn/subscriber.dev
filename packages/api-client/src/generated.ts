@@ -114,9 +114,7 @@ export interface CreateSubscriberDto {
 export type CreateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
 
 export type CreateSubscriberResponseDtoSubscriber = {
-  id?: number;
   publicId?: string;
-  environmentId?: number;
   /** @nullable */
   email?: string | null;
   /** @nullable */
@@ -136,8 +134,7 @@ export type CreateSubscriberResponseDtoSubscriber = {
 };
 
 export type CreateSubscriberResponseDtoPreferences = {
-  id?: number;
-  subscriberId?: number;
+  publicId?: string;
   email?: boolean;
   version?: number;
   createdAt?: unknown;
@@ -146,6 +143,22 @@ export type CreateSubscriberResponseDtoPreferences = {
 export interface CreateSubscriberResponseDto {
   subscriber: CreateSubscriberResponseDtoSubscriber;
   preferences: CreateSubscriberResponseDtoPreferences;
+}
+
+export interface UpdatePreferencesDto {
+  email?: boolean;
+}
+
+export type UpdatePreferencesResponseDtoPreferences = {
+  publicId?: string;
+  subscriberPublicId?: string;
+  email?: boolean;
+  version?: number;
+  createdAt?: unknown;
+};
+
+export interface UpdatePreferencesResponseDto {
+  preferences: UpdatePreferencesResponseDtoPreferences;
 }
 
 /**
@@ -881,6 +894,108 @@ export const useCreateSubscriber = <TError = void,
       > => {
 
       const mutationOptions = getCreateSubscriberMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Creates a new preference record with updated values (immutable pattern)
+ * @summary Update subscriber preferences
+ */
+export type updateSubscriberPreferencesResponse200 = {
+  data: UpdatePreferencesResponseDto
+  status: 200
+}
+
+export type updateSubscriberPreferencesResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type updateSubscriberPreferencesResponseSuccess = (updateSubscriberPreferencesResponse200) & {
+  headers: Headers;
+};
+export type updateSubscriberPreferencesResponseError = (updateSubscriberPreferencesResponse404) & {
+  headers: Headers;
+};
+
+export type updateSubscriberPreferencesResponse = (updateSubscriberPreferencesResponseSuccess | updateSubscriberPreferencesResponseError)
+
+export const getUpdateSubscriberPreferencesUrl = (environmentId: string,
+    subscriberId: string,) => {
+
+
+  
+
+  return `http://localhost:3001/environments/${environmentId}/subscribers/${subscriberId}/preferences`
+}
+
+export const updateSubscriberPreferences = async (environmentId: string,
+    subscriberId: string,
+    updatePreferencesDto: UpdatePreferencesDto, options?: RequestInit): Promise<updateSubscriberPreferencesResponse> => {
+  
+  const res = await fetch(getUpdateSubscriberPreferencesUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updatePreferencesDto,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: updateSubscriberPreferencesResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as updateSubscriberPreferencesResponse
+}
+
+
+
+
+export const getUpdateSubscriberPreferencesMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext> => {
+
+const mutationKey = ['updateSubscriberPreferences'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubscriberPreferences>>, {environmentId: string;subscriberId: string;data: UpdatePreferencesDto}> = (props) => {
+          const {environmentId,subscriberId,data} = props ?? {};
+
+          return  updateSubscriberPreferences(environmentId,subscriberId,data,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSubscriberPreferencesMutationResult = NonNullable<Awaited<ReturnType<typeof updateSubscriberPreferences>>>
+    export type UpdateSubscriberPreferencesMutationBody = UpdatePreferencesDto
+    export type UpdateSubscriberPreferencesMutationError = void
+
+    /**
+ * @summary Update subscriber preferences
+ */
+export const useUpdateSubscriberPreferences = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSubscriberPreferences>>,
+        TError,
+        {environmentId: string;subscriberId: string;data: UpdatePreferencesDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateSubscriberPreferencesMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

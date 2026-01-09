@@ -5,6 +5,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from "@nestjs/common";
@@ -26,6 +27,10 @@ import {
   CreateSubscriberDto,
   CreateSubscriberResponseDto,
 } from "./dto/create-subscriber.dto.js";
+import {
+  UpdatePreferencesDto,
+  UpdatePreferencesResponseDto,
+} from "./dto/update-preferences.dto.js";
 import { SubscriberService } from "./subscriber.service.js";
 
 @ApiTags("Subscribers")
@@ -89,6 +94,70 @@ export class SubscriberController {
       attributes: input.attributes ?? null,
       emailPreference: input.preferences?.email ?? true,
       createdBy: user.id,
+    });
+  }
+
+  @Patch(":subscriberId/preferences")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "updateSubscriberPreferences",
+    summary: "Update subscriber preferences",
+    description:
+      "Creates a new preference record with updated values (immutable pattern)",
+  })
+  @ApiParam({
+    name: "environmentId",
+    description: "The ID of the environment",
+    type: "string",
+  })
+  @ApiParam({
+    name: "subscriberId",
+    description: "The public ID of the subscriber",
+    type: "string",
+  })
+  @ApiResponse({
+    status: 200,
+    type: UpdatePreferencesResponseDto,
+    description: "Preferences updated successfully",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Subscriber or preferences not found",
+  })
+  async updatePreferences(
+    @CurrentUser() user: User,
+    @Param("environmentId") environmentId: string,
+    @Param("subscriberId") subscriberId: string,
+    @Body() input: UpdatePreferencesDto,
+  ): Promise<UpdatePreferencesResponseDto> {
+    const db = createDrizzleClient();
+
+    // Verify environment exists
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    // Get subscriber by publicId
+    const subscriber = await subscriberRepo.getSubscriberByPublicId(
+      db,
+      subscriberId,
+    );
+    if (!subscriber) {
+      throw new NotFoundException("Subscriber not found");
+    }
+
+    // Verify subscriber belongs to environment
+    if (subscriber.environmentId !== environment.id) {
+      throw new NotFoundException("Subscriber not found in this environment");
+    }
+
+    return this.subscriberService.updatePreferences(db, {
+      subscriberId: subscriber.id,
+      email: input.email,
     });
   }
 }
