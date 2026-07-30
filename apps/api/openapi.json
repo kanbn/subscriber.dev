@@ -483,6 +483,42 @@
           }
         ]
       }
+    },
+    "/unsubscribe": {
+      "get": {
+        "operationId": "unsubscribe",
+        "summary": "Unsubscribe via email link",
+        "description": "Public endpoint for one-click unsubscribe links embedded in emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsubscribeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid or expired unsubscribe link"
+          }
+        },
+        "tags": [
+          "Unsubscribe"
+        ]
+      }
     }
   },
   "info": {
@@ -1057,6 +1093,17 @@
         },
         "required": [
           "preferences"
+        ]
+      },
+      "UnsubscribeResponseDto": {
+        "type": "object",
+        "properties": {
+          "unsubscribed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "unsubscribed"
         ]
       }
     }

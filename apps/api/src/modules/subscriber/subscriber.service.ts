@@ -7,7 +7,10 @@ import {
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
-import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
+import {
+  createEmailUnsubscribeLink,
+  verifyEmailUnsubscribeToken,
+} from "@subscriber.dev/shared/utils";
 
 interface CreateSubscriberData {
   environmentId: number;
@@ -316,5 +319,44 @@ export class SubscriberService {
     if (!deleted) {
       throw new NotFoundException("Subscriber not found");
     }
+  }
+
+  async unsubscribeByToken(
+    db: dbClient,
+    token: string,
+  ): Promise<{ unsubscribed: boolean }> {
+    const subscriberPublicId = await verifyEmailUnsubscribeToken(token);
+    if (!subscriberPublicId) {
+      throw new NotFoundException("Invalid or expired unsubscribe link");
+    }
+
+    const subscriber = await subscriberRepo.getSubscriberByPublicId(
+      db,
+      subscriberPublicId,
+    );
+    if (!subscriber) {
+      throw new NotFoundException("Invalid or expired unsubscribe link");
+    }
+
+    const latestPreferences = await subscriberRepo.getLatestPreferences(
+      db,
+      subscriber.id,
+    );
+
+    if (latestPreferences && !latestPreferences.email) {
+      // Already unsubscribed - no-op so repeat clicks don't churn out versions.
+      return { unsubscribed: true };
+    }
+
+    const preferences = await subscriberRepo.createSubscriberPreferences(db, {
+      subscriberId: subscriber.id,
+      email: false,
+    });
+
+    if (!preferences) {
+      throw new InternalServerErrorException("Failed to unsubscribe");
+    }
+
+    return { unsubscribed: true };
   }
 }

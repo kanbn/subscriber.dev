@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as repo from "@subscriber.dev/db/repository/subscriber.repo";
+import * as sharedUtils from "@subscriber.dev/shared/utils";
 
 import { SubscriberService } from "../subscriber.service.js";
 
@@ -25,6 +26,7 @@ vi.mock("@subscriber.dev/shared/utils", () => ({
   createEmailUnsubscribeLink: vi.fn((publicId: string) =>
     Promise.resolve(`https://api.example.com/unsubscribe?token=${publicId}`),
   ),
+  verifyEmailUnsubscribeToken: vi.fn(),
 }));
 
 // ---------------------------------------------------------------------------
@@ -344,5 +346,74 @@ describe("createSubscriber", () => {
 
     expect(result.subscriber.publicId).toBe("sub_abc");
     expect(result.preferences.email).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// unsubscribeByToken
+// ---------------------------------------------------------------------------
+
+describe("unsubscribeByToken", () => {
+  it("throws NotFoundException for an invalid token", async () => {
+    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue(null);
+
+    await expect(
+      service.unsubscribeByToken(mockDb, "bad-token"),
+    ).rejects.toThrow(NotFoundException);
+    expect(repo.getSubscriberByPublicId).not.toHaveBeenCalled();
+  });
+
+  it("throws NotFoundException when the subscriber no longer exists", async () => {
+    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue(
+      "sub_abc",
+    );
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(undefined);
+
+    await expect(
+      service.unsubscribeByToken(mockDb, "good-token"),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it("creates a new preference version turning email off", async () => {
+    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue(
+      "sub_abc",
+    );
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.getLatestPreferences).mockResolvedValue(
+      mockPreferences as any,
+    );
+    vi.mocked(repo.createSubscriberPreferences).mockResolvedValue({
+      ...mockPreferences,
+      email: false,
+      version: 2,
+    } as any);
+
+    const result = await service.unsubscribeByToken(mockDb, "good-token");
+
+    expect(result).toEqual({ unsubscribed: true });
+    expect(repo.createSubscriberPreferences).toHaveBeenCalledWith(mockDb, {
+      subscriberId: 1,
+      email: false,
+    });
+  });
+
+  it("is a no-op when already unsubscribed", async () => {
+    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue(
+      "sub_abc",
+    );
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.getLatestPreferences).mockResolvedValue({
+      ...mockPreferences,
+      email: false,
+    } as any);
+
+    const result = await service.unsubscribeByToken(mockDb, "good-token");
+
+    expect(result).toEqual({ unsubscribed: true });
+    expect(repo.createSubscriberPreferences).not.toHaveBeenCalled();
   });
 });
