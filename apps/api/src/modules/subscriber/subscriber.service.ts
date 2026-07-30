@@ -7,6 +7,7 @@ import {
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
+import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
 
 interface CreateSubscriberData {
   environmentId: number;
@@ -38,24 +39,42 @@ interface UpdateSubscriberData {
   updatedBy: number;
 }
 
+interface SubscriberRow {
+  publicId: string;
+  email: string | null;
+  phone: string | null;
+  externalId: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  name: string | null;
+  attributes: Record<string, unknown> | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 @Injectable()
 export class SubscriberService {
+  private async toSubscriberDto(subscriber: SubscriberRow) {
+    return {
+      publicId: subscriber.publicId,
+      email: subscriber.email,
+      phone: subscriber.phone,
+      externalId: subscriber.externalId,
+      firstName: subscriber.firstName,
+      lastName: subscriber.lastName,
+      name: subscriber.name,
+      attributes: subscriber.attributes,
+      createdAt: subscriber.createdAt,
+      updatedAt: subscriber.updatedAt,
+      unsubscribeUrl: await createEmailUnsubscribeLink(subscriber.publicId),
+    };
+  }
+
   async createSubscriber(
     db: dbClient,
     data: CreateSubscriberData,
   ): Promise<{
-    subscriber: {
-      publicId: string;
-      email: string | null;
-      phone: string | null;
-      externalId: string | null;
-      firstName: string | null;
-      lastName: string | null;
-      name: string | null;
-      attributes: Record<string, unknown> | null;
-      createdAt: Date;
-      updatedAt: Date;
-    };
+    subscriber: SubscriberRow & { unsubscribeUrl: string | null };
     preferences: {
       publicId: string;
       email: boolean;
@@ -140,18 +159,7 @@ export class SubscriberService {
     }
 
     return {
-      subscriber: {
-        publicId: subscriber.publicId,
-        email: subscriber.email,
-        phone: subscriber.phone,
-        externalId: subscriber.externalId,
-        firstName: subscriber.firstName,
-        lastName: subscriber.lastName,
-        name: subscriber.name,
-        attributes: subscriber.attributes,
-        createdAt: subscriber.createdAt,
-        updatedAt: subscriber.updatedAt,
-      },
+      subscriber: await this.toSubscriberDto(subscriber),
       preferences: {
         publicId: preferences.publicId,
         email: preferences.email,
@@ -233,18 +241,7 @@ export class SubscriberService {
     );
 
     return {
-      subscriber: {
-        publicId: subscriber.publicId,
-        email: subscriber.email,
-        phone: subscriber.phone,
-        externalId: subscriber.externalId,
-        firstName: subscriber.firstName,
-        lastName: subscriber.lastName,
-        name: subscriber.name,
-        attributes: subscriber.attributes,
-        createdAt: subscriber.createdAt,
-        updatedAt: subscriber.updatedAt,
-      },
+      subscriber: await this.toSubscriberDto(subscriber),
       preferences: preferences
         ? {
             publicId: preferences.publicId,
@@ -264,18 +261,7 @@ export class SubscriberService {
     const rows = await subscriberRepo.listSubscribers(db, environmentId, opts);
 
     return {
-      subscribers: rows.map((s) => ({
-        publicId: s.publicId,
-        email: s.email,
-        phone: s.phone,
-        externalId: s.externalId,
-        firstName: s.firstName,
-        lastName: s.lastName,
-        name: s.name,
-        attributes: s.attributes,
-        createdAt: s.createdAt,
-        updatedAt: s.updatedAt,
-      })),
+      subscribers: await Promise.all(rows.map((s) => this.toSubscriberDto(s))),
       limit: opts.limit,
       offset: opts.offset,
     };
@@ -302,18 +288,7 @@ export class SubscriberService {
     }
 
     return {
-      subscriber: {
-        publicId: subscriber.publicId,
-        email: subscriber.email,
-        phone: subscriber.phone,
-        externalId: subscriber.externalId,
-        firstName: subscriber.firstName,
-        lastName: subscriber.lastName,
-        name: subscriber.name,
-        attributes: subscriber.attributes,
-        createdAt: subscriber.createdAt,
-        updatedAt: subscriber.updatedAt,
-      },
+      subscriber: await this.toSubscriberDto(subscriber),
     };
   }
 

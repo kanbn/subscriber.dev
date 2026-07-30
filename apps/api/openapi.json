@@ -708,7 +708,11 @@
                   "nullable": true
                 },
                 "createdAt": {},
-                "updatedAt": {}
+                "updatedAt": {},
+                "unsubscribeUrl": {
+                  "type": "string",
+                  "nullable": true
+                }
               },
               "required": [
                 "publicId",
@@ -720,7 +724,8 @@
                 "name",
                 "attributes",
                 "createdAt",
-                "updatedAt"
+                "updatedAt",
+                "unsubscribeUrl"
               ]
             }
           },
@@ -776,7 +781,11 @@
                 "nullable": true
               },
               "createdAt": {},
-              "updatedAt": {}
+              "updatedAt": {},
+              "unsubscribeUrl": {
+                "type": "string",
+                "nullable": true
+              }
             },
             "selfRequired": true
           },
@@ -888,7 +897,11 @@
                 "nullable": true
               },
               "createdAt": {},
-              "updatedAt": {}
+              "updatedAt": {},
+              "unsubscribeUrl": {
+                "type": "string",
+                "nullable": true
+              }
             },
             "selfRequired": true
           },
@@ -998,7 +1011,11 @@
                 "nullable": true
               },
               "createdAt": {},
-              "updatedAt": {}
+              "updatedAt": {},
+              "unsubscribeUrl": {
+                "type": "string",
+                "nullable": true
+              }
             },
             "selfRequired": true
           }

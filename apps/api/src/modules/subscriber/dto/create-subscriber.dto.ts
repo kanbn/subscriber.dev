@@ -28,6 +28,7 @@ export const SubscriberSchema = z.object({
   attributes: z.record(z.unknown()).nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  unsubscribeUrl: z.string().nullable(),
 });
 
 export const SubscriberPreferencesSchema = z.object({

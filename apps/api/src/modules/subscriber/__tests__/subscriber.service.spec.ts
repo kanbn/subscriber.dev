@@ -1,7 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
+import * as repo from "@subscriber.dev/db/repository/subscriber.repo";
+
+import { SubscriberService } from "../subscriber.service.js";
 
 // Mock the entire repo module before importing the service
 vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
@@ -18,8 +21,11 @@ vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
   getLatestPreferences: vi.fn(),
 }));
 
-import * as repo from "@subscriber.dev/db/repository/subscriber.repo";
-import { SubscriberService } from "../subscriber.service.js";
+vi.mock("@subscriber.dev/shared/utils", () => ({
+  createEmailUnsubscribeLink: vi.fn((publicId: string) =>
+    Promise.resolve(`https://api.example.com/unsubscribe?token=${publicId}`),
+  ),
+}));
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -79,17 +85,26 @@ beforeEach(() => {
 
 describe("getSubscriber", () => {
   it("returns subscriber and preferences when found in the correct environment", async () => {
-    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(mockSubscriber as any);
-    vi.mocked(repo.getLatestPreferences).mockResolvedValue(mockPreferences as any);
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.getLatestPreferences).mockResolvedValue(
+      mockPreferences as any,
+    );
 
     const result = await service.getSubscriber(mockDb, 10, "sub_abc");
 
     expect(result.subscriber.publicId).toBe("sub_abc");
+    expect(result.subscriber.unsubscribeUrl).toBe(
+      "https://api.example.com/unsubscribe?token=sub_abc",
+    );
     expect(result.preferences?.email).toBe(true);
   });
 
   it("returns null preferences when none exist yet", async () => {
-    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(mockSubscriber as any);
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
+      mockSubscriber as any,
+    );
     vi.mocked(repo.getLatestPreferences).mockResolvedValue(undefined);
 
     const result = await service.getSubscriber(mockDb, 10, "sub_abc");
@@ -99,9 +114,9 @@ describe("getSubscriber", () => {
   it("throws NotFoundException when subscriber does not exist", async () => {
     vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(undefined);
 
-    await expect(service.getSubscriber(mockDb, 10, "sub_missing")).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.getSubscriber(mockDb, 10, "sub_missing"),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it("throws NotFoundException when subscriber belongs to a different environment", async () => {
@@ -124,10 +139,16 @@ describe("listSubscribers", () => {
   it("returns mapped subscribers and pagination info", async () => {
     vi.mocked(repo.listSubscribers).mockResolvedValue([mockSubscriber] as any);
 
-    const result = await service.listSubscribers(mockDb, 10, { limit: 20, offset: 0 });
+    const result = await service.listSubscribers(mockDb, 10, {
+      limit: 20,
+      offset: 0,
+    });
 
     expect(result.subscribers).toHaveLength(1);
     expect(result.subscribers[0]?.publicId).toBe("sub_abc");
+    expect(result.subscribers[0]?.unsubscribeUrl).toBe(
+      "https://api.example.com/unsubscribe?token=sub_abc",
+    );
     expect(result.limit).toBe(20);
     expect(result.offset).toBe(0);
   });
@@ -135,7 +156,10 @@ describe("listSubscribers", () => {
   it("returns empty array when no subscribers exist", async () => {
     vi.mocked(repo.listSubscribers).mockResolvedValue([]);
 
-    const result = await service.listSubscribers(mockDb, 10, { limit: 20, offset: 0 });
+    const result = await service.listSubscribers(mockDb, 10, {
+      limit: 20,
+      offset: 0,
+    });
     expect(result.subscribers).toEqual([]);
   });
 
@@ -144,7 +168,10 @@ describe("listSubscribers", () => {
 
     await service.listSubscribers(mockDb, 10, { limit: 5, offset: 15 });
 
-    expect(repo.listSubscribers).toHaveBeenCalledWith(mockDb, 10, { limit: 5, offset: 15 });
+    expect(repo.listSubscribers).toHaveBeenCalledWith(mockDb, 10, {
+      limit: 5,
+      offset: 15,
+    });
   });
 });
 
@@ -185,12 +212,16 @@ describe("updateSubscriber", () => {
       updatedBy: 1,
     });
 
-    expect(repo.updateSubscriber).toHaveBeenCalledWith(mockDb, 1, expect.objectContaining({
-      email: "new@example.com",
-      phone: "+1234567890",
-      firstName: "Bob",
-      updatedBy: 1,
-    }));
+    expect(repo.updateSubscriber).toHaveBeenCalledWith(
+      mockDb,
+      1,
+      expect.objectContaining({
+        email: "new@example.com",
+        phone: "+1234567890",
+        firstName: "Bob",
+        updatedBy: 1,
+      }),
+    );
   });
 });
 
@@ -200,19 +231,26 @@ describe("updateSubscriber", () => {
 
 describe("deleteSubscriber", () => {
   it("soft deletes successfully", async () => {
-    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(mockSubscriber as any);
-    vi.mocked(repo.softDeleteSubscriber).mockResolvedValue({ ...mockSubscriber, deletedAt: new Date() } as any);
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.softDeleteSubscriber).mockResolvedValue({
+      ...mockSubscriber,
+      deletedAt: new Date(),
+    } as any);
 
-    await expect(service.deleteSubscriber(mockDb, 10, "sub_abc", 1)).resolves.toBeUndefined();
+    await expect(
+      service.deleteSubscriber(mockDb, 10, "sub_abc", 1),
+    ).resolves.toBeUndefined();
     expect(repo.softDeleteSubscriber).toHaveBeenCalledWith(mockDb, 1, 1);
   });
 
   it("throws NotFoundException when subscriber does not exist", async () => {
     vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(undefined);
 
-    await expect(service.deleteSubscriber(mockDb, 10, "sub_missing", 1)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.deleteSubscriber(mockDb, 10, "sub_missing", 1),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it("throws NotFoundException when subscriber belongs to a different environment", async () => {
@@ -221,18 +259,20 @@ describe("deleteSubscriber", () => {
       environmentId: 999,
     } as any);
 
-    await expect(service.deleteSubscriber(mockDb, 10, "sub_abc", 1)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.deleteSubscriber(mockDb, 10, "sub_abc", 1),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it("throws NotFoundException when soft delete returns nothing (race condition)", async () => {
-    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(mockSubscriber as any);
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
+      mockSubscriber as any,
+    );
     vi.mocked(repo.softDeleteSubscriber).mockResolvedValue(undefined);
 
-    await expect(service.deleteSubscriber(mockDb, 10, "sub_abc", 1)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.deleteSubscriber(mockDb, 10, "sub_abc", 1),
+    ).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -242,7 +282,9 @@ describe("deleteSubscriber", () => {
 
 describe("createSubscriber", () => {
   it("throws BadRequestException when neither email nor externalId provided", async () => {
-    vi.mocked(repo.getEnvironmentById).mockResolvedValue(mockEnvironment as any);
+    vi.mocked(repo.getEnvironmentById).mockResolvedValue(
+      mockEnvironment as any,
+    );
 
     await expect(
       service.createSubscriber(mockDb, { environmentId: 10, createdBy: 1 }),
@@ -250,8 +292,12 @@ describe("createSubscriber", () => {
   });
 
   it("throws BadRequestException when email is already taken in the environment", async () => {
-    vi.mocked(repo.getEnvironmentById).mockResolvedValue(mockEnvironment as any);
-    vi.mocked(repo.getSubscriberByEmail).mockResolvedValue(mockSubscriber as any);
+    vi.mocked(repo.getEnvironmentById).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    vi.mocked(repo.getSubscriberByEmail).mockResolvedValue(
+      mockSubscriber as any,
+    );
 
     await expect(
       service.createSubscriber(mockDb, {
@@ -263,9 +309,13 @@ describe("createSubscriber", () => {
   });
 
   it("throws BadRequestException when externalId is already taken in the environment", async () => {
-    vi.mocked(repo.getEnvironmentById).mockResolvedValue(mockEnvironment as any);
+    vi.mocked(repo.getEnvironmentById).mockResolvedValue(
+      mockEnvironment as any,
+    );
     vi.mocked(repo.getSubscriberByEmail).mockResolvedValue(undefined);
-    vi.mocked(repo.getSubscriberByExternalId).mockResolvedValue(mockSubscriber as any);
+    vi.mocked(repo.getSubscriberByExternalId).mockResolvedValue(
+      mockSubscriber as any,
+    );
 
     await expect(
       service.createSubscriber(mockDb, {
@@ -277,10 +327,14 @@ describe("createSubscriber", () => {
   });
 
   it("creates subscriber and preferences successfully", async () => {
-    vi.mocked(repo.getEnvironmentById).mockResolvedValue(mockEnvironment as any);
+    vi.mocked(repo.getEnvironmentById).mockResolvedValue(
+      mockEnvironment as any,
+    );
     vi.mocked(repo.getSubscriberByEmail).mockResolvedValue(undefined);
     vi.mocked(repo.createSubscriber).mockResolvedValue(mockSubscriber as any);
-    vi.mocked(repo.createSubscriberPreferences).mockResolvedValue(mockPreferences as any);
+    vi.mocked(repo.createSubscriberPreferences).mockResolvedValue(
+      mockPreferences as any,
+    );
 
     const result = await service.createSubscriber(mockDb, {
       environmentId: 10,

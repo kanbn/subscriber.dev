@@ -114,6 +114,8 @@ export type ListSubscribersResponseDtoSubscribersItem = {
   attributes: ListSubscribersResponseDtoSubscribersItemAttributes;
   createdAt: unknown;
   updatedAt: unknown;
+  /** @nullable */
+  unsubscribeUrl: string | null;
 };
 
 export interface ListSubscribersResponseDto {
@@ -145,6 +147,8 @@ export type GetSubscriberResponseDtoSubscriber = {
   attributes?: GetSubscriberResponseDtoSubscriberAttributes;
   createdAt?: unknown;
   updatedAt?: unknown;
+  /** @nullable */
+  unsubscribeUrl?: string | null;
 };
 
 /**
@@ -203,6 +207,8 @@ export type CreateSubscriberResponseDtoSubscriber = {
   attributes?: CreateSubscriberResponseDtoSubscriberAttributes;
   createdAt?: unknown;
   updatedAt?: unknown;
+  /** @nullable */
+  unsubscribeUrl?: string | null;
 };
 
 export type CreateSubscriberResponseDtoPreferences = {
@@ -262,6 +268,8 @@ export type UpdateSubscriberResponseDtoSubscriber = {
   attributes?: UpdateSubscriberResponseDtoSubscriberAttributes;
   createdAt?: unknown;
   updatedAt?: unknown;
+  /** @nullable */
+  unsubscribeUrl?: string | null;
 };
 
 export interface UpdateSubscriberResponseDto {
