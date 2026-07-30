@@ -516,12 +516,51 @@ importers:
       '@novu/api':
         specifier: ^3.11.0
         version: 3.11.0
+      '@react-email/body':
+        specifier: 0.2.0
+        version: 0.2.0(react@18.3.1)
+      '@react-email/button':
+        specifier: 0.2.0
+        version: 0.2.0(react@18.3.1)
       '@react-email/components':
         specifier: ^1.0.1
         version: 1.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-email/container':
+        specifier: 0.0.15
+        version: 0.0.15(react@18.3.1)
+      '@react-email/head':
+        specifier: 0.0.12
+        version: 0.0.12(react@18.3.1)
+      '@react-email/heading':
+        specifier: 0.0.15
+        version: 0.0.15(react@18.3.1)
+      '@react-email/hr':
+        specifier: 0.0.11
+        version: 0.0.11(react@18.3.1)
+      '@react-email/html':
+        specifier: 0.0.11
+        version: 0.0.11(react@18.3.1)
+      '@react-email/link':
+        specifier: 0.0.12
+        version: 0.0.12(react@18.3.1)
+      '@react-email/preview':
+        specifier: 0.0.13
+        version: 0.0.13(react@18.3.1)
+      '@react-email/render':
+        specifier: 2.0.0
+        version: 2.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-email/text':
+        specifier: 0.1.5
+        version: 0.1.5(react@18.3.1)
+      next-runtime-env:
+        specifier: ^1.7.2
+        version: 1.8.0
       nodemailer:
         specifier: ^7.0.3
         version: 7.0.6
+      react:
+        specifier: catalog:react18
+        version: 18.3.1
       react-email:
         specifier: ^5.0.6
         version: 5.0.6
@@ -541,6 +580,9 @@ importers:
       '@types/nodemailer':
         specifier: ^6.4.17
         version: 6.4.19
+      '@types/react':
+        specifier: catalog:react18
+        version: 18.3.24
       eslint:
         specifier: 'catalog:'
         version: 9.34.0(jiti@2.6.1)
