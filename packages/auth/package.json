@@ -37,6 +37,7 @@
     "@subscriber.dev/shared": "workspace:*",
     "@subscriber.dev/stripe": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",
+    "@types/node": "^20.17.7",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"

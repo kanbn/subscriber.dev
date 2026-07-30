@@ -55,6 +55,7 @@
     "@subscriber.dev/eslint-config": "workspace:*",
     "@subscriber.dev/prettier-config": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",
+    "@types/node": "^20.17.7",
     "@types/pg": "^8.10.9",
     "dotenv-cli": "^7.4.4",
     "drizzle-kit": "^0.28.1",
