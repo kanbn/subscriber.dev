@@ -6,14 +6,17 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
       "default": "./src/index.ts"
     },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
       "default": "./src/utils/index.ts"
     },
     "./constants": {
       "types": "./dist/constants/index.d.ts",
+      "import": "./dist/constants/index.js",
       "default": "./src/constants/index.ts"
     }
   },

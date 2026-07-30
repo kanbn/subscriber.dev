@@ -8,7 +8,7 @@ import {
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
-import type { socialProvidersPlugin } from "./auth";
+import type { socialProvidersPlugin } from "./auth.js";
 
 const socialProvidersPluginClient = {
   id: "social-providers-plugin",

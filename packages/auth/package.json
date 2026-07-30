@@ -4,13 +4,19 @@
   "version": "0.1.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./src/index.ts"
+    },
     "./client": {
-      "types": "./src/client.ts",
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
       "default": "./src/client.ts"
     },
     "./server": {
-      "types": "./src/server.ts",
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
       "default": "./src/server.ts"
     }
   },

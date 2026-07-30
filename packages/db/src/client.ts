@@ -6,7 +6,7 @@ import { drizzle as drizzlePgLite } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { Pool } from "pg";
 
-import * as schema from "./schema";
+import * as schema from "./schema/index.js";
 
 export type dbClient = NodePgDatabase<typeof schema> & {
   $client: Pool;

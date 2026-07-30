@@ -12,8 +12,8 @@ import {
 
 import { generateUID } from "@subscriber.dev/shared/utils";
 
-import { users } from "./users";
-import { memberRoleEnum, workspaces } from "./workspaces";
+import { users } from "./users.js";
+import { memberRoleEnum, workspaces } from "./workspaces.js";
 
 export const invitationStatuses = [
   "pending",

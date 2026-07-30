@@ -116,7 +116,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/GetWorkspaceResponseDto"
+                    "$ref": "#/components/schemas/WorkspaceDto"
                   }
                 }
               }
@@ -600,49 +600,27 @@
           "name"
         ]
       },
-      "GetWorkspaceResponseDto": {
+      "WorkspaceDto": {
         "type": "object",
         "properties": {
-          "workspace": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "publicId": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "slug": {
-                "type": "string"
-              }
-            },
-            "selfRequired": true
+          "id": {
+            "type": "number"
           },
-          "environment": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "publicId": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "slug": {
-                "type": "string"
-              }
-            },
-            "selfRequired": true
+          "publicId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
           }
         },
         "required": [
-          "workspace",
-          "environment"
+          "id",
+          "publicId",
+          "name",
+          "slug"
         ]
       },
       "CreateWorkspaceDto": {

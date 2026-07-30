@@ -12,9 +12,9 @@ import {
 
 import { generateUID } from "@subscriber.dev/shared/utils";
 
-import { subscribers } from "./subscribers";
-import { users } from "./users";
-import { workspaces } from "./workspaces";
+import { subscribers } from "./subscribers.js";
+import { users } from "./users.js";
+import { workspaces } from "./workspaces.js";
 
 export const environments = pgTable(
   "environments",

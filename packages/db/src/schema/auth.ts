@@ -8,7 +8,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
-import { users } from "./users";
+import { users } from "./users.js";
 
 export const session = pgTable("session", {
   id: bigserial("id", { mode: "number" }).primaryKey(),

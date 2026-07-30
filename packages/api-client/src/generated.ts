@@ -42,23 +42,11 @@ export interface TestRequestDto {
   message?: string;
 }
 
-export type GetWorkspaceResponseDtoWorkspace = {
-  id?: number;
-  publicId?: string;
-  name?: string;
-  slug?: string;
-};
-
-export type GetWorkspaceResponseDtoEnvironment = {
-  id?: number;
-  publicId?: string;
-  name?: string;
-  slug?: string;
-};
-
-export interface GetWorkspaceResponseDto {
-  workspace: GetWorkspaceResponseDtoWorkspace;
-  environment: GetWorkspaceResponseDtoEnvironment;
+export interface WorkspaceDto {
+  id: number;
+  publicId: string;
+  name: string;
+  slug: string;
 }
 
 export interface CreateWorkspaceDto {
@@ -833,7 +821,7 @@ export const useCreateTest = <TError = unknown, TContext = unknown>(
  * @summary Get user's workspaces
  */
 export type getWorkspacesResponse200 = {
-  data: GetWorkspaceResponseDto[];
+  data: WorkspaceDto[];
   status: 200;
 };
 

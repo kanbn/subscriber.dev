@@ -14,8 +14,8 @@ import {
 
 import { generateUID } from "@subscriber.dev/shared/utils";
 
-import { environments } from "./environments";
-import { users } from "./users";
+import { environments } from "./environments.js";
+import { users } from "./users.js";
 
 export const subscribers = pgTable(
   "subscribers",

@@ -10,8 +10,8 @@ import {
 
 import { generateUID } from "@subscriber.dev/shared/utils";
 
-import { apikey } from "./auth";
-import { workspaceMembers } from "./workspaces";
+import { apikey } from "./auth.js";
+import { workspaceMembers } from "./workspaces.js";
 
 export const users = pgTable("users", {
   id: bigserial("id", { mode: "number" }).primaryKey(),

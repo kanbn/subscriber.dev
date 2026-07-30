@@ -23,3 +23,5 @@ export const GetWorkspaceResponseSchema = z.object({
 export class GetWorkspaceResponseDto extends createZodDto(
   GetWorkspaceResponseSchema,
 ) {}
+
+export class WorkspaceDto extends createZodDto(WorkspaceSchema) {}

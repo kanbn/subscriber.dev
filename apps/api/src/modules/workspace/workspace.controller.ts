@@ -26,7 +26,7 @@ import {
   CreateWorkspaceDto,
   CreateWorkspaceResponseDto,
 } from "./dto/create-workspace.dto.js";
-import { GetWorkspaceResponseDto } from "./dto/get-workspace.dto.js";
+import { WorkspaceDto } from "./dto/get-workspace.dto.js";
 import { WorkspaceService } from "./workspace.service.js";
 
 @ApiTags("Workspaces")
@@ -44,11 +44,8 @@ export class WorkspaceController {
     operationId: "getWorkspaces",
     summary: "Get user's workspaces",
   })
-  @ApiResponse({ status: 200, type: [GetWorkspaceResponseDto] })
-  async getWorkspaces(
-    @CurrentUser() user: User,
-  ): Promise<GetWorkspaceResponseDto[]> {
-    console.log("user", user);
+  @ApiResponse({ status: 200, type: [WorkspaceDto] })
+  async getWorkspaces(@CurrentUser() user: User): Promise<WorkspaceDto[]> {
     const db = createDrizzleClient();
     return this.workspaceService.getWorkspacesByUserId(db, user.id);
   }

@@ -6,14 +6,17 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
       "default": "./src/index.ts"
     },
     "./client": {
       "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
       "default": "./src/client.ts"
     },
     "./schema": {
-      "types": "./dist/schema.d.ts",
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js",
       "default": "./src/schema/index.ts"
     },
     "./types/*": {
@@ -22,6 +25,7 @@
     },
     "./repository/*": {
       "types": "./dist/repository/*.d.ts",
+      "import": "./dist/repository/*.js",
       "default": "./src/repository/*.ts"
     }
   },
