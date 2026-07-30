@@ -9,7 +9,7 @@ services:
       - dokploy-network
     build:
       context: .
-      dockerfile: ./apps/web/Dockerfile.new
+      dockerfile: ./apps/web/Dockerfile
     env_file:
       - .env
     environment:
