@@ -31,7 +31,7 @@
   },
   "license": "GPL-3.0",
   "scripts": {
-    "build": "orval && tsc",
+    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "orval --watch & tsc --watch --preserveWatchOutput",
     "format": "prettier --check . --ignore-path ../../.gitignore",
