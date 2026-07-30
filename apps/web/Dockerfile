@@ -32,7 +32,7 @@ COPY . .
  
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
 # Assuming "@acme/nextjs" is the name entered in the project's package.json: { name: "@acme/nextjs" }
-RUN turbo prune --scope=${PROJECT} --scope=@kan/db --docker
+RUN turbo prune --scope=${PROJECT} --scope=@subscriber.dev/db --docker
  
 # 3. Build the project
 FROM base AS builder
