@@ -18,7 +18,9 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "with-env": "dotenv -e ../../.env --"
+    "with-env": "dotenv -e ../../.env --",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.802.0",
@@ -40,6 +42,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@nestjs/testing": "^11.1.19",
     "@subscriber.dev/eslint-config": "workspace:*",
     "@subscriber.dev/prettier-config": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",
@@ -49,7 +52,9 @@
     "dotenv-cli": "^7.4.4",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "unplugin-swc": "^1.5.9",
+    "vitest": "^2.1.9"
   },
   "prettier": "@subscriber.dev/prettier-config"
 }

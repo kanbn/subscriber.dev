@@ -59,6 +59,7 @@
     "@subscriber.dev/eslint-config": "workspace:*",
     "@subscriber.dev/prettier-config": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",
+    "dotenv": "^16.0.0",
     "eslint": "catalog:",
     "orval": "^7.17.2",
     "prettier": "catalog:",

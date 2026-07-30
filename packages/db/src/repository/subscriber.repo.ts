@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, max } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, max } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
@@ -141,8 +141,64 @@ export const getSubscriberByPublicId = async (
   publicId: string,
 ) => {
   return await db.query.subscribers.findFirst({
-    where: eq(subscribers.publicId, publicId),
+    where: and(
+      eq(subscribers.publicId, publicId),
+      isNull(subscribers.deletedAt),
+    ),
   });
+};
+
+export const listSubscribers = async (
+  db: dbClient,
+  environmentId: number,
+  opts: { limit: number; offset: number },
+) => {
+  return await db.query.subscribers.findMany({
+    where: and(
+      eq(subscribers.environmentId, environmentId),
+      isNull(subscribers.deletedAt),
+    ),
+    orderBy: asc(subscribers.createdAt),
+    limit: opts.limit,
+    offset: opts.offset,
+  });
+};
+
+export const updateSubscriber = async (
+  db: dbClient,
+  id: number,
+  data: {
+    email?: string | null;
+    phone?: string | null;
+    externalId?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    name?: string | null;
+    attributes?: Record<string, unknown> | null;
+    updatedBy: number;
+  },
+) => {
+  const [result] = await db
+    .update(subscribers)
+    .set({ ...data, updatedAt: new Date() })
+    .where(and(eq(subscribers.id, id), isNull(subscribers.deletedAt)))
+    .returning();
+
+  return result;
+};
+
+export const softDeleteSubscriber = async (
+  db: dbClient,
+  id: number,
+  deletedBy: number,
+) => {
+  const [result] = await db
+    .update(subscribers)
+    .set({ deletedAt: new Date(), deletedBy, updatedAt: new Date() })
+    .where(and(eq(subscribers.id, id), isNull(subscribers.deletedAt)))
+    .returning();
+
+  return result;
 };
 
 export const getLatestPreferences = async (

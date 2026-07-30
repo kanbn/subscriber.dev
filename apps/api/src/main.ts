@@ -40,7 +40,7 @@ async function bootstrap() {
       "api-key",
     )
     .addServer(
-      process.env.API_BASE_URL || "http://localhost:3001",
+      process.env.API_BASE_URL || "http://localhost:4000",
       "Development",
     )
     .build();
@@ -54,7 +54,7 @@ async function bootstrap() {
     res.json(document);
   });
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 4000;
   await app.listen(port);
   console.log(`🚀 API server running on http://localhost:${port}`);
 }

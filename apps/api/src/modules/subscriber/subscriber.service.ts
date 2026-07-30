@@ -26,6 +26,18 @@ interface UpdatePreferencesData {
   email?: boolean;
 }
 
+interface UpdateSubscriberData {
+  subscriberId: number;
+  email?: string | null;
+  phone?: string | null;
+  externalId?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  name?: string | null;
+  attributes?: Record<string, unknown> | null;
+  updatedBy: number;
+}
+
 @Injectable()
 export class SubscriberService {
   async createSubscriber(
@@ -199,5 +211,135 @@ export class SubscriberService {
         createdAt: preferences.createdAt,
       },
     };
+  }
+
+  async getSubscriber(
+    db: dbClient,
+    environmentId: number,
+    subscriberPublicId: string,
+  ) {
+    const subscriber = await subscriberRepo.getSubscriberByPublicId(
+      db,
+      subscriberPublicId,
+    );
+
+    if (!subscriber || subscriber.environmentId !== environmentId) {
+      throw new NotFoundException("Subscriber not found");
+    }
+
+    const preferences = await subscriberRepo.getLatestPreferences(
+      db,
+      subscriber.id,
+    );
+
+    return {
+      subscriber: {
+        publicId: subscriber.publicId,
+        email: subscriber.email,
+        phone: subscriber.phone,
+        externalId: subscriber.externalId,
+        firstName: subscriber.firstName,
+        lastName: subscriber.lastName,
+        name: subscriber.name,
+        attributes: subscriber.attributes,
+        createdAt: subscriber.createdAt,
+        updatedAt: subscriber.updatedAt,
+      },
+      preferences: preferences
+        ? {
+            publicId: preferences.publicId,
+            email: preferences.email,
+            version: preferences.version,
+            createdAt: preferences.createdAt,
+          }
+        : null,
+    };
+  }
+
+  async listSubscribers(
+    db: dbClient,
+    environmentId: number,
+    opts: { limit: number; offset: number },
+  ) {
+    const rows = await subscriberRepo.listSubscribers(db, environmentId, opts);
+
+    return {
+      subscribers: rows.map((s) => ({
+        publicId: s.publicId,
+        email: s.email,
+        phone: s.phone,
+        externalId: s.externalId,
+        firstName: s.firstName,
+        lastName: s.lastName,
+        name: s.name,
+        attributes: s.attributes,
+        createdAt: s.createdAt,
+        updatedAt: s.updatedAt,
+      })),
+      limit: opts.limit,
+      offset: opts.offset,
+    };
+  }
+
+  async updateSubscriber(db: dbClient, data: UpdateSubscriberData) {
+    const subscriber = await subscriberRepo.updateSubscriber(
+      db,
+      data.subscriberId,
+      {
+        email: data.email,
+        phone: data.phone,
+        externalId: data.externalId,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        name: data.name,
+        attributes: data.attributes,
+        updatedBy: data.updatedBy,
+      },
+    );
+
+    if (!subscriber) {
+      throw new NotFoundException("Subscriber not found");
+    }
+
+    return {
+      subscriber: {
+        publicId: subscriber.publicId,
+        email: subscriber.email,
+        phone: subscriber.phone,
+        externalId: subscriber.externalId,
+        firstName: subscriber.firstName,
+        lastName: subscriber.lastName,
+        name: subscriber.name,
+        attributes: subscriber.attributes,
+        createdAt: subscriber.createdAt,
+        updatedAt: subscriber.updatedAt,
+      },
+    };
+  }
+
+  async deleteSubscriber(
+    db: dbClient,
+    environmentId: number,
+    subscriberPublicId: string,
+    deletedBy: number,
+  ) {
+    const subscriber = await subscriberRepo.getSubscriberByPublicId(
+      db,
+      subscriberPublicId,
+    );
+
+    if (!subscriber || subscriber.environmentId !== environmentId) {
+      throw new NotFoundException("Subscriber not found");
+    }
+
+    const deleted = await subscriberRepo.softDeleteSubscriber(
+      db,
+      subscriber.id,
+      deletedBy,
+    );
+
+    if (!deleted) {
+      throw new NotFoundException("Subscriber not found");
+    }
   }
 }

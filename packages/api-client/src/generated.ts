@@ -91,6 +91,78 @@ export interface CreateWorkspaceResponseDto {
   environment: CreateWorkspaceResponseDtoEnvironment;
 }
 
+/**
+ * @nullable
+ */
+export type ListSubscribersResponseDtoSubscribersItemAttributes = {[key: string]: unknown} | null;
+
+export type ListSubscribersResponseDtoSubscribersItem = {
+  publicId: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  externalId: string | null;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastName: string | null;
+  /** @nullable */
+  name: string | null;
+  /** @nullable */
+  attributes: ListSubscribersResponseDtoSubscribersItemAttributes;
+  createdAt: unknown;
+  updatedAt: unknown;
+};
+
+export interface ListSubscribersResponseDto {
+  subscribers: ListSubscribersResponseDtoSubscribersItem[];
+  limit: number;
+  offset: number;
+}
+
+/**
+ * @nullable
+ */
+export type GetSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+
+export type GetSubscriberResponseDtoSubscriber = {
+  publicId?: string;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  externalId?: string | null;
+  /** @nullable */
+  firstName?: string | null;
+  /** @nullable */
+  lastName?: string | null;
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  attributes?: GetSubscriberResponseDtoSubscriberAttributes;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+};
+
+/**
+ * @nullable
+ */
+export type GetSubscriberResponseDtoPreferences = {
+  publicId?: string;
+  email?: boolean;
+  version?: number;
+  createdAt?: unknown;
+} | null;
+
+export interface GetSubscriberResponseDto {
+  subscriber: GetSubscriberResponseDtoSubscriber;
+  /** @nullable */
+  preferences: GetSubscriberResponseDtoPreferences;
+}
+
 export type CreateSubscriberDtoAttributes = {[key: string]: unknown};
 
 export type CreateSubscriberDtoPreferences = {
@@ -145,6 +217,57 @@ export interface CreateSubscriberResponseDto {
   preferences: CreateSubscriberResponseDtoPreferences;
 }
 
+/**
+ * @nullable
+ */
+export type UpdateSubscriberDtoAttributes = {[key: string]: unknown} | null;
+
+export interface UpdateSubscriberDto {
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  externalId: string | null;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastName: string | null;
+  /** @nullable */
+  name: string | null;
+  /** @nullable */
+  attributes: UpdateSubscriberDtoAttributes;
+}
+
+/**
+ * @nullable
+ */
+export type UpdateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+
+export type UpdateSubscriberResponseDtoSubscriber = {
+  publicId?: string;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  externalId?: string | null;
+  /** @nullable */
+  firstName?: string | null;
+  /** @nullable */
+  lastName?: string | null;
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  attributes?: UpdateSubscriberResponseDtoSubscriberAttributes;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+};
+
+export interface UpdateSubscriberResponseDto {
+  subscriber: UpdateSubscriberResponseDtoSubscriber;
+}
+
 export interface UpdatePreferencesDto {
   email?: boolean;
 }
@@ -160,6 +283,18 @@ export type UpdatePreferencesResponseDtoPreferences = {
 export interface UpdatePreferencesResponseDto {
   preferences: UpdatePreferencesResponseDtoPreferences;
 }
+
+export type ListSubscribersParams = {
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
+};
 
 /**
  * @summary Get current user
@@ -181,7 +316,7 @@ export const getGetCurrentUserUrl = () => {
 
   
 
-  return `http://localhost:3001/users/me`
+  return `http://localhost:4000/users/me`
 }
 
 export const getCurrentUser = async ( options?: RequestInit): Promise<getCurrentUserResponse> => {
@@ -208,7 +343,7 @@ export const getCurrentUser = async ( options?: RequestInit): Promise<getCurrent
 
 export const getGetCurrentUserQueryKey = () => {
     return [
-    `http://localhost:3001/users/me`
+    `http://localhost:4000/users/me`
     ] as const;
     }
 
@@ -301,7 +436,7 @@ export const getUpdateCurrentUserUrl = () => {
 
   
 
-  return `http://localhost:3001/users`
+  return `http://localhost:4000/users`
 }
 
 export const updateCurrentUser = async ( options?: RequestInit): Promise<updateCurrentUserResponse> => {
@@ -391,7 +526,7 @@ export const getGetTestUrl = () => {
 
   
 
-  return `http://localhost:3001/test`
+  return `http://localhost:4000/test`
 }
 
 export const getTest = async ( options?: RequestInit): Promise<getTestResponse> => {
@@ -418,7 +553,7 @@ export const getTest = async ( options?: RequestInit): Promise<getTestResponse> 
 
 export const getGetTestQueryKey = () => {
     return [
-    `http://localhost:3001/test`
+    `http://localhost:4000/test`
     ] as const;
     }
 
@@ -511,7 +646,7 @@ export const getCreateTestUrl = () => {
 
   
 
-  return `http://localhost:3001/test`
+  return `http://localhost:4000/test`
 }
 
 export const createTest = async (testRequestDto: TestRequestDto, options?: RequestInit): Promise<createTestResponse> => {
@@ -602,7 +737,7 @@ export const getGetWorkspacesUrl = () => {
 
   
 
-  return `http://localhost:3001/workspaces`
+  return `http://localhost:4000/workspaces`
 }
 
 export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspacesResponse> => {
@@ -629,7 +764,7 @@ export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspac
 
 export const getGetWorkspacesQueryKey = () => {
     return [
-    `http://localhost:3001/workspaces`
+    `http://localhost:4000/workspaces`
     ] as const;
     }
 
@@ -722,7 +857,7 @@ export const getCreateWorkspaceUrl = () => {
 
   
 
-  return `http://localhost:3001/workspaces`
+  return `http://localhost:4000/workspaces`
 }
 
 export const createWorkspace = async (createWorkspaceDto: CreateWorkspaceDto, options?: RequestInit): Promise<createWorkspaceResponse> => {
@@ -794,6 +929,149 @@ export const useCreateWorkspace = <TError = unknown,
     }
     
 /**
+ * Returns a paginated list of active subscribers in the environment
+ * @summary List subscribers
+ */
+export type listSubscribersResponse200 = {
+  data: ListSubscribersResponseDto
+  status: 200
+}
+
+export type listSubscribersResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type listSubscribersResponseSuccess = (listSubscribersResponse200) & {
+  headers: Headers;
+};
+export type listSubscribersResponseError = (listSubscribersResponse404) & {
+  headers: Headers;
+};
+
+export type listSubscribersResponse = (listSubscribersResponseSuccess | listSubscribersResponseError)
+
+export const getListSubscribersUrl = (environmentId: string,
+    params?: ListSubscribersParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `http://localhost:4000/environments/${environmentId}/subscribers?${stringifiedParams}` : `http://localhost:4000/environments/${environmentId}/subscribers`
+}
+
+export const listSubscribers = async (environmentId: string,
+    params?: ListSubscribersParams, options?: RequestInit): Promise<listSubscribersResponse> => {
+  
+  const res = await fetch(getListSubscribersUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: listSubscribersResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listSubscribersResponse
+}
+
+
+
+
+
+export const getListSubscribersQueryKey = (environmentId?: string,
+    params?: ListSubscribersParams,) => {
+    return [
+    `http://localhost:4000/environments/${environmentId}/subscribers`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListSubscribersQueryOptions = <TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(environmentId: string,
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, fetch?: RequestInit}
+) => {
+
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSubscribersQueryKey(environmentId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSubscribers>>> = ({ signal }) => listSubscribers(environmentId,params, { signal, ...fetchOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListSubscribersQueryResult = NonNullable<Awaited<ReturnType<typeof listSubscribers>>>
+export type ListSubscribersQueryError = void
+
+
+export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
+ environmentId: string,
+    params: undefined |  ListSubscribersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSubscribers>>,
+          TError,
+          Awaited<ReturnType<typeof listSubscribers>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
+ environmentId: string,
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSubscribers>>,
+          TError,
+          Awaited<ReturnType<typeof listSubscribers>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
+ environmentId: string,
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary List subscribers
+ */
+
+export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
+ environmentId: string,
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getListSubscribersQueryOptions(environmentId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
  * Creates a new subscriber in the specified environment and initialises their preferences
  * @summary Create a new subscriber
  */
@@ -826,7 +1104,7 @@ export const getCreateSubscriberUrl = (environmentId: string,) => {
 
   
 
-  return `http://localhost:3001/environments/${environmentId}/subscribers`
+  return `http://localhost:4000/environments/${environmentId}/subscribers`
 }
 
 export const createSubscriber = async (environmentId: string,
@@ -899,6 +1177,344 @@ export const useCreateSubscriber = <TError = void,
     }
     
 /**
+ * Returns a single subscriber with their latest preferences
+ * @summary Get a subscriber
+ */
+export type getSubscriberResponse200 = {
+  data: GetSubscriberResponseDto
+  status: 200
+}
+
+export type getSubscriberResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type getSubscriberResponseSuccess = (getSubscriberResponse200) & {
+  headers: Headers;
+};
+export type getSubscriberResponseError = (getSubscriberResponse404) & {
+  headers: Headers;
+};
+
+export type getSubscriberResponse = (getSubscriberResponseSuccess | getSubscriberResponseError)
+
+export const getGetSubscriberUrl = (environmentId: string,
+    subscriberId: string,) => {
+
+
+  
+
+  return `http://localhost:4000/environments/${environmentId}/subscribers/${subscriberId}`
+}
+
+export const getSubscriber = async (environmentId: string,
+    subscriberId: string, options?: RequestInit): Promise<getSubscriberResponse> => {
+  
+  const res = await fetch(getGetSubscriberUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: getSubscriberResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getSubscriberResponse
+}
+
+
+
+
+
+export const getGetSubscriberQueryKey = (environmentId?: string,
+    subscriberId?: string,) => {
+    return [
+    `http://localhost:4000/environments/${environmentId}/subscribers/${subscriberId}`
+    ] as const;
+    }
+
+    
+export const getGetSubscriberQueryOptions = <TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(environmentId: string,
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, fetch?: RequestInit}
+) => {
+
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSubscriberQueryKey(environmentId,subscriberId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubscriber>>> = ({ signal }) => getSubscriber(environmentId,subscriberId, { signal, ...fetchOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId && subscriberId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetSubscriberQueryResult = NonNullable<Awaited<ReturnType<typeof getSubscriber>>>
+export type GetSubscriberQueryError = void
+
+
+export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
+ environmentId: string,
+    subscriberId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSubscriber>>,
+          TError,
+          Awaited<ReturnType<typeof getSubscriber>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
+ environmentId: string,
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSubscriber>>,
+          TError,
+          Awaited<ReturnType<typeof getSubscriber>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
+ environmentId: string,
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary Get a subscriber
+ */
+
+export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
+ environmentId: string,
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getGetSubscriberQueryOptions(environmentId,subscriberId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Updates subscriber fields. All fields are optional.
+ * @summary Update a subscriber
+ */
+export type updateSubscriberResponse200 = {
+  data: UpdateSubscriberResponseDto
+  status: 200
+}
+
+export type updateSubscriberResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type updateSubscriberResponseSuccess = (updateSubscriberResponse200) & {
+  headers: Headers;
+};
+export type updateSubscriberResponseError = (updateSubscriberResponse404) & {
+  headers: Headers;
+};
+
+export type updateSubscriberResponse = (updateSubscriberResponseSuccess | updateSubscriberResponseError)
+
+export const getUpdateSubscriberUrl = (environmentId: string,
+    subscriberId: string,) => {
+
+
+  
+
+  return `http://localhost:4000/environments/${environmentId}/subscribers/${subscriberId}`
+}
+
+export const updateSubscriber = async (environmentId: string,
+    subscriberId: string,
+    updateSubscriberDto: UpdateSubscriberDto, options?: RequestInit): Promise<updateSubscriberResponse> => {
+  
+  const res = await fetch(getUpdateSubscriberUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateSubscriberDto,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: updateSubscriberResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as updateSubscriberResponse
+}
+
+
+
+
+export const getUpdateSubscriberMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext> => {
+
+const mutationKey = ['updateSubscriber'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubscriber>>, {environmentId: string;subscriberId: string;data: UpdateSubscriberDto}> = (props) => {
+          const {environmentId,subscriberId,data} = props ?? {};
+
+          return  updateSubscriber(environmentId,subscriberId,data,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSubscriberMutationResult = NonNullable<Awaited<ReturnType<typeof updateSubscriber>>>
+    export type UpdateSubscriberMutationBody = UpdateSubscriberDto
+    export type UpdateSubscriberMutationError = void
+
+    /**
+ * @summary Update a subscriber
+ */
+export const useUpdateSubscriber = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSubscriber>>,
+        TError,
+        {environmentId: string;subscriberId: string;data: UpdateSubscriberDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateSubscriberMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Soft-deletes a subscriber. The record is retained but excluded from all queries.
+ * @summary Delete a subscriber
+ */
+export type deleteSubscriberResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteSubscriberResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type deleteSubscriberResponseSuccess = (deleteSubscriberResponse204) & {
+  headers: Headers;
+};
+export type deleteSubscriberResponseError = (deleteSubscriberResponse404) & {
+  headers: Headers;
+};
+
+export type deleteSubscriberResponse = (deleteSubscriberResponseSuccess | deleteSubscriberResponseError)
+
+export const getDeleteSubscriberUrl = (environmentId: string,
+    subscriberId: string,) => {
+
+
+  
+
+  return `http://localhost:4000/environments/${environmentId}/subscribers/${subscriberId}`
+}
+
+export const deleteSubscriber = async (environmentId: string,
+    subscriberId: string, options?: RequestInit): Promise<deleteSubscriberResponse> => {
+  
+  const res = await fetch(getDeleteSubscriberUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: deleteSubscriberResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as deleteSubscriberResponse
+}
+
+
+
+
+export const getDeleteSubscriberMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext> => {
+
+const mutationKey = ['deleteSubscriber'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSubscriber>>, {environmentId: string;subscriberId: string}> = (props) => {
+          const {environmentId,subscriberId} = props ?? {};
+
+          return  deleteSubscriber(environmentId,subscriberId,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteSubscriberMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSubscriber>>>
+    
+    export type DeleteSubscriberMutationError = void
+
+    /**
+ * @summary Delete a subscriber
+ */
+export const useDeleteSubscriber = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteSubscriber>>,
+        TError,
+        {environmentId: string;subscriberId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteSubscriberMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
  * Creates a new preference record with updated values (immutable pattern)
  * @summary Update subscriber preferences
  */
@@ -927,7 +1543,7 @@ export const getUpdateSubscriberPreferencesUrl = (environmentId: string,
 
   
 
-  return `http://localhost:3001/environments/${environmentId}/subscribers/${subscriberId}/preferences`
+  return `http://localhost:4000/environments/${environmentId}/subscribers/${subscriberId}/preferences`
 }
 
 export const updateSubscriberPreferences = async (environmentId: string,

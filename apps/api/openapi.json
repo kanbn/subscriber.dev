@@ -169,6 +169,68 @@
       }
     },
     "/environments/{environmentId}/subscribers": {
+      "get": {
+        "operationId": "listSubscribers",
+        "summary": "List subscribers",
+        "description": "Returns a paginated list of active subscribers in the environment",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "exclusiveMaximum": false,
+              "exclusiveMinimum": false,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "exclusiveMinimum": false,
+              "default": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListSubscribersResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "tags": [
+          "Subscribers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
       "post": {
         "operationId": "createSubscriber",
         "summary": "Create a new subscriber",
@@ -178,7 +240,6 @@
             "name": "environmentId",
             "required": true,
             "in": "path",
-            "description": "The ID of the environment",
             "schema": {
               "type": "string"
             }
@@ -222,6 +283,149 @@
         ]
       }
     },
+    "/environments/{environmentId}/subscribers/{subscriberId}": {
+      "get": {
+        "operationId": "getSubscriber",
+        "summary": "Get a subscriber",
+        "description": "Returns a single subscriber with their latest preferences",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSubscriberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "tags": [
+          "Subscribers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateSubscriber",
+        "summary": "Update a subscriber",
+        "description": "Updates subscriber fields. All fields are optional.",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscriberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSubscriberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "tags": [
+          "Subscribers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteSubscriber",
+        "summary": "Delete a subscriber",
+        "description": "Soft-deletes a subscriber. The record is retained but excluded from all queries.",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Subscriber deleted"
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "tags": [
+          "Subscribers"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/environments/{environmentId}/subscribers/{subscriberId}/preferences": {
       "patch": {
         "operationId": "updateSubscriberPreferences",
@@ -232,7 +436,6 @@
             "name": "environmentId",
             "required": true,
             "in": "path",
-            "description": "The ID of the environment",
             "schema": {
               "type": "string"
             }
@@ -241,7 +444,6 @@
             "name": "subscriberId",
             "required": true,
             "in": "path",
-            "description": "The public ID of the subscriber",
             "schema": {
               "type": "string"
             }
@@ -292,7 +494,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "http://localhost:3001",
+      "url": "http://localhost:4000",
       "description": "Development"
     }
   ],
@@ -465,6 +667,142 @@
           "environment"
         ]
       },
+      "ListSubscribersResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscribers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "externalId": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "firstName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "lastName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "name": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "attributes": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "nullable": true
+                },
+                "createdAt": {},
+                "updatedAt": {}
+              },
+              "required": [
+                "publicId",
+                "email",
+                "phone",
+                "externalId",
+                "firstName",
+                "lastName",
+                "name",
+                "attributes",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "subscribers",
+          "limit",
+          "offset"
+        ]
+      },
+      "GetSubscriberResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscriber": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
+              "externalId": {
+                "type": "string",
+                "nullable": true
+              },
+              "firstName": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastName": {
+                "type": "string",
+                "nullable": true
+              },
+              "name": {
+                "type": "string",
+                "nullable": true
+              },
+              "attributes": {
+                "type": "object",
+                "additionalProperties": {},
+                "nullable": true
+              },
+              "createdAt": {},
+              "updatedAt": {}
+            },
+            "selfRequired": true
+          },
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "number"
+              },
+              "createdAt": {}
+            },
+            "nullable": true,
+            "selfRequired": true
+          }
+        },
+        "required": [
+          "subscriber",
+          "preferences"
+        ]
+      },
       "CreateSubscriberDto": {
         "type": "object",
         "properties": {
@@ -574,6 +912,99 @@
         "required": [
           "subscriber",
           "preferences"
+        ]
+      },
+      "UpdateSubscriberDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "externalId": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {},
+            "nullable": true,
+            "selfRequired": true
+          }
+        },
+        "required": [
+          "email",
+          "phone",
+          "externalId",
+          "firstName",
+          "lastName",
+          "name",
+          "attributes"
+        ]
+      },
+      "UpdateSubscriberResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscriber": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
+              "externalId": {
+                "type": "string",
+                "nullable": true
+              },
+              "firstName": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastName": {
+                "type": "string",
+                "nullable": true
+              },
+              "name": {
+                "type": "string",
+                "nullable": true
+              },
+              "attributes": {
+                "type": "object",
+                "additionalProperties": {},
+                "nullable": true
+              },
+              "createdAt": {},
+              "updatedAt": {}
+            },
+            "selfRequired": true
+          }
+        },
+        "required": [
+          "subscriber"
         ]
       },
       "UpdatePreferencesDto": {
