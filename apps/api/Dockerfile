@@ -9,7 +9,7 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy package files
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
+COPY .npmrc pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
 COPY packages ./packages
 COPY tooling ./tooling
 COPY apps/api ./apps/api
