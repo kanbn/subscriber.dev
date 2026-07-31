@@ -48,13 +48,18 @@ RUN adduser --system --uid 1001 nestjs
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy built application
-COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./dist
-COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package.json ./
+# Copy built application. apps/api is copied whole (not just dist/) because its own
+# node_modules holds relative symlinks to workspace packages (e.g.
+# apps/api/node_modules/@subscriber.dev/db -> ../../../../packages/db) - pnpm always
+# links workspace packages into the consuming package's own node_modules, never hoisted
+# to root, so the original nested layout must be preserved for those symlinks to resolve.
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/packages ./packages
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api ./apps/api
 
 USER nestjs
+
+WORKDIR /app/apps/api
 
 EXPOSE 4000
 
