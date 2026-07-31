@@ -141,7 +141,7 @@ services:
     ports:
       - ${POSTGRES_PORT:-5332}:5432
     volumes:
-      - sub_postgres_data:/var/lib/postgresql/data
+      - sub_postgres_data:/var/lib/postgresql
     restart: unless-stopped
     networks:
       - subscriber-network
