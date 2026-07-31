@@ -1,7 +1,7 @@
 services:
   web:
     image: ghcr.io/kanbn/subscriber.dev:latest
-    container_name: ${CONTAINER_NAME:-subscriber-web}
+    container_name: ${CONTAINER_NAME:-sub-web}
     ports:
       - "${WEB_PORT:-3000}:3000"
     networks:
@@ -107,7 +107,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
-    container_name: subscriber-api
+    container_name: sub-api
     ports:
       - "${API_PORT:-3001}:3001"
     networks:
@@ -133,7 +133,7 @@ services:
 
   postgres:
     image: postgres:18
-    container_name: subscriber-db
+    container_name: sub-db
     environment:
       - POSTGRES_DB=subscriber_db
       - POSTGRES_USER=subscriber
