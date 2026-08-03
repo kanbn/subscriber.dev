@@ -12,6 +12,8 @@ import {
   verifyEmailUnsubscribeToken,
 } from "@subscriber.dev/shared/utils";
 
+import { WorkflowService } from "../workflow/workflow.service.js";
+
 interface CreateSubscriberData {
   environmentId: number;
   publicId?: string | null;
@@ -71,6 +73,8 @@ interface SubscriberRow {
 
 @Injectable()
 export class SubscriberService {
+  constructor(private readonly workflowService: WorkflowService) {}
+
   private async toSubscriberDto(subscriber: SubscriberRow) {
     return {
       publicId: subscriber.publicId,
@@ -277,6 +281,14 @@ export class SubscriberService {
               subscriberId: existing.id,
               email: row.preferences.email,
             });
+
+            if (!row.preferences.email) {
+              await this.workflowService.cancelPendingRunsForSubscriber(
+                db,
+                existing.id,
+                "Subscriber opted out of email",
+              );
+            }
           }
 
           results.push({
@@ -447,6 +459,14 @@ export class SubscriberService {
       throw new InternalServerErrorException("Failed to update preferences");
     }
 
+    if (data.email === false && latestPreferences.email !== false) {
+      await this.workflowService.cancelPendingRunsForSubscriber(
+        db,
+        data.subscriberId,
+        "Subscriber opted out of email",
+      );
+    }
+
     return {
       preferences: {
         publicId: preferences.publicId,
@@ -593,6 +613,12 @@ export class SubscriberService {
     if (!preferences) {
       throw new InternalServerErrorException("Failed to unsubscribe");
     }
+
+    await this.workflowService.cancelPendingRunsForSubscriber(
+      db,
+      subscriber.id,
+      "Subscriber opted out of email",
+    );
 
     return { unsubscribed: true };
   }

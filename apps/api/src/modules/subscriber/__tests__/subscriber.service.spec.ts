@@ -76,11 +76,15 @@ const mockEnvironment = {
 // Setup
 // ---------------------------------------------------------------------------
 
+const mockWorkflowService = {
+  cancelPendingRunsForSubscriber: vi.fn(),
+};
+
 let service: SubscriberService;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  service = new SubscriberService();
+  service = new SubscriberService(mockWorkflowService as any);
 });
 
 // ---------------------------------------------------------------------------
