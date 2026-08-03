@@ -1,0 +1,123 @@
+import type { Job } from "bullmq";
+import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
+import { Injectable, Logger } from "@nestjs/common";
+
+import { createDrizzleClient } from "@subscriber.dev/db/client";
+import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
+import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
+import { sendRawEmail } from "@subscriber.dev/email";
+import { interpolate } from "@subscriber.dev/shared/utils";
+
+import type { WorkflowStepJobData } from "./workflow.constants.js";
+import { WORKFLOW_QUEUE_NAME } from "./workflow.constants.js";
+
+@Processor(WORKFLOW_QUEUE_NAME)
+@Injectable()
+export class WorkflowProcessor extends WorkerHost {
+  private readonly logger = new Logger(WorkflowProcessor.name);
+
+  async process(job: Job<WorkflowStepJobData>): Promise<void> {
+    const db = createDrizzleClient();
+    const runStep = await workflowRunRepo.getRunStepById(
+      db,
+      job.data.runStepId,
+    );
+    if (!runStep || runStep.status !== "pending") return;
+
+    const run = await workflowRunRepo.getRunById(db, runStep.runId);
+    if (!run) {
+      await workflowRunRepo.updateRunStepStatus(
+        db,
+        runStep.id,
+        "failed",
+        "Parent run not found",
+      );
+      return;
+    }
+
+    const subscriber = await subscriberRepo.getSubscriberById(
+      db,
+      run.subscriberId,
+    );
+    if (!subscriber) {
+      await workflowRunRepo.updateRunStepStatus(
+        db,
+        runStep.id,
+        "skipped",
+        "Subscriber not found",
+      );
+      return;
+    }
+
+    if (runStep.type === "email") {
+      const preferences = await subscriberRepo.getLatestPreferences(
+        db,
+        subscriber.id,
+      );
+      if (preferences && !preferences.email) {
+        await workflowRunRepo.updateRunStepStatus(
+          db,
+          runStep.id,
+          "skipped",
+          "Subscriber opted out of email",
+        );
+      } else if (!subscriber.email) {
+        await workflowRunRepo.updateRunStepStatus(
+          db,
+          runStep.id,
+          "skipped",
+          "Subscriber has no email address",
+        );
+      } else {
+        const config = runStep.configSnapshot as {
+          subject: string;
+          body: string;
+        };
+        const context = {
+          firstName: subscriber.firstName,
+          lastName: subscriber.lastName,
+          name: subscriber.name,
+          email: subscriber.email,
+          ...(subscriber.attributes ?? {}),
+          ...(run.payload ?? {}),
+        };
+        const subject = interpolate(config.subject, context);
+        const html = interpolate(config.body, context);
+
+        try {
+          await sendRawEmail(subscriber.email, subject, html);
+          await workflowRunRepo.updateRunStepStatus(db, runStep.id, "sent");
+        } catch (error) {
+          await workflowRunRepo.updateRunStepStatus(
+            db,
+            runStep.id,
+            "failed",
+            error instanceof Error ? error.message : "Unknown error",
+          );
+          throw error;
+        }
+      }
+    }
+
+    await workflowRunRepo.completeRunIfAllStepsTerminal(db, run.id);
+  }
+
+  @OnWorkerEvent("failed")
+  async onFailed(job: Job<WorkflowStepJobData> | undefined, error: Error) {
+    if (!job?.id) return;
+    this.logger.error(`Workflow step job ${job.id} failed: ${error.message}`);
+
+    if ((job.attemptsMade ?? 0) >= (job.opts.attempts ?? 1)) {
+      const db = createDrizzleClient();
+      const runStep = await workflowRunRepo.getRunStepByBullJobId(db, job.id);
+      if (runStep?.status === "pending") {
+        await workflowRunRepo.updateRunStepStatus(
+          db,
+          runStep.id,
+          "failed",
+          error.message,
+        );
+      }
+    }
+  }
+}

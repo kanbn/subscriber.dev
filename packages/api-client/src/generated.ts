@@ -388,6 +388,267 @@ export interface UnsubscribeResponseDto {
   unsubscribed: boolean;
 }
 
+export type TriggerWorkflowDtoSubscriber = {
+  publicId?: string;
+  externalId?: string;
+  email?: string;
+};
+
+/**
+ * Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.
+ */
+export type TriggerWorkflowDtoPayload = {[key: string]: unknown};
+
+export interface TriggerWorkflowDto {
+  /**
+   * The workflow key, e.g. "user-signup".
+   * @minLength 1
+   */
+  key: string;
+  subscriber: TriggerWorkflowDtoSubscriber;
+  /** Arbitrary data merged into {{variable}} interpolation alongside subscriber fields. */
+  payload: TriggerWorkflowDtoPayload;
+}
+
+export interface TriggerWorkflowResponseDto {
+  triggered: boolean;
+  runPublicId?: string;
+  reason?: string;
+}
+
+export type CreateWorkflowDtoStepsItemType = typeof CreateWorkflowDtoStepsItemType[keyof typeof CreateWorkflowDtoStepsItemType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateWorkflowDtoStepsItemType = {
+  email: 'email',
+} as const;
+
+export type CreateWorkflowDtoStepsItem = {
+  type?: CreateWorkflowDtoStepsItemType;
+  /**
+   * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
+   * @minimum 0
+   */
+  delayMs?: number;
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
+  subject: string;
+  /**
+   * HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload.
+   * @minLength 1
+   */
+  body: string;
+};
+
+export interface CreateWorkflowDto {
+  /**
+   * Stable identifier used to trigger this workflow, e.g. "user-signup". Unique within the environment.
+   * @minLength 1
+   * @maxLength 255
+   */
+  key: string;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: string;
+  /** @maxLength 2000 */
+  description?: string;
+  /**
+   * @minItems 1
+   * @maxItems 50
+   */
+  steps: CreateWorkflowDtoStepsItem[];
+}
+
+export type WorkflowResponseDtoStatus = typeof WorkflowResponseDtoStatus[keyof typeof WorkflowResponseDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkflowResponseDtoStatus = {
+  active: 'active',
+  paused: 'paused',
+} as const;
+
+export type WorkflowResponseDtoStepsItem = {
+  publicId: string;
+  stepOrder: number;
+  type: string;
+  delayMs: number;
+  subject?: string;
+  body?: string;
+};
+
+export interface WorkflowResponseDto {
+  publicId: string;
+  key: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+  status: WorkflowResponseDtoStatus;
+  steps: WorkflowResponseDtoStepsItem[];
+  createdAt: unknown;
+  updatedAt: unknown;
+}
+
+export type ListWorkflowsResponseDtoWorkflowsItemStatus = typeof ListWorkflowsResponseDtoWorkflowsItemStatus[keyof typeof ListWorkflowsResponseDtoWorkflowsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListWorkflowsResponseDtoWorkflowsItemStatus = {
+  active: 'active',
+  paused: 'paused',
+} as const;
+
+export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
+  publicId: string;
+  stepOrder: number;
+  type: string;
+  delayMs: number;
+  subject?: string;
+  body?: string;
+};
+
+export type ListWorkflowsResponseDtoWorkflowsItem = {
+  publicId: string;
+  key: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+  status: ListWorkflowsResponseDtoWorkflowsItemStatus;
+  steps: ListWorkflowsResponseDtoWorkflowsItemStepsItem[];
+  createdAt: unknown;
+  updatedAt: unknown;
+};
+
+export interface ListWorkflowsResponseDto {
+  workflows: ListWorkflowsResponseDtoWorkflowsItem[];
+  limit: number;
+  offset: number;
+}
+
+export type UpdateWorkflowDtoStatus = typeof UpdateWorkflowDtoStatus[keyof typeof UpdateWorkflowDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateWorkflowDtoStatus = {
+  active: 'active',
+  paused: 'paused',
+} as const;
+
+export type UpdateWorkflowDtoStepsItemType = typeof UpdateWorkflowDtoStepsItemType[keyof typeof UpdateWorkflowDtoStepsItemType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateWorkflowDtoStepsItemType = {
+  email: 'email',
+} as const;
+
+export type UpdateWorkflowDtoStepsItem = {
+  type?: UpdateWorkflowDtoStepsItemType;
+  /**
+   * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
+   * @minimum 0
+   */
+  delayMs?: number;
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
+  subject: string;
+  /**
+   * HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload.
+   * @minLength 1
+   */
+  body: string;
+};
+
+export interface UpdateWorkflowDto {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  key?: string;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name?: string;
+  /**
+   * @maxLength 2000
+   * @nullable
+   */
+  description?: string | null;
+  status?: UpdateWorkflowDtoStatus;
+  /**
+   * If provided, replaces ALL existing steps for this workflow.
+   * @minItems 1
+   * @maxItems 50
+   */
+  steps?: UpdateWorkflowDtoStepsItem[];
+}
+
+export type ListRunsResponseDtoRunsItemStatus = typeof ListRunsResponseDtoRunsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListRunsResponseDtoRunsItemStatus = {
+  active: 'active',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ListRunsResponseDtoRunsItemCompletedAt = unknown | null;
+
+export type ListRunsResponseDtoRunsItemStepsItemStatus = typeof ListRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStepsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListRunsResponseDtoRunsItemStepsItemStatus = {
+  pending: 'pending',
+  sent: 'sent',
+  skipped: 'skipped',
+  failed: 'failed',
+  cancelled: 'cancelled',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ListRunsResponseDtoRunsItemStepsItemSentAt = unknown | null;
+
+export type ListRunsResponseDtoRunsItemStepsItem = {
+  stepOrder: number;
+  type: string;
+  status: ListRunsResponseDtoRunsItemStepsItemStatus;
+  scheduledAt: unknown;
+  /** @nullable */
+  sentAt: ListRunsResponseDtoRunsItemStepsItemSentAt;
+  /** @nullable */
+  errorMessage: string | null;
+};
+
+export type ListRunsResponseDtoRunsItem = {
+  publicId: string;
+  status: ListRunsResponseDtoRunsItemStatus;
+  triggeredAt: unknown;
+  /** @nullable */
+  completedAt: ListRunsResponseDtoRunsItemCompletedAt;
+  steps: ListRunsResponseDtoRunsItemStepsItem[];
+};
+
+export interface ListRunsResponseDto {
+  runs: ListRunsResponseDtoRunsItem[];
+  limit: number;
+  offset: number;
+}
+
 export type ListSubscribersParams = {
 /**
  * @minimum 1
@@ -405,6 +666,30 @@ export type UnsubscribeParams = {
  * @minLength 1
  */
 token: string;
+};
+
+export type ListWorkflowsParams = {
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
+};
+
+export type ListWorkflowRunsParams = {
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
 };
 
 /**
@@ -1950,6 +2235,838 @@ export function useUnsubscribe<TData = Awaited<ReturnType<typeof unsubscribe>>, 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
   const queryOptions = getUnsubscribeQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.
+ * @summary Trigger a workflow
+ */
+export type triggerWorkflowResponse200 = {
+  data: TriggerWorkflowResponseDto
+  status: 200
+}
+
+export type triggerWorkflowResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type triggerWorkflowResponseSuccess = (triggerWorkflowResponse200) & {
+  headers: Headers;
+};
+export type triggerWorkflowResponseError = (triggerWorkflowResponse404) & {
+  headers: Headers;
+};
+
+export type triggerWorkflowResponse = (triggerWorkflowResponseSuccess | triggerWorkflowResponseError)
+
+export const getTriggerWorkflowUrl = (environmentId: string,) => {
+
+
+  
+
+  return `http://localhost:6000/environments/${environmentId}/workflows/trigger`
+}
+
+export const triggerWorkflow = async (environmentId: string,
+    triggerWorkflowDto: TriggerWorkflowDto, options?: RequestInit): Promise<triggerWorkflowResponse> => {
+  
+  const res = await fetch(getTriggerWorkflowUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      triggerWorkflowDto,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: triggerWorkflowResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as triggerWorkflowResponse
+}
+
+
+
+
+export const getTriggerWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext> => {
+
+const mutationKey = ['triggerWorkflow'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof triggerWorkflow>>, {environmentId: string;data: TriggerWorkflowDto}> = (props) => {
+          const {environmentId,data} = props ?? {};
+
+          return  triggerWorkflow(environmentId,data,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TriggerWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof triggerWorkflow>>>
+    export type TriggerWorkflowMutationBody = TriggerWorkflowDto
+    export type TriggerWorkflowMutationError = void
+
+    /**
+ * @summary Trigger a workflow
+ */
+export const useTriggerWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof triggerWorkflow>>,
+        TError,
+        {environmentId: string;data: TriggerWorkflowDto},
+        TContext
+      > => {
+
+      const mutationOptions = getTriggerWorkflowMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Creates a workflow definition: a named, ordered sequence of steps (currently email only), each with a delay relative to the previous step.
+ * @summary Create a new workflow
+ */
+export type createWorkflowResponse201 = {
+  data: WorkflowResponseDto
+  status: 201
+}
+
+export type createWorkflowResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type createWorkflowResponseSuccess = (createWorkflowResponse201) & {
+  headers: Headers;
+};
+export type createWorkflowResponseError = (createWorkflowResponse404) & {
+  headers: Headers;
+};
+
+export type createWorkflowResponse = (createWorkflowResponseSuccess | createWorkflowResponseError)
+
+export const getCreateWorkflowUrl = (environmentId: string,) => {
+
+
+  
+
+  return `http://localhost:6000/environments/${environmentId}/workflows`
+}
+
+export const createWorkflow = async (environmentId: string,
+    createWorkflowDto: CreateWorkflowDto, options?: RequestInit): Promise<createWorkflowResponse> => {
+  
+  const res = await fetch(getCreateWorkflowUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createWorkflowDto,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: createWorkflowResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createWorkflowResponse
+}
+
+
+
+
+export const getCreateWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext> => {
+
+const mutationKey = ['createWorkflow'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkflow>>, {environmentId: string;data: CreateWorkflowDto}> = (props) => {
+          const {environmentId,data} = props ?? {};
+
+          return  createWorkflow(environmentId,data,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkflow>>>
+    export type CreateWorkflowMutationBody = CreateWorkflowDto
+    export type CreateWorkflowMutationError = void
+
+    /**
+ * @summary Create a new workflow
+ */
+export const useCreateWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createWorkflow>>,
+        TError,
+        {environmentId: string;data: CreateWorkflowDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateWorkflowMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Returns a paginated list of workflows in the environment
+ * @summary List workflows
+ */
+export type listWorkflowsResponse200 = {
+  data: ListWorkflowsResponseDto
+  status: 200
+}
+
+export type listWorkflowsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type listWorkflowsResponseSuccess = (listWorkflowsResponse200) & {
+  headers: Headers;
+};
+export type listWorkflowsResponseError = (listWorkflowsResponse404) & {
+  headers: Headers;
+};
+
+export type listWorkflowsResponse = (listWorkflowsResponseSuccess | listWorkflowsResponseError)
+
+export const getListWorkflowsUrl = (environmentId: string,
+    params?: ListWorkflowsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `http://localhost:6000/environments/${environmentId}/workflows?${stringifiedParams}` : `http://localhost:6000/environments/${environmentId}/workflows`
+}
+
+export const listWorkflows = async (environmentId: string,
+    params?: ListWorkflowsParams, options?: RequestInit): Promise<listWorkflowsResponse> => {
+  
+  const res = await fetch(getListWorkflowsUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: listWorkflowsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listWorkflowsResponse
+}
+
+
+
+
+
+export const getListWorkflowsQueryKey = (environmentId?: string,
+    params?: ListWorkflowsParams,) => {
+    return [
+    `http://localhost:6000/environments/${environmentId}/workflows`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListWorkflowsQueryOptions = <TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(environmentId: string,
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, fetch?: RequestInit}
+) => {
+
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListWorkflowsQueryKey(environmentId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflows>>> = ({ signal }) => listWorkflows(environmentId,params, { signal, ...fetchOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListWorkflowsQueryResult = NonNullable<Awaited<ReturnType<typeof listWorkflows>>>
+export type ListWorkflowsQueryError = void
+
+
+export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
+ environmentId: string,
+    params: undefined |  ListWorkflowsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listWorkflows>>,
+          TError,
+          Awaited<ReturnType<typeof listWorkflows>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
+ environmentId: string,
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listWorkflows>>,
+          TError,
+          Awaited<ReturnType<typeof listWorkflows>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
+ environmentId: string,
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary List workflows
+ */
+
+export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
+ environmentId: string,
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getListWorkflowsQueryOptions(environmentId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Returns a single workflow with its steps
+ * @summary Get a workflow
+ */
+export type getWorkflowResponse200 = {
+  data: WorkflowResponseDto
+  status: 200
+}
+
+export type getWorkflowResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type getWorkflowResponseSuccess = (getWorkflowResponse200) & {
+  headers: Headers;
+};
+export type getWorkflowResponseError = (getWorkflowResponse404) & {
+  headers: Headers;
+};
+
+export type getWorkflowResponse = (getWorkflowResponseSuccess | getWorkflowResponseError)
+
+export const getGetWorkflowUrl = (environmentId: string,
+    workflowId: string,) => {
+
+
+  
+
+  return `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}`
+}
+
+export const getWorkflow = async (environmentId: string,
+    workflowId: string, options?: RequestInit): Promise<getWorkflowResponse> => {
+  
+  const res = await fetch(getGetWorkflowUrl(environmentId,workflowId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: getWorkflowResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getWorkflowResponse
+}
+
+
+
+
+
+export const getGetWorkflowQueryKey = (environmentId?: string,
+    workflowId?: string,) => {
+    return [
+    `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}`
+    ] as const;
+    }
+
+    
+export const getGetWorkflowQueryOptions = <TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(environmentId: string,
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, fetch?: RequestInit}
+) => {
+
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkflowQueryKey(environmentId,workflowId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkflow>>> = ({ signal }) => getWorkflow(environmentId,workflowId, { signal, ...fetchOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId && workflowId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetWorkflowQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkflow>>>
+export type GetWorkflowQueryError = void
+
+
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ environmentId: string,
+    workflowId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkflow>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkflow>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ environmentId: string,
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkflow>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkflow>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ environmentId: string,
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary Get a workflow
+ */
+
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ environmentId: string,
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getGetWorkflowQueryOptions(environmentId,workflowId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Updates workflow fields. If `steps` is provided, it replaces ALL existing steps.
+ * @summary Update a workflow
+ */
+export type updateWorkflowResponse200 = {
+  data: WorkflowResponseDto
+  status: 200
+}
+
+export type updateWorkflowResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type updateWorkflowResponseSuccess = (updateWorkflowResponse200) & {
+  headers: Headers;
+};
+export type updateWorkflowResponseError = (updateWorkflowResponse404) & {
+  headers: Headers;
+};
+
+export type updateWorkflowResponse = (updateWorkflowResponseSuccess | updateWorkflowResponseError)
+
+export const getUpdateWorkflowUrl = (environmentId: string,
+    workflowId: string,) => {
+
+
+  
+
+  return `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}`
+}
+
+export const updateWorkflow = async (environmentId: string,
+    workflowId: string,
+    updateWorkflowDto: UpdateWorkflowDto, options?: RequestInit): Promise<updateWorkflowResponse> => {
+  
+  const res = await fetch(getUpdateWorkflowUrl(environmentId,workflowId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateWorkflowDto,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: updateWorkflowResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as updateWorkflowResponse
+}
+
+
+
+
+export const getUpdateWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext> => {
+
+const mutationKey = ['updateWorkflow'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorkflow>>, {environmentId: string;workflowId: string;data: UpdateWorkflowDto}> = (props) => {
+          const {environmentId,workflowId,data} = props ?? {};
+
+          return  updateWorkflow(environmentId,workflowId,data,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorkflow>>>
+    export type UpdateWorkflowMutationBody = UpdateWorkflowDto
+    export type UpdateWorkflowMutationError = void
+
+    /**
+ * @summary Update a workflow
+ */
+export const useUpdateWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateWorkflow>>,
+        TError,
+        {environmentId: string;workflowId: string;data: UpdateWorkflowDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateWorkflowMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Soft-deletes a workflow. Existing in-flight runs are unaffected.
+ * @summary Delete a workflow
+ */
+export type deleteWorkflowResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteWorkflowResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type deleteWorkflowResponseSuccess = (deleteWorkflowResponse204) & {
+  headers: Headers;
+};
+export type deleteWorkflowResponseError = (deleteWorkflowResponse404) & {
+  headers: Headers;
+};
+
+export type deleteWorkflowResponse = (deleteWorkflowResponseSuccess | deleteWorkflowResponseError)
+
+export const getDeleteWorkflowUrl = (environmentId: string,
+    workflowId: string,) => {
+
+
+  
+
+  return `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}`
+}
+
+export const deleteWorkflow = async (environmentId: string,
+    workflowId: string, options?: RequestInit): Promise<deleteWorkflowResponse> => {
+  
+  const res = await fetch(getDeleteWorkflowUrl(environmentId,workflowId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: deleteWorkflowResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as deleteWorkflowResponse
+}
+
+
+
+
+export const getDeleteWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext> => {
+
+const mutationKey = ['deleteWorkflow'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkflow>>, {environmentId: string;workflowId: string}> = (props) => {
+          const {environmentId,workflowId} = props ?? {};
+
+          return  deleteWorkflow(environmentId,workflowId,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkflow>>>
+    
+    export type DeleteWorkflowMutationError = void
+
+    /**
+ * @summary Delete a workflow
+ */
+export const useDeleteWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkflow>>,
+        TError,
+        {environmentId: string;workflowId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteWorkflowMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Returns a paginated list of trigger runs for this workflow, most recent first
+ * @summary List runs for a workflow
+ */
+export type listWorkflowRunsResponse200 = {
+  data: ListRunsResponseDto
+  status: 200
+}
+
+export type listWorkflowRunsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type listWorkflowRunsResponseSuccess = (listWorkflowRunsResponse200) & {
+  headers: Headers;
+};
+export type listWorkflowRunsResponseError = (listWorkflowRunsResponse404) & {
+  headers: Headers;
+};
+
+export type listWorkflowRunsResponse = (listWorkflowRunsResponseSuccess | listWorkflowRunsResponseError)
+
+export const getListWorkflowRunsUrl = (environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}/runs?${stringifiedParams}` : `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}/runs`
+}
+
+export const listWorkflowRuns = async (environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: RequestInit): Promise<listWorkflowRunsResponse> => {
+  
+  const res = await fetch(getListWorkflowRunsUrl(environmentId,workflowId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: listWorkflowRunsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listWorkflowRunsResponse
+}
+
+
+
+
+
+export const getListWorkflowRunsQueryKey = (environmentId?: string,
+    workflowId?: string,
+    params?: ListWorkflowRunsParams,) => {
+    return [
+    `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}/runs`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListWorkflowRunsQueryOptions = <TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, fetch?: RequestInit}
+) => {
+
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListWorkflowRunsQueryKey(environmentId,workflowId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflowRuns>>> = ({ signal }) => listWorkflowRuns(environmentId,workflowId,params, { signal, ...fetchOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId && workflowId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListWorkflowRunsQueryResult = NonNullable<Awaited<ReturnType<typeof listWorkflowRuns>>>
+export type ListWorkflowRunsQueryError = void
+
+
+export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params: undefined |  ListWorkflowRunsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listWorkflowRuns>>,
+          TError,
+          Awaited<ReturnType<typeof listWorkflowRuns>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listWorkflowRuns>>,
+          TError,
+          Awaited<ReturnType<typeof listWorkflowRuns>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary List runs for a workflow
+ */
+
+export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getListWorkflowRunsQueryOptions(environmentId,workflowId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
