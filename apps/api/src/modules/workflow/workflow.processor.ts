@@ -6,7 +6,10 @@ import { createDrizzleClient } from "@subscriber.dev/db/client";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 import { sendRawEmail } from "@subscriber.dev/email";
-import { interpolate } from "@subscriber.dev/shared/utils";
+import {
+  createEmailUnsubscribeLink,
+  interpolate,
+} from "@subscriber.dev/shared/utils";
 
 import type { WorkflowStepJobData } from "./workflow.constants.js";
 import { WORKFLOW_QUEUE_NAME } from "./workflow.constants.js";
@@ -73,6 +76,10 @@ export class WorkflowProcessor extends WorkerHost {
           subject: string;
           body: string;
         };
+        const unsubscribeUrl = await createEmailUnsubscribeLink(
+          subscriber.environmentId,
+          subscriber.publicId,
+        );
         const context = {
           firstName: subscriber.firstName,
           lastName: subscriber.lastName,
@@ -80,6 +87,7 @@ export class WorkflowProcessor extends WorkerHost {
           email: subscriber.email,
           ...(subscriber.attributes ?? {}),
           ...(run.payload ?? {}),
+          unsubscribeUrl,
         };
         const subject = interpolate(config.subject, context);
         const html = interpolate(config.body, context);

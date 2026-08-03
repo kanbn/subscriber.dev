@@ -16,7 +16,7 @@ export const WorkflowStepSchema = z.object({
     .string()
     .min(1)
     .describe(
-      "HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload.",
+      "HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link.",
     ),
 });
 
