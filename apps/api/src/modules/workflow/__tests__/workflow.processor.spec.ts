@@ -3,12 +3,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 import { sendRawEmail } from "@subscriber.dev/email";
+import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
 
 import { WorkflowProcessor } from "../workflow.processor.js";
 
 vi.mock("@subscriber.dev/db/client", () => ({
   createDrizzleClient: vi.fn().mockReturnValue({}),
 }));
+
+vi.mock("@subscriber.dev/shared/utils", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@subscriber.dev/shared/utils")>();
+  return {
+    ...actual,
+    createEmailUnsubscribeLink: vi.fn(),
+  };
+});
 
 vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
   getRunStepById: vi.fn(),
@@ -42,6 +52,8 @@ const mockRun = { id: 5, subscriberId: 100, payload: null };
 
 const mockSubscriber = {
   id: 100,
+  publicId: "sub_alice",
+  environmentId: 10,
   email: "alice@example.com",
   firstName: "Alice",
   lastName: "Smith",
@@ -65,6 +77,9 @@ beforeEach(() => {
     email: true,
   } as any);
   vi.mocked(sendRawEmail).mockResolvedValue(undefined as any);
+  vi.mocked(createEmailUnsubscribeLink).mockResolvedValue(
+    "https://example.com/unsubscribe?token=abc",
+  );
 });
 
 function makeJob(runStepId = 1) {
@@ -105,6 +120,25 @@ describe("process", () => {
     expect(workflowRunRepo.completeRunIfAllStepsTerminal).toHaveBeenCalledWith(
       expect.anything(),
       5,
+    );
+  });
+
+  it("makes the subscriber's unsubscribe link available for interpolation", async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+      ...mockRunStep,
+      configSnapshot: {
+        subject: "Hi {{firstName}}",
+        body: "Bye - {{unsubscribeUrl}}",
+      },
+    } as any);
+
+    await processor.process(makeJob());
+
+    expect(createEmailUnsubscribeLink).toHaveBeenCalledWith(10, "sub_alice");
+    expect(sendRawEmail).toHaveBeenCalledWith(
+      "alice@example.com",
+      "Hi Alice",
+      "Bye - https://example.com/unsubscribe?token=abc",
     );
   });
 
