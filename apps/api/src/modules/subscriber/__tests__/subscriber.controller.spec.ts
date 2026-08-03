@@ -63,6 +63,7 @@ const mockService = {
   updateSubscriber: vi.fn(),
   deleteSubscriber: vi.fn(),
   updatePreferences: vi.fn(),
+  bulkUpsertSubscribers: vi.fn(),
 };
 
 let controller: SubscriberController;
@@ -193,6 +194,50 @@ describe("createSubscriber", () => {
 
     await expect(
       controller.createSubscriber(mockUser as any, "env_missing", {} as any),
+    ).rejects.toThrow(NotFoundException);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// POST /bulk — bulkUpsertSubscribers
+// ---------------------------------------------------------------------------
+
+describe("bulkUpsertSubscribers", () => {
+  it("delegates to the service", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    const serviceResult = {
+      results: [{ index: 0, status: "created" }],
+      summary: { created: 1, updated: 0, errored: 0 },
+    };
+    mockService.bulkUpsertSubscribers.mockResolvedValue(serviceResult);
+
+    const input = { subscribers: [{ email: "alice@example.com" }] };
+    const result = await controller.bulkUpsertSubscribers(
+      mockUser as any,
+      "env_abc",
+      input as any,
+    );
+
+    expect(result).toEqual(serviceResult);
+    expect(mockService.bulkUpsertSubscribers).toHaveBeenCalledWith(
+      {},
+      10,
+      input.subscribers,
+      1,
+    );
+  });
+
+  it("throws NotFoundException when environment does not exist", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      controller.bulkUpsertSubscribers(mockUser as any, "env_missing", {
+        subscribers: [],
+      } as any),
     ).rejects.toThrow(NotFoundException);
   });
 });

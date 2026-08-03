@@ -26,6 +26,18 @@ interface CreateSubscriberData {
   createdBy: number;
 }
 
+interface BulkUpsertSubscriberItem {
+  publicId?: string;
+  email?: string;
+  phone?: string;
+  externalId?: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  attributes?: Record<string, unknown>;
+  preferences?: { email?: boolean };
+}
+
 interface UpdatePreferencesData {
   subscriberId: number;
   email?: boolean;
@@ -179,6 +191,219 @@ export class SubscriberService {
         createdAt: preferences.createdAt,
       },
     };
+  }
+
+  async bulkUpsertSubscribers(
+    db: dbClient,
+    environmentId: number,
+    rows: BulkUpsertSubscriberItem[],
+    actorUserId: number,
+  ) {
+    const results: {
+      index: number;
+      status: "created" | "updated" | "error";
+      subscriber?: Awaited<ReturnType<typeof this.toSubscriberDto>>;
+      preferences?: {
+        publicId: string;
+        email: boolean;
+        version: number;
+        createdAt: Date;
+      };
+      error?: string;
+    }[] = [];
+
+    // Processed sequentially (not Promise.all) so a later row can correctly
+    // match/update a subscriber an earlier row in this same batch just created.
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      if (!row) continue;
+
+      try {
+        if (!row.publicId && !row.externalId && !row.email) {
+          throw new BadRequestException(
+            "At least one of publicId, externalId, or email must be provided",
+          );
+        }
+
+        const existing = await subscriberRepo.findSubscriberForUpsert(
+          db,
+          environmentId,
+          {
+            publicId: row.publicId,
+            externalId: row.externalId,
+            email: row.email,
+          },
+        );
+
+        if (existing) {
+          await this.assertNoIdentifierConflicts(
+            db,
+            environmentId,
+            existing.id,
+            row,
+          );
+
+          const subscriber = await subscriberRepo.updateSubscriber(
+            db,
+            existing.id,
+            {
+              email: row.email,
+              phone: row.phone,
+              externalId: row.externalId,
+              firstName: row.firstName,
+              lastName: row.lastName,
+              name: row.name,
+              attributes: row.attributes,
+              updatedBy: actorUserId,
+            },
+          );
+
+          if (!subscriber) {
+            throw new InternalServerErrorException(
+              "Failed to update subscriber",
+            );
+          }
+
+          let preferences = await subscriberRepo.getLatestPreferences(
+            db,
+            existing.id,
+          );
+
+          if (
+            row.preferences?.email !== undefined &&
+            (!preferences || preferences.email !== row.preferences.email)
+          ) {
+            preferences = await subscriberRepo.createSubscriberPreferences(db, {
+              subscriberId: existing.id,
+              email: row.preferences.email,
+            });
+          }
+
+          results.push({
+            index,
+            status: "updated",
+            subscriber: await this.toSubscriberDto(subscriber),
+            preferences: preferences
+              ? {
+                  publicId: preferences.publicId,
+                  email: preferences.email,
+                  version: preferences.version,
+                  createdAt: preferences.createdAt,
+                }
+              : undefined,
+          });
+        } else {
+          const subscriber = await subscriberRepo.createSubscriber(db, {
+            environmentId,
+            publicId: row.publicId ?? null,
+            email: row.email ?? null,
+            phone: row.phone ?? null,
+            externalId: row.externalId ?? null,
+            firstName: row.firstName ?? null,
+            lastName: row.lastName ?? null,
+            name: row.name ?? null,
+            attributes: row.attributes ?? null,
+            createdBy: actorUserId,
+          });
+
+          if (!subscriber) {
+            throw new InternalServerErrorException(
+              "Failed to create subscriber",
+            );
+          }
+
+          const preferences = await subscriberRepo.createSubscriberPreferences(
+            db,
+            {
+              subscriberId: subscriber.id,
+              email: row.preferences?.email ?? true,
+            },
+          );
+
+          if (!preferences) {
+            throw new InternalServerErrorException(
+              "Failed to create subscriber preferences",
+            );
+          }
+
+          results.push({
+            index,
+            status: "created",
+            subscriber: await this.toSubscriberDto(subscriber),
+            preferences: {
+              publicId: preferences.publicId,
+              email: preferences.email,
+              version: preferences.version,
+              createdAt: preferences.createdAt,
+            },
+          });
+        }
+      } catch (error) {
+        results.push({
+          index,
+          status: "error",
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
+
+    const summary = results.reduce(
+      (acc, result) => {
+        if (result.status === "created") acc.created++;
+        else if (result.status === "updated") acc.updated++;
+        else acc.errored++;
+        return acc;
+      },
+      { created: 0, updated: 0, errored: 0 },
+    );
+
+    return { results, summary };
+  }
+
+  private async assertNoIdentifierConflicts(
+    db: dbClient,
+    environmentId: number,
+    existingId: number,
+    row: BulkUpsertSubscriberItem,
+  ) {
+    if (row.publicId) {
+      const other = await subscriberRepo.getSubscriberByPublicId(
+        db,
+        environmentId,
+        row.publicId,
+      );
+      if (other && other.id !== existingId) {
+        throw new BadRequestException(
+          "publicId already belongs to a different subscriber in this environment",
+        );
+      }
+    }
+
+    if (row.externalId) {
+      const other = await subscriberRepo.getSubscriberByExternalId(
+        db,
+        environmentId,
+        row.externalId,
+      );
+      if (other && other.id !== existingId) {
+        throw new BadRequestException(
+          "externalId already belongs to a different subscriber in this environment",
+        );
+      }
+    }
+
+    if (row.email) {
+      const other = await subscriberRepo.getSubscriberByEmail(
+        db,
+        environmentId,
+        row.email,
+      );
+      if (other && other.id !== existingId) {
+        throw new BadRequestException(
+          "email already belongs to a different subscriber in this environment",
+        );
+      }
+    }
   }
 
   async updatePreferences(

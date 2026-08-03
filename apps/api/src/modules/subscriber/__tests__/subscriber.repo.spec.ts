@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
+  findSubscriberForUpsert,
   getSubscriberByPublicId,
   listSubscribers,
   softDeleteSubscriber,
@@ -87,6 +88,84 @@ describe("getSubscriberByPublicId", () => {
     expect(opts.where).toBeDefined();
     // Drizzle encodes compound conditions as objects; ensure it's not a single-field eq
     expect(String(opts.where)).not.toBe("sub_abc123");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// findSubscriberForUpsert
+// ---------------------------------------------------------------------------
+
+describe("findSubscriberForUpsert", () => {
+  it("matches on publicId first, without checking externalId or email", async () => {
+    const findFirst = vi.fn().mockResolvedValueOnce(mockSubscriber);
+    const db = makeMockDb({ findFirst });
+
+    const result = await findSubscriberForUpsert(db, 10, {
+      publicId: "sub_abc123",
+      externalId: "ext_1",
+      email: "alice@example.com",
+    });
+
+    expect(result).toEqual(mockSubscriber);
+    expect(findFirst).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls back to externalId when publicId does not match", async () => {
+    const findFirst = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(mockSubscriber);
+    const db = makeMockDb({ findFirst });
+
+    const result = await findSubscriberForUpsert(db, 10, {
+      publicId: "sub_missing",
+      externalId: "ext_1",
+      email: "alice@example.com",
+    });
+
+    expect(result).toEqual(mockSubscriber);
+    expect(findFirst).toHaveBeenCalledTimes(2);
+  });
+
+  it("falls back to email when externalId does not match", async () => {
+    const findFirst = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(mockSubscriber);
+    const db = makeMockDb({ findFirst });
+
+    const result = await findSubscriberForUpsert(db, 10, {
+      externalId: "ext_missing",
+      email: "alice@example.com",
+    });
+
+    expect(result).toEqual(mockSubscriber);
+    expect(findFirst).toHaveBeenCalledTimes(2);
+  });
+
+  it("skips identifiers that are not provided", async () => {
+    const findFirst = vi.fn().mockResolvedValueOnce(mockSubscriber);
+    const db = makeMockDb({ findFirst });
+
+    const result = await findSubscriberForUpsert(db, 10, {
+      email: "alice@example.com",
+    });
+
+    expect(result).toEqual(mockSubscriber);
+    expect(findFirst).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns undefined when nothing matches", async () => {
+    const findFirst = vi.fn().mockResolvedValue(undefined);
+    const db = makeMockDb({ findFirst });
+
+    const result = await findSubscriberForUpsert(db, 10, {
+      publicId: "sub_missing",
+      externalId: "ext_missing",
+      email: "missing@example.com",
+    });
+
+    expect(result).toBeUndefined();
   });
 });
 

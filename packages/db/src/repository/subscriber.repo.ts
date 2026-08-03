@@ -151,6 +151,45 @@ export const getSubscriberByPublicId = async (
   });
 };
 
+export const findSubscriberForUpsert = async (
+  db: dbClient,
+  environmentId: number,
+  identifiers: {
+    publicId?: string | null;
+    externalId?: string | null;
+    email?: string | null;
+  },
+) => {
+  if (identifiers.publicId) {
+    const match = await getSubscriberByPublicId(
+      db,
+      environmentId,
+      identifiers.publicId,
+    );
+    if (match) return match;
+  }
+
+  if (identifiers.externalId) {
+    const match = await getSubscriberByExternalId(
+      db,
+      environmentId,
+      identifiers.externalId,
+    );
+    if (match) return match;
+  }
+
+  if (identifiers.email) {
+    const match = await getSubscriberByEmail(
+      db,
+      environmentId,
+      identifiers.email,
+    );
+    if (match) return match;
+  }
+
+  return undefined;
+};
+
 export const listSubscribers = async (
   db: dbClient,
   environmentId: number,

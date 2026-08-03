@@ -13,6 +13,7 @@ vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
   getSubscriberById: vi.fn(),
   getSubscriberByEmail: vi.fn(),
   getSubscriberByExternalId: vi.fn(),
+  findSubscriberForUpsert: vi.fn(),
   getEnvironmentById: vi.fn(),
   listSubscribers: vi.fn(),
   createSubscriber: vi.fn(),
@@ -345,6 +346,174 @@ describe("createSubscriber", () => {
 
     expect(result.subscriber.publicId).toBe("sub_abc");
     expect(result.preferences.email).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// bulkUpsertSubscribers
+// ---------------------------------------------------------------------------
+
+describe("bulkUpsertSubscribers", () => {
+  it("creates a new subscriber when no existing match is found", async () => {
+    vi.mocked(repo.findSubscriberForUpsert).mockResolvedValue(undefined);
+    vi.mocked(repo.createSubscriber).mockResolvedValue(mockSubscriber as any);
+    vi.mocked(repo.createSubscriberPreferences).mockResolvedValue(
+      mockPreferences as any,
+    );
+
+    const result = await service.bulkUpsertSubscribers(
+      mockDb,
+      10,
+      [{ email: "alice@example.com" }],
+      1,
+    );
+
+    expect(result.results).toEqual([
+      expect.objectContaining({ index: 0, status: "created" }),
+    ]);
+    expect(result.summary).toEqual({ created: 1, updated: 0, errored: 0 });
+    expect(repo.createSubscriberPreferences).toHaveBeenCalledWith(mockDb, {
+      subscriberId: mockSubscriber.id,
+      email: true,
+    });
+  });
+
+  it("updates an existing subscriber when a match is found, without touching preferences if omitted", async () => {
+    vi.mocked(repo.findSubscriberForUpsert).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.getSubscriberByEmail).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.updateSubscriber).mockResolvedValue({
+      ...mockSubscriber,
+      firstName: "Bob",
+    } as any);
+    vi.mocked(repo.getLatestPreferences).mockResolvedValue(
+      mockPreferences as any,
+    );
+
+    const result = await service.bulkUpsertSubscribers(
+      mockDb,
+      10,
+      [{ email: "alice@example.com", firstName: "Bob" }],
+      1,
+    );
+
+    expect(result.results).toEqual([
+      expect.objectContaining({ index: 0, status: "updated" }),
+    ]);
+    expect(result.summary).toEqual({ created: 0, updated: 1, errored: 0 });
+    expect(repo.createSubscriberPreferences).not.toHaveBeenCalled();
+  });
+
+  it("creates a new preference version when preferences.email differs from latest", async () => {
+    vi.mocked(repo.findSubscriberForUpsert).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.getSubscriberByEmail).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.updateSubscriber).mockResolvedValue(mockSubscriber as any);
+    vi.mocked(repo.getLatestPreferences).mockResolvedValue({
+      ...mockPreferences,
+      email: true,
+    } as any);
+    vi.mocked(repo.createSubscriberPreferences).mockResolvedValue({
+      ...mockPreferences,
+      email: false,
+      version: 2,
+    } as any);
+
+    const result = await service.bulkUpsertSubscribers(
+      mockDb,
+      10,
+      [{ email: "alice@example.com", preferences: { email: false } }],
+      1,
+    );
+
+    expect(repo.createSubscriberPreferences).toHaveBeenCalledWith(mockDb, {
+      subscriberId: mockSubscriber.id,
+      email: false,
+    });
+    expect(result.results[0]).toEqual(
+      expect.objectContaining({
+        status: "updated",
+        preferences: expect.objectContaining({ email: false, version: 2 }),
+      }),
+    );
+  });
+
+  it("errors a row (without failing the batch) when no identifier is provided", async () => {
+    vi.mocked(repo.findSubscriberForUpsert).mockResolvedValue(undefined);
+    vi.mocked(repo.createSubscriber).mockResolvedValue(mockSubscriber as any);
+    vi.mocked(repo.createSubscriberPreferences).mockResolvedValue(
+      mockPreferences as any,
+    );
+
+    const result = await service.bulkUpsertSubscribers(
+      mockDb,
+      10,
+      [{}, { email: "alice@example.com" }],
+      1,
+    );
+
+    expect(result.results[0]).toEqual(
+      expect.objectContaining({ index: 0, status: "error" }),
+    );
+    expect(result.results[1]).toEqual(
+      expect.objectContaining({ index: 1, status: "created" }),
+    );
+    expect(result.summary).toEqual({ created: 1, updated: 0, errored: 1 });
+  });
+
+  it("errors a row when a provided identifier belongs to a different subscriber", async () => {
+    const otherSubscriber = { ...mockSubscriber, id: 2, externalId: "ext_2" };
+
+    vi.mocked(repo.findSubscriberForUpsert).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.getSubscriberByEmail).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(repo.getSubscriberByExternalId).mockResolvedValue(
+      otherSubscriber as any,
+    );
+
+    const result = await service.bulkUpsertSubscribers(
+      mockDb,
+      10,
+      [{ email: "alice@example.com", externalId: "ext_2" }],
+      1,
+    );
+
+    expect(result.results[0]).toEqual(
+      expect.objectContaining({ index: 0, status: "error" }),
+    );
+    expect(result.results[0]?.error).toMatch(/externalId/);
+    expect(repo.updateSubscriber).not.toHaveBeenCalled();
+    expect(result.summary).toEqual({ created: 0, updated: 0, errored: 1 });
+  });
+
+  it("isolates a failure on one row from the rest of the batch", async () => {
+    vi.mocked(repo.findSubscriberForUpsert).mockResolvedValue(undefined);
+    vi.mocked(repo.createSubscriber)
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(mockSubscriber as any);
+    vi.mocked(repo.createSubscriberPreferences).mockResolvedValue(
+      mockPreferences as any,
+    );
+
+    const result = await service.bulkUpsertSubscribers(
+      mockDb,
+      10,
+      [{ email: "fails@example.com" }, { email: "alice@example.com" }],
+      1,
+    );
+
+    expect(result.results[0]?.status).toBe("error");
+    expect(result.results[1]?.status).toBe("created");
+    expect(result.summary).toEqual({ created: 1, updated: 0, errored: 1 });
   });
 });
 

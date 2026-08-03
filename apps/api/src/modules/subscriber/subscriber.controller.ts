@@ -28,6 +28,10 @@ import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import {
+  BulkUpsertSubscribersDto,
+  BulkUpsertSubscribersResponseDto,
+} from "./dto/bulk-upsert-subscribers.dto.js";
+import {
   CreateSubscriberDto,
   CreateSubscriberResponseDto,
 } from "./dto/create-subscriber.dto.js";
@@ -165,6 +169,40 @@ export class SubscriberController {
       emailPreference: input.preferences?.email ?? true,
       createdBy: user.id,
     });
+  }
+
+  @Post("bulk")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "bulkUpsertSubscribers",
+    summary: "Bulk create or update subscribers",
+    description:
+      "Upserts up to 500 subscribers per request. Each row is matched to an existing subscriber by publicId, then externalId, then email (in that order); if none match, a new subscriber is created. Rows are processed independently, so one failing row does not fail the batch.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiResponse({ status: 200, type: BulkUpsertSubscribersResponseDto })
+  @ApiResponse({ status: 404, description: "Environment not found" })
+  async bulkUpsertSubscribers(
+    @CurrentUser() user: User,
+    @Param("environmentId") environmentId: string,
+    @Body() input: BulkUpsertSubscribersDto,
+  ): Promise<BulkUpsertSubscribersResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.subscriberService.bulkUpsertSubscribers(
+      db,
+      environment.id,
+      input.subscribers,
+      user.id,
+    );
   }
 
   @Patch(":subscriberId")
