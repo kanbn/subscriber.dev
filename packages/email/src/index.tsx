@@ -1,3 +1,3 @@
 export const name = "email";
 
-export { sendEmail } from "./sendEmail.js";
+export { sendEmail, sendRawEmail } from "./sendEmail.js";

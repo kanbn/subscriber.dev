@@ -36,6 +36,38 @@ const transporter = nodemailer.createTransport({
     }),
 });
 
+export const sendRawEmail = async (
+  to: string,
+  subject: string,
+  html: string,
+) => {
+  try {
+    const options = {
+      from: process.env.EMAIL_FROM,
+      to,
+      subject,
+      html,
+    };
+
+    const response = await transporter.sendMail(options);
+
+    if (!response.accepted.length) {
+      throw new Error(`Failed to send email: ${response.response}`);
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Raw email sending failed:", {
+      to,
+      from: process.env.EMAIL_FROM,
+      subject,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    throw error;
+  }
+};
+
 export const sendEmail = async (
   to: string,
   subject: string,
