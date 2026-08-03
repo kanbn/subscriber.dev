@@ -14,6 +14,7 @@ import {
 
 interface CreateSubscriberData {
   environmentId: number;
+  publicId?: string | null;
   email?: string | null;
   phone?: string | null;
   externalId?: string | null;
@@ -44,6 +45,7 @@ interface UpdateSubscriberData {
 
 interface SubscriberRow {
   publicId: string;
+  environmentId: number;
   email: string | null;
   phone: string | null;
   externalId: string | null;
@@ -69,22 +71,14 @@ export class SubscriberService {
       attributes: subscriber.attributes,
       createdAt: subscriber.createdAt,
       updatedAt: subscriber.updatedAt,
-      unsubscribeUrl: await createEmailUnsubscribeLink(subscriber.publicId),
+      unsubscribeUrl: await createEmailUnsubscribeLink(
+        subscriber.environmentId,
+        subscriber.publicId,
+      ),
     };
   }
 
-  async createSubscriber(
-    db: dbClient,
-    data: CreateSubscriberData,
-  ): Promise<{
-    subscriber: SubscriberRow & { unsubscribeUrl: string | null };
-    preferences: {
-      publicId: string;
-      email: boolean;
-      version: number;
-      createdAt: Date;
-    };
-  }> {
+  async createSubscriber(db: dbClient, data: CreateSubscriberData) {
     // Verify environment exists
     const environment = await subscriberRepo.getEnvironmentById(
       db,
@@ -132,9 +126,24 @@ export class SubscriberService {
       }
     }
 
+    if (data.publicId) {
+      const existingByPublicId = await subscriberRepo.getSubscriberByPublicId(
+        db,
+        data.environmentId,
+        data.publicId,
+      );
+
+      if (existingByPublicId) {
+        throw new BadRequestException(
+          "Subscriber with this publicId already exists in this environment",
+        );
+      }
+    }
+
     // Create subscriber
     const subscriber = await subscriberRepo.createSubscriber(db, {
       environmentId: data.environmentId,
+      publicId: data.publicId ?? null,
       email: data.email ?? null,
       phone: data.phone ?? null,
       externalId: data.externalId ?? null,
@@ -231,10 +240,11 @@ export class SubscriberService {
   ) {
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,
+      environmentId,
       subscriberPublicId,
     );
 
-    if (!subscriber || subscriber.environmentId !== environmentId) {
+    if (!subscriber) {
       throw new NotFoundException("Subscriber not found");
     }
 
@@ -303,10 +313,11 @@ export class SubscriberService {
   ) {
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,
+      environmentId,
       subscriberPublicId,
     );
 
-    if (!subscriber || subscriber.environmentId !== environmentId) {
+    if (!subscriber) {
       throw new NotFoundException("Subscriber not found");
     }
 
@@ -325,14 +336,15 @@ export class SubscriberService {
     db: dbClient,
     token: string,
   ): Promise<{ unsubscribed: boolean }> {
-    const subscriberPublicId = await verifyEmailUnsubscribeToken(token);
-    if (!subscriberPublicId) {
+    const verified = await verifyEmailUnsubscribeToken(token);
+    if (!verified) {
       throw new NotFoundException("Invalid or expired unsubscribe link");
     }
 
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,
-      subscriberPublicId,
+      verified.environmentId,
+      verified.subscriberPublicId,
     );
     if (!subscriber) {
       throw new NotFoundException("Invalid or expired unsubscribe link");

@@ -3,16 +3,24 @@ import { jwtVerify, SignJWT } from "jose";
 const encoder = new TextEncoder();
 const UNSUBSCRIBE_TOKEN_PURPOSE = "unsubscribe";
 
+export interface UnsubscribeTokenPayload {
+  environmentId: number;
+  subscriberPublicId: string;
+}
+
 /**
  * Creates a long‑lived unsubscribe link for a given subscriber.
  *
  * `${API_BASE_URL}/unsubscribe?token=<jwt>`
  *
- * The JWT payload only contains the subscriber's public ID and is scoped
- * to this purpose. There is no expiry on purpose – unsubscribe links
- * should remain valid indefinitely.
+ * The JWT payload contains the subscriber's public ID and the environment
+ * it belongs to (publicId is only unique per environment, not globally, so
+ * both are needed to resolve the subscriber) and is scoped to this purpose.
+ * There is no expiry on purpose – unsubscribe links should remain valid
+ * indefinitely.
  */
 export async function createEmailUnsubscribeLink(
+  environmentId: number,
   subscriberPublicId: string,
 ): Promise<string | null> {
   const baseUrl = process.env.API_BASE_URL;
@@ -24,6 +32,7 @@ export async function createEmailUnsubscribeLink(
   }
 
   const token = await new SignJWT({
+    environmentId,
     subscriberPublicId,
     purpose: UNSUBSCRIBE_TOKEN_PURPOSE,
   })
@@ -35,12 +44,13 @@ export async function createEmailUnsubscribeLink(
 }
 
 /**
- * Verifies an unsubscribe token and returns the subscriber's public ID,
- * or null if the token is missing, invalid, or signed for another purpose.
+ * Verifies an unsubscribe token and returns the environment ID and
+ * subscriber's public ID, or null if the token is missing, invalid, or
+ * signed for another purpose.
  */
 export async function verifyEmailUnsubscribeToken(
   token: string,
-): Promise<string | null> {
+): Promise<UnsubscribeTokenPayload | null> {
   const secret = process.env.EMAIL_UNSUBSCRIBE_SECRET;
   if (!secret) {
     return null;
@@ -51,12 +61,16 @@ export async function verifyEmailUnsubscribeToken(
 
     if (
       payload.purpose !== UNSUBSCRIBE_TOKEN_PURPOSE ||
-      typeof payload.subscriberPublicId !== "string"
+      typeof payload.subscriberPublicId !== "string" ||
+      typeof payload.environmentId !== "number"
     ) {
       return null;
     }
 
-    return payload.subscriberPublicId;
+    return {
+      environmentId: payload.environmentId,
+      subscriberPublicId: payload.subscriberPublicId,
+    };
   } catch {
     return null;
   }

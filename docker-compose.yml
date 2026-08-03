@@ -139,7 +139,7 @@ services:
       - POSTGRES_USER=subscriber
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - ${POSTGRES_PORT:-5332}:5432
+      - ${POSTGRES_PORT:-5432}:5432
     volumes:
       - sub_postgres_data:/var/lib/postgresql
     restart: unless-stopped

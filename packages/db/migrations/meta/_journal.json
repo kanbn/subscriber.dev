@@ -29,6 +29,13 @@
       "when": 1767967497856,
       "tag": "20260109140457_AddPublicIdToSubscriberPreferences",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785703343838,
+      "tag": "20260802204212_MakePublicIdEnvironmentScoped",
+      "breakpoints": true
     }
   ]
 }

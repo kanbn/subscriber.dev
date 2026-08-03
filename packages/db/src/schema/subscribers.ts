@@ -23,7 +23,6 @@ export const subscribers = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     publicId: text("publicId")
       .notNull()
-      .unique()
       .$defaultFn(() => generateUID()),
     environmentId: bigserial("environmentId", { mode: "number" })
       .notNull()
@@ -58,6 +57,10 @@ export const subscribers = pgTable(
     ),
   },
   (table) => [
+    unique("subscribers_environment_publicId").on(
+      table.environmentId,
+      table.publicId,
+    ),
     unique("subscribers_environment_externalId").on(
       table.environmentId,
       table.externalId,

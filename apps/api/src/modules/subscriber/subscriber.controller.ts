@@ -154,6 +154,7 @@ export class SubscriberController {
 
     return this.subscriberService.createSubscriber(db, {
       environmentId: environment.id,
+      publicId: input.publicId,
       email: input.email,
       phone: input.phone,
       externalId: input.externalId,
@@ -195,9 +196,10 @@ export class SubscriberController {
 
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,
+      environment.id,
       subscriberId,
     );
-    if (!subscriber || subscriber.environmentId !== environment.id) {
+    if (!subscriber) {
       throw new NotFoundException("Subscriber not found");
     }
 
@@ -286,14 +288,11 @@ export class SubscriberController {
 
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,
+      environment.id,
       subscriberId,
     );
     if (!subscriber) {
       throw new NotFoundException("Subscriber not found");
-    }
-
-    if (subscriber.environmentId !== environment.id) {
-      throw new NotFoundException("Subscriber not found in this environment");
     }
 
     return this.subscriberService.updatePreferences(db, {

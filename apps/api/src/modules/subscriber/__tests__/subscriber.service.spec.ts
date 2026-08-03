@@ -23,8 +23,9 @@ vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
 }));
 
 vi.mock("@subscriber.dev/shared/utils", () => ({
-  createEmailUnsubscribeLink: vi.fn((publicId: string) =>
-    Promise.resolve(`https://api.example.com/unsubscribe?token=${publicId}`),
+  createEmailUnsubscribeLink: vi.fn(
+    (_environmentId: number, publicId: string) =>
+      Promise.resolve(`https://api.example.com/unsubscribe?token=${publicId}`),
   ),
   verifyEmailUnsubscribeToken: vi.fn(),
 }));
@@ -122,10 +123,9 @@ describe("getSubscriber", () => {
   });
 
   it("throws NotFoundException when subscriber belongs to a different environment", async () => {
-    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue({
-      ...mockSubscriber,
-      environmentId: 999,
-    } as any);
+    // A per-environment-scoped query returns nothing for a publicId that
+    // exists only in a different environment.
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(undefined);
 
     await expect(service.getSubscriber(mockDb, 10, "sub_abc")).rejects.toThrow(
       NotFoundException,
@@ -256,10 +256,9 @@ describe("deleteSubscriber", () => {
   });
 
   it("throws NotFoundException when subscriber belongs to a different environment", async () => {
-    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue({
-      ...mockSubscriber,
-      environmentId: 999,
-    } as any);
+    // A per-environment-scoped query returns nothing for a publicId that
+    // exists only in a different environment.
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(undefined);
 
     await expect(
       service.deleteSubscriber(mockDb, 10, "sub_abc", 1),
@@ -364,9 +363,10 @@ describe("unsubscribeByToken", () => {
   });
 
   it("throws NotFoundException when the subscriber no longer exists", async () => {
-    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue(
-      "sub_abc",
-    );
+    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue({
+      environmentId: 10,
+      subscriberPublicId: "sub_abc",
+    });
     vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(undefined);
 
     await expect(
@@ -375,9 +375,10 @@ describe("unsubscribeByToken", () => {
   });
 
   it("creates a new preference version turning email off", async () => {
-    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue(
-      "sub_abc",
-    );
+    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue({
+      environmentId: 10,
+      subscriberPublicId: "sub_abc",
+    });
     vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
       mockSubscriber as any,
     );
@@ -400,9 +401,10 @@ describe("unsubscribeByToken", () => {
   });
 
   it("is a no-op when already unsubscribed", async () => {
-    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue(
-      "sub_abc",
-    );
+    vi.mocked(sharedUtils.verifyEmailUnsubscribeToken).mockResolvedValue({
+      environmentId: 10,
+      subscriberPublicId: "sub_abc",
+    });
     vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
       mockSubscriber as any,
     );

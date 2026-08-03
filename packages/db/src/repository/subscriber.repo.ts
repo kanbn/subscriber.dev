@@ -64,6 +64,7 @@ export const createSubscriber = async (
   db: dbClient,
   data: {
     environmentId: number;
+    publicId?: string | null;
     email?: string | null;
     phone?: string | null;
     externalId?: string | null;
@@ -77,7 +78,7 @@ export const createSubscriber = async (
   const [result] = await db
     .insert(subscribers)
     .values({
-      publicId: generateUID(),
+      publicId: data.publicId ?? generateUID(),
       environmentId: data.environmentId,
       email: data.email ?? null,
       phone: data.phone ?? null,
@@ -138,10 +139,12 @@ export const getSubscriberById = async (db: dbClient, id: number) => {
 
 export const getSubscriberByPublicId = async (
   db: dbClient,
+  environmentId: number,
   publicId: string,
 ) => {
   return await db.query.subscribers.findFirst({
     where: and(
+      eq(subscribers.environmentId, environmentId),
       eq(subscribers.publicId, publicId),
       isNull(subscribers.deletedAt),
     ),

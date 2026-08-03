@@ -829,6 +829,12 @@
       "CreateSubscriberDto": {
         "type": "object",
         "properties": {
+          "publicId": {
+            "description": "Bring your own identifier for this subscriber. Must be unique within the environment. If omitted, one is generated automatically.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
           "email": {
             "type": "string",
             "format": "email"

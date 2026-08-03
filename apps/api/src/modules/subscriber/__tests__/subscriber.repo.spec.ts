@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
   getSubscriberByPublicId,
   listSubscribers,
-  updateSubscriber,
   softDeleteSubscriber,
+  updateSubscriber,
 } from "@subscriber.dev/db/repository/subscriber.repo";
 
 // ---------------------------------------------------------------------------
@@ -19,11 +19,13 @@ function makeReturning(value: unknown) {
   return { set, where, returning };
 }
 
-function makeMockDb(overrides: Partial<{
-  findFirst: ReturnType<typeof vi.fn>;
-  findMany: ReturnType<typeof vi.fn>;
-  updateChain: ReturnType<typeof makeReturning>;
-}>  = {}) {
+function makeMockDb(
+  overrides: Partial<{
+    findFirst: ReturnType<typeof vi.fn>;
+    findMany: ReturnType<typeof vi.fn>;
+    updateChain: ReturnType<typeof makeReturning>;
+  }> = {},
+) {
   const findFirst = overrides.findFirst ?? vi.fn();
   const findMany = overrides.findMany ?? vi.fn();
   const updateChain = overrides.updateChain ?? makeReturning([]);
@@ -63,21 +65,23 @@ const mockSubscriber = {
 
 describe("getSubscriberByPublicId", () => {
   it("returns the subscriber when found", async () => {
-    const db = makeMockDb({ findFirst: vi.fn().mockResolvedValue(mockSubscriber) });
-    const result = await getSubscriberByPublicId(db, "sub_abc123");
+    const db = makeMockDb({
+      findFirst: vi.fn().mockResolvedValue(mockSubscriber),
+    });
+    const result = await getSubscriberByPublicId(db, 10, "sub_abc123");
     expect(result).toEqual(mockSubscriber);
   });
 
   it("returns undefined when not found", async () => {
     const db = makeMockDb({ findFirst: vi.fn().mockResolvedValue(undefined) });
-    const result = await getSubscriberByPublicId(db, "sub_missing");
+    const result = await getSubscriberByPublicId(db, 10, "sub_missing");
     expect(result).toBeUndefined();
   });
 
   it("passes isNull(deletedAt) in the where clause", async () => {
     const findFirst = vi.fn().mockResolvedValue(undefined);
     const db = makeMockDb({ findFirst });
-    await getSubscriberByPublicId(db, "sub_abc123");
+    await getSubscriberByPublicId(db, 10, "sub_abc123");
     const [opts] = findFirst.mock.calls[0];
     // The where condition is a compound `and(...)` — verify it's not a plain eq
     expect(opts.where).toBeDefined();
@@ -92,7 +96,9 @@ describe("getSubscriberByPublicId", () => {
 
 describe("listSubscribers", () => {
   it("returns subscribers for the environment", async () => {
-    const db = makeMockDb({ findMany: vi.fn().mockResolvedValue([mockSubscriber]) });
+    const db = makeMockDb({
+      findMany: vi.fn().mockResolvedValue([mockSubscriber]),
+    });
     const result = await listSubscribers(db, 10, { limit: 20, offset: 0 });
     expect(result).toHaveLength(1);
     expect(result[0]?.publicId).toBe("sub_abc123");

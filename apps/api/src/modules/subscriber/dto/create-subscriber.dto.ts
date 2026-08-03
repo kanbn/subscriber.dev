@@ -2,6 +2,14 @@ import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
 export const CreateSubscriberSchema = z.object({
+  publicId: z
+    .string()
+    .min(1)
+    .max(255)
+    .optional()
+    .describe(
+      "Bring your own identifier for this subscriber. Must be unique within the environment. If omitted, one is generated automatically.",
+    ),
   email: z.string().email().optional(),
   phone: z.string().optional(),
   externalId: z.string().optional(),

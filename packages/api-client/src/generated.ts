@@ -163,6 +163,12 @@ export type CreateSubscriberDtoPreferences = {
 };
 
 export interface CreateSubscriberDto {
+  /**
+   * Bring your own identifier for this subscriber. Must be unique within the environment. If omitted, one is generated automatically.
+   * @minLength 1
+   * @maxLength 255
+   */
+  publicId?: string;
   email?: string;
   phone?: string;
   externalId?: string;
