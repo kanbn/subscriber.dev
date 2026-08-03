@@ -36,6 +36,13 @@
       "when": 1785703343838,
       "tag": "20260802204212_MakePublicIdEnvironmentScoped",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1785783968882,
+      "tag": "20260803190608_AddWorkflowsTables",
+      "breakpoints": true
     }
   ]
 }
