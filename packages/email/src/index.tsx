@@ -1,3 +1,4 @@
 export const name = "email";
 
-export { sendEmail, sendRawEmail } from "./sendEmail.js";
+export type { SmtpConfig } from "./sendEmail.js";
+export { sendEmail, sendRawEmail, verifySmtpConnection } from "./sendEmail.js";

@@ -36,20 +36,42 @@ const transporter = nodemailer.createTransport({
     }),
 });
 
+export interface SmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  password: string;
+  from: string;
+}
+
+const buildTransporter = (config: Omit<SmtpConfig, "from">) =>
+  nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: { user: config.user, pass: config.password },
+  });
+
+export const verifySmtpConnection = async (
+  config: Omit<SmtpConfig, "from">,
+) => {
+  await buildTransporter(config).verify();
+};
+
 export const sendRawEmail = async (
+  config: SmtpConfig,
   to: string,
   subject: string,
   html: string,
 ) => {
   try {
-    const options = {
-      from: process.env.EMAIL_FROM,
+    const response = await buildTransporter(config).sendMail({
+      from: config.from,
       to,
       subject,
       html,
-    };
-
-    const response = await transporter.sendMail(options);
+    });
 
     if (!response.accepted.length) {
       throw new Error(`Failed to send email: ${response.response}`);
@@ -59,7 +81,7 @@ export const sendRawEmail = async (
   } catch (error) {
     console.error("Raw email sending failed:", {
       to,
-      from: process.env.EMAIL_FROM,
+      from: config.from,
       subject,
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,

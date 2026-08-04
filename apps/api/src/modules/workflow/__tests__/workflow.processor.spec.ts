@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 import { sendRawEmail } from "@subscriber.dev/email";
 import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
 
+import { decrypt } from "../../../common/encryption.js";
 import { WorkflowProcessor } from "../workflow.processor.js";
 
 vi.mock("@subscriber.dev/db/client", () => ({
@@ -31,6 +33,14 @@ vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
 vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
   getSubscriberById: vi.fn(),
   getLatestPreferences: vi.fn(),
+}));
+
+vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
+  getByEnvironmentAndType: vi.fn(),
+}));
+
+vi.mock("../../../common/encryption.js", () => ({
+  decrypt: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/email", () => ({
@@ -80,6 +90,21 @@ beforeEach(() => {
   vi.mocked(createEmailUnsubscribeLink).mockResolvedValue(
     "https://example.com/unsubscribe?token=abc",
   );
+  vi.mocked(
+    environmentIntegrationsRepo.getByEnvironmentAndType,
+  ).mockResolvedValue({
+    config: {
+      host: "smtp.example.com",
+      port: 587,
+      secure: false,
+      fromEmail: "hello@example.com",
+      fromName: "Example",
+    },
+    encryptedSecret: "encrypted-blob",
+  } as any);
+  vi.mocked(decrypt).mockReturnValue(
+    JSON.stringify({ user: "smtp-user", password: "s3cret" }),
+  );
 });
 
 function makeJob(runStepId = 1) {
@@ -107,7 +132,15 @@ describe("process", () => {
   it("sends the interpolated email and marks the run-step sent when subscribed", async () => {
     await processor.process(makeJob());
 
-    const [to, subject, html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    const [config, to, subject, html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(config).toEqual({
+      host: "smtp.example.com",
+      port: 587,
+      secure: false,
+      user: "smtp-user",
+      password: "s3cret",
+      from: "Example <hello@example.com>",
+    });
     expect(to).toBe("alice@example.com");
     expect(subject).toBe("Hi Alice");
     expect(html).toContain("Welcome Alice!");
@@ -129,7 +162,7 @@ describe("process", () => {
     await processor.process(makeJob());
 
     expect(createEmailUnsubscribeLink).toHaveBeenCalledWith(10, "sub_alice");
-    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
     expect(html).toContain('href="https://example.com/unsubscribe?token=abc"');
   });
 
@@ -144,7 +177,7 @@ describe("process", () => {
 
     await processor.process(makeJob());
 
-    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
     expect(html).toBe("Bye - https://example.com/unsubscribe?token=abc");
   });
 
@@ -159,7 +192,7 @@ describe("process", () => {
 
     await processor.process(makeJob());
 
-    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
     expect(html).toContain("Hey Alice,");
   });
 
@@ -178,7 +211,7 @@ describe("process", () => {
 
     await processor.process(makeJob());
 
-    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
     expect(html).toContain("Hey there,");
   });
 
@@ -187,7 +220,7 @@ describe("process", () => {
 
     await processor.process(makeJob());
 
-    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
     expect(html).toBe("Welcome Alice!");
   });
 
@@ -234,6 +267,22 @@ describe("process", () => {
       1,
       "failed",
       "SMTP down",
+    );
+  });
+
+  it("marks the run-step failed when no SMTP integration is configured for the environment", async () => {
+    vi.mocked(
+      environmentIntegrationsRepo.getByEnvironmentAndType,
+    ).mockResolvedValue(undefined);
+
+    await processor.process(makeJob());
+
+    expect(sendRawEmail).not.toHaveBeenCalled();
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      1,
+      "failed",
+      "No SMTP integration configured for this environment",
     );
   });
 

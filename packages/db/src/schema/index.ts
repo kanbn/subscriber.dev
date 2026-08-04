@@ -5,3 +5,4 @@ export * from "./environments.js";
 export * from "./invitations.js";
 export * from "./subscribers.js";
 export * from "./workflows.js";
+export * from "./environmentIntegrations.js";
