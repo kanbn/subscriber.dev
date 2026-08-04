@@ -90,7 +90,12 @@ export class WorkflowProcessor extends WorkerHost {
           unsubscribeUrl,
         };
         const subject = interpolate(config.subject, context);
-        const html = interpolate(config.body, context);
+        // Appended unconditionally (not left to the {{unsubscribeUrl}} token
+        // being remembered in the template) so every workflow email carries
+        // a working unsubscribe link, matching subscriber.dev's core promise.
+        const html = unsubscribeUrl
+          ? `${interpolate(config.body, context)}<hr><p style="font-size:12px;color:#666;">Don't want these emails? <a href="${unsubscribeUrl}">Unsubscribe</a></p>`
+          : interpolate(config.body, context);
 
         try {
           await sendRawEmail(subscriber.email, subject, html);

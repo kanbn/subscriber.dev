@@ -107,11 +107,10 @@ describe("process", () => {
   it("sends the interpolated email and marks the run-step sent when subscribed", async () => {
     await processor.process(makeJob());
 
-    expect(sendRawEmail).toHaveBeenCalledWith(
-      "alice@example.com",
-      "Hi Alice",
-      "Welcome Alice!",
-    );
+    const [to, subject, html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(to).toBe("alice@example.com");
+    expect(subject).toBe("Hi Alice");
+    expect(html).toContain("Welcome Alice!");
     expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
       expect.anything(),
       1,
@@ -123,7 +122,20 @@ describe("process", () => {
     );
   });
 
-  it("makes the subscriber's unsubscribe link available for interpolation", async () => {
+  it("always appends a working unsubscribe link, even when the template doesn't reference {{unsubscribeUrl}}", async () => {
+    // mockRunStep's body has no {{unsubscribeUrl}} token - this is the actual
+    // bug this test guards against: the link must not depend on the workflow
+    // author remembering to include it.
+    await processor.process(makeJob());
+
+    expect(createEmailUnsubscribeLink).toHaveBeenCalledWith(10, "sub_alice");
+    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toContain(
+      'href="https://example.com/unsubscribe?token=abc"',
+    );
+  });
+
+  it("also supports {{unsubscribeUrl}} interpolation for custom placement", async () => {
     vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
       ...mockRunStep,
       configSnapshot: {
@@ -134,12 +146,17 @@ describe("process", () => {
 
     await processor.process(makeJob());
 
-    expect(createEmailUnsubscribeLink).toHaveBeenCalledWith(10, "sub_alice");
-    expect(sendRawEmail).toHaveBeenCalledWith(
-      "alice@example.com",
-      "Hi Alice",
-      "Bye - https://example.com/unsubscribe?token=abc",
-    );
+    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toContain("Bye - https://example.com/unsubscribe?token=abc");
+  });
+
+  it("skips the footer when no unsubscribe link could be generated", async () => {
+    vi.mocked(createEmailUnsubscribeLink).mockResolvedValue(null);
+
+    await processor.process(makeJob());
+
+    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toBe("Welcome Alice!");
   });
 
   it("skips sending and marks skipped when the subscriber opted out of email", async () => {
