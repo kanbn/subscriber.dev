@@ -50,6 +50,17 @@ export class WorkflowProcessor extends WorkerHost {
       return;
     }
 
+    const baseContext = {
+      subscriber: {
+        firstName: subscriber.firstName,
+        lastName: subscriber.lastName,
+        name: subscriber.name,
+        email: subscriber.email,
+        ...(subscriber.attributes ?? {}),
+      },
+      ...(run.payload ?? {}),
+    };
+
     if (runStep.type === "email") {
       const preferences = await subscriberRepo.getLatestPreferences(
         db,
@@ -78,15 +89,7 @@ export class WorkflowProcessor extends WorkerHost {
           subscriber.environmentId,
           subscriber.publicId,
         );
-        const context = {
-          firstName: subscriber.firstName,
-          lastName: subscriber.lastName,
-          name: subscriber.name,
-          email: subscriber.email,
-          ...(subscriber.attributes ?? {}),
-          ...(run.payload ?? {}),
-          unsubscribeUrl,
-        };
+        const context = { ...baseContext, unsubscribeUrl };
         const subject = await renderTemplate(config.subject, context);
         const interpolatedBody = await renderTemplate(config.body, context);
         const bodyHasUnsubscribeToken =
@@ -109,6 +112,37 @@ export class WorkflowProcessor extends WorkerHost {
           throw error;
         }
       }
+    } else if (runStep.type === "webhook") {
+      const config = runStep.configSnapshot as { url: string; body: string };
+      const payload = await renderTemplate(config.body, baseContext);
+
+      try {
+        JSON.parse(payload);
+        const response = await fetch(config.url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+        });
+        if (!response.ok) {
+          throw new Error(`Webhook responded with ${response.status}`);
+        }
+        await workflowRunRepo.updateRunStepStatus(db, runStep.id, "sent");
+      } catch (error) {
+        await workflowRunRepo.updateRunStepStatus(
+          db,
+          runStep.id,
+          "failed",
+          error instanceof Error ? error.message : "Unknown error",
+        );
+        throw error;
+      }
+    } else {
+      await workflowRunRepo.updateRunStepStatus(
+        db,
+        runStep.id,
+        "failed",
+        `Unsupported step type: ${runStep.type}`,
+      );
     }
 
     await workflowRunRepo.completeRunIfAllStepsTerminal(db, run.id);

@@ -93,7 +93,7 @@ export class WorkflowController {
     operationId: "createWorkflow",
     summary: "Create a new workflow",
     description:
-      "Creates a workflow definition: a named, ordered sequence of steps (currently email only), each with a delay relative to the previous step.",
+      "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step.",
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 201, type: WorkflowResponseDto })

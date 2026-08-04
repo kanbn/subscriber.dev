@@ -1,3 +1,4 @@
+import type { z } from "zod";
 import { InjectQueue } from "@nestjs/bullmq";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Queue } from "bullmq";
@@ -7,18 +8,14 @@ import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
+import type { WorkflowStepSchema } from "./dto/create-workflow.dto.js";
 import type { WorkflowStepJobData } from "./workflow.constants.js";
 import {
   WORKFLOW_QUEUE_NAME,
   WORKFLOW_STEP_JOB_NAME,
 } from "./workflow.constants.js";
 
-interface WorkflowStepInput {
-  type?: string;
-  delayMs?: number;
-  subject: string;
-  body: string;
-}
+type WorkflowStepInput = z.infer<typeof WorkflowStepSchema>;
 
 interface CreateWorkflowData {
   key: string;
@@ -77,13 +74,11 @@ export class WorkflowService {
       description: workflow.description,
       status: workflow.status,
       steps: steps.map((s) => ({
+        ...s.config,
         publicId: s.publicId,
         stepOrder: s.stepOrder,
         type: s.type,
         delayMs: s.delayMs,
-        subject:
-          typeof s.config.subject === "string" ? s.config.subject : undefined,
-        body: typeof s.config.body === "string" ? s.config.body : undefined,
       })),
       createdAt: workflow.createdAt,
       updatedAt: workflow.updatedAt,
@@ -91,11 +86,10 @@ export class WorkflowService {
   }
 
   private toStepInputs(steps: WorkflowStepInput[]) {
-    return steps.map((s) => ({
-      type: s.type ?? "email",
-      delayMs: s.delayMs ?? 0,
-      config: { subject: s.subject, body: s.body },
-    }));
+    return steps.map((s) => {
+      const { type, delayMs, ...config } = s;
+      return { type, delayMs, config };
+    });
   }
 
   async createWorkflow(

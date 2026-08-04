@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
@@ -43,8 +43,8 @@ const mockRunStep = {
   status: "pending" as const,
   type: "email",
   configSnapshot: {
-    subject: "Hi {{firstName}}",
-    body: "Welcome {{firstName}}!",
+    subject: "Hi {{ subscriber.firstName }}",
+    body: "Welcome {{ subscriber.firstName }}!",
   },
 };
 
@@ -137,7 +137,7 @@ describe("process", () => {
     vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
       ...mockRunStep,
       configSnapshot: {
-        subject: "Hi {{firstName}}",
+        subject: "Hi {{ subscriber.firstName }}",
         body: "Bye - {{unsubscribeUrl}}",
       },
     } as any);
@@ -153,7 +153,7 @@ describe("process", () => {
       ...mockRunStep,
       configSnapshot: {
         subject: "Hi",
-        body: "Hey {% if firstName %}{{ firstName }}{% else %}there{% endif %},",
+        body: "Hey {% if subscriber.firstName %}{{ subscriber.firstName }}{% else %}there{% endif %},",
       },
     } as any);
 
@@ -172,7 +172,7 @@ describe("process", () => {
       ...mockRunStep,
       configSnapshot: {
         subject: "Hi",
-        body: "Hey {% if firstName %}{{ firstName }}{% else %}there{% endif %},",
+        body: "Hey {% if subscriber.firstName %}{{ subscriber.firstName }}{% else %}there{% endif %},",
       },
     } as any);
 
@@ -247,6 +247,103 @@ describe("process", () => {
       1,
       "skipped",
       "Subscriber not found",
+    );
+  });
+});
+
+describe("webhook steps", () => {
+  const mockWebhookRunStep = {
+    id: 2,
+    runId: 5,
+    status: "pending" as const,
+    type: "webhook",
+    configSnapshot: {
+      url: "https://discord.com/api/webhooks/xyz",
+      body: '{"content": "{{ subscriber.email }} just signed up!"}',
+    },
+  };
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("POSTs the rendered JSON payload and marks the run-step sent on a 2xx response", async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue(
+      mockWebhookRunStep as any,
+    );
+    vi.mocked(fetch).mockResolvedValue({ ok: true, status: 200 } as any);
+
+    await processor.process(makeJob(2));
+
+    expect(fetch).toHaveBeenCalledWith("https://discord.com/api/webhooks/xyz", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: '{"content": "alice@example.com just signed up!"}',
+    });
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      2,
+      "sent",
+    );
+  });
+
+  it("marks the run-step failed and rethrows on a non-2xx response", async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue(
+      mockWebhookRunStep as any,
+    );
+    vi.mocked(fetch).mockResolvedValue({ ok: false, status: 500 } as any);
+
+    await expect(processor.process(makeJob(2))).rejects.toThrow(
+      "Webhook responded with 500",
+    );
+
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      2,
+      "failed",
+      "Webhook responded with 500",
+    );
+  });
+
+  it("marks the run-step failed without making a network call when the rendered body isn't valid JSON", async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+      ...mockWebhookRunStep,
+      configSnapshot: {
+        url: "https://discord.com/api/webhooks/xyz",
+        body: '{"content": "{{ subscriber.email }} just signed up!"',
+      },
+    } as any);
+
+    await expect(processor.process(makeJob(2))).rejects.toThrow();
+
+    expect(fetch).not.toHaveBeenCalled();
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      2,
+      "failed",
+      expect.any(String),
+    );
+  });
+});
+
+describe("unsupported step types", () => {
+  it("marks the run-step failed for a type that isn't email or webhook", async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+      ...mockRunStep,
+      type: "sms",
+    } as any);
+
+    await processor.process(makeJob());
+
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      1,
+      "failed",
+      "Unsupported step type: sms",
     );
   });
 });

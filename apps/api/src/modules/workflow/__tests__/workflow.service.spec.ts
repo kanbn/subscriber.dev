@@ -248,7 +248,7 @@ describe("cancelPendingRunsForSubscriber", () => {
 // ---------------------------------------------------------------------------
 
 describe("createWorkflow", () => {
-  it("defaults step type to email and delayMs to 0", async () => {
+  it("passes email step config straight through", async () => {
     const workflow = {
       publicId: "wf_abc",
       key: "user-signup",
@@ -274,7 +274,7 @@ describe("createWorkflow", () => {
     const result = await service.createWorkflow(mockDb, 10, {
       key: "user-signup",
       name: "Signup",
-      steps: [{ subject: "hi", body: "hi" }],
+      steps: [{ type: "email", delayMs: 0, subject: "hi", body: "hi" }],
       createdBy: 1,
     });
 
@@ -289,5 +289,51 @@ describe("createWorkflow", () => {
     expect(result.workflow.steps[0]).toEqual(
       expect.objectContaining({ subject: "hi", body: "hi" }),
     );
+  });
+
+  it("passes webhook step config straight through, without email fields bleeding in", async () => {
+    const workflow = {
+      publicId: "wf_abc",
+      key: "user-signup",
+      name: "Signup",
+      description: null,
+      status: "active" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const webhookConfig = {
+      url: "https://discord.com/api/webhooks/xyz",
+      body: '{"content":"hi"}',
+    };
+    vi.mocked(workflowRepo.createWorkflow).mockResolvedValue({
+      workflow,
+      steps: [
+        {
+          publicId: "step_1",
+          stepOrder: 0,
+          type: "webhook",
+          delayMs: 0,
+          config: webhookConfig,
+        },
+      ],
+    } as any);
+
+    const result = await service.createWorkflow(mockDb, 10, {
+      key: "user-signup",
+      name: "Signup",
+      steps: [{ type: "webhook", delayMs: 0, ...webhookConfig }],
+      createdBy: 1,
+    });
+
+    expect(workflowRepo.createWorkflow).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({
+        steps: [{ type: "webhook", delayMs: 0, config: webhookConfig }],
+      }),
+    );
+    expect(result.workflow.steps[0]).toEqual(
+      expect.objectContaining(webhookConfig),
+    );
+    expect(result.workflow.steps[0]).not.toHaveProperty("subject");
   });
 });
