@@ -6,13 +6,11 @@ import { createDrizzleClient } from "@subscriber.dev/db/client";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 import { sendRawEmail } from "@subscriber.dev/email";
-import {
-  createEmailUnsubscribeLink,
-  interpolate,
-} from "@subscriber.dev/shared/utils";
+import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
 
 import type { WorkflowStepJobData } from "./workflow.constants.js";
 import { WORKFLOW_QUEUE_NAME } from "./workflow.constants.js";
+import { renderTemplate } from "./workflow.template.js";
 
 @Processor(WORKFLOW_QUEUE_NAME)
 @Injectable()
@@ -89,13 +87,14 @@ export class WorkflowProcessor extends WorkerHost {
           ...(run.payload ?? {}),
           unsubscribeUrl,
         };
-        const subject = interpolate(config.subject, context);
-        // Appended unconditionally (not left to the {{unsubscribeUrl}} token
-        // being remembered in the template) so every workflow email carries
-        // a working unsubscribe link, matching subscriber.dev's core promise.
-        const html = unsubscribeUrl
-          ? `${interpolate(config.body, context)}<hr><p style="font-size:12px;color:#666;">Don't want these emails? <a href="${unsubscribeUrl}">Unsubscribe</a></p>`
-          : interpolate(config.body, context);
+        const subject = await renderTemplate(config.subject, context);
+        const interpolatedBody = await renderTemplate(config.body, context);
+        const bodyHasUnsubscribeToken =
+          config.body.includes("{{unsubscribeUrl}}");
+        const html =
+          unsubscribeUrl && !bodyHasUnsubscribeToken
+            ? `${interpolatedBody}<p style="font-size:12px;color:#666;">Don't want these emails? <a href="${unsubscribeUrl}">Unsubscribe</a></p>`
+            : interpolatedBody;
 
         try {
           await sendRawEmail(subscriber.email, subject, html);

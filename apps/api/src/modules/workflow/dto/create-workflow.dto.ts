@@ -16,7 +16,7 @@ export const WorkflowStepSchema = z.object({
     .string()
     .min(1)
     .describe(
-      "HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link.",
+      "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if firstName %}Hey {{firstName}}{% else %}Hey there{% endif %}.",
     ),
 });
 

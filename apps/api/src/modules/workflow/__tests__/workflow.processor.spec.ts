@@ -130,12 +130,10 @@ describe("process", () => {
 
     expect(createEmailUnsubscribeLink).toHaveBeenCalledWith(10, "sub_alice");
     const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
-    expect(html).toContain(
-      'href="https://example.com/unsubscribe?token=abc"',
-    );
+    expect(html).toContain('href="https://example.com/unsubscribe?token=abc"');
   });
 
-  it("also supports {{unsubscribeUrl}} interpolation for custom placement", async () => {
+  it("also supports {{unsubscribeUrl}} interpolation for custom placement, without duplicating the auto-footer", async () => {
     vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
       ...mockRunStep,
       configSnapshot: {
@@ -147,7 +145,41 @@ describe("process", () => {
     await processor.process(makeJob());
 
     const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
-    expect(html).toContain("Bye - https://example.com/unsubscribe?token=abc");
+    expect(html).toBe("Bye - https://example.com/unsubscribe?token=abc");
+  });
+
+  it("supports Liquid {% if %} conditionals, taking the truthy branch when the subscriber has a first name", async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+      ...mockRunStep,
+      configSnapshot: {
+        subject: "Hi",
+        body: "Hey {% if firstName %}{{ firstName }}{% else %}there{% endif %},",
+      },
+    } as any);
+
+    await processor.process(makeJob());
+
+    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toContain("Hey Alice,");
+  });
+
+  it("supports Liquid {% if %} conditionals, taking the else branch when the subscriber has no first name", async () => {
+    vi.mocked(subscriberRepo.getSubscriberById).mockResolvedValue({
+      ...mockSubscriber,
+      firstName: null,
+    } as any);
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+      ...mockRunStep,
+      configSnapshot: {
+        subject: "Hi",
+        body: "Hey {% if firstName %}{{ firstName }}{% else %}there{% endif %},",
+      },
+    } as any);
+
+    await processor.process(makeJob());
+
+    const [, , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toContain("Hey there,");
   });
 
   it("skips the footer when no unsubscribe link could be generated", async () => {
