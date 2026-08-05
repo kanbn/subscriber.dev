@@ -1,9 +1,11 @@
-import { defineConfig } from "orval";
-import { config } from "dotenv";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
+import { config } from "dotenv";
+import { defineConfig } from "orval";
 
-config({ path: resolve(dirname(fileURLToPath(import.meta.url)), "../../.env") });
+config({
+  path: resolve(dirname(fileURLToPath(import.meta.url)), "../../.env"),
+});
 
 export default defineConfig({
   api: {
@@ -17,8 +19,11 @@ export default defineConfig({
       target: "./src/generated.ts",
       client: "react-query",
       httpClient: "fetch",
-      baseUrl: process.env.API_BASE_URL,
       override: {
+        mutator: {
+          path: "./src/mutator/custom-fetch.ts",
+          name: "customFetch",
+        },
         requestOptions: {
           credentials: "include",
         },

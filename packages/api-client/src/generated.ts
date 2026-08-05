@@ -24,6 +24,7 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
+import { customFetch } from './mutator/custom-fetch';
 export type TestResponseDtoEcho = {
   /** Test name */
   name?: string;
@@ -384,6 +385,11 @@ export interface UpdatePreferencesResponseDto {
   preferences: UpdatePreferencesResponseDtoPreferences;
 }
 
+export interface UnsubscribeBodyDto {
+  /** @minLength 1 */
+  token: string;
+}
+
 export interface UnsubscribeResponseDto {
   unsubscribed: boolean;
 }
@@ -416,16 +422,16 @@ export interface TriggerWorkflowResponseDto {
   reason?: string;
 }
 
-export type CreateWorkflowDtoStepsItemType = typeof CreateWorkflowDtoStepsItemType[keyof typeof CreateWorkflowDtoStepsItemType];
+export type CreateWorkflowDtoStepsItemOneOfType = typeof CreateWorkflowDtoStepsItemOneOfType[keyof typeof CreateWorkflowDtoStepsItemOneOfType];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const CreateWorkflowDtoStepsItemType = {
+export const CreateWorkflowDtoStepsItemOneOfType = {
   email: 'email',
 } as const;
 
-export type CreateWorkflowDtoStepsItem = {
-  type?: CreateWorkflowDtoStepsItemType;
+export type CreateWorkflowDtoStepsItemOneOf = {
+  type: CreateWorkflowDtoStepsItemOneOfType;
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -437,11 +443,37 @@ export type CreateWorkflowDtoStepsItem = {
    */
   subject: string;
   /**
-   * HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload.
+   * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.
    * @minLength 1
    */
   body: string;
 };
+
+export type CreateWorkflowDtoStepsItemOneOfThreeType = typeof CreateWorkflowDtoStepsItemOneOfThreeType[keyof typeof CreateWorkflowDtoStepsItemOneOfThreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateWorkflowDtoStepsItemOneOfThreeType = {
+  webhook: 'webhook',
+} as const;
+
+export type CreateWorkflowDtoStepsItemOneOfThree = {
+  type: CreateWorkflowDtoStepsItemOneOfThreeType;
+  /**
+   * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
+   * @minimum 0
+   */
+  delayMs?: number;
+  /** Destination URL the JSON payload is POSTed to. */
+  url: string;
+  /**
+   * JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {"content": "{{ subscriber.email | json }} just signed up!"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON.
+   * @minLength 1
+   */
+  body: string;
+};
+
+export type CreateWorkflowDtoStepsItem = CreateWorkflowDtoStepsItemOneOf | CreateWorkflowDtoStepsItemOneOfThree;
 
 export interface CreateWorkflowDto {
   /**
@@ -480,6 +512,7 @@ export type WorkflowResponseDtoStepsItem = {
   delayMs: number;
   subject?: string;
   body?: string;
+  url?: string;
 };
 
 export interface WorkflowResponseDto {
@@ -510,6 +543,7 @@ export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
   delayMs: number;
   subject?: string;
   body?: string;
+  url?: string;
 };
 
 export type ListWorkflowsResponseDtoWorkflowsItem = {
@@ -539,16 +573,16 @@ export const UpdateWorkflowDtoStatus = {
   paused: 'paused',
 } as const;
 
-export type UpdateWorkflowDtoStepsItemType = typeof UpdateWorkflowDtoStepsItemType[keyof typeof UpdateWorkflowDtoStepsItemType];
+export type UpdateWorkflowDtoStepsItemOneOfType = typeof UpdateWorkflowDtoStepsItemOneOfType[keyof typeof UpdateWorkflowDtoStepsItemOneOfType];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UpdateWorkflowDtoStepsItemType = {
+export const UpdateWorkflowDtoStepsItemOneOfType = {
   email: 'email',
 } as const;
 
-export type UpdateWorkflowDtoStepsItem = {
-  type?: UpdateWorkflowDtoStepsItemType;
+export type UpdateWorkflowDtoStepsItemOneOf = {
+  type: UpdateWorkflowDtoStepsItemOneOfType;
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -560,11 +594,37 @@ export type UpdateWorkflowDtoStepsItem = {
    */
   subject: string;
   /**
-   * HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload.
+   * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.
    * @minLength 1
    */
   body: string;
 };
+
+export type UpdateWorkflowDtoStepsItemOneOfThreeType = typeof UpdateWorkflowDtoStepsItemOneOfThreeType[keyof typeof UpdateWorkflowDtoStepsItemOneOfThreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateWorkflowDtoStepsItemOneOfThreeType = {
+  webhook: 'webhook',
+} as const;
+
+export type UpdateWorkflowDtoStepsItemOneOfThree = {
+  type: UpdateWorkflowDtoStepsItemOneOfThreeType;
+  /**
+   * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
+   * @minimum 0
+   */
+  delayMs?: number;
+  /** Destination URL the JSON payload is POSTed to. */
+  url: string;
+  /**
+   * JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {"content": "{{ subscriber.email | json }} just signed up!"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON.
+   * @minLength 1
+   */
+  body: string;
+};
+
+export type UpdateWorkflowDtoStepsItem = UpdateWorkflowDtoStepsItemOneOf | UpdateWorkflowDtoStepsItemOneOfThree;
 
 export interface UpdateWorkflowDto {
   /**
@@ -661,13 +721,6 @@ limit?: number;
 offset?: number;
 };
 
-export type UnsubscribeParams = {
-/**
- * @minLength 1
- */
-token: string;
-};
-
 export type ListWorkflowsParams = {
 /**
  * @minimum 1
@@ -692,6 +745,10 @@ limit?: number;
 offset?: number;
 };
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
 /**
  * @summary Get current user
  */
@@ -712,12 +769,12 @@ export const getGetCurrentUserUrl = () => {
 
   
 
-  return `http://localhost:6000/users/me`
+  return `/users/me`
 }
 
 export const getCurrentUser = async ( options?: RequestInit): Promise<getCurrentUserResponse> => {
   
-  const res = await fetch(getGetCurrentUserUrl(),
+  return customFetch<getCurrentUserResponse>(getGetCurrentUserUrl(),
   {
       credentials: 'include',
     ...options,
@@ -725,13 +782,7 @@ export const getCurrentUser = async ( options?: RequestInit): Promise<getCurrent
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: getCurrentUserResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getCurrentUserResponse
-}
+);}
 
 
 
@@ -739,21 +790,21 @@ export const getCurrentUser = async ( options?: RequestInit): Promise<getCurrent
 
 export const getGetCurrentUserQueryKey = () => {
     return [
-    `http://localhost:6000/users/me`
+    `/users/me`
     ] as const;
     }
 
     
-export const getGetCurrentUserQueryOptions = <TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, fetch?: RequestInit}
+export const getGetCurrentUserQueryOptions = <TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetCurrentUserQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) => getCurrentUser({ signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) => getCurrentUser({ signal, ...requestOptions });
 
       
 
@@ -773,7 +824,7 @@ export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUs
           TError,
           Awaited<ReturnType<typeof getCurrentUser>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>(
@@ -783,11 +834,11 @@ export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUs
           TError,
           Awaited<ReturnType<typeof getCurrentUser>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, fetch?: RequestInit}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
@@ -795,7 +846,7 @@ export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUs
  */
 
 export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, fetch?: RequestInit}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
@@ -832,12 +883,12 @@ export const getUpdateCurrentUserUrl = () => {
 
   
 
-  return `http://localhost:6000/users`
+  return `/users`
 }
 
 export const updateCurrentUser = async ( options?: RequestInit): Promise<updateCurrentUserResponse> => {
   
-  const res = await fetch(getUpdateCurrentUserUrl(),
+  return customFetch<updateCurrentUserResponse>(getUpdateCurrentUserUrl(),
   {
       credentials: 'include',
     ...options,
@@ -845,27 +896,21 @@ export const updateCurrentUser = async ( options?: RequestInit): Promise<updateC
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: updateCurrentUserResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as updateCurrentUserResponse
-}
+);}
 
 
 
 
 export const getUpdateCurrentUserMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,void, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,void, TContext> => {
 
 const mutationKey = ['updateCurrentUser'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -873,7 +918,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCurrentUser>>, void> = () => {
           
 
-          return  updateCurrentUser(fetchOptions)
+          return  updateCurrentUser(requestOptions)
         }
 
         
@@ -889,7 +934,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Update current user
  */
 export const useUpdateCurrentUser = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,void, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateCurrentUser>>,
         TError,
@@ -922,12 +967,12 @@ export const getGetTestUrl = () => {
 
   
 
-  return `http://localhost:6000/test`
+  return `/test`
 }
 
 export const getTest = async ( options?: RequestInit): Promise<getTestResponse> => {
   
-  const res = await fetch(getGetTestUrl(),
+  return customFetch<getTestResponse>(getGetTestUrl(),
   {
       credentials: 'include',
     ...options,
@@ -935,13 +980,7 @@ export const getTest = async ( options?: RequestInit): Promise<getTestResponse> 
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: getTestResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getTestResponse
-}
+);}
 
 
 
@@ -949,21 +988,21 @@ export const getTest = async ( options?: RequestInit): Promise<getTestResponse> 
 
 export const getGetTestQueryKey = () => {
     return [
-    `http://localhost:6000/test`
+    `/test`
     ] as const;
     }
 
     
-export const getGetTestQueryOptions = <TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, fetch?: RequestInit}
+export const getGetTestQueryOptions = <TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTestQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTest>>> = ({ signal }) => getTest({ signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTest>>> = ({ signal }) => getTest({ signal, ...requestOptions });
 
       
 
@@ -983,7 +1022,7 @@ export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError =
           TError,
           Awaited<ReturnType<typeof getTest>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>(
@@ -993,11 +1032,11 @@ export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError =
           TError,
           Awaited<ReturnType<typeof getTest>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, fetch?: RequestInit}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
@@ -1005,7 +1044,7 @@ export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError =
  */
 
 export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, fetch?: RequestInit}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
@@ -1042,12 +1081,12 @@ export const getCreateTestUrl = () => {
 
   
 
-  return `http://localhost:6000/test`
+  return `/test`
 }
 
 export const createTest = async (testRequestDto: TestRequestDto, options?: RequestInit): Promise<createTestResponse> => {
   
-  const res = await fetch(getCreateTestUrl(),
+  return customFetch<createTestResponse>(getCreateTestUrl(),
   {
       credentials: 'include',
     ...options,
@@ -1056,27 +1095,21 @@ export const createTest = async (testRequestDto: TestRequestDto, options?: Reque
     body: JSON.stringify(
       testRequestDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: createTestResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createTestResponse
-}
+);}
 
 
 
 
 export const getCreateTestMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTest>>, TError,{data: TestRequestDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTest>>, TError,{data: TestRequestDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createTest>>, TError,{data: TestRequestDto}, TContext> => {
 
 const mutationKey = ['createTest'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -1084,7 +1117,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTest>>, {data: TestRequestDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  createTest(data,fetchOptions)
+          return  createTest(data,requestOptions)
         }
 
         
@@ -1100,7 +1133,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Post test data
  */
 export const useCreateTest = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTest>>, TError,{data: TestRequestDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTest>>, TError,{data: TestRequestDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createTest>>,
         TError,
@@ -1133,12 +1166,12 @@ export const getGetWorkspacesUrl = () => {
 
   
 
-  return `http://localhost:6000/workspaces`
+  return `/workspaces`
 }
 
 export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspacesResponse> => {
   
-  const res = await fetch(getGetWorkspacesUrl(),
+  return customFetch<getWorkspacesResponse>(getGetWorkspacesUrl(),
   {
       credentials: 'include',
     ...options,
@@ -1146,13 +1179,7 @@ export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspac
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: getWorkspacesResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getWorkspacesResponse
-}
+);}
 
 
 
@@ -1160,21 +1187,21 @@ export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspac
 
 export const getGetWorkspacesQueryKey = () => {
     return [
-    `http://localhost:6000/workspaces`
+    `/workspaces`
     ] as const;
     }
 
     
-export const getGetWorkspacesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, fetch?: RequestInit}
+export const getGetWorkspacesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaces>>> = ({ signal }) => getWorkspaces({ signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaces>>> = ({ signal }) => getWorkspaces({ signal, ...requestOptions });
 
       
 
@@ -1194,7 +1221,7 @@ export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces
           TError,
           Awaited<ReturnType<typeof getWorkspaces>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
@@ -1204,11 +1231,11 @@ export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces
           TError,
           Awaited<ReturnType<typeof getWorkspaces>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, fetch?: RequestInit}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
@@ -1216,7 +1243,7 @@ export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces
  */
 
 export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, fetch?: RequestInit}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
@@ -1253,12 +1280,12 @@ export const getCreateWorkspaceUrl = () => {
 
   
 
-  return `http://localhost:6000/workspaces`
+  return `/workspaces`
 }
 
 export const createWorkspace = async (createWorkspaceDto: CreateWorkspaceDto, options?: RequestInit): Promise<createWorkspaceResponse> => {
   
-  const res = await fetch(getCreateWorkspaceUrl(),
+  return customFetch<createWorkspaceResponse>(getCreateWorkspaceUrl(),
   {
       credentials: 'include',
     ...options,
@@ -1267,27 +1294,21 @@ export const createWorkspace = async (createWorkspaceDto: CreateWorkspaceDto, op
     body: JSON.stringify(
       createWorkspaceDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: createWorkspaceResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createWorkspaceResponse
-}
+);}
 
 
 
 
 export const getCreateWorkspaceMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext> => {
 
 const mutationKey = ['createWorkspace'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -1295,7 +1316,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkspace>>, {data: CreateWorkspaceDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  createWorkspace(data,fetchOptions)
+          return  createWorkspace(data,requestOptions)
         }
 
         
@@ -1311,7 +1332,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Create a new workspace
  */
 export const useCreateWorkspace = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createWorkspace>>,
         TError,
@@ -1360,13 +1381,13 @@ export const getListSubscribersUrl = (environmentId: string,
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `http://localhost:6000/environments/${environmentId}/subscribers?${stringifiedParams}` : `http://localhost:6000/environments/${environmentId}/subscribers`
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/subscribers?${stringifiedParams}` : `/environments/${environmentId}/subscribers`
 }
 
 export const listSubscribers = async (environmentId: string,
     params?: ListSubscribersParams, options?: RequestInit): Promise<listSubscribersResponse> => {
   
-  const res = await fetch(getListSubscribersUrl(environmentId,params),
+  return customFetch<listSubscribersResponse>(getListSubscribersUrl(environmentId,params),
   {
       credentials: 'include',
     ...options,
@@ -1374,13 +1395,7 @@ export const listSubscribers = async (environmentId: string,
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: listSubscribersResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as listSubscribersResponse
-}
+);}
 
 
 
@@ -1389,22 +1404,22 @@ export const listSubscribers = async (environmentId: string,
 export const getListSubscribersQueryKey = (environmentId?: string,
     params?: ListSubscribersParams,) => {
     return [
-    `http://localhost:6000/environments/${environmentId}/subscribers`, ...(params ? [params]: [])
+    `/environments/${environmentId}/subscribers`, ...(params ? [params]: [])
     ] as const;
     }
 
     
 export const getListSubscribersQueryOptions = <TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(environmentId: string,
-    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getListSubscribersQueryKey(environmentId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSubscribers>>> = ({ signal }) => listSubscribers(environmentId,params, { signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSubscribers>>> = ({ signal }) => listSubscribers(environmentId,params, { signal, ...requestOptions });
 
       
 
@@ -1425,7 +1440,7 @@ export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscri
           TError,
           Awaited<ReturnType<typeof listSubscribers>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
@@ -1436,12 +1451,12 @@ export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscri
           TError,
           Awaited<ReturnType<typeof listSubscribers>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
  environmentId: string,
-    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
@@ -1450,7 +1465,7 @@ export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscri
 
 export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
  environmentId: string,
-    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
@@ -1500,13 +1515,13 @@ export const getCreateSubscriberUrl = (environmentId: string,) => {
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/subscribers`
+  return `/environments/${environmentId}/subscribers`
 }
 
 export const createSubscriber = async (environmentId: string,
     createSubscriberDto: CreateSubscriberDto, options?: RequestInit): Promise<createSubscriberResponse> => {
   
-  const res = await fetch(getCreateSubscriberUrl(environmentId),
+  return customFetch<createSubscriberResponse>(getCreateSubscriberUrl(environmentId),
   {
       credentials: 'include',
     ...options,
@@ -1515,27 +1530,21 @@ export const createSubscriber = async (environmentId: string,
     body: JSON.stringify(
       createSubscriberDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: createSubscriberResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createSubscriberResponse
-}
+);}
 
 
 
 
 export const getCreateSubscriberMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext> => {
 
 const mutationKey = ['createSubscriber'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -1543,7 +1552,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSubscriber>>, {environmentId: string;data: CreateSubscriberDto}> = (props) => {
           const {environmentId,data} = props ?? {};
 
-          return  createSubscriber(environmentId,data,fetchOptions)
+          return  createSubscriber(environmentId,data,requestOptions)
         }
 
         
@@ -1559,7 +1568,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Create a new subscriber
  */
 export const useCreateSubscriber = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createSubscriber>>,
         TError,
@@ -1601,13 +1610,13 @@ export const getGetSubscriberUrl = (environmentId: string,
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/subscribers/${subscriberId}`
+  return `/environments/${environmentId}/subscribers/${subscriberId}`
 }
 
 export const getSubscriber = async (environmentId: string,
     subscriberId: string, options?: RequestInit): Promise<getSubscriberResponse> => {
   
-  const res = await fetch(getGetSubscriberUrl(environmentId,subscriberId),
+  return customFetch<getSubscriberResponse>(getGetSubscriberUrl(environmentId,subscriberId),
   {
       credentials: 'include',
     ...options,
@@ -1615,13 +1624,7 @@ export const getSubscriber = async (environmentId: string,
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: getSubscriberResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getSubscriberResponse
-}
+);}
 
 
 
@@ -1630,22 +1633,22 @@ export const getSubscriber = async (environmentId: string,
 export const getGetSubscriberQueryKey = (environmentId?: string,
     subscriberId?: string,) => {
     return [
-    `http://localhost:6000/environments/${environmentId}/subscribers/${subscriberId}`
+    `/environments/${environmentId}/subscribers/${subscriberId}`
     ] as const;
     }
 
     
 export const getGetSubscriberQueryOptions = <TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(environmentId: string,
-    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, fetch?: RequestInit}
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetSubscriberQueryKey(environmentId,subscriberId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubscriber>>> = ({ signal }) => getSubscriber(environmentId,subscriberId, { signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubscriber>>> = ({ signal }) => getSubscriber(environmentId,subscriberId, { signal, ...requestOptions });
 
       
 
@@ -1666,7 +1669,7 @@ export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber
           TError,
           Awaited<ReturnType<typeof getSubscriber>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
@@ -1677,12 +1680,12 @@ export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber
           TError,
           Awaited<ReturnType<typeof getSubscriber>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
  environmentId: string,
-    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, fetch?: RequestInit}
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
@@ -1691,7 +1694,7 @@ export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber
 
 export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
  environmentId: string,
-    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, fetch?: RequestInit}
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
@@ -1737,14 +1740,14 @@ export const getUpdateSubscriberUrl = (environmentId: string,
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/subscribers/${subscriberId}`
+  return `/environments/${environmentId}/subscribers/${subscriberId}`
 }
 
 export const updateSubscriber = async (environmentId: string,
     subscriberId: string,
     updateSubscriberDto: UpdateSubscriberDto, options?: RequestInit): Promise<updateSubscriberResponse> => {
   
-  const res = await fetch(getUpdateSubscriberUrl(environmentId,subscriberId),
+  return customFetch<updateSubscriberResponse>(getUpdateSubscriberUrl(environmentId,subscriberId),
   {
       credentials: 'include',
     ...options,
@@ -1753,27 +1756,21 @@ export const updateSubscriber = async (environmentId: string,
     body: JSON.stringify(
       updateSubscriberDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: updateSubscriberResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as updateSubscriberResponse
-}
+);}
 
 
 
 
 export const getUpdateSubscriberMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext> => {
 
 const mutationKey = ['updateSubscriber'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -1781,7 +1778,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubscriber>>, {environmentId: string;subscriberId: string;data: UpdateSubscriberDto}> = (props) => {
           const {environmentId,subscriberId,data} = props ?? {};
 
-          return  updateSubscriber(environmentId,subscriberId,data,fetchOptions)
+          return  updateSubscriber(environmentId,subscriberId,data,requestOptions)
         }
 
         
@@ -1797,7 +1794,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Update a subscriber
  */
 export const useUpdateSubscriber = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateSubscriber>>,
         TError,
@@ -1839,13 +1836,13 @@ export const getDeleteSubscriberUrl = (environmentId: string,
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/subscribers/${subscriberId}`
+  return `/environments/${environmentId}/subscribers/${subscriberId}`
 }
 
 export const deleteSubscriber = async (environmentId: string,
     subscriberId: string, options?: RequestInit): Promise<deleteSubscriberResponse> => {
   
-  const res = await fetch(getDeleteSubscriberUrl(environmentId,subscriberId),
+  return customFetch<deleteSubscriberResponse>(getDeleteSubscriberUrl(environmentId,subscriberId),
   {
       credentials: 'include',
     ...options,
@@ -1853,27 +1850,21 @@ export const deleteSubscriber = async (environmentId: string,
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: deleteSubscriberResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as deleteSubscriberResponse
-}
+);}
 
 
 
 
 export const getDeleteSubscriberMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext> => {
 
 const mutationKey = ['deleteSubscriber'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -1881,7 +1872,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSubscriber>>, {environmentId: string;subscriberId: string}> = (props) => {
           const {environmentId,subscriberId} = props ?? {};
 
-          return  deleteSubscriber(environmentId,subscriberId,fetchOptions)
+          return  deleteSubscriber(environmentId,subscriberId,requestOptions)
         }
 
         
@@ -1897,7 +1888,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Delete a subscriber
  */
 export const useDeleteSubscriber = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteSubscriber>>,
         TError,
@@ -1938,13 +1929,13 @@ export const getBulkUpsertSubscribersUrl = (environmentId: string,) => {
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/subscribers/bulk`
+  return `/environments/${environmentId}/subscribers/bulk`
 }
 
 export const bulkUpsertSubscribers = async (environmentId: string,
     bulkUpsertSubscribersDto: BulkUpsertSubscribersDto, options?: RequestInit): Promise<bulkUpsertSubscribersResponse> => {
   
-  const res = await fetch(getBulkUpsertSubscribersUrl(environmentId),
+  return customFetch<bulkUpsertSubscribersResponse>(getBulkUpsertSubscribersUrl(environmentId),
   {
       credentials: 'include',
     ...options,
@@ -1953,27 +1944,21 @@ export const bulkUpsertSubscribers = async (environmentId: string,
     body: JSON.stringify(
       bulkUpsertSubscribersDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: bulkUpsertSubscribersResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as bulkUpsertSubscribersResponse
-}
+);}
 
 
 
 
 export const getBulkUpsertSubscribersMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, TError,{environmentId: string;data: BulkUpsertSubscribersDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, TError,{environmentId: string;data: BulkUpsertSubscribersDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, TError,{environmentId: string;data: BulkUpsertSubscribersDto}, TContext> => {
 
 const mutationKey = ['bulkUpsertSubscribers'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -1981,7 +1966,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, {environmentId: string;data: BulkUpsertSubscribersDto}> = (props) => {
           const {environmentId,data} = props ?? {};
 
-          return  bulkUpsertSubscribers(environmentId,data,fetchOptions)
+          return  bulkUpsertSubscribers(environmentId,data,requestOptions)
         }
 
         
@@ -1997,7 +1982,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Bulk create or update subscribers
  */
 export const useBulkUpsertSubscribers = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, TError,{environmentId: string;data: BulkUpsertSubscribersDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, TError,{environmentId: string;data: BulkUpsertSubscribersDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof bulkUpsertSubscribers>>,
         TError,
@@ -2039,14 +2024,14 @@ export const getUpdateSubscriberPreferencesUrl = (environmentId: string,
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/subscribers/${subscriberId}/preferences`
+  return `/environments/${environmentId}/subscribers/${subscriberId}/preferences`
 }
 
 export const updateSubscriberPreferences = async (environmentId: string,
     subscriberId: string,
     updatePreferencesDto: UpdatePreferencesDto, options?: RequestInit): Promise<updateSubscriberPreferencesResponse> => {
   
-  const res = await fetch(getUpdateSubscriberPreferencesUrl(environmentId,subscriberId),
+  return customFetch<updateSubscriberPreferencesResponse>(getUpdateSubscriberPreferencesUrl(environmentId,subscriberId),
   {
       credentials: 'include',
     ...options,
@@ -2055,27 +2040,21 @@ export const updateSubscriberPreferences = async (environmentId: string,
     body: JSON.stringify(
       updatePreferencesDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: updateSubscriberPreferencesResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as updateSubscriberPreferencesResponse
-}
+);}
 
 
 
 
 export const getUpdateSubscriberPreferencesMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext> => {
 
 const mutationKey = ['updateSubscriberPreferences'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -2083,7 +2062,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubscriberPreferences>>, {environmentId: string;subscriberId: string;data: UpdatePreferencesDto}> = (props) => {
           const {environmentId,subscriberId,data} = props ?? {};
 
-          return  updateSubscriberPreferences(environmentId,subscriberId,data,fetchOptions)
+          return  updateSubscriberPreferences(environmentId,subscriberId,data,requestOptions)
         }
 
         
@@ -2099,7 +2078,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Update subscriber preferences
  */
 export const useUpdateSubscriberPreferences = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateSubscriberPreferences>>,
         TError,
@@ -2113,8 +2092,8 @@ export const useUpdateSubscriberPreferences = <TError = void,
     }
     
 /**
- * Public endpoint for one-click unsubscribe links embedded in emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.
- * @summary Unsubscribe via email link
+ * Called from the unsubscribe confirmation page linked from emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.
+ * @summary Unsubscribe
  */
 export type unsubscribeResponse200 = {
   data: UnsubscribeResponseDto
@@ -2135,118 +2114,76 @@ export type unsubscribeResponseError = (unsubscribeResponse404) & {
 
 export type unsubscribeResponse = (unsubscribeResponseSuccess | unsubscribeResponseError)
 
-export const getUnsubscribeUrl = (params: UnsubscribeParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getUnsubscribeUrl = () => {
 
-  Object.entries(params || {}).forEach(([key, value]) => {
-    
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
 
-  const stringifiedParams = normalizedParams.toString();
+  
 
-  return stringifiedParams.length > 0 ? `http://localhost:6000/unsubscribe?${stringifiedParams}` : `http://localhost:6000/unsubscribe`
+  return `/unsubscribe`
 }
 
-export const unsubscribe = async (params: UnsubscribeParams, options?: RequestInit): Promise<unsubscribeResponse> => {
+export const unsubscribe = async (unsubscribeBodyDto: UnsubscribeBodyDto, options?: RequestInit): Promise<unsubscribeResponse> => {
   
-  const res = await fetch(getUnsubscribeUrl(params),
+  return customFetch<unsubscribeResponse>(getUnsubscribeUrl(),
   {
       credentials: 'include',
     ...options,
-    method: 'GET'
-    
-    
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      unsubscribeBodyDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: unsubscribeResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as unsubscribeResponse
-}
+);}
 
 
 
 
+export const getUnsubscribeMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsubscribe>>, TError,{data: UnsubscribeBodyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unsubscribe>>, TError,{data: UnsubscribeBodyDto}, TContext> => {
 
-export const getUnsubscribeQueryKey = (params?: UnsubscribeParams,) => {
-    return [
-    `http://localhost:6000/unsubscribe`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getUnsubscribeQueryOptions = <TData = Awaited<ReturnType<typeof unsubscribe>>, TError = void>(params: UnsubscribeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof unsubscribe>>, TError, TData>>, fetch?: RequestInit}
-) => {
-
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getUnsubscribeQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof unsubscribe>>> = ({ signal }) => unsubscribe(params, { signal, ...fetchOptions });
+const mutationKey = ['unsubscribe'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
-      
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof unsubscribe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
-}
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unsubscribe>>, {data: UnsubscribeBodyDto}> = (props) => {
+          const {data} = props ?? {};
 
-export type UnsubscribeQueryResult = NonNullable<Awaited<ReturnType<typeof unsubscribe>>>
-export type UnsubscribeQueryError = void
+          return  unsubscribe(data,requestOptions)
+        }
+
+        
 
 
-export function useUnsubscribe<TData = Awaited<ReturnType<typeof unsubscribe>>, TError = void>(
- params: UnsubscribeParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof unsubscribe>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof unsubscribe>>,
-          TError,
-          Awaited<ReturnType<typeof unsubscribe>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useUnsubscribe<TData = Awaited<ReturnType<typeof unsubscribe>>, TError = void>(
- params: UnsubscribeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof unsubscribe>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof unsubscribe>>,
-          TError,
-          Awaited<ReturnType<typeof unsubscribe>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useUnsubscribe<TData = Awaited<ReturnType<typeof unsubscribe>>, TError = void>(
- params: UnsubscribeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof unsubscribe>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-/**
- * @summary Unsubscribe via email link
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnsubscribeMutationResult = NonNullable<Awaited<ReturnType<typeof unsubscribe>>>
+    export type UnsubscribeMutationBody = UnsubscribeBodyDto
+    export type UnsubscribeMutationError = void
+
+    /**
+ * @summary Unsubscribe
  */
+export const useUnsubscribe = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsubscribe>>, TError,{data: UnsubscribeBodyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unsubscribe>>,
+        TError,
+        {data: UnsubscribeBodyDto},
+        TContext
+      > => {
 
-export function useUnsubscribe<TData = Awaited<ReturnType<typeof unsubscribe>>, TError = void>(
- params: UnsubscribeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof unsubscribe>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+      const mutationOptions = getUnsubscribeMutationOptions(options);
 
-  const queryOptions = getUnsubscribeQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.
  * @summary Trigger a workflow
@@ -2275,13 +2212,13 @@ export const getTriggerWorkflowUrl = (environmentId: string,) => {
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/workflows/trigger`
+  return `/environments/${environmentId}/workflows/trigger`
 }
 
 export const triggerWorkflow = async (environmentId: string,
     triggerWorkflowDto: TriggerWorkflowDto, options?: RequestInit): Promise<triggerWorkflowResponse> => {
   
-  const res = await fetch(getTriggerWorkflowUrl(environmentId),
+  return customFetch<triggerWorkflowResponse>(getTriggerWorkflowUrl(environmentId),
   {
       credentials: 'include',
     ...options,
@@ -2290,27 +2227,21 @@ export const triggerWorkflow = async (environmentId: string,
     body: JSON.stringify(
       triggerWorkflowDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: triggerWorkflowResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as triggerWorkflowResponse
-}
+);}
 
 
 
 
 export const getTriggerWorkflowMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext> => {
 
 const mutationKey = ['triggerWorkflow'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -2318,7 +2249,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof triggerWorkflow>>, {environmentId: string;data: TriggerWorkflowDto}> = (props) => {
           const {environmentId,data} = props ?? {};
 
-          return  triggerWorkflow(environmentId,data,fetchOptions)
+          return  triggerWorkflow(environmentId,data,requestOptions)
         }
 
         
@@ -2334,7 +2265,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Trigger a workflow
  */
 export const useTriggerWorkflow = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof triggerWorkflow>>,
         TError,
@@ -2348,7 +2279,7 @@ export const useTriggerWorkflow = <TError = void,
     }
     
 /**
- * Creates a workflow definition: a named, ordered sequence of steps (currently email only), each with a delay relative to the previous step.
+ * Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step.
  * @summary Create a new workflow
  */
 export type createWorkflowResponse201 = {
@@ -2375,13 +2306,13 @@ export const getCreateWorkflowUrl = (environmentId: string,) => {
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/workflows`
+  return `/environments/${environmentId}/workflows`
 }
 
 export const createWorkflow = async (environmentId: string,
     createWorkflowDto: CreateWorkflowDto, options?: RequestInit): Promise<createWorkflowResponse> => {
   
-  const res = await fetch(getCreateWorkflowUrl(environmentId),
+  return customFetch<createWorkflowResponse>(getCreateWorkflowUrl(environmentId),
   {
       credentials: 'include',
     ...options,
@@ -2390,27 +2321,21 @@ export const createWorkflow = async (environmentId: string,
     body: JSON.stringify(
       createWorkflowDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: createWorkflowResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createWorkflowResponse
-}
+);}
 
 
 
 
 export const getCreateWorkflowMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext> => {
 
 const mutationKey = ['createWorkflow'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -2418,7 +2343,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkflow>>, {environmentId: string;data: CreateWorkflowDto}> = (props) => {
           const {environmentId,data} = props ?? {};
 
-          return  createWorkflow(environmentId,data,fetchOptions)
+          return  createWorkflow(environmentId,data,requestOptions)
         }
 
         
@@ -2434,7 +2359,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Create a new workflow
  */
 export const useCreateWorkflow = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createWorkflow>>,
         TError,
@@ -2483,13 +2408,13 @@ export const getListWorkflowsUrl = (environmentId: string,
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `http://localhost:6000/environments/${environmentId}/workflows?${stringifiedParams}` : `http://localhost:6000/environments/${environmentId}/workflows`
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows?${stringifiedParams}` : `/environments/${environmentId}/workflows`
 }
 
 export const listWorkflows = async (environmentId: string,
     params?: ListWorkflowsParams, options?: RequestInit): Promise<listWorkflowsResponse> => {
   
-  const res = await fetch(getListWorkflowsUrl(environmentId,params),
+  return customFetch<listWorkflowsResponse>(getListWorkflowsUrl(environmentId,params),
   {
       credentials: 'include',
     ...options,
@@ -2497,13 +2422,7 @@ export const listWorkflows = async (environmentId: string,
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: listWorkflowsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as listWorkflowsResponse
-}
+);}
 
 
 
@@ -2512,22 +2431,22 @@ export const listWorkflows = async (environmentId: string,
 export const getListWorkflowsQueryKey = (environmentId?: string,
     params?: ListWorkflowsParams,) => {
     return [
-    `http://localhost:6000/environments/${environmentId}/workflows`, ...(params ? [params]: [])
+    `/environments/${environmentId}/workflows`, ...(params ? [params]: [])
     ] as const;
     }
 
     
 export const getListWorkflowsQueryOptions = <TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(environmentId: string,
-    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getListWorkflowsQueryKey(environmentId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflows>>> = ({ signal }) => listWorkflows(environmentId,params, { signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflows>>> = ({ signal }) => listWorkflows(environmentId,params, { signal, ...requestOptions });
 
       
 
@@ -2548,7 +2467,7 @@ export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows
           TError,
           Awaited<ReturnType<typeof listWorkflows>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
@@ -2559,12 +2478,12 @@ export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows
           TError,
           Awaited<ReturnType<typeof listWorkflows>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
  environmentId: string,
-    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
@@ -2573,7 +2492,7 @@ export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows
 
 export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
  environmentId: string,
-    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
@@ -2619,13 +2538,13 @@ export const getGetWorkflowUrl = (environmentId: string,
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}`
+  return `/environments/${environmentId}/workflows/${workflowId}`
 }
 
 export const getWorkflow = async (environmentId: string,
     workflowId: string, options?: RequestInit): Promise<getWorkflowResponse> => {
   
-  const res = await fetch(getGetWorkflowUrl(environmentId,workflowId),
+  return customFetch<getWorkflowResponse>(getGetWorkflowUrl(environmentId,workflowId),
   {
       credentials: 'include',
     ...options,
@@ -2633,13 +2552,7 @@ export const getWorkflow = async (environmentId: string,
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: getWorkflowResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getWorkflowResponse
-}
+);}
 
 
 
@@ -2648,22 +2561,22 @@ export const getWorkflow = async (environmentId: string,
 export const getGetWorkflowQueryKey = (environmentId?: string,
     workflowId?: string,) => {
     return [
-    `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}`
+    `/environments/${environmentId}/workflows/${workflowId}`
     ] as const;
     }
 
     
 export const getGetWorkflowQueryOptions = <TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(environmentId: string,
-    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, fetch?: RequestInit}
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkflowQueryKey(environmentId,workflowId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkflow>>> = ({ signal }) => getWorkflow(environmentId,workflowId, { signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkflow>>> = ({ signal }) => getWorkflow(environmentId,workflowId, { signal, ...requestOptions });
 
       
 
@@ -2684,7 +2597,7 @@ export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, 
           TError,
           Awaited<ReturnType<typeof getWorkflow>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
@@ -2695,12 +2608,12 @@ export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, 
           TError,
           Awaited<ReturnType<typeof getWorkflow>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
  environmentId: string,
-    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, fetch?: RequestInit}
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
@@ -2709,7 +2622,7 @@ export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, 
 
 export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
  environmentId: string,
-    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, fetch?: RequestInit}
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
@@ -2755,14 +2668,14 @@ export const getUpdateWorkflowUrl = (environmentId: string,
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}`
+  return `/environments/${environmentId}/workflows/${workflowId}`
 }
 
 export const updateWorkflow = async (environmentId: string,
     workflowId: string,
     updateWorkflowDto: UpdateWorkflowDto, options?: RequestInit): Promise<updateWorkflowResponse> => {
   
-  const res = await fetch(getUpdateWorkflowUrl(environmentId,workflowId),
+  return customFetch<updateWorkflowResponse>(getUpdateWorkflowUrl(environmentId,workflowId),
   {
       credentials: 'include',
     ...options,
@@ -2771,27 +2684,21 @@ export const updateWorkflow = async (environmentId: string,
     body: JSON.stringify(
       updateWorkflowDto,)
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: updateWorkflowResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as updateWorkflowResponse
-}
+);}
 
 
 
 
 export const getUpdateWorkflowMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext> => {
 
 const mutationKey = ['updateWorkflow'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -2799,7 +2706,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorkflow>>, {environmentId: string;workflowId: string;data: UpdateWorkflowDto}> = (props) => {
           const {environmentId,workflowId,data} = props ?? {};
 
-          return  updateWorkflow(environmentId,workflowId,data,fetchOptions)
+          return  updateWorkflow(environmentId,workflowId,data,requestOptions)
         }
 
         
@@ -2815,7 +2722,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Update a workflow
  */
 export const useUpdateWorkflow = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateWorkflow>>,
         TError,
@@ -2857,13 +2764,13 @@ export const getDeleteWorkflowUrl = (environmentId: string,
 
   
 
-  return `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}`
+  return `/environments/${environmentId}/workflows/${workflowId}`
 }
 
 export const deleteWorkflow = async (environmentId: string,
     workflowId: string, options?: RequestInit): Promise<deleteWorkflowResponse> => {
   
-  const res = await fetch(getDeleteWorkflowUrl(environmentId,workflowId),
+  return customFetch<deleteWorkflowResponse>(getDeleteWorkflowUrl(environmentId,workflowId),
   {
       credentials: 'include',
     ...options,
@@ -2871,27 +2778,21 @@ export const deleteWorkflow = async (environmentId: string,
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: deleteWorkflowResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as deleteWorkflowResponse
-}
+);}
 
 
 
 
 export const getDeleteWorkflowMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext> => {
 
 const mutationKey = ['deleteWorkflow'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -2899,7 +2800,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkflow>>, {environmentId: string;workflowId: string}> = (props) => {
           const {environmentId,workflowId} = props ?? {};
 
-          return  deleteWorkflow(environmentId,workflowId,fetchOptions)
+          return  deleteWorkflow(environmentId,workflowId,requestOptions)
         }
 
         
@@ -2915,7 +2816,7 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  * @summary Delete a workflow
  */
 export const useDeleteWorkflow = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext>, fetch?: RequestInit}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteWorkflow>>,
         TError,
@@ -2965,14 +2866,14 @@ export const getListWorkflowRunsUrl = (environmentId: string,
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}/runs?${stringifiedParams}` : `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}/runs`
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/${workflowId}/runs?${stringifiedParams}` : `/environments/${environmentId}/workflows/${workflowId}/runs`
 }
 
 export const listWorkflowRuns = async (environmentId: string,
     workflowId: string,
     params?: ListWorkflowRunsParams, options?: RequestInit): Promise<listWorkflowRunsResponse> => {
   
-  const res = await fetch(getListWorkflowRunsUrl(environmentId,workflowId,params),
+  return customFetch<listWorkflowRunsResponse>(getListWorkflowRunsUrl(environmentId,workflowId,params),
   {
       credentials: 'include',
     ...options,
@@ -2980,13 +2881,7 @@ export const listWorkflowRuns = async (environmentId: string,
     
     
   }
-)
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  
-  const data: listWorkflowRunsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as listWorkflowRunsResponse
-}
+);}
 
 
 
@@ -2996,23 +2891,23 @@ export const getListWorkflowRunsQueryKey = (environmentId?: string,
     workflowId?: string,
     params?: ListWorkflowRunsParams,) => {
     return [
-    `http://localhost:6000/environments/${environmentId}/workflows/${workflowId}/runs`, ...(params ? [params]: [])
+    `/environments/${environmentId}/workflows/${workflowId}/runs`, ...(params ? [params]: [])
     ] as const;
     }
 
     
 export const getListWorkflowRunsQueryOptions = <TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(environmentId: string,
     workflowId: string,
-    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getListWorkflowRunsQueryKey(environmentId,workflowId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflowRuns>>> = ({ signal }) => listWorkflowRuns(environmentId,workflowId,params, { signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflowRuns>>> = ({ signal }) => listWorkflowRuns(environmentId,workflowId,params, { signal, ...requestOptions });
 
       
 
@@ -3034,7 +2929,7 @@ export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkfl
           TError,
           Awaited<ReturnType<typeof listWorkflowRuns>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
@@ -3046,13 +2941,13 @@ export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkfl
           TError,
           Awaited<ReturnType<typeof listWorkflowRuns>>
         > , 'initialData'
-      >, fetch?: RequestInit}
+      >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
  environmentId: string,
     workflowId: string,
-    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
@@ -3062,11 +2957,441 @@ export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkfl
 export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
  environmentId: string,
     workflowId: string,
-    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, fetch?: RequestInit}
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
   const queryOptions = getListWorkflowRunsQueryOptions(environmentId,workflowId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Creates or updates the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned.
+ * @summary Configure an integration
+ */
+export type upsertIntegrationResponse200 = {
+  data: void
+  status: 200
+}
+
+export type upsertIntegrationResponse400 = {
+  data: void
+  status: 400
+}
+
+export type upsertIntegrationResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type upsertIntegrationResponseSuccess = (upsertIntegrationResponse200) & {
+  headers: Headers;
+};
+export type upsertIntegrationResponseError = (upsertIntegrationResponse400 | upsertIntegrationResponse404) & {
+  headers: Headers;
+};
+
+export type upsertIntegrationResponse = (upsertIntegrationResponseSuccess | upsertIntegrationResponseError)
+
+export const getUpsertIntegrationUrl = (environmentId: string,
+    type: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/integrations/${type}`
+}
+
+export const upsertIntegration = async (environmentId: string,
+    type: string, options?: RequestInit): Promise<upsertIntegrationResponse> => {
+  
+  return customFetch<upsertIntegrationResponse>(getUpsertIntegrationUrl(environmentId,type),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH'
+    
+    
+  }
+);}
+
+
+
+
+export const getUpsertIntegrationMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string}, TContext> => {
+
+const mutationKey = ['upsertIntegration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertIntegration>>, {environmentId: string;type: string}> = (props) => {
+          const {environmentId,type} = props ?? {};
+
+          return  upsertIntegration(environmentId,type,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpsertIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof upsertIntegration>>>
+    
+    export type UpsertIntegrationMutationError = void
+
+    /**
+ * @summary Configure an integration
+ */
+export const useUpsertIntegration = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof upsertIntegration>>,
+        TError,
+        {environmentId: string;type: string},
+        TContext
+      > => {
+
+      const mutationOptions = getUpsertIntegrationMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Returns the sanitized config for a single integration type (no secrets).
+ * @summary Get an integration
+ */
+export type getIntegrationResponse404 = {
+  data: void
+  status: 404
+}
+    
+;
+export type getIntegrationResponseError = (getIntegrationResponse404) & {
+  headers: Headers;
+};
+
+export type getIntegrationResponse = (getIntegrationResponseError)
+
+export const getGetIntegrationUrl = (environmentId: string,
+    type: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/integrations/${type}`
+}
+
+export const getIntegration = async (environmentId: string,
+    type: string, options?: RequestInit): Promise<getIntegrationResponse> => {
+  
+  return customFetch<getIntegrationResponse>(getGetIntegrationUrl(environmentId,type),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetIntegrationQueryKey = (environmentId?: string,
+    type?: string,) => {
+    return [
+    `/environments/${environmentId}/integrations/${type}`
+    ] as const;
+    }
+
+    
+export const getGetIntegrationQueryOptions = <TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(environmentId: string,
+    type: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIntegrationQueryKey(environmentId,type);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIntegration>>> = ({ signal }) => getIntegration(environmentId,type, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId && type), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetIntegrationQueryResult = NonNullable<Awaited<ReturnType<typeof getIntegration>>>
+export type GetIntegrationQueryError = void
+
+
+export function useGetIntegration<TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(
+ environmentId: string,
+    type: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIntegration>>,
+          TError,
+          Awaited<ReturnType<typeof getIntegration>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetIntegration<TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(
+ environmentId: string,
+    type: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIntegration>>,
+          TError,
+          Awaited<ReturnType<typeof getIntegration>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetIntegration<TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(
+ environmentId: string,
+    type: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary Get an integration
+ */
+
+export function useGetIntegration<TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(
+ environmentId: string,
+    type: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getGetIntegrationQueryOptions(environmentId,type,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Remove an integration
+ */
+export type deleteIntegrationResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteIntegrationResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type deleteIntegrationResponseSuccess = (deleteIntegrationResponse204) & {
+  headers: Headers;
+};
+export type deleteIntegrationResponseError = (deleteIntegrationResponse404) & {
+  headers: Headers;
+};
+
+export type deleteIntegrationResponse = (deleteIntegrationResponseSuccess | deleteIntegrationResponseError)
+
+export const getDeleteIntegrationUrl = (environmentId: string,
+    type: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/integrations/${type}`
+}
+
+export const deleteIntegration = async (environmentId: string,
+    type: string, options?: RequestInit): Promise<deleteIntegrationResponse> => {
+  
+  return customFetch<deleteIntegrationResponse>(getDeleteIntegrationUrl(environmentId,type),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteIntegrationMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteIntegration>>, TError,{environmentId: string;type: string}, TContext> => {
+
+const mutationKey = ['deleteIntegration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteIntegration>>, {environmentId: string;type: string}> = (props) => {
+          const {environmentId,type} = props ?? {};
+
+          return  deleteIntegration(environmentId,type,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof deleteIntegration>>>
+    
+    export type DeleteIntegrationMutationError = void
+
+    /**
+ * @summary Remove an integration
+ */
+export const useDeleteIntegration = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteIntegration>>,
+        TError,
+        {environmentId: string;type: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteIntegrationMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Returns every integration configured for this environment, sanitized (no secrets).
+ * @summary List configured integrations
+ */
+export type listIntegrationsResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type listIntegrationsResponseSuccess = (listIntegrationsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listIntegrationsResponse = (listIntegrationsResponseSuccess)
+
+export const getListIntegrationsUrl = (environmentId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/integrations`
+}
+
+export const listIntegrations = async (environmentId: string, options?: RequestInit): Promise<listIntegrationsResponse> => {
+  
+  return customFetch<listIntegrationsResponse>(getListIntegrationsUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListIntegrationsQueryKey = (environmentId?: string,) => {
+    return [
+    `/environments/${environmentId}/integrations`
+    ] as const;
+    }
+
+    
+export const getListIntegrationsQueryOptions = <TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListIntegrationsQueryKey(environmentId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listIntegrations>>> = ({ signal }) => listIntegrations(environmentId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListIntegrationsQueryResult = NonNullable<Awaited<ReturnType<typeof listIntegrations>>>
+export type ListIntegrationsQueryError = unknown
+
+
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(
+ environmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listIntegrations>>,
+          TError,
+          Awaited<ReturnType<typeof listIntegrations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listIntegrations>>,
+          TError,
+          Awaited<ReturnType<typeof listIntegrations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary List configured integrations
+ */
+
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getListIntegrationsQueryOptions(environmentId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 

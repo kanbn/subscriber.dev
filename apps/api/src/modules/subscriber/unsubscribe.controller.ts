@@ -1,10 +1,10 @@
-import { Controller, Get, HttpCode, HttpStatus, Query } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 import {
-  UnsubscribeQueryDto,
+  UnsubscribeBodyDto,
   UnsubscribeResponseDto,
 } from "./dto/unsubscribe.dto.js";
 import { SubscriberService } from "./subscriber.service.js";
@@ -14,25 +14,24 @@ import { SubscriberService } from "./subscriber.service.js";
 export class UnsubscribeController {
   constructor(private readonly subscriberService: SubscriberService) {}
 
-  @Get("unsubscribe")
+  @Post("unsubscribe")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "unsubscribe",
-    summary: "Unsubscribe via email link",
+    summary: "Unsubscribe",
     description:
-      "Public endpoint for one-click unsubscribe links embedded in emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.",
+      "Called from the unsubscribe confirmation page linked from emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.",
   })
-  @ApiQuery({ name: "token", required: true, type: String })
   @ApiResponse({ status: 200, type: UnsubscribeResponseDto })
   @ApiResponse({
     status: 404,
     description: "Invalid or expired unsubscribe link",
   })
   async unsubscribe(
-    @Query() query: UnsubscribeQueryDto,
+    @Body() body: UnsubscribeBodyDto,
   ): Promise<UnsubscribeResponseDto> {
     const db = createDrizzleClient();
 
-    return this.subscriberService.unsubscribeByToken(db, query.token);
+    return this.subscriberService.unsubscribeByToken(db, body.token);
   }
 }

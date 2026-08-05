@@ -11,9 +11,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
             "bearer": []
@@ -31,9 +29,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
             "bearer": []
@@ -58,9 +54,7 @@
             }
           }
         },
-        "tags": [
-          "Test"
-        ],
+        "tags": ["Test"],
         "security": [
           {
             "bearer": []
@@ -93,9 +87,7 @@
             }
           }
         },
-        "tags": [
-          "Test"
-        ],
+        "tags": ["Test"],
         "security": [
           {
             "bearer": []
@@ -123,9 +115,7 @@
             }
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -158,9 +148,7 @@
             }
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -222,9 +210,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -273,9 +259,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -321,9 +305,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -377,9 +359,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -416,9 +396,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -466,9 +444,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -524,9 +500,7 @@
             "description": "Subscriber or preferences not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -535,21 +509,21 @@
       }
     },
     "/unsubscribe": {
-      "get": {
+      "post": {
         "operationId": "unsubscribe",
-        "summary": "Unsubscribe via email link",
-        "description": "Public endpoint for one-click unsubscribe links embedded in emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.",
-        "parameters": [
-          {
-            "name": "token",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "minLength": 1,
-              "type": "string"
+        "summary": "Unsubscribe",
+        "description": "Called from the unsubscribe confirmation page linked from emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsubscribeBodyDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "",
@@ -565,9 +539,7 @@
             "description": "Invalid or expired unsubscribe link"
           }
         },
-        "tags": [
-          "Unsubscribe"
-        ]
+        "tags": ["Unsubscribe"]
       }
     },
     "/environments/{environmentId}/workflows/trigger": {
@@ -610,9 +582,7 @@
             "description": "Environment, workflow, or subscriber not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -624,7 +594,7 @@
       "post": {
         "operationId": "createWorkflow",
         "summary": "Create a new workflow",
-        "description": "Creates a workflow definition: a named, ordered sequence of steps (currently email only), each with a delay relative to the previous step.",
+        "description": "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step.",
         "parameters": [
           {
             "name": "environmentId",
@@ -660,9 +630,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -722,9 +690,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -770,9 +736,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -826,9 +790,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -865,9 +827,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -937,9 +897,147 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
+        "tags": ["Workflows"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/integrations/{type}": {
+      "patch": {
+        "operationId": "upsertIntegration",
+        "summary": "Configure an integration",
+        "description": "Creates or updates the integration of the given type for this environment (e.g. \"smtp\"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned.",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
+        "responses": {
+          "200": {
+            "description": "Integration saved"
+          },
+          "400": {
+            "description": "Invalid config or failed verification"
+          },
+          "404": {
+            "description": "Environment or integration type not found"
+          }
+        },
+        "tags": ["Integrations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getIntegration",
+        "summary": "Get an integration",
+        "description": "Returns the sanitized config for a single integration type (no secrets).",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Environment or integration not found"
+          }
+        },
+        "tags": ["Integrations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteIntegration",
+        "summary": "Remove an integration",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Integration deleted"
+          },
+          "404": {
+            "description": "Environment or integration not found"
+          }
+        },
+        "tags": ["Integrations"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/integrations": {
+      "get": {
+        "operationId": "listIntegrations",
+        "summary": "List configured integrations",
+        "description": "Returns every integration configured for this environment, sanitized (no secrets).",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -957,7 +1055,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "http://localhost:6000",
+      "url": "http://localhost:4001",
       "description": "Development"
     }
   ],
@@ -1004,12 +1102,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "message",
-          "timestamp",
-          "success",
-          "echo"
-        ]
+        "required": ["message", "timestamp", "success", "echo"]
       },
       "TestRequestDto": {
         "type": "object",
@@ -1023,9 +1116,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "WorkspaceDto": {
         "type": "object",
@@ -1043,12 +1134,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "publicId",
-          "name",
-          "slug"
-        ]
+        "required": ["id", "publicId", "name", "slug"]
       },
       "CreateWorkspaceDto": {
         "type": "object",
@@ -1059,9 +1145,7 @@
             "maxLength": 255
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "CreateWorkspaceResponseDto": {
         "type": "object",
@@ -1103,10 +1187,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "workspace",
-          "environment"
-        ]
+        "required": ["workspace", "environment"]
       },
       "ListSubscribersResponseDto": {
         "type": "object",
@@ -1177,11 +1258,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "subscribers",
-          "limit",
-          "offset"
-        ]
+        "required": ["subscribers", "limit", "offset"]
       },
       "GetSubscriberResponseDto": {
         "type": "object",
@@ -1248,10 +1325,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "subscriber",
-          "preferences"
-        ]
+        "required": ["subscriber", "preferences"]
       },
       "CreateSubscriberDto": {
         "type": "object",
@@ -1300,10 +1374,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "attributes",
-          "preferences"
-        ]
+        "required": ["attributes", "preferences"]
       },
       "CreateSubscriberResponseDto": {
         "type": "object",
@@ -1369,10 +1440,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "subscriber",
-          "preferences"
-        ]
+        "required": ["subscriber", "preferences"]
       },
       "BulkUpsertSubscribersDto": {
         "type": "object",
@@ -1426,9 +1494,7 @@
             }
           }
         },
-        "required": [
-          "subscribers"
-        ]
+        "required": ["subscribers"]
       },
       "BulkUpsertSubscribersResponseDto": {
         "type": "object",
@@ -1443,11 +1509,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "created",
-                    "updated",
-                    "error"
-                  ]
+                  "enum": ["created", "updated", "error"]
                 },
                 "subscriber": {
                   "type": "object",
@@ -1519,21 +1581,13 @@
                     },
                     "createdAt": {}
                   },
-                  "required": [
-                    "publicId",
-                    "email",
-                    "version",
-                    "createdAt"
-                  ]
+                  "required": ["publicId", "email", "version", "createdAt"]
                 },
                 "error": {
                   "type": "string"
                 }
               },
-              "required": [
-                "index",
-                "status"
-              ]
+              "required": ["index", "status"]
             }
           },
           "summary": {
@@ -1552,10 +1606,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "results",
-          "summary"
-        ]
+        "required": ["results", "summary"]
       },
       "UpdateSubscriberDto": {
         "type": "object",
@@ -1650,9 +1701,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "subscriber"
-        ]
+        "required": ["subscriber"]
       },
       "UpdatePreferencesDto": {
         "type": "object",
@@ -1685,9 +1734,17 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "preferences"
-        ]
+        "required": ["preferences"]
+      },
+      "UnsubscribeBodyDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["token"]
       },
       "UnsubscribeResponseDto": {
         "type": "object",
@@ -1696,9 +1753,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "unsubscribed"
-        ]
+        "required": ["unsubscribed"]
       },
       "TriggerWorkflowDto": {
         "type": "object",
@@ -1731,11 +1786,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "key",
-          "subscriber",
-          "payload"
-        ]
+        "required": ["key", "subscriber", "payload"]
       },
       "TriggerWorkflowResponseDto": {
         "type": "object",
@@ -1750,9 +1801,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "triggered"
-        ]
+        "required": ["triggered"]
       },
       "CreateWorkflowDto": {
         "type": "object",
@@ -1777,45 +1826,66 @@
             "minItems": 1,
             "maxItems": 50,
             "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "enum": [
-                    "email"
-                  ],
-                  "default": "email"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["email"]
+                    },
+                    "delayMs": {
+                      "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": false,
+                      "default": 0
+                    },
+                    "subject": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "body": {
+                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.",
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": ["type", "subject", "body"]
                 },
-                "delayMs": {
-                  "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
-                  "type": "integer",
-                  "minimum": 0,
-                  "exclusiveMinimum": false,
-                  "default": 0
-                },
-                "subject": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 500
-                },
-                "body": {
-                  "description": "HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload.",
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["webhook"]
+                    },
+                    "delayMs": {
+                      "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": false,
+                      "default": 0
+                    },
+                    "url": {
+                      "description": "Destination URL the JSON payload is POSTed to.",
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "body": {
+                      "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON.",
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": ["type", "url", "body"]
                 }
-              },
-              "required": [
-                "subject",
-                "body"
               ]
             }
           }
         },
-        "required": [
-          "key",
-          "name",
-          "steps"
-        ]
+        "required": ["key", "name", "steps"]
       },
       "WorkflowResponseDto": {
         "type": "object",
@@ -1835,10 +1905,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "paused"
-            ]
+            "enum": ["active", "paused"]
           },
           "steps": {
             "type": "array",
@@ -1862,14 +1929,12 @@
                 },
                 "body": {
                   "type": "string"
+                },
+                "url": {
+                  "type": "string"
                 }
               },
-              "required": [
-                "publicId",
-                "stepOrder",
-                "type",
-                "delayMs"
-              ]
+              "required": ["publicId", "stepOrder", "type", "delayMs"]
             }
           },
           "createdAt": {
@@ -1915,10 +1980,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "active",
-                    "paused"
-                  ]
+                  "enum": ["active", "paused"]
                 },
                 "steps": {
                   "type": "array",
@@ -1942,14 +2004,12 @@
                       },
                       "body": {
                         "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
                       }
                     },
-                    "required": [
-                      "publicId",
-                      "stepOrder",
-                      "type",
-                      "delayMs"
-                    ]
+                    "required": ["publicId", "stepOrder", "type", "delayMs"]
                   }
                 },
                 "createdAt": {},
@@ -1974,11 +2034,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "workflows",
-          "limit",
-          "offset"
-        ]
+        "required": ["workflows", "limit", "offset"]
       },
       "UpdateWorkflowDto": {
         "type": "object",
@@ -2000,10 +2056,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "paused"
-            ]
+            "enum": ["active", "paused"]
           },
           "steps": {
             "description": "If provided, replaces ALL existing steps for this workflow.",
@@ -2011,36 +2064,61 @@
             "minItems": 1,
             "maxItems": 50,
             "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "enum": [
-                    "email"
-                  ],
-                  "default": "email"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["email"]
+                    },
+                    "delayMs": {
+                      "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": false,
+                      "default": 0
+                    },
+                    "subject": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "body": {
+                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.",
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": ["type", "subject", "body"]
                 },
-                "delayMs": {
-                  "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
-                  "type": "integer",
-                  "minimum": 0,
-                  "exclusiveMinimum": false,
-                  "default": 0
-                },
-                "subject": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 500
-                },
-                "body": {
-                  "description": "HTML (or plain text) email body. Supports {{variableName}} interpolation from subscriber fields, subscriber.attributes, and the trigger payload.",
-                  "type": "string",
-                  "minLength": 1
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["webhook"]
+                    },
+                    "delayMs": {
+                      "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": false,
+                      "default": 0
+                    },
+                    "url": {
+                      "description": "Destination URL the JSON payload is POSTed to.",
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "body": {
+                      "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON.",
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": ["type", "url", "body"]
                 }
-              },
-              "required": [
-                "subject",
-                "body"
               ]
             }
           }
@@ -2059,11 +2137,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "active",
-                    "completed",
-                    "cancelled"
-                  ]
+                  "enum": ["active", "completed", "cancelled"]
                 },
                 "triggeredAt": {},
                 "completedAt": {
@@ -2126,11 +2200,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "runs",
-          "limit",
-          "offset"
-        ]
+        "required": ["runs", "limit", "offset"]
       }
     }
   }

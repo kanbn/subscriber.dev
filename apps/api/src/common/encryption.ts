@@ -5,7 +5,14 @@ const ALGO = "aes-256-gcm";
 function getKey(): Buffer {
   const key = process.env.INTEGRATIONS_ENCRYPTION_KEY;
   if (!key) throw new Error("INTEGRATIONS_ENCRYPTION_KEY is not set");
-  return Buffer.from(key, "base64");
+
+  const buf = Buffer.from(key, "base64");
+  if (buf.length !== 32) {
+    throw new Error(
+      `INTEGRATIONS_ENCRYPTION_KEY must decode to exactly 32 bytes (got ${buf.length}). Generate one with: openssl rand -base64 32`,
+    );
+  }
+  return buf;
 }
 
 export function encrypt(plaintext: string): string {

@@ -11,7 +11,7 @@ export interface UnsubscribeTokenPayload {
 /**
  * Creates a long‑lived unsubscribe link for a given subscriber.
  *
- * `${API_BASE_URL}/unsubscribe?token=<jwt>`
+ * `${NEXT_PUBLIC_BASE_URL}/unsubscribe?token=<jwt>`
  *
  * The JWT payload contains the subscriber's public ID and the environment
  * it belongs to (publicId is only unique per environment, not globally, so
@@ -23,7 +23,7 @@ export async function createEmailUnsubscribeLink(
   environmentId: number,
   subscriberPublicId: string,
 ): Promise<string | null> {
-  const baseUrl = process.env.API_BASE_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const secret = process.env.EMAIL_UNSUBSCRIBE_SECRET;
 
   if (!baseUrl || !secret) {

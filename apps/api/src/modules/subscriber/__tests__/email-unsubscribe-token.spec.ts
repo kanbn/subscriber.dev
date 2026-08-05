@@ -9,7 +9,7 @@ describe("email unsubscribe token", () => {
   const originalEnv = { ...process.env };
 
   beforeEach(() => {
-    process.env.API_BASE_URL = "https://api.example.com";
+    process.env.NEXT_PUBLIC_BASE_URL = "https://example.com";
     process.env.EMAIL_UNSUBSCRIBE_SECRET = "test-secret";
   });
 
