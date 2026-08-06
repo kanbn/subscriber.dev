@@ -25,7 +25,7 @@ export default function LoginPage() {
 
   const { data } = authClient.useSession();
 
-  if (data?.user.id) router.push("/workspaces");
+  if (data?.user.id) router.push("/");
 
   return (
     <>

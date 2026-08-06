@@ -20,7 +20,7 @@ export default function SignUpPage() {
 
   const { data } = authClient.useSession();
 
-  if (data?.user.id) router.push("/workspaces");
+  if (data?.user.id) router.push("/");
 
   const handleMagicLinkSent = (value: boolean, recipient: string) => {
     setIsMagicLinkSent(value);

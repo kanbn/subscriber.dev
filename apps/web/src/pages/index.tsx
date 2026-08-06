@@ -1,18 +1,14 @@
-import { authClient } from "@subscriber.dev/auth/client";
+import { PageHead } from "~/components/PageHead";
 
 export default function Home() {
-  const handleCreateApiKey = async () => {
-    const { data, error } = await authClient.apiKey.create({
-      name: "Subscriber.dev API Key",
-      prefix: "sub_",
-    });
-
-    console.log(data, error);
-  };
-
   return (
-    <div>
-      <button onClick={handleCreateApiKey}>Create API Key</button>
-    </div>
+    <>
+      <PageHead title="subscriber.dev" />
+      <main className="bg-background flex min-h-screen flex-col items-center justify-center px-4">
+        <h1 className="text-foreground text-lg font-bold tracking-tight">
+          subscriber.dev
+        </h1>
+      </main>
+    </>
   );
 }
