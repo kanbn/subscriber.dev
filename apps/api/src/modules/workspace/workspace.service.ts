@@ -63,6 +63,52 @@ export class WorkspaceService {
     };
   }
 
+  async getWorkspaceForUser(
+    db: dbClient,
+    userId: number,
+    workspacePublicId: string,
+  ) {
+    const [result] = await db
+      .select({
+        id: workspaces.id,
+        publicId: workspaces.publicId,
+        name: workspaces.name,
+        slug: workspaces.slug,
+      })
+      .from(workspaces)
+      .innerJoin(
+        workspaceMembers,
+        eq(workspaces.id, workspaceMembers.workspaceId),
+      )
+      .where(
+        and(
+          eq(workspaces.publicId, workspacePublicId),
+          eq(workspaceMembers.userId, userId),
+          isNull(workspaceMembers.deletedAt),
+          isNull(workspaces.deletedAt),
+        ),
+      );
+
+    return result;
+  }
+
+  async listEnvironmentsForWorkspace(db: dbClient, workspaceId: number) {
+    return await db
+      .select({
+        id: environments.id,
+        publicId: environments.publicId,
+        name: environments.name,
+        slug: environments.slug,
+      })
+      .from(environments)
+      .where(
+        and(
+          eq(environments.workspaceId, workspaceId),
+          isNull(environments.deletedAt),
+        ),
+      );
+  }
+
   async getWorkspacesByUserId(db: dbClient, userId: number) {
     const result = await db
       .select({

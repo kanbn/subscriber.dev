@@ -12,6 +12,7 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
@@ -26,7 +27,10 @@ import {
   CreateWorkspaceDto,
   CreateWorkspaceResponseDto,
 } from "./dto/create-workspace.dto.js";
-import { WorkspaceDto } from "./dto/get-workspace.dto.js";
+import {
+  ListEnvironmentsResponseDto,
+  WorkspaceDto,
+} from "./dto/get-workspace.dto.js";
 import { WorkspaceService } from "./workspace.service.js";
 
 @ApiTags("Workspaces")
@@ -67,5 +71,36 @@ export class WorkspaceController {
     return this.workspaceService.createWorkspace(db, user.id, {
       name: input.name,
     });
+  }
+
+  @Get(":workspaceId/environments")
+  @ApiOperation({
+    operationId: "listEnvironments",
+    summary: "List a workspace's environments",
+  })
+  @ApiParam({ name: "workspaceId", type: "string" })
+  @ApiResponse({ status: 200, type: ListEnvironmentsResponseDto })
+  @ApiResponse({ status: 404, description: "Workspace not found" })
+  async listEnvironments(
+    @CurrentUser() user: User,
+    @Param("workspaceId") workspaceId: string,
+  ): Promise<ListEnvironmentsResponseDto> {
+    const db = createDrizzleClient();
+    const workspace = await this.workspaceService.getWorkspaceForUser(
+      db,
+      user.id,
+      workspaceId,
+    );
+    if (!workspace) {
+      throw new NotFoundException("Workspace not found");
+    }
+
+    const environments =
+      await this.workspaceService.listEnvironmentsForWorkspace(
+        db,
+        workspace.id,
+      );
+
+    return { environments };
   }
 }
