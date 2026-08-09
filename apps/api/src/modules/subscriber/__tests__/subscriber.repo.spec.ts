@@ -197,6 +197,17 @@ describe("listSubscribers", () => {
     const result = await listSubscribers(db, 10, { limit: 20, offset: 0 });
     expect(result).toEqual([]);
   });
+
+  it("doesn't throw when an email filter is provided", async () => {
+    const findMany = vi.fn().mockResolvedValue([mockSubscriber]);
+    const db = makeMockDb({ findMany });
+    const result = await listSubscribers(db, 10, {
+      limit: 20,
+      offset: 0,
+      email: "alice@example.com",
+    });
+    expect(result).toHaveLength(1);
+  });
 });
 
 // ---------------------------------------------------------------------------

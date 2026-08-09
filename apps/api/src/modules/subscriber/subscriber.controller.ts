@@ -68,6 +68,25 @@ export class SubscriberController {
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
+  @ApiQuery({
+    name: "email",
+    required: false,
+    type: String,
+    description: "Filter to the subscriber with this exact email address",
+  })
+  @ApiQuery({
+    name: "externalId",
+    required: false,
+    type: String,
+    description: "Filter to the subscriber with this exact external ID",
+  })
+  @ApiQuery({
+    name: "emailOptedIn",
+    required: false,
+    type: Boolean,
+    description:
+      "Filter by the subscriber's latest email preference (true = opted in, false = opted out)",
+  })
   @ApiResponse({ status: 200, type: ListSubscribersResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async listSubscribers(
@@ -87,6 +106,9 @@ export class SubscriberController {
     return this.subscriberService.listSubscribers(db, environment.id, {
       limit: query.limit,
       offset: query.offset,
+      email: query.email,
+      externalId: query.externalId,
+      emailOptedIn: query.emailOptedIn,
     });
   }
 

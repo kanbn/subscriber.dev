@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNull, max } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, max } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
@@ -190,15 +190,61 @@ export const findSubscriberForUpsert = async (
   return undefined;
 };
 
+const latestOptedInOrOutSubscriberIds = (
+  db: dbClient,
+  environmentId: number,
+  emailOptedIn: boolean,
+) => {
+  const latestPreferencePerSubscriber = db
+    .selectDistinctOn([subscriberPreferences.subscriberId], {
+      subscriberId: subscriberPreferences.subscriberId,
+      email: subscriberPreferences.email,
+    })
+    .from(subscriberPreferences)
+    .innerJoin(
+      subscribers,
+      eq(subscribers.id, subscriberPreferences.subscriberId),
+    )
+    .where(eq(subscribers.environmentId, environmentId))
+    .orderBy(
+      subscriberPreferences.subscriberId,
+      desc(subscriberPreferences.version),
+    )
+    .as("latest_preference_per_subscriber");
+
+  return db
+    .select({ subscriberId: latestPreferencePerSubscriber.subscriberId })
+    .from(latestPreferencePerSubscriber)
+    .where(eq(latestPreferencePerSubscriber.email, emailOptedIn));
+};
+
 export const listSubscribers = async (
   db: dbClient,
   environmentId: number,
-  opts: { limit: number; offset: number },
+  opts: {
+    limit: number;
+    offset: number;
+    email?: string;
+    externalId?: string;
+    emailOptedIn?: boolean;
+  },
 ) => {
   return await db.query.subscribers.findMany({
     where: and(
       eq(subscribers.environmentId, environmentId),
       isNull(subscribers.deletedAt),
+      opts.email ? eq(subscribers.email, opts.email) : undefined,
+      opts.externalId ? eq(subscribers.externalId, opts.externalId) : undefined,
+      opts.emailOptedIn !== undefined
+        ? inArray(
+            subscribers.id,
+            latestOptedInOrOutSubscriberIds(
+              db,
+              environmentId,
+              opts.emailOptedIn,
+            ),
+          )
+        : undefined,
     ),
     orderBy: asc(subscribers.createdAt),
     limit: opts.limit,

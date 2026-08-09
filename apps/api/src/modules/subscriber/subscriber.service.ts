@@ -514,7 +514,13 @@ export class SubscriberService {
   async listSubscribers(
     db: dbClient,
     environmentId: number,
-    opts: { limit: number; offset: number },
+    opts: {
+      limit: number;
+      offset: number;
+      email?: string;
+      externalId?: string;
+      emailOptedIn?: boolean;
+    },
   ) {
     const rows = await subscriberRepo.listSubscribers(db, environmentId, opts);
 
