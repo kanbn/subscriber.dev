@@ -4,6 +4,7 @@
   "exclude": ["node_modules"],
   "compilerOptions": {
     "baseUrl": ".",
+    "emitDeclarationOnly": false,
     "paths": {
       "~/*": ["./src/*"]
     }

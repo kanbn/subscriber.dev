@@ -80,6 +80,17 @@ export interface CreateWorkspaceResponseDto {
   environment: CreateWorkspaceResponseDtoEnvironment;
 }
 
+export type ListEnvironmentsResponseDtoEnvironmentsItem = {
+  id: number;
+  publicId: string;
+  name: string;
+  slug: string;
+};
+
+export interface ListEnvironmentsResponseDto {
+  environments: ListEnvironmentsResponseDtoEnvironmentsItem[];
+}
+
 /**
  * @nullable
  */
@@ -719,6 +730,18 @@ limit?: number;
  * @minimum 0
  */
 offset?: number;
+/**
+ * Filter to the subscriber with this exact email address
+ */
+email?: string;
+/**
+ * Filter to the subscriber with this exact external ID
+ */
+externalId?: string;
+/**
+ * Filter by the subscriber's latest email preference (true = opted in, false = opted out)
+ */
+emailOptedIn?: boolean;
 };
 
 export type ListWorkflowsParams = {
@@ -1345,6 +1368,127 @@ export const useCreateWorkspace = <TError = unknown,
       return useMutation(mutationOptions, queryClient);
     }
     
+/**
+ * @summary List a workspace's environments
+ */
+export type listEnvironmentsResponse200 = {
+  data: ListEnvironmentsResponseDto
+  status: 200
+}
+
+export type listEnvironmentsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type listEnvironmentsResponseSuccess = (listEnvironmentsResponse200) & {
+  headers: Headers;
+};
+export type listEnvironmentsResponseError = (listEnvironmentsResponse404) & {
+  headers: Headers;
+};
+
+export type listEnvironmentsResponse = (listEnvironmentsResponseSuccess | listEnvironmentsResponseError)
+
+export const getListEnvironmentsUrl = (workspaceId: string,) => {
+
+
+  
+
+  return `/workspaces/${workspaceId}/environments`
+}
+
+export const listEnvironments = async (workspaceId: string, options?: RequestInit): Promise<listEnvironmentsResponse> => {
+  
+  return customFetch<listEnvironmentsResponse>(getListEnvironmentsUrl(workspaceId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListEnvironmentsQueryKey = (workspaceId?: string,) => {
+    return [
+    `/workspaces/${workspaceId}/environments`
+    ] as const;
+    }
+
+    
+export const getListEnvironmentsQueryOptions = <TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListEnvironmentsQueryKey(workspaceId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listEnvironments>>> = ({ signal }) => listEnvironments(workspaceId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListEnvironmentsQueryResult = NonNullable<Awaited<ReturnType<typeof listEnvironments>>>
+export type ListEnvironmentsQueryError = void
+
+
+export function useListEnvironments<TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEnvironments>>,
+          TError,
+          Awaited<ReturnType<typeof listEnvironments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListEnvironments<TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEnvironments>>,
+          TError,
+          Awaited<ReturnType<typeof listEnvironments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListEnvironments<TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary List a workspace's environments
+ */
+
+export function useListEnvironments<TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getListEnvironmentsQueryOptions(workspaceId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
 /**
  * Returns a paginated list of active subscribers in the environment
  * @summary List subscribers

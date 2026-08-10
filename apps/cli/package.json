@@ -1,0 +1,33 @@
+{
+  "name": "@subscriber.dev/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "subscriber": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@subscriber.dev/api-client": "workspace:*",
+    "@subscriber.dev/shared": "workspace:^",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@subscriber.dev/eslint-config": "workspace:*",
+    "@subscriber.dev/prettier-config": "workspace:*",
+    "@subscriber.dev/tsconfig": "workspace:*",
+    "@swc-node/register": "^1.10.9",
+    "@types/node": "^20.17.7",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": "@subscriber.dev/prettier-config"
+}

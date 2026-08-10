@@ -6,11 +6,18 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
       "default": "./src/index.ts"
     },
     "./hooks": {
       "types": "./dist/generated.d.ts",
+      "import": "./dist/generated.js",
       "default": "./src/generated.ts"
+    },
+    "./cli": {
+      "types": "./dist/generated-cli.d.ts",
+      "import": "./dist/generated-cli.js",
+      "default": "./src/generated-cli.ts"
     },
     "./root": {
       "types": "./dist/root.d.ts",

@@ -30,4 +30,30 @@ export default defineConfig({
       },
     },
   },
+  cli: {
+    input: {
+      target: "../../apps/api/openapi.json",
+      parserOptions: {
+        validate: false,
+      },
+    },
+    output: {
+      target: "./src/generated-cli.ts",
+      client: "fetch",
+      httpClient: "fetch",
+      override: {
+        mutator: {
+          path: "./src/mutator/cli-fetch.ts",
+          name: "cliFetch",
+        },
+      },
+    },
+    hooks: {
+      // Node's ESM resolver requires explicit extensions on relative
+      // imports, but orval emits them without one. Runs after every
+      // write (including `orval --watch`), so this can't be skipped
+      // by invoking orval directly instead of the `generate` script.
+      afterAllFilesWrite: "node scripts/fix-generated-imports.mjs",
+    },
+  },
 });
