@@ -1,12 +1,16 @@
 import { render } from "ink-testing-library";
 import { describe, expect, it, vi } from "vitest";
 
-import { listSubscribers } from "@subscriber.dev/api-client/cli";
+import {
+  createSubscriber,
+  listSubscribers,
+} from "@subscriber.dev/api-client/cli";
 
 import { SubscribersScreen } from "../SubscribersScreen.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   listSubscribers: vi.fn(),
+  createSubscriber: vi.fn(),
 }));
 
 function subscriber(overrides: Partial<Record<string, unknown>> = {}) {
@@ -91,6 +95,80 @@ describe("SubscribersScreen", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("No subscribers");
     });
+  });
+});
+
+describe("SubscribersScreen create", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  it("shows the new-subscriber field menu when 'n' is pressed", async () => {
+    listSubscribersMock({ subscribers: [subscriber()] });
+
+    const { lastFrame, stdin } = render(
+      <SubscribersScreen
+        environmentId="test-environment-1"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("test@example.com");
+    });
+
+    await tick();
+    stdin.write("n");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New subscriber");
+    });
+    expect(lastFrame()).toContain("Email: —");
+  });
+
+  it("fills in the default field before creating", async () => {
+    listSubscribersMock({ subscribers: [] });
+    vi.mocked(createSubscriber).mockResolvedValue({
+      status: 201,
+      headers: new Headers(),
+      data: {
+        subscriber: { publicId: "test-subscriber-new", email: "a@b.com" },
+        preferences: { email: true },
+      },
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <SubscribersScreen
+        environmentId="test-environment-1"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("No subscribers");
+    });
+
+    await tick();
+    stdin.write("n");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New subscriber");
+    });
+
+    // Default-selected item is "Email" (the first field).
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("Email: —");
+    });
+
+    await tick();
+    stdin.write("a@b.com");
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Email: a@b.com");
+    });
+    expect(createSubscriber).not.toHaveBeenCalled();
   });
 });
 
