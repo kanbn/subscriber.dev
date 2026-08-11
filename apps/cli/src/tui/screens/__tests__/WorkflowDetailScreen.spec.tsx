@@ -1,13 +1,18 @@
 import { render } from "ink-testing-library";
 import { describe, expect, it, vi } from "vitest";
 
-import { deleteWorkflow, getWorkflow } from "@subscriber.dev/api-client/cli";
+import {
+  deleteWorkflow,
+  getWorkflow,
+  triggerWorkflow,
+} from "@subscriber.dev/api-client/cli";
 
 import { WorkflowDetailScreen } from "../WorkflowDetailScreen.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   getWorkflow: vi.fn(),
   deleteWorkflow: vi.fn(),
+  triggerWorkflow: vi.fn(),
 }));
 
 const testWorkflow = {
@@ -134,5 +139,128 @@ describe("WorkflowDetailScreen delete", () => {
       expect(lastFrame()).not.toContain("This cannot be undone.");
     });
     expect(deleteWorkflow).not.toHaveBeenCalled();
+  });
+});
+
+describe("WorkflowDetailScreen trigger", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  async function loaded() {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testWorkflow,
+    } as never);
+    const screen = renderScreen();
+    await vi.waitFor(() => {
+      expect(screen.lastFrame()).toContain("key: test-signup");
+    });
+    return screen;
+  }
+
+  it("shows a text prompt when 't' is pressed", async () => {
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Trigger for subscriber email:");
+    });
+  });
+
+  it("triggers with the typed email and shows the run on success", async () => {
+    vi.mocked(triggerWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { triggered: true, runPublicId: "test-run-1" },
+    } as never);
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Trigger for subscriber email:");
+    });
+
+    await tick();
+    stdin.write("test@example.com");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Triggered. Run: test-run-1");
+    });
+    expect(triggerWorkflow).toHaveBeenCalledWith("test-environment-1", {
+      key: "test-signup",
+      subscriber: { email: "test@example.com" },
+      payload: {},
+    });
+  });
+
+  it("shows the reason when the workflow declines to trigger", async () => {
+    vi.mocked(triggerWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { triggered: false, reason: "workflow_has_no_steps" },
+    } as never);
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Trigger for subscriber email:");
+    });
+
+    await tick();
+    stdin.write("test@example.com");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Not triggered: workflow_has_no_steps");
+    });
+  });
+
+  it("does not call the API when submitting an empty email", async () => {
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Trigger for subscriber email:");
+    });
+
+    await tick();
+    stdin.write("\r");
+    await tick();
+
+    expect(triggerWorkflow).not.toHaveBeenCalled();
+  });
+
+  it("shows an error on a 404", async () => {
+    vi.mocked(triggerWorkflow).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Trigger for subscriber email:");
+    });
+
+    await tick();
+    stdin.write("test@example.com");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Workflow or subscriber not found.");
+    });
   });
 });
