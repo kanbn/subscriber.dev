@@ -1,10 +1,13 @@
+import { readFileSync } from "node:fs";
 import type { Command } from "commander";
 
 import type {
+  BulkUpsertSubscribersDto,
   CreateSubscriberDto,
   UpdateSubscriberDto,
 } from "@subscriber.dev/api-client/cli";
 import {
+  bulkUpsertSubscribers,
   createSubscriber,
   deleteSubscriber,
   getSubscriber,
@@ -184,6 +187,74 @@ export function registerSubscribersCommand(program: Command): void {
         }
         printResult(response.data, opts);
       }),
+    );
+
+  subscribers
+    .command("bulk")
+    .description("Bulk create or update up to 500 subscribers from a JSON file")
+    .requiredOption(
+      "--file <path>",
+      'path to a JSON file containing {"subscribers": [...]} or a bare array (use "-" for stdin)',
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (opts: {
+          file: string;
+          environment?: string;
+          json?: boolean;
+        }) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+
+          let raw: string;
+          try {
+            raw = readFileSync(opts.file === "-" ? 0 : opts.file, "utf-8");
+          } catch (err) {
+            const source = opts.file === "-" ? "stdin" : opts.file;
+            const message = err instanceof Error ? err.message : String(err);
+            console.error(`Failed to read ${source}: ${message}`);
+            process.exitCode = 1;
+            return;
+          }
+
+          let parsed: unknown;
+          try {
+            parsed = JSON.parse(raw);
+          } catch {
+            console.error("File must contain valid JSON.");
+            process.exitCode = 1;
+            return;
+          }
+
+          const subscribersInput = Array.isArray(parsed)
+            ? parsed
+            : (parsed as { subscribers?: unknown }).subscribers;
+
+          if (!Array.isArray(subscribersInput)) {
+            console.error(
+              'JSON must be an array, or an object with a "subscribers" array.',
+            );
+            process.exitCode = 1;
+            return;
+          }
+
+          const response = await bulkUpsertSubscribers(environmentId, {
+            subscribers:
+              subscribersInput as BulkUpsertSubscribersDto["subscribers"],
+          });
+          if (response.status === 404) {
+            console.error("Environment not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data, opts);
+        },
+      ),
     );
 
   subscribers

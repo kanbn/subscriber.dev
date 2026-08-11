@@ -1,7 +1,9 @@
+import { readFileSync } from "node:fs";
 import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  bulkUpsertSubscribers,
   createSubscriber,
   deleteSubscriber,
   getSubscriber,
@@ -18,10 +20,15 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   createSubscriber: vi.fn(),
   updateSubscriber: vi.fn(),
   deleteSubscriber: vi.fn(),
+  bulkUpsertSubscribers: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
   readCliConfig: vi.fn(),
+}));
+
+vi.mock("node:fs", () => ({
+  readFileSync: vi.fn(),
 }));
 
 const testSubscriber = {
@@ -318,6 +325,156 @@ describe("subscribers delete", () => {
     });
 
     expect(errorSpy).toHaveBeenCalledWith("Subscriber not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("subscribers bulk", () => {
+  it("accepts a bare array and wraps it in { subscribers }", async () => {
+    vi.mocked(readFileSync).mockReturnValue(
+      JSON.stringify([{ email: "a@example.com" }]),
+    );
+    vi.mocked(bulkUpsertSubscribers).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        results: [{ index: 0, status: "created" }],
+        summary: { created: 1, updated: 0, errored: 0 },
+      },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["subscribers", "bulk", "--file", "rows.json"],
+      { from: "user" },
+    );
+
+    expect(readFileSync).toHaveBeenCalledWith("rows.json", "utf-8");
+    expect(bulkUpsertSubscribers).toHaveBeenCalledWith("test-environment-1", {
+      subscribers: [{ email: "a@example.com" }],
+    });
+  });
+
+  it("accepts an object with a subscribers array", async () => {
+    vi.mocked(readFileSync).mockReturnValue(
+      JSON.stringify({ subscribers: [{ email: "a@example.com" }] }),
+    );
+    vi.mocked(bulkUpsertSubscribers).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { results: [], summary: {} },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["subscribers", "bulk", "--file", "rows.json"],
+      { from: "user" },
+    );
+
+    expect(bulkUpsertSubscribers).toHaveBeenCalledWith("test-environment-1", {
+      subscribers: [{ email: "a@example.com" }],
+    });
+  });
+
+  it("reads from stdin (fd 0) when --file is -", async () => {
+    vi.mocked(readFileSync).mockReturnValue(JSON.stringify([]));
+    vi.mocked(bulkUpsertSubscribers).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { results: [], summary: {} },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(["subscribers", "bulk", "--file", "-"], {
+      from: "user",
+    });
+
+    expect(readFileSync).toHaveBeenCalledWith(0, "utf-8");
+  });
+
+  it("errors without calling the API when the file can't be read", async () => {
+    vi.mocked(readFileSync).mockImplementation(() => {
+      throw new Error("ENOENT: no such file or directory");
+    });
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["subscribers", "bulk", "--file", "missing.json"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to read missing.json"),
+    );
+    expect(process.exitCode).toBe(1);
+    expect(bulkUpsertSubscribers).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("errors without calling the API when the file isn't valid JSON", async () => {
+    vi.mocked(readFileSync).mockReturnValue("not json");
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["subscribers", "bulk", "--file", "rows.json"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith("File must contain valid JSON.");
+    expect(process.exitCode).toBe(1);
+    expect(bulkUpsertSubscribers).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("errors without calling the API when the JSON has no subscribers array", async () => {
+    vi.mocked(readFileSync).mockReturnValue(JSON.stringify({ foo: "bar" }));
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["subscribers", "bulk", "--file", "rows.json"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("JSON must be an array"),
+    );
+    expect(process.exitCode).toBe(1);
+    expect(bulkUpsertSubscribers).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("prints an error and exits on a 404", async () => {
+    vi.mocked(readFileSync).mockReturnValue(JSON.stringify([]));
+    vi.mocked(bulkUpsertSubscribers).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["subscribers", "bulk", "--file", "rows.json"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith("Environment not found.");
     expect(process.exitCode).toBe(1);
 
     process.exitCode = undefined;

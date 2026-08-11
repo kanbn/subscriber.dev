@@ -7,6 +7,40 @@
  */
 import { cliFetch } from "./mutator/cli-fetch.js";
 
+export type UserResponseDtoApiKeysItem = {
+  id: number;
+  /** @nullable */
+  prefix: string | null;
+  key: string;
+};
+
+export interface UserResponseDto {
+  publicId: string;
+  /** @nullable */
+  name: string | null;
+  email: string;
+  /** @nullable */
+  image: string | null;
+  /** @nullable */
+  stripeCustomerId: string | null;
+  apiKeys: UserResponseDtoApiKeysItem[];
+}
+
+export interface UpdateUserDto {
+  name?: string;
+  image?: string;
+}
+
+export interface UpdateUserResponseDto {
+  publicId: string;
+  /** @nullable */
+  name: string | null;
+  /** @nullable */
+  image: string | null;
+  /** @nullable */
+  stripeCustomerId: string | null;
+}
+
 export type TestResponseDtoEcho = {
   /** Test name */
   name?: string;
@@ -718,6 +752,26 @@ export interface ListRunsResponseDto {
   offset: number;
 }
 
+export type UpsertIntegrationDtoRoot = { [key: string]: unknown };
+
+export interface UpsertIntegrationDto {
+  root: UpsertIntegrationDtoRoot;
+}
+
+export interface IntegrationResponseDto {
+  type: string;
+  updatedAt: unknown;
+}
+
+export type ListIntegrationsResponseDtoIntegrationsItem = {
+  type: string;
+  updatedAt: unknown;
+};
+
+export interface ListIntegrationsResponseDto {
+  integrations: ListIntegrationsResponseDtoIntegrationsItem[];
+}
+
 export type ListSubscribersParams = {
   /**
    * @minimum 1
@@ -770,7 +824,7 @@ export type ListWorkflowRunsParams = {
  * @summary Get current user
  */
 export type getCurrentUserResponse200 = {
-  data: void;
+  data: UserResponseDto;
   status: 200;
 };
 
@@ -796,7 +850,7 @@ export const getCurrentUser = async (
  * @summary Update current user
  */
 export type updateCurrentUserResponse200 = {
-  data: void;
+  data: UpdateUserResponseDto;
   status: 200;
 };
 
@@ -810,11 +864,14 @@ export const getUpdateCurrentUserUrl = () => {
 };
 
 export const updateCurrentUser = async (
+  updateUserDto: UpdateUserDto,
   options?: RequestInit,
 ): Promise<updateCurrentUserResponse> => {
   return cliFetch<updateCurrentUserResponse>(getUpdateCurrentUserUrl(), {
     ...options,
     method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateUserDto),
   });
 };
 
@@ -1711,7 +1768,7 @@ export const listWorkflowRuns = async (
  * @summary Configure an integration
  */
 export type upsertIntegrationResponse200 = {
-  data: void;
+  data: IntegrationResponseDto;
   status: 200;
 };
 
@@ -1749,6 +1806,7 @@ export const getUpsertIntegrationUrl = (
 export const upsertIntegration = async (
   environmentId: string,
   type: string,
+  upsertIntegrationDto: UpsertIntegrationDto,
   options?: RequestInit,
 ): Promise<upsertIntegrationResponse> => {
   return cliFetch<upsertIntegrationResponse>(
@@ -1756,6 +1814,8 @@ export const upsertIntegration = async (
     {
       ...options,
       method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(upsertIntegrationDto),
     },
   );
 };
@@ -1764,15 +1824,26 @@ export const upsertIntegration = async (
  * Returns the sanitized config for a single integration type (no secrets).
  * @summary Get an integration
  */
+export type getIntegrationResponse200 = {
+  data: IntegrationResponseDto;
+  status: 200;
+};
+
 export type getIntegrationResponse404 = {
   data: void;
   status: 404;
+};
+
+export type getIntegrationResponseSuccess = getIntegrationResponse200 & {
+  headers: Headers;
 };
 export type getIntegrationResponseError = getIntegrationResponse404 & {
   headers: Headers;
 };
 
-export type getIntegrationResponse = getIntegrationResponseError;
+export type getIntegrationResponse =
+  | getIntegrationResponseSuccess
+  | getIntegrationResponseError;
 
 export const getGetIntegrationUrl = (environmentId: string, type: string) => {
   return `/environments/${environmentId}/integrations/${type}`;
@@ -1842,14 +1913,25 @@ export const deleteIntegration = async (
  * @summary List configured integrations
  */
 export type listIntegrationsResponse200 = {
-  data: void;
+  data: ListIntegrationsResponseDto;
   status: 200;
+};
+
+export type listIntegrationsResponse404 = {
+  data: void;
+  status: 404;
 };
 
 export type listIntegrationsResponseSuccess = listIntegrationsResponse200 & {
   headers: Headers;
 };
-export type listIntegrationsResponse = listIntegrationsResponseSuccess;
+export type listIntegrationsResponseError = listIntegrationsResponse404 & {
+  headers: Headers;
+};
+
+export type listIntegrationsResponse =
+  | listIntegrationsResponseSuccess
+  | listIntegrationsResponseError;
 
 export const getListIntegrationsUrl = (environmentId: string) => {
   return `/environments/${environmentId}/integrations`;

@@ -25,6 +25,40 @@ import type {
 } from '@tanstack/react-query';
 
 import { customFetch } from './mutator/custom-fetch';
+export type UserResponseDtoApiKeysItem = {
+  id: number;
+  /** @nullable */
+  prefix: string | null;
+  key: string;
+};
+
+export interface UserResponseDto {
+  publicId: string;
+  /** @nullable */
+  name: string | null;
+  email: string;
+  /** @nullable */
+  image: string | null;
+  /** @nullable */
+  stripeCustomerId: string | null;
+  apiKeys: UserResponseDtoApiKeysItem[];
+}
+
+export interface UpdateUserDto {
+  name?: string;
+  image?: string;
+}
+
+export interface UpdateUserResponseDto {
+  publicId: string;
+  /** @nullable */
+  name: string | null;
+  /** @nullable */
+  image: string | null;
+  /** @nullable */
+  stripeCustomerId: string | null;
+}
+
 export type TestResponseDtoEcho = {
   /** Test name */
   name?: string;
@@ -720,6 +754,26 @@ export interface ListRunsResponseDto {
   offset: number;
 }
 
+export type UpsertIntegrationDtoRoot = { [key: string]: unknown };
+
+export interface UpsertIntegrationDto {
+  root: UpsertIntegrationDtoRoot;
+}
+
+export interface IntegrationResponseDto {
+  type: string;
+  updatedAt: unknown;
+}
+
+export type ListIntegrationsResponseDtoIntegrationsItem = {
+  type: string;
+  updatedAt: unknown;
+};
+
+export interface ListIntegrationsResponseDto {
+  integrations: ListIntegrationsResponseDtoIntegrationsItem[];
+}
+
 export type ListSubscribersParams = {
 /**
  * @minimum 1
@@ -776,7 +830,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Get current user
  */
 export type getCurrentUserResponse200 = {
-  data: void
+  data: UserResponseDto
   status: 200
 }
     
@@ -890,7 +944,7 @@ export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUs
  * @summary Update current user
  */
 export type updateCurrentUserResponse200 = {
-  data: void
+  data: UpdateUserResponseDto
   status: 200
 }
     
@@ -909,15 +963,16 @@ export const getUpdateCurrentUserUrl = () => {
   return `/users`
 }
 
-export const updateCurrentUser = async ( options?: RequestInit): Promise<updateCurrentUserResponse> => {
+export const updateCurrentUser = async (updateUserDto: UpdateUserDto, options?: RequestInit): Promise<updateCurrentUserResponse> => {
   
   return customFetch<updateCurrentUserResponse>(getUpdateCurrentUserUrl(),
   {
       credentials: 'include',
     ...options,
-    method: 'PUT'
-    
-    
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateUserDto,)
   }
 );}
 
@@ -925,8 +980,8 @@ export const updateCurrentUser = async ( options?: RequestInit): Promise<updateC
 
 
 export const getUpdateCurrentUserMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateUserDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateUserDto}, TContext> => {
 
 const mutationKey = ['updateCurrentUser'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -938,10 +993,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCurrentUser>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCurrentUser>>, {data: UpdateUserDto}> = (props) => {
+          const {data} = props ?? {};
 
-          return  updateCurrentUser(requestOptions)
+          return  updateCurrentUser(data,requestOptions)
         }
 
         
@@ -950,18 +1005,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateCurrentUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateCurrentUser>>>
-    
+    export type UpdateCurrentUserMutationBody = UpdateUserDto
     export type UpdateCurrentUserMutationError = unknown
 
     /**
  * @summary Update current user
  */
 export const useUpdateCurrentUser = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateUserDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateCurrentUser>>,
         TError,
-        void,
+        {data: UpdateUserDto},
         TContext
       > => {
 
@@ -3123,7 +3178,7 @@ export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkfl
  * @summary Configure an integration
  */
 export type upsertIntegrationResponse200 = {
-  data: void
+  data: IntegrationResponseDto
   status: 200
 }
 
@@ -3156,15 +3211,17 @@ export const getUpsertIntegrationUrl = (environmentId: string,
 }
 
 export const upsertIntegration = async (environmentId: string,
-    type: string, options?: RequestInit): Promise<upsertIntegrationResponse> => {
+    type: string,
+    upsertIntegrationDto: UpsertIntegrationDto, options?: RequestInit): Promise<upsertIntegrationResponse> => {
   
   return customFetch<upsertIntegrationResponse>(getUpsertIntegrationUrl(environmentId,type),
   {
       credentials: 'include',
     ...options,
-    method: 'PATCH'
-    
-    
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      upsertIntegrationDto,)
   }
 );}
 
@@ -3172,8 +3229,8 @@ export const upsertIntegration = async (environmentId: string,
 
 
 export const getUpsertIntegrationMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string;data: UpsertIntegrationDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string;data: UpsertIntegrationDto}, TContext> => {
 
 const mutationKey = ['upsertIntegration'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -3185,10 +3242,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertIntegration>>, {environmentId: string;type: string}> = (props) => {
-          const {environmentId,type} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertIntegration>>, {environmentId: string;type: string;data: UpsertIntegrationDto}> = (props) => {
+          const {environmentId,type,data} = props ?? {};
 
-          return  upsertIntegration(environmentId,type,requestOptions)
+          return  upsertIntegration(environmentId,type,data,requestOptions)
         }
 
         
@@ -3197,18 +3254,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpsertIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof upsertIntegration>>>
-    
+    export type UpsertIntegrationMutationBody = UpsertIntegrationDto
     export type UpsertIntegrationMutationError = void
 
     /**
  * @summary Configure an integration
  */
 export const useUpsertIntegration = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string;data: UpsertIntegrationDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof upsertIntegration>>,
         TError,
-        {environmentId: string;type: string},
+        {environmentId: string;type: string;data: UpsertIntegrationDto},
         TContext
       > => {
 
@@ -3221,17 +3278,24 @@ export const useUpsertIntegration = <TError = void,
  * Returns the sanitized config for a single integration type (no secrets).
  * @summary Get an integration
  */
+export type getIntegrationResponse200 = {
+  data: IntegrationResponseDto
+  status: 200
+}
+
 export type getIntegrationResponse404 = {
   data: void
   status: 404
 }
     
-;
+export type getIntegrationResponseSuccess = (getIntegrationResponse200) & {
+  headers: Headers;
+};
 export type getIntegrationResponseError = (getIntegrationResponse404) & {
   headers: Headers;
 };
 
-export type getIntegrationResponse = (getIntegrationResponseError)
+export type getIntegrationResponse = (getIntegrationResponseSuccess | getIntegrationResponseError)
 
 export const getGetIntegrationUrl = (environmentId: string,
     type: string,) => {
@@ -3438,16 +3502,23 @@ export const useDeleteIntegration = <TError = void,
  * @summary List configured integrations
  */
 export type listIntegrationsResponse200 = {
-  data: void
+  data: ListIntegrationsResponseDto
   status: 200
+}
+
+export type listIntegrationsResponse404 = {
+  data: void
+  status: 404
 }
     
 export type listIntegrationsResponseSuccess = (listIntegrationsResponse200) & {
   headers: Headers;
 };
-;
+export type listIntegrationsResponseError = (listIntegrationsResponse404) & {
+  headers: Headers;
+};
 
-export type listIntegrationsResponse = (listIntegrationsResponseSuccess)
+export type listIntegrationsResponse = (listIntegrationsResponseSuccess | listIntegrationsResponseError)
 
 export const getListIntegrationsUrl = (environmentId: string,) => {
 
@@ -3480,7 +3551,7 @@ export const getListIntegrationsQueryKey = (environmentId?: string,) => {
     }
 
     
-export const getListIntegrationsQueryOptions = <TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getListIntegrationsQueryOptions = <TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3499,10 +3570,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ListIntegrationsQueryResult = NonNullable<Awaited<ReturnType<typeof listIntegrations>>>
-export type ListIntegrationsQueryError = unknown
+export type ListIntegrationsQueryError = void
 
 
-export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(
  environmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listIntegrations>>,
@@ -3512,7 +3583,7 @@ export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(
  environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listIntegrations>>,
@@ -3522,7 +3593,7 @@ export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
-export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(
  environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
@@ -3530,7 +3601,7 @@ export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegr
  * @summary List configured integrations
  */
 
-export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = unknown>(
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(
  environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {

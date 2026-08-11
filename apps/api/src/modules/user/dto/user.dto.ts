@@ -1,0 +1,35 @@
+import { createZodDto } from "nestjs-zod";
+import { z } from "zod";
+
+export const UpdateUserSchema = z.object({
+  name: z.string().optional(),
+  image: z.string().optional(),
+});
+
+const UserApiKeySchema = z.object({
+  id: z.number(),
+  prefix: z.string().nullable(),
+  key: z.string(),
+});
+
+export const UserResponseSchema = z.object({
+  publicId: z.string(),
+  name: z.string().nullable(),
+  email: z.string(),
+  image: z.string().nullable(),
+  stripeCustomerId: z.string().nullable(),
+  apiKeys: z.array(UserApiKeySchema),
+});
+
+export const UpdateUserResponseSchema = z.object({
+  publicId: z.string(),
+  name: z.string().nullable(),
+  image: z.string().nullable(),
+  stripeCustomerId: z.string().nullable(),
+});
+
+export class UpdateUserDto extends createZodDto(UpdateUserSchema) {}
+export class UserResponseDto extends createZodDto(UserResponseSchema) {}
+export class UpdateUserResponseDto extends createZodDto(
+  UpdateUserResponseSchema,
+) {}

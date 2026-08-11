@@ -24,6 +24,11 @@ import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
+import {
+  IntegrationResponseDto,
+  ListIntegrationsResponseDto,
+  UpsertIntegrationDto,
+} from "./dto/integration.dto.js";
 import { IntegrationsService } from "./integrations.service.js";
 
 @ApiTags("Integrations")
@@ -43,7 +48,11 @@ export class IntegrationsController {
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "type", type: "string" })
-  @ApiResponse({ status: 200, description: "Integration saved" })
+  @ApiResponse({
+    status: 200,
+    description: "Integration saved",
+    type: IntegrationResponseDto,
+  })
   @ApiResponse({
     status: 400,
     description: "Invalid config or failed verification",
@@ -56,8 +65,8 @@ export class IntegrationsController {
     @CurrentUser() user: User,
     @Param("environmentId") environmentId: string,
     @Param("type") type: string,
-    @Body() body: Record<string, unknown>,
-  ) {
+    @Body() body: UpsertIntegrationDto,
+  ): Promise<IntegrationResponseDto> {
     const db = createDrizzleClient();
 
     const environment = await subscriberRepo.getEnvironmentByPublicId(
@@ -86,7 +95,11 @@ export class IntegrationsController {
       "Returns every integration configured for this environment, sanitized (no secrets).",
   })
   @ApiParam({ name: "environmentId", type: "string" })
-  async list(@Param("environmentId") environmentId: string) {
+  @ApiResponse({ status: 200, type: ListIntegrationsResponseDto })
+  @ApiResponse({ status: 404, description: "Environment not found" })
+  async list(
+    @Param("environmentId") environmentId: string,
+  ): Promise<ListIntegrationsResponseDto> {
     const db = createDrizzleClient();
 
     const environment = await subscriberRepo.getEnvironmentByPublicId(
@@ -110,6 +123,7 @@ export class IntegrationsController {
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "type", type: "string" })
+  @ApiResponse({ status: 200, type: IntegrationResponseDto })
   @ApiResponse({
     status: 404,
     description: "Environment or integration not found",
@@ -117,7 +131,7 @@ export class IntegrationsController {
   async get(
     @Param("environmentId") environmentId: string,
     @Param("type") type: string,
-  ) {
+  ): Promise<IntegrationResponseDto> {
     const db = createDrizzleClient();
 
     const environment = await subscriberRepo.getEnvironmentByPublicId(
