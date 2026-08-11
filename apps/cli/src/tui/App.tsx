@@ -85,6 +85,7 @@ export function App() {
         <SubscriberDetailScreen
           environmentId={screen.environment.publicId}
           subscriberId={screen.subscriberId}
+          onDeleted={pop}
         />
       )}
 
@@ -105,6 +106,7 @@ export function App() {
         <WorkflowDetailScreen
           environmentId={screen.environment.publicId}
           workflowId={screen.workflowId}
+          onDeleted={pop}
         />
       )}
     </Box>

@@ -16,8 +16,10 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   listEnvironments: vi.fn(),
   listSubscribers: vi.fn(),
   getSubscriber: vi.fn(),
+  deleteSubscriber: vi.fn(),
   listWorkflows: vi.fn(),
   getWorkflow: vi.fn(),
+  deleteWorkflow: vi.fn(),
 }));
 
 const exitMock = vi.fn();
