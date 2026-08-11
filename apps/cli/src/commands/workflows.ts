@@ -1,13 +1,22 @@
 import type { Command } from "commander";
 
+import type {
+  CreateWorkflowDto,
+  UpdateWorkflowDto,
+} from "@subscriber.dev/api-client/cli";
 import {
+  createWorkflow,
+  deleteWorkflow,
   getWorkflow,
+  listWorkflowRuns,
   listWorkflows,
   triggerWorkflow,
+  updateWorkflow,
 } from "@subscriber.dev/api-client/cli";
 
 import { ensureLoggedIn } from "../auth.js";
 import { requireEnvironmentId } from "../context.js";
+import { readJsonFile } from "../json-input.js";
 import { printResult } from "../output.js";
 import { run } from "../run.js";
 
@@ -140,6 +149,155 @@ export function registerWorkflowsCommand(program: Command): void {
             return;
           }
           printResult(response.data, opts);
+        },
+      ),
+    );
+
+  workflows
+    .command("create")
+    .description(
+      'Create a workflow from a JSON file: {"key", "name", "description"?, "steps": [...]}',
+    )
+    .requiredOption(
+      "--file <path>",
+      'path to a JSON file with the workflow definition (use "-" for stdin)',
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (opts: {
+          file: string;
+          environment?: string;
+          json?: boolean;
+        }) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+
+          const result = readJsonFile(opts.file);
+          if (!result.ok) {
+            console.error(result.message);
+            process.exitCode = 1;
+            return;
+          }
+
+          const response = await createWorkflow(
+            environmentId,
+            result.data as CreateWorkflowDto,
+          );
+          if (response.status === 404) {
+            console.error("Environment not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data, opts);
+        },
+      ),
+    );
+
+  workflows
+    .command("update <workflowId>")
+    .description(
+      "Update a workflow from a JSON file. Only passed fields are changed; " +
+        "if steps is present, it replaces ALL existing steps.",
+    )
+    .requiredOption(
+      "--file <path>",
+      'path to a JSON file with the fields to change (use "-" for stdin)',
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          opts: { file: string; environment?: string; json?: boolean },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+
+          const result = readJsonFile(opts.file);
+          if (!result.ok) {
+            console.error(result.message);
+            process.exitCode = 1;
+            return;
+          }
+
+          const response = await updateWorkflow(
+            environmentId,
+            workflowId,
+            result.data as UpdateWorkflowDto,
+          );
+          if (response.status === 404) {
+            console.error("Workflow not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data, opts);
+        },
+      ),
+    );
+
+  workflows
+    .command("delete <workflowId>")
+    .description("Delete a workflow")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .action(
+      run(async (workflowId: string, opts: { environment?: string }) => {
+        ensureLoggedIn();
+        const environmentId = requireEnvironmentId(opts);
+        const response = await deleteWorkflow(environmentId, workflowId);
+        if (response.status === 404) {
+          console.error("Workflow not found.");
+          process.exitCode = 1;
+          return;
+        }
+        console.log(`Deleted workflow ${workflowId}.`);
+      }),
+    );
+
+  workflows
+    .command("runs <workflowId>")
+    .description("List runs for a workflow")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--limit <limit>", "max results (1-100)")
+    .option("--offset <offset>", "pagination offset")
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          opts: {
+            environment?: string;
+            limit?: string;
+            offset?: string;
+            json?: boolean;
+          },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await listWorkflowRuns(environmentId, workflowId, {
+            limit: opts.limit ? Number(opts.limit) : undefined,
+            offset: opts.offset ? Number(opts.offset) : undefined,
+          });
+          if (response.status === 404) {
+            console.error("Workflow not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data.runs, opts);
         },
       ),
     );

@@ -1,10 +1,15 @@
+import { readFileSync } from "node:fs";
 import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  createWorkflow,
+  deleteWorkflow,
   getWorkflow,
+  listWorkflowRuns,
   listWorkflows,
   triggerWorkflow,
+  updateWorkflow,
 } from "@subscriber.dev/api-client/cli";
 import { readCliConfig } from "@subscriber.dev/shared";
 
@@ -14,10 +19,18 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   listWorkflows: vi.fn(),
   getWorkflow: vi.fn(),
   triggerWorkflow: vi.fn(),
+  createWorkflow: vi.fn(),
+  updateWorkflow: vi.fn(),
+  deleteWorkflow: vi.fn(),
+  listWorkflowRuns: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
   readCliConfig: vi.fn(),
+}));
+
+vi.mock("node:fs", () => ({
+  readFileSync: vi.fn(),
 }));
 
 const testWorkflow = {
@@ -229,6 +242,252 @@ describe("workflows trigger", () => {
     );
 
     expect(errorSpy).toHaveBeenCalledWith("Workflow or subscriber not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("workflows create", () => {
+  it("sends the parsed workflow definition", async () => {
+    vi.mocked(readFileSync).mockReturnValue(
+      JSON.stringify({
+        key: "test-signup",
+        name: "Test Signup",
+        steps: [{ type: "email", delayMs: 0, subject: "hi", body: "hi" }],
+      }),
+    );
+    vi.mocked(createWorkflow).mockResolvedValue({
+      status: 201,
+      headers: new Headers(),
+      data: testWorkflow,
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["workflows", "create", "--file", "workflow.json"],
+      { from: "user" },
+    );
+
+    expect(readFileSync).toHaveBeenCalledWith("workflow.json", "utf-8");
+    expect(createWorkflow).toHaveBeenCalledWith("test-environment-1", {
+      key: "test-signup",
+      name: "Test Signup",
+      steps: [{ type: "email", delayMs: 0, subject: "hi", body: "hi" }],
+    });
+  });
+
+  it("errors without calling the API when the file isn't valid JSON", async () => {
+    vi.mocked(readFileSync).mockReturnValue("not json");
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["workflows", "create", "--file", "workflow.json"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith("File must contain valid JSON.");
+    expect(process.exitCode).toBe(1);
+    expect(createWorkflow).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("prints an error and exits on a 404", async () => {
+    vi.mocked(readFileSync).mockReturnValue(
+      JSON.stringify({ key: "k", name: "n", steps: [] }),
+    );
+    vi.mocked(createWorkflow).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["workflows", "create", "--file", "workflow.json"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith("Environment not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("workflows update", () => {
+  it("sends the parsed partial update", async () => {
+    vi.mocked(readFileSync).mockReturnValue(
+      JSON.stringify({ status: "paused" }),
+    );
+    vi.mocked(updateWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { ...testWorkflow, status: "paused" },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["workflows", "update", "test-workflow-1", "--file", "patch.json"],
+      { from: "user" },
+    );
+
+    expect(updateWorkflow).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      { status: "paused" },
+    );
+  });
+
+  it("errors without calling the API when the file can't be read", async () => {
+    vi.mocked(readFileSync).mockImplementation(() => {
+      throw new Error("ENOENT");
+    });
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["workflows", "update", "test-workflow-1", "--file", "missing.json"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to read missing.json"),
+    );
+    expect(process.exitCode).toBe(1);
+    expect(updateWorkflow).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("prints an error and exits on a 404", async () => {
+    vi.mocked(readFileSync).mockReturnValue(JSON.stringify({}));
+    vi.mocked(updateWorkflow).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["workflows", "update", "missing", "--file", "patch.json"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith("Workflow not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("workflows delete", () => {
+  it("deletes the workflow and confirms", async () => {
+    vi.mocked(deleteWorkflow).mockResolvedValue({
+      status: 204,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["workflows", "delete", "test-workflow-1"],
+      { from: "user" },
+    );
+
+    expect(deleteWorkflow).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+    );
+    expect(logSpy).toHaveBeenCalledWith("Deleted workflow test-workflow-1.");
+  });
+
+  it("prints an error and exits on a 404", async () => {
+    vi.mocked(deleteWorkflow).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(["workflows", "delete", "missing"], {
+      from: "user",
+    });
+
+    expect(errorSpy).toHaveBeenCalledWith("Workflow not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("workflows runs", () => {
+  it("passes pagination params through and prints the runs", async () => {
+    const testRun = {
+      publicId: "test-run-1",
+      status: "completed",
+      triggeredAt: "2026-01-01T00:00:00.000Z",
+      completedAt: "2026-01-01T00:01:00.000Z",
+      steps: [],
+    };
+    vi.mocked(listWorkflowRuns).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { runs: [testRun], limit: 10, offset: 0 },
+    } as never);
+    vi.spyOn(console, "table").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      [
+        "workflows",
+        "runs",
+        "test-workflow-1",
+        "--limit",
+        "10",
+        "--offset",
+        "5",
+      ],
+      { from: "user" },
+    );
+
+    expect(listWorkflowRuns).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      { limit: 10, offset: 5 },
+    );
+  });
+
+  it("prints an error and exits on a 404", async () => {
+    vi.mocked(listWorkflowRuns).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(["workflows", "runs", "missing"], {
+      from: "user",
+    });
+
+    expect(errorSpy).toHaveBeenCalledWith("Workflow not found.");
     expect(process.exitCode).toBe(1);
 
     process.exitCode = undefined;

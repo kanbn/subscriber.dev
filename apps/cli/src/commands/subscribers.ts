@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import type { Command } from "commander";
 
 import type {
@@ -13,10 +12,12 @@ import {
   getSubscriber,
   listSubscribers,
   updateSubscriber,
+  updateSubscriberPreferences,
 } from "@subscriber.dev/api-client/cli";
 
 import { ensureLoggedIn } from "../auth.js";
 import { requireEnvironmentId } from "../context.js";
+import { readJsonFile } from "../json-input.js";
 import { printResult } from "../output.js";
 import { run } from "../run.js";
 
@@ -190,6 +191,51 @@ export function registerSubscribersCommand(program: Command): void {
     );
 
   subscribers
+    .command("update-preferences <subscriberId>")
+    .description("Set a subscriber's email opt-in preference")
+    .option("--opted-in", "opt the subscriber into email")
+    .option("--opted-out", "opt the subscriber out of email")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          subscriberId: string,
+          opts: {
+            optedIn?: boolean;
+            optedOut?: boolean;
+            environment?: string;
+            json?: boolean;
+          },
+        ) => {
+          ensureLoggedIn();
+
+          if (opts.optedIn === opts.optedOut) {
+            console.error("Pass exactly one of --opted-in or --opted-out.");
+            process.exitCode = 1;
+            return;
+          }
+
+          const environmentId = requireEnvironmentId(opts);
+          const response = await updateSubscriberPreferences(
+            environmentId,
+            subscriberId,
+            { email: opts.optedIn === true },
+          );
+          if (response.status === 404) {
+            console.error("Subscriber not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data, opts);
+        },
+      ),
+    );
+
+  subscribers
     .command("bulk")
     .description("Bulk create or update up to 500 subscribers from a JSON file")
     .requiredOption(
@@ -211,29 +257,16 @@ export function registerSubscribersCommand(program: Command): void {
           ensureLoggedIn();
           const environmentId = requireEnvironmentId(opts);
 
-          let raw: string;
-          try {
-            raw = readFileSync(opts.file === "-" ? 0 : opts.file, "utf-8");
-          } catch (err) {
-            const source = opts.file === "-" ? "stdin" : opts.file;
-            const message = err instanceof Error ? err.message : String(err);
-            console.error(`Failed to read ${source}: ${message}`);
+          const result = readJsonFile(opts.file);
+          if (!result.ok) {
+            console.error(result.message);
             process.exitCode = 1;
             return;
           }
 
-          let parsed: unknown;
-          try {
-            parsed = JSON.parse(raw);
-          } catch {
-            console.error("File must contain valid JSON.");
-            process.exitCode = 1;
-            return;
-          }
-
-          const subscribersInput = Array.isArray(parsed)
-            ? parsed
-            : (parsed as { subscribers?: unknown }).subscribers;
+          const subscribersInput = Array.isArray(result.data)
+            ? result.data
+            : (result.data as { subscribers?: unknown }).subscribers;
 
           if (!Array.isArray(subscribersInput)) {
             console.error(

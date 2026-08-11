@@ -9,6 +9,7 @@ import {
   getSubscriber,
   listSubscribers,
   updateSubscriber,
+  updateSubscriberPreferences,
 } from "@subscriber.dev/api-client/cli";
 import { readCliConfig } from "@subscriber.dev/shared";
 
@@ -21,6 +22,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   updateSubscriber: vi.fn(),
   deleteSubscriber: vi.fn(),
   bulkUpsertSubscribers: vi.fn(),
+  updateSubscriberPreferences: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
@@ -276,6 +278,116 @@ describe("subscribers update", () => {
 
     await buildProgram().parseAsync(
       ["subscribers", "update", "missing", "--email", "x@example.com"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith("Subscriber not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("subscribers update-preferences", () => {
+  it("sends email: true for --opted-in", async () => {
+    vi.mocked(updateSubscriberPreferences).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { preferences: { email: true } },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["subscribers", "update-preferences", "test-subscriber-1", "--opted-in"],
+      { from: "user" },
+    );
+
+    expect(updateSubscriberPreferences).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-subscriber-1",
+      { email: true },
+    );
+  });
+
+  it("sends email: false for --opted-out", async () => {
+    vi.mocked(updateSubscriberPreferences).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { preferences: { email: false } },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["subscribers", "update-preferences", "test-subscriber-1", "--opted-out"],
+      { from: "user" },
+    );
+
+    expect(updateSubscriberPreferences).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-subscriber-1",
+      { email: false },
+    );
+  });
+
+  it("errors without calling the API when neither flag is passed", async () => {
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["subscribers", "update-preferences", "test-subscriber-1"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Pass exactly one of --opted-in or --opted-out.",
+    );
+    expect(process.exitCode).toBe(1);
+    expect(updateSubscriberPreferences).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("errors without calling the API when both flags are passed", async () => {
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      [
+        "subscribers",
+        "update-preferences",
+        "test-subscriber-1",
+        "--opted-in",
+        "--opted-out",
+      ],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Pass exactly one of --opted-in or --opted-out.",
+    );
+    expect(process.exitCode).toBe(1);
+    expect(updateSubscriberPreferences).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("prints an error and exits on a 404", async () => {
+    vi.mocked(updateSubscriberPreferences).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["subscribers", "update-preferences", "missing", "--opted-in"],
       { from: "user" },
     );
 
