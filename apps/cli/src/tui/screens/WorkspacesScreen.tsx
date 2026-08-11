@@ -8,10 +8,14 @@ import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
 import { useAsyncData } from "../useAsyncData.js";
 
+const ACCOUNT_VALUE = "__account__";
+
 export function WorkspacesScreen({
-  onSelect,
+  onSelectWorkspace,
+  onSelectAccount,
 }: {
-  onSelect: (workspace: WorkspaceSummary) => void;
+  onSelectWorkspace: (workspace: WorkspaceSummary) => void;
+  onSelectAccount: () => void;
 }) {
   const state = useAsyncData(async () => {
     const response = await getWorkspaces();
@@ -22,27 +26,36 @@ export function WorkspacesScreen({
     <Box flexDirection="column">
       <Text bold>Workspaces</Text>
       <AsyncBoundary state={state}>
-        {(workspaces) =>
-          workspaces.length === 0 ? (
-            <Text dimColor>
-              No workspaces. Create one with `subscriber workspaces create`.
-            </Text>
-          ) : (
+        {(workspaces) => (
+          <Box flexDirection="column">
             <SelectInput
               limit={10}
-              items={workspaces.map((workspace) => ({
-                label: `${workspace.name}  (${workspace.slug})`,
-                value: workspace.publicId,
-              }))}
+              items={[
+                ...workspaces.map((workspace) => ({
+                  label: `${workspace.name}  (${workspace.slug})`,
+                  value: workspace.publicId,
+                })),
+                { label: "★ My Account", value: ACCOUNT_VALUE },
+              ]}
               onSelect={(item) => {
+                if (item.value === ACCOUNT_VALUE) {
+                  onSelectAccount();
+                  return;
+                }
                 const workspace = workspaces.find(
                   (w) => w.publicId === item.value,
                 );
-                if (workspace) onSelect(workspace);
+                if (workspace) onSelectWorkspace(workspace);
               }}
             />
-          )
-        }
+            {workspaces.length === 0 && (
+              <Text dimColor>
+                No workspaces yet. Create one with `subscriber workspaces
+                create`.
+              </Text>
+            )}
+          </Box>
+        )}
       </AsyncBoundary>
       <Hints text="↑↓ navigate · Enter select · q quit" />
     </Box>

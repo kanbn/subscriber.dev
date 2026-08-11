@@ -38,14 +38,16 @@ const testWorkflow = {
   ],
 };
 
-function renderScreen(onDeleted = vi.fn()) {
+function renderScreen(onDeleted = vi.fn(), onViewRuns = vi.fn()) {
   return {
     onDeleted,
+    onViewRuns,
     ...render(
       <WorkflowDetailScreen
         environmentId="test-environment-1"
         workflowId="test-workflow-1"
         onDeleted={onDeleted}
+        onViewRuns={onViewRuns}
       />,
     ),
   };
@@ -83,6 +85,7 @@ describe("WorkflowDetailScreen", () => {
         environmentId="test-environment-1"
         workflowId="missing"
         onDeleted={vi.fn()}
+        onViewRuns={vi.fn()}
       />,
     );
 
@@ -262,5 +265,26 @@ describe("WorkflowDetailScreen trigger", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Workflow or subscriber not found.");
     });
+  });
+});
+
+describe("WorkflowDetailScreen runs", () => {
+  it("calls onViewRuns when 'r' is pressed", async () => {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testWorkflow,
+    } as never);
+    const onViewRuns = vi.fn();
+    const { lastFrame, stdin } = renderScreen(vi.fn(), onViewRuns);
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("key: test-signup");
+    });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    stdin.write("r");
+
+    expect(onViewRuns).toHaveBeenCalled();
   });
 });

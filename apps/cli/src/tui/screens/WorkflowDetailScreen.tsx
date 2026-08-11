@@ -25,10 +25,12 @@ export function WorkflowDetailScreen({
   environmentId,
   workflowId,
   onDeleted,
+  onViewRuns,
 }: {
   environmentId: string;
   workflowId: string;
   onDeleted: () => void;
+  onViewRuns: () => void;
 }) {
   const state = useAsyncData(async () => {
     const response = await getWorkflow(environmentId, workflowId);
@@ -59,6 +61,8 @@ export function WorkflowDetailScreen({
     } else if (input === "t" || input === "T") {
       setTriggerEmail("");
       setTriggerStatus("entering-email");
+    } else if (input === "r" || input === "R") {
+      onViewRuns();
     }
   });
 
@@ -159,7 +163,7 @@ export function WorkflowDetailScreen({
       <Hints
         text={
           idle
-            ? "d delete · t trigger · Esc back · q quit"
+            ? "d delete · t trigger · r runs · Esc back · q quit"
             : triggerStatus === "success" || triggerStatus === "error"
               ? "any key to continue"
               : triggerStatus === "entering-email"

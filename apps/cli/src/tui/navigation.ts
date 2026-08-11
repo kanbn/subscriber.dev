@@ -10,6 +10,7 @@ export interface EnvironmentSummary {
 
 export type Screen =
   | { kind: "workspaces" }
+  | { kind: "users" }
   | { kind: "environments"; workspace: WorkspaceSummary }
   | {
       kind: "section";
@@ -35,4 +36,19 @@ export type Screen =
       kind: "workflowDetail";
       environment: EnvironmentSummary;
       workflowId: string;
+    }
+  | {
+      kind: "workflowRuns";
+      environment: EnvironmentSummary;
+      workflowId: string;
+    }
+  | {
+      kind: "integrations";
+      workspace: WorkspaceSummary;
+      environment: EnvironmentSummary;
+    }
+  | {
+      kind: "integrationDetail";
+      environment: EnvironmentSummary;
+      type: string;
     };

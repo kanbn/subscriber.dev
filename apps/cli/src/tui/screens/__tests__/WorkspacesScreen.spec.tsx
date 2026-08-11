@@ -16,6 +16,19 @@ const testWorkspace = {
   slug: "test-workspace",
 };
 
+function renderScreen(onSelectWorkspace = vi.fn(), onSelectAccount = vi.fn()) {
+  return {
+    onSelectWorkspace,
+    onSelectAccount,
+    ...render(
+      <WorkspacesScreen
+        onSelectWorkspace={onSelectWorkspace}
+        onSelectAccount={onSelectAccount}
+      />,
+    ),
+  };
+}
+
 describe("WorkspacesScreen", () => {
   it("shows a loading state, then lists workspaces once fetched", async () => {
     vi.mocked(getWorkspaces).mockResolvedValue({
@@ -24,26 +37,25 @@ describe("WorkspacesScreen", () => {
       data: [testWorkspace],
     } as never);
 
-    const { lastFrame } = render(<WorkspacesScreen onSelect={vi.fn()} />);
+    const { lastFrame } = renderScreen();
 
     expect(lastFrame()).toContain("Loading");
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Test Workspace");
     });
+    expect(lastFrame()).toContain("My Account");
   });
 
-  it("calls onSelect with the chosen workspace on Enter", async () => {
+  it("calls onSelectWorkspace with the chosen workspace on Enter (workspaces come before My Account)", async () => {
     vi.mocked(getWorkspaces).mockResolvedValue({
       status: 200,
       headers: new Headers(),
       data: [testWorkspace],
     } as never);
 
-    const onSelect = vi.fn();
-    const { lastFrame, stdin } = render(
-      <WorkspacesScreen onSelect={onSelect} />,
-    );
+    const { lastFrame, stdin, onSelectWorkspace, onSelectAccount } =
+      renderScreen();
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Test Workspace");
@@ -51,7 +63,8 @@ describe("WorkspacesScreen", () => {
 
     stdin.write("\r");
 
-    expect(onSelect).toHaveBeenCalledWith(testWorkspace);
+    expect(onSelectWorkspace).toHaveBeenCalledWith(testWorkspace);
+    expect(onSelectAccount).not.toHaveBeenCalled();
   });
 
   it("shows an empty-state hint when there are no workspaces", async () => {
@@ -61,10 +74,11 @@ describe("WorkspacesScreen", () => {
       data: [],
     } as never);
 
-    const { lastFrame } = render(<WorkspacesScreen onSelect={vi.fn()} />);
+    const { lastFrame } = renderScreen();
 
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain("No workspaces");
+      expect(lastFrame()).toContain("No workspaces yet");
     });
+    expect(lastFrame()).toContain("My Account");
   });
 });

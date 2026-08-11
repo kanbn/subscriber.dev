@@ -3,10 +3,14 @@ import { useState } from "react";
 
 import type { Screen } from "./navigation.js";
 import { EnvironmentsScreen } from "./screens/EnvironmentsScreen.js";
+import { IntegrationDetailScreen } from "./screens/IntegrationDetailScreen.js";
+import { IntegrationsScreen } from "./screens/IntegrationsScreen.js";
 import { SectionScreen } from "./screens/SectionScreen.js";
 import { SubscriberDetailScreen } from "./screens/SubscriberDetailScreen.js";
 import { SubscribersScreen } from "./screens/SubscribersScreen.js";
+import { UserScreen } from "./screens/UserScreen.js";
 import { WorkflowDetailScreen } from "./screens/WorkflowDetailScreen.js";
+import { WorkflowRunsScreen } from "./screens/WorkflowRunsScreen.js";
 import { WorkflowsScreen } from "./screens/WorkflowsScreen.js";
 import { WorkspacesScreen } from "./screens/WorkspacesScreen.js";
 
@@ -37,9 +41,14 @@ export function App() {
 
       {screen.kind === "workspaces" && (
         <WorkspacesScreen
-          onSelect={(workspace) => push({ kind: "environments", workspace })}
+          onSelectWorkspace={(workspace) =>
+            push({ kind: "environments", workspace })
+          }
+          onSelectAccount={() => push({ kind: "users" })}
         />
       )}
+
+      {screen.kind === "users" && <UserScreen />}
 
       {screen.kind === "environments" && (
         <EnvironmentsScreen
@@ -106,6 +115,41 @@ export function App() {
         <WorkflowDetailScreen
           environmentId={screen.environment.publicId}
           workflowId={screen.workflowId}
+          onDeleted={pop}
+          onViewRuns={() =>
+            push({
+              kind: "workflowRuns",
+              environment: screen.environment,
+              workflowId: screen.workflowId,
+            })
+          }
+        />
+      )}
+
+      {screen.kind === "workflowRuns" && (
+        <WorkflowRunsScreen
+          environmentId={screen.environment.publicId}
+          workflowId={screen.workflowId}
+        />
+      )}
+
+      {screen.kind === "integrations" && (
+        <IntegrationsScreen
+          environmentId={screen.environment.publicId}
+          onSelect={(type) =>
+            push({
+              kind: "integrationDetail",
+              environment: screen.environment,
+              type,
+            })
+          }
+        />
+      )}
+
+      {screen.kind === "integrationDetail" && (
+        <IntegrationDetailScreen
+          environmentId={screen.environment.publicId}
+          type={screen.type}
           onDeleted={pop}
         />
       )}

@@ -3,6 +3,7 @@ import { render } from "ink-testing-library";
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  getCurrentUser,
   getSubscriber,
   getWorkspaces,
   listEnvironments,
@@ -20,6 +21,12 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   listWorkflows: vi.fn(),
   getWorkflow: vi.fn(),
   deleteWorkflow: vi.fn(),
+  triggerWorkflow: vi.fn(),
+  listWorkflowRuns: vi.fn(),
+  listIntegrations: vi.fn(),
+  getIntegration: vi.fn(),
+  deleteIntegration: vi.fn(),
+  getCurrentUser: vi.fn(),
 }));
 
 const exitMock = vi.fn();
@@ -116,6 +123,43 @@ describe("App navigation", () => {
       expect(lastFrame()).toContain("test@example.com");
     });
     expect(lastFrame()).not.toContain("publicId: test-subscriber-1");
+  });
+
+  it("navigates to My Account and back with Escape", async () => {
+    vi.mocked(getWorkspaces).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: [],
+    } as never);
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        publicId: "test-user-1",
+        name: "Test User",
+        email: "test@example.com",
+        image: null,
+        stripeCustomerId: null,
+        apiKeys: [],
+      },
+    } as never);
+
+    const { lastFrame, stdin } = render(<App />);
+
+    // With no workspaces, "My Account" is the only (and default) item.
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("My Account");
+    });
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("name: Test User");
+    });
+
+    stdin.write("\u001B");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("No workspaces yet");
+    });
   });
 
   it("quits on 'q'", async () => {
