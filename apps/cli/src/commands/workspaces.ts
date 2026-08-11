@@ -1,6 +1,6 @@
 import type { Command } from "commander";
 
-import { getWorkspaces } from "@subscriber.dev/api-client/cli";
+import { createWorkspace, getWorkspaces } from "@subscriber.dev/api-client/cli";
 import { updateCliConfig } from "@subscriber.dev/shared";
 
 import { ensureLoggedIn } from "../auth.js";
@@ -20,6 +20,18 @@ export function registerWorkspacesCommand(program: Command): void {
       run(async (opts: { json?: boolean }) => {
         ensureLoggedIn();
         const response = await getWorkspaces();
+        printResult(response.data, opts);
+      }),
+    );
+
+  workspaces
+    .command("create <name>")
+    .description("Create a new workspace")
+    .option("--json", "output as JSON")
+    .action(
+      run(async (name: string, opts: { json?: boolean }) => {
+        ensureLoggedIn();
+        const response = await createWorkspace({ name });
         printResult(response.data, opts);
       }),
     );

@@ -1,16 +1,27 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 
+import { ensureLoggedIn } from "./auth.js";
 import { registerEnvironmentsCommand } from "./commands/environments.js";
 import { registerLoginCommand } from "./commands/login.js";
+import { registerSubscribersCommand } from "./commands/subscribers.js";
+import { registerWorkflowsCommand } from "./commands/workflows.js";
 import { registerWorkspacesCommand } from "./commands/workspaces.js";
 
-const program = new Command();
+if (process.argv.length <= 2) {
+  ensureLoggedIn();
+  const { runTui } = await import("./tui/index.js");
+  runTui();
+} else {
+  const program = new Command();
 
-program.name("subscriber").description("subscriber.dev CLI").version("0.1.0");
+  program.name("subscriber").description("subscriber.dev CLI").version("0.1.0");
 
-registerLoginCommand(program);
-registerWorkspacesCommand(program);
-registerEnvironmentsCommand(program);
+  registerLoginCommand(program);
+  registerWorkspacesCommand(program);
+  registerEnvironmentsCommand(program);
+  registerSubscribersCommand(program);
+  registerWorkflowsCommand(program);
 
-program.parse();
+  program.parse();
+}

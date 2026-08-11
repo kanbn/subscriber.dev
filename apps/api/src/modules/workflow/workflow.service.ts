@@ -106,7 +106,7 @@ export class WorkflowService {
       createdBy: data.createdBy,
     });
 
-    return { workflow: this.toWorkflowDto(workflow, steps) };
+    return this.toWorkflowDto(workflow, steps);
   }
 
   async listWorkflows(
@@ -138,7 +138,7 @@ export class WorkflowService {
     if (!workflow) throw new NotFoundException("Workflow not found");
 
     const steps = await workflowRepo.listStepsForWorkflow(db, workflow.id);
-    return { workflow: this.toWorkflowDto(workflow, steps) };
+    return this.toWorkflowDto(workflow, steps);
   }
 
   async updateWorkflow(
@@ -171,7 +171,7 @@ export class WorkflowService {
         )
       : await workflowRepo.listStepsForWorkflow(db, existing.id);
 
-    return { workflow: this.toWorkflowDto(workflow, steps) };
+    return this.toWorkflowDto(workflow, steps);
   }
 
   async deleteWorkflow(

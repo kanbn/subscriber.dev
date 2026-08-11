@@ -1,9 +1,10 @@
 import type { Command } from "commander";
 
 import { listEnvironments } from "@subscriber.dev/api-client/cli";
-import { readCliConfig, updateCliConfig } from "@subscriber.dev/shared";
+import { updateCliConfig } from "@subscriber.dev/shared";
 
 import { ensureLoggedIn } from "../auth.js";
+import { requireWorkspaceId } from "../context.js";
 import { printResult } from "../output.js";
 import { run } from "../run.js";
 
@@ -23,15 +24,7 @@ export function registerEnvironmentsCommand(program: Command): void {
     .action(
       run(async (opts: { workspace?: string; json?: boolean }) => {
         ensureLoggedIn();
-        const workspaceId =
-          opts.workspace ?? readCliConfig().currentWorkspaceId;
-        if (!workspaceId) {
-          console.error(
-            "No workspace specified. Pass --workspace <workspaceId>, or run `subscriber workspaces list` and pass one in.",
-          );
-          process.exitCode = 1;
-          return;
-        }
+        const workspaceId = requireWorkspaceId(opts);
 
         const response = await listEnvironments(workspaceId);
         if (response.status === 404) {

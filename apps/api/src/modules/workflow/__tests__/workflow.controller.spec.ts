@@ -88,9 +88,7 @@ describe("createWorkflow", () => {
     vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
       mockEnvironment as any,
     );
-    mockService.createWorkflow.mockResolvedValue({
-      workflow: { publicId: "wf_1" },
-    });
+    mockService.createWorkflow.mockResolvedValue({ publicId: "wf_1" });
 
     const result = await controller.createWorkflow(mockUser as any, "env_abc", {
       key: "user-signup",
@@ -98,7 +96,7 @@ describe("createWorkflow", () => {
       steps: [{ subject: "hi", body: "hi" }],
     } as any);
 
-    expect(result).toEqual({ workflow: { publicId: "wf_1" } });
+    expect(result).toEqual({ publicId: "wf_1" });
   });
 });
 

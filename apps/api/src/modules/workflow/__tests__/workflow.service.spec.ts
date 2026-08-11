@@ -286,7 +286,7 @@ describe("createWorkflow", () => {
         ],
       }),
     );
-    expect(result.workflow.steps[0]).toEqual(
+    expect(result.steps[0]).toEqual(
       expect.objectContaining({ subject: "hi", body: "hi" }),
     );
   });
@@ -331,9 +331,7 @@ describe("createWorkflow", () => {
         steps: [{ type: "webhook", delayMs: 0, config: webhookConfig }],
       }),
     );
-    expect(result.workflow.steps[0]).toEqual(
-      expect.objectContaining(webhookConfig),
-    );
-    expect(result.workflow.steps[0]).not.toHaveProperty("subject");
+    expect(result.steps[0]).toEqual(expect.objectContaining(webhookConfig));
+    expect(result.steps[0]).not.toHaveProperty("subject");
   });
 });
