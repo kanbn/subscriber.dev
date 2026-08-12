@@ -182,6 +182,9 @@ importers:
       commander:
         specifier: ^12.1.0
         version: 12.1.0
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       ink:
         specifier: ^5.2.1
         version: 5.2.1(@types/react@18.3.24)(react@18.3.1)

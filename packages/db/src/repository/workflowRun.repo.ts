@@ -179,6 +179,6 @@ export const listRunsForWorkflow = async (
     orderBy: desc(workflowRuns.triggeredAt),
     limit: opts.limit,
     offset: opts.offset,
-    with: { steps: true },
+    with: { steps: true, subscriber: true },
   });
 };

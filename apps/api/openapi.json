@@ -2576,6 +2576,32 @@
                 "completedAt": {
                   "nullable": true
                 },
+                "subscriber": {
+                  "type": "object",
+                  "properties": {
+                    "publicId": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "name": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "externalId": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "publicId",
+                    "email",
+                    "name",
+                    "externalId"
+                  ]
+                },
                 "steps": {
                   "type": "array",
                   "items": {
@@ -2622,6 +2648,7 @@
                 "status",
                 "triggeredAt",
                 "completedAt",
+                "subscriber",
                 "steps"
               ]
             }

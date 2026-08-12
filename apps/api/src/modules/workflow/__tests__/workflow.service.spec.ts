@@ -335,3 +335,63 @@ describe("createWorkflow", () => {
     expect(result.steps[0]).not.toHaveProperty("subject");
   });
 });
+
+// ---------------------------------------------------------------------------
+// listRuns
+// ---------------------------------------------------------------------------
+
+describe("listRuns", () => {
+  it("maps the subscriber and steps for each run", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      id: 1,
+      key: "user-signup",
+    } as any);
+    vi.mocked(workflowRunRepo.listRunsForWorkflow).mockResolvedValue([
+      {
+        publicId: "run_abc",
+        status: "active",
+        triggeredAt: new Date("2026-01-01T00:00:00Z"),
+        completedAt: null,
+        subscriber: {
+          publicId: "sub_abc",
+          email: "alice@example.com",
+          name: null,
+          externalId: null,
+        },
+        steps: [
+          {
+            stepOrder: 0,
+            type: "email",
+            status: "sent",
+            scheduledAt: new Date("2026-01-01T00:00:00Z"),
+            sentAt: new Date("2026-01-01T00:00:01Z"),
+            errorMessage: null,
+          },
+        ],
+      },
+    ] as any);
+
+    const result = await service.listRuns(mockDb, 10, "wf_abc", {
+      limit: 20,
+      offset: 0,
+    });
+
+    expect(result.runs[0]?.subscriber).toEqual({
+      publicId: "sub_abc",
+      email: "alice@example.com",
+      name: null,
+      externalId: null,
+    });
+    expect(result.runs[0]?.steps[0]).toEqual(
+      expect.objectContaining({ type: "email", status: "sent" }),
+    );
+  });
+
+  it("throws NotFoundException when the workflow does not exist", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(undefined);
+
+    await expect(
+      service.listRuns(mockDb, 10, "wf_missing", { limit: 20, offset: 0 }),
+    ).rejects.toThrow(NotFoundException);
+  });
+});

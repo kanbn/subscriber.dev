@@ -296,6 +296,12 @@ export class WorkflowService {
         status: run.status,
         triggeredAt: run.triggeredAt,
         completedAt: run.completedAt,
+        subscriber: {
+          publicId: run.subscriber.publicId,
+          email: run.subscriber.email,
+          name: run.subscriber.name,
+          externalId: run.subscriber.externalId,
+        },
         steps: run.steps.map((s) => ({
           stepOrder: s.stepOrder,
           type: s.type,

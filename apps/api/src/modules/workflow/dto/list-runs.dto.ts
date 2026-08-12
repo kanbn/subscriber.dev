@@ -15,11 +15,19 @@ export const WorkflowRunStepSummarySchema = z.object({
   errorMessage: z.string().nullable(),
 });
 
+export const WorkflowRunSubscriberSummarySchema = z.object({
+  publicId: z.string(),
+  email: z.string().nullable(),
+  name: z.string().nullable(),
+  externalId: z.string().nullable(),
+});
+
 export const WorkflowRunSummarySchema = z.object({
   publicId: z.string(),
   status: z.enum(["active", "completed", "cancelled"]),
   triggeredAt: z.date(),
   completedAt: z.date().nullable(),
+  subscriber: WorkflowRunSubscriberSummarySchema,
   steps: z.array(WorkflowRunStepSummarySchema),
 });
 

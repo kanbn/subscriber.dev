@@ -711,6 +711,16 @@ export const ListRunsResponseDtoRunsItemStatus = {
  */
 export type ListRunsResponseDtoRunsItemCompletedAt = unknown | null;
 
+export type ListRunsResponseDtoRunsItemSubscriber = {
+  publicId: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  name: string | null;
+  /** @nullable */
+  externalId: string | null;
+};
+
 export type ListRunsResponseDtoRunsItemStepsItemStatus = typeof ListRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStepsItemStatus];
 
 
@@ -745,6 +755,7 @@ export type ListRunsResponseDtoRunsItem = {
   triggeredAt: unknown;
   /** @nullable */
   completedAt: ListRunsResponseDtoRunsItemCompletedAt;
+  subscriber: ListRunsResponseDtoRunsItemSubscriber;
   steps: ListRunsResponseDtoRunsItemStepsItem[];
 };
 

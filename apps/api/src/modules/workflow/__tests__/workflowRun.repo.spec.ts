@@ -5,6 +5,7 @@ import {
   cancelPendingForSubscriber,
   completeRunIfAllStepsTerminal,
   createRunWithSteps,
+  listRunsForWorkflow,
   updateRunStepStatus,
 } from "@subscriber.dev/db/repository/workflowRun.repo";
 
@@ -27,9 +28,11 @@ function makeMockDb(
   }> = {},
 ) {
   const findMany = overrides.findMany ?? vi.fn();
-  const insertChain =
-    overrides.insertChain ??
-    { values: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }) };
+  const insertChain = overrides.insertChain ?? {
+    values: vi
+      .fn()
+      .mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
+  };
   const updateChain = overrides.updateChain ?? makeUpdateChain([]);
 
   const db = {
@@ -39,7 +42,9 @@ function makeMockDb(
     },
     insert: vi.fn().mockReturnValue(insertChain),
     update: vi.fn().mockReturnValue(updateChain),
-    transaction: vi.fn(async (cb: (tx: dbClient) => unknown) => cb(db as unknown as dbClient)),
+    transaction: vi.fn(async (cb: (tx: dbClient) => unknown) =>
+      cb(db as unknown as dbClient),
+    ),
   };
 
   return db as unknown as dbClient;
@@ -84,7 +89,11 @@ describe("createRunWithSteps", () => {
   });
 
   it("throws if the run insert returns nothing", async () => {
-    const insertChain = { values: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }) };
+    const insertChain = {
+      values: vi
+        .fn()
+        .mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
+    };
     const db = makeMockDb({ insertChain });
 
     await expect(
@@ -152,7 +161,10 @@ describe("cancelPendingForSubscriber", () => {
     const db = makeMockDb({ updateChain });
     await cancelPendingForSubscriber(db, 100, [], "opted out");
     expect(updateChain.set).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "cancelled", completedAt: expect.any(Date) }),
+      expect.objectContaining({
+        status: "cancelled",
+        completedAt: expect.any(Date),
+      }),
     );
   });
 
@@ -162,10 +174,16 @@ describe("cancelPendingForSubscriber", () => {
     await cancelPendingForSubscriber(db, 100, [1, 2], "opted out");
 
     expect(updateChain.set).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "cancelled", errorMessage: "opted out" }),
+      expect.objectContaining({
+        status: "cancelled",
+        errorMessage: "opted out",
+      }),
     );
     expect(updateChain.set).toHaveBeenCalledWith(
-      expect.objectContaining({ status: "cancelled", completedAt: expect.any(Date) }),
+      expect.objectContaining({
+        status: "cancelled",
+        completedAt: expect.any(Date),
+      }),
     );
     expect(db.update).toHaveBeenCalledTimes(2);
   });
@@ -179,7 +197,9 @@ describe("completeRunIfAllStepsTerminal", () => {
   it("marks the run completed when every step is terminal", async () => {
     const updateChain = makeUpdateChain([]);
     const db = makeMockDb({
-      findMany: vi.fn().mockResolvedValue([{ status: "sent" }, { status: "skipped" }]),
+      findMany: vi
+        .fn()
+        .mockResolvedValue([{ status: "sent" }, { status: "skipped" }]),
       updateChain,
     });
 
@@ -192,11 +212,29 @@ describe("completeRunIfAllStepsTerminal", () => {
   it("leaves the run alone when a step is still pending", async () => {
     const updateChain = makeUpdateChain([]);
     const db = makeMockDb({
-      findMany: vi.fn().mockResolvedValue([{ status: "sent" }, { status: "pending" }]),
+      findMany: vi
+        .fn()
+        .mockResolvedValue([{ status: "sent" }, { status: "pending" }]),
       updateChain,
     });
 
     await completeRunIfAllStepsTerminal(db, 5);
     expect(db.update).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listRunsForWorkflow
+// ---------------------------------------------------------------------------
+
+describe("listRunsForWorkflow", () => {
+  it("includes the subscriber and steps relations", async () => {
+    const findMany = vi.fn().mockResolvedValue([]);
+    const db = makeMockDb({ findMany });
+
+    await listRunsForWorkflow(db, 1, { limit: 20, offset: 0 });
+
+    const [opts] = findMany.mock.calls[0];
+    expect(opts.with).toEqual({ steps: true, subscriber: true });
   });
 });
