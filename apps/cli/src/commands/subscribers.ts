@@ -61,6 +61,10 @@ export function registerSubscribersCommand(program: Command): void {
     )
     .option("--email <email>", "filter by exact email")
     .option("--external-id <externalId>", "filter by exact external ID")
+    .option(
+      "--search <text>",
+      "case-insensitive partial match across email, phone, external ID, first name, last name, and name",
+    )
     .option("--opted-in", "filter to subscribers opted into email")
     .option("--opted-out", "filter to subscribers opted out of email")
     .option("--limit <limit>", "max results (1-100)")
@@ -72,6 +76,7 @@ export function registerSubscribersCommand(program: Command): void {
           environment?: string;
           email?: string;
           externalId?: string;
+          search?: string;
           optedIn?: boolean;
           optedOut?: boolean;
           limit?: string;
@@ -89,6 +94,7 @@ export function registerSubscribersCommand(program: Command): void {
           const response = await listSubscribers(environmentId, {
             email: opts.email,
             externalId: opts.externalId,
+            q: opts.search,
             emailOptedIn,
             limit: opts.limit ? Number(opts.limit) : undefined,
             offset: opts.offset ? Number(opts.offset) : undefined,

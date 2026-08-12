@@ -793,6 +793,11 @@ email?: string;
  */
 externalId?: string;
 /**
+ * Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name
+ * @minLength 1
+ */
+q?: string;
+/**
  * Filter by the subscriber's latest email preference (true = opted in, false = opted out)
  */
 emailOptedIn?: boolean;

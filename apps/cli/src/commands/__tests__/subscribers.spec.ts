@@ -91,6 +91,25 @@ describe("subscribers list", () => {
     });
   });
 
+  it("passes --search through as the q param", async () => {
+    vi.mocked(listSubscribers).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { subscribers: [], limit: 100, offset: 0 },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["subscribers", "list", "--search", "ali"],
+      { from: "user" },
+    );
+
+    expect(listSubscribers).toHaveBeenCalledWith(
+      "test-environment-1",
+      expect.objectContaining({ q: "ali" }),
+    );
+  });
+
   it("treats --opted-out as emailOptedIn: false", async () => {
     vi.mocked(listSubscribers).mockResolvedValue({
       status: 200,

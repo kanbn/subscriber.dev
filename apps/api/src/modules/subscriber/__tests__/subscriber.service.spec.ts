@@ -180,6 +180,22 @@ describe("listSubscribers", () => {
       offset: 15,
     });
   });
+
+  it("forwards the search query to the repo", async () => {
+    vi.mocked(repo.listSubscribers).mockResolvedValue([]);
+
+    await service.listSubscribers(mockDb, 10, {
+      limit: 20,
+      offset: 0,
+      q: "ali",
+    });
+
+    expect(repo.listSubscribers).toHaveBeenCalledWith(mockDb, 10, {
+      limit: 20,
+      offset: 0,
+      q: "ali",
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------

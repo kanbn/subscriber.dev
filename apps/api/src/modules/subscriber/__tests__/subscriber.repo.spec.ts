@@ -208,6 +208,19 @@ describe("listSubscribers", () => {
     });
     expect(result).toHaveLength(1);
   });
+
+  it("doesn't throw when a search query is provided", async () => {
+    const findMany = vi.fn().mockResolvedValue([mockSubscriber]);
+    const db = makeMockDb({ findMany });
+    const result = await listSubscribers(db, 10, {
+      limit: 20,
+      offset: 0,
+      q: "ali",
+    });
+    expect(result).toHaveLength(1);
+    const [opts] = findMany.mock.calls[0];
+    expect(opts.where).toBeDefined();
+  });
 });
 
 // ---------------------------------------------------------------------------

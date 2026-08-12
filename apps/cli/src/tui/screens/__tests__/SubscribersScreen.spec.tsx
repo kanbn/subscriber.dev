@@ -172,6 +172,68 @@ describe("SubscribersScreen create", () => {
   });
 });
 
+describe("SubscribersScreen search", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  it("opens a search input when '/' is pressed", async () => {
+    listSubscribersMock({ subscribers: [subscriber()] });
+
+    const { lastFrame, stdin } = render(
+      <SubscribersScreen
+        environmentId="test-environment-1"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("test@example.com");
+    });
+
+    await tick();
+    stdin.write("/");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Search:");
+    });
+  });
+
+  it("refetches with the query and shows it in the header", async () => {
+    listSubscribersMock({ subscribers: [subscriber()] });
+
+    const { lastFrame, stdin } = render(
+      <SubscribersScreen
+        environmentId="test-environment-1"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("test@example.com");
+    });
+
+    await tick();
+    stdin.write("/");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Search:");
+    });
+
+    await tick();
+    stdin.write("ali");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain('search: "ali"');
+      expect(listSubscribers).toHaveBeenLastCalledWith(
+        "test-environment-1",
+        expect.objectContaining({ q: "ali" }),
+      );
+    });
+  });
+});
+
 function listSubscribersMock(data: { subscribers: unknown[] }) {
   vi.mocked(listSubscribers).mockResolvedValue({
     status: 200,

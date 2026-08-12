@@ -1,4 +1,14 @@
-import { and, asc, desc, eq, inArray, isNull, max } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNull,
+  max,
+  or,
+} from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
@@ -227,6 +237,7 @@ export const listSubscribers = async (
     email?: string;
     externalId?: string;
     emailOptedIn?: boolean;
+    q?: string;
   },
 ) => {
   return await db.query.subscribers.findMany({
@@ -243,6 +254,16 @@ export const listSubscribers = async (
               environmentId,
               opts.emailOptedIn,
             ),
+          )
+        : undefined,
+      opts.q
+        ? or(
+            ilike(subscribers.email, `%${opts.q}%`),
+            ilike(subscribers.phone, `%${opts.q}%`),
+            ilike(subscribers.externalId, `%${opts.q}%`),
+            ilike(subscribers.firstName, `%${opts.q}%`),
+            ilike(subscribers.lastName, `%${opts.q}%`),
+            ilike(subscribers.name, `%${opts.q}%`),
           )
         : undefined,
     ),

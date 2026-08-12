@@ -115,6 +115,29 @@ describe("listSubscribers", () => {
       controller.listSubscribers("env_missing", { limit: 20, offset: 0 }),
     ).rejects.toThrow(NotFoundException);
   });
+
+  it("passes the search query through to the service", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    mockService.listSubscribers.mockResolvedValue({
+      subscribers: [],
+      limit: 20,
+      offset: 0,
+    });
+
+    await controller.listSubscribers("env_abc", {
+      limit: 20,
+      offset: 0,
+      q: "ali",
+    } as any);
+
+    expect(mockService.listSubscribers).toHaveBeenCalledWith({}, 10, {
+      limit: 20,
+      offset: 0,
+      q: "ali",
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------

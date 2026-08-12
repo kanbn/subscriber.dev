@@ -520,6 +520,7 @@ export class SubscriberService {
       email?: string;
       externalId?: string;
       emailOptedIn?: boolean;
+      q?: string;
     },
   ) {
     const rows = await subscriberRepo.listSubscribers(db, environmentId, opts);

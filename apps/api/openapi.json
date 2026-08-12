@@ -289,6 +289,16 @@
             }
           },
           {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name",
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
             "name": "emailOptedIn",
             "required": false,
             "in": "query",

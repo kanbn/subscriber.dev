@@ -8,6 +8,13 @@ export const ListSubscribersQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   email: z.string().email().optional(),
   externalId: z.string().optional(),
+  q: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      "Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name",
+    ),
   emailOptedIn: z
     .enum(["true", "false"])
     .optional()

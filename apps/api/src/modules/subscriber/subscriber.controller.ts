@@ -87,6 +87,13 @@ export class SubscriberController {
     description:
       "Filter by the subscriber's latest email preference (true = opted in, false = opted out)",
   })
+  @ApiQuery({
+    name: "q",
+    required: false,
+    type: String,
+    description:
+      "Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name",
+  })
   @ApiResponse({ status: 200, type: ListSubscribersResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async listSubscribers(
@@ -109,6 +116,7 @@ export class SubscriberController {
       email: query.email,
       externalId: query.externalId,
       emailOptedIn: query.emailOptedIn,
+      q: query.q,
     });
   }
 
