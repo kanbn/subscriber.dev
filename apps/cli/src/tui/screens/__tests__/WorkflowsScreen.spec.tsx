@@ -1,12 +1,13 @@
 import { render } from "ink-testing-library";
 import { describe, expect, it, vi } from "vitest";
 
-import { listWorkflows } from "@subscriber.dev/api-client/cli";
+import { createWorkflow, listWorkflows } from "@subscriber.dev/api-client/cli";
 
 import { WorkflowsScreen } from "../WorkflowsScreen.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   listWorkflows: vi.fn(),
+  createWorkflow: vi.fn(),
 }));
 
 const testWorkflow = {
@@ -89,5 +90,75 @@ describe("WorkflowsScreen", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Error");
     });
+  });
+});
+
+describe("WorkflowsScreen create", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  it("shows the new-workflow field menu when 'n' is pressed", async () => {
+    vi.mocked(listWorkflows).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { workflows: [testWorkflow], limit: 100, offset: 0 },
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <WorkflowsScreen environmentId="test-environment-1" onSelect={vi.fn()} />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Test Signup");
+    });
+
+    await tick();
+    stdin.write("n");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New workflow");
+    });
+    expect(lastFrame()).toContain("Key: —");
+    expect(lastFrame()).toContain("Type: Email");
+    expect(lastFrame()).toContain("Body: —");
+  });
+
+  it("fills in the default field before creating", async () => {
+    vi.mocked(listWorkflows).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { workflows: [], limit: 100, offset: 0 },
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <WorkflowsScreen environmentId="test-environment-1" onSelect={vi.fn()} />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("No workflows");
+    });
+
+    await tick();
+    stdin.write("n");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New workflow");
+    });
+
+    // Default-selected item is "Key" (the first field).
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("Type: Email");
+    });
+
+    await tick();
+    stdin.write("user-signup");
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Key: user-signup");
+    });
+    expect(createWorkflow).not.toHaveBeenCalled();
   });
 });

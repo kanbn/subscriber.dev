@@ -1,7 +1,9 @@
-import { Box, Text } from "ink";
+import { Box, Text, useInput } from "ink";
 import SelectInput from "ink-select-input";
+import TextInput from "ink-text-input";
+import { useState } from "react";
 
-import { getWorkspaces } from "@subscriber.dev/api-client/cli";
+import { createWorkspace, getWorkspaces } from "@subscriber.dev/api-client/cli";
 
 import type { WorkspaceSummary } from "../navigation.js";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
@@ -9,6 +11,8 @@ import { Hints } from "../components/Hints.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 const ACCOUNT_VALUE = "__account__";
+
+type Mode = "list" | "creating" | "submitting";
 
 export function WorkspacesScreen({
   onSelectWorkspace,
@@ -21,6 +25,61 @@ export function WorkspacesScreen({
     const response = await getWorkspaces();
     return response.data;
   }, []);
+
+  const [mode, setMode] = useState<Mode>("list");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+
+  useInput((input) => {
+    if (mode !== "list") return;
+    if (input === "n" || input === "N") {
+      setName("");
+      setError("");
+      setMode("creating");
+    }
+  });
+
+  const handleCreate = async (value: string) => {
+    const trimmed = value.trim();
+    if (trimmed.length === 0) return;
+
+    setMode("submitting");
+    try {
+      const response = await createWorkspace({ name: trimmed });
+      const workspace = response.data.workspace;
+      if (!workspace.publicId || !workspace.name) {
+        setError("Failed to create workspace.");
+        setMode("creating");
+        return;
+      }
+      onSelectWorkspace({ publicId: workspace.publicId, name: workspace.name });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setMode("creating");
+    }
+  };
+
+  if (mode === "creating" || mode === "submitting") {
+    return (
+      <Box flexDirection="column">
+        <Text bold>New workspace</Text>
+        {error.length > 0 && <Text color="red">{error}</Text>}
+        {mode === "submitting" ? (
+          <Text color="gray">Creating…</Text>
+        ) : (
+          <Box>
+            <Text>Name: </Text>
+            <TextInput
+              value={name}
+              onChange={setName}
+              onSubmit={(value) => void handleCreate(value)}
+            />
+          </Box>
+        )}
+        <Hints text="Enter to create · Esc back · q quit" />
+      </Box>
+    );
+  }
 
   return (
     <Box flexDirection="column">
@@ -57,7 +116,7 @@ export function WorkspacesScreen({
           </Box>
         )}
       </AsyncBoundary>
-      <Hints text="↑↓ navigate · Enter select · q quit" />
+      <Hints text="↑↓ navigate · Enter select · n new · q quit" />
     </Box>
   );
 }

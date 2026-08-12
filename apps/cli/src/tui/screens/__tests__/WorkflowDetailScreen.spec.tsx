@@ -5,6 +5,7 @@ import {
   deleteWorkflow,
   getWorkflow,
   triggerWorkflow,
+  updateWorkflow,
 } from "@subscriber.dev/api-client/cli";
 
 import { WorkflowDetailScreen } from "../WorkflowDetailScreen.js";
@@ -13,6 +14,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   getWorkflow: vi.fn(),
   deleteWorkflow: vi.fn(),
   triggerWorkflow: vi.fn(),
+  updateWorkflow: vi.fn(),
 }));
 
 const testWorkflow = {
@@ -265,6 +267,63 @@ describe("WorkflowDetailScreen trigger", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Workflow or subscriber not found.");
     });
+  });
+});
+
+describe("WorkflowDetailScreen edit", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  async function loaded() {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testWorkflow,
+    } as never);
+    const screen = renderScreen();
+    await vi.waitFor(() => {
+      expect(screen.lastFrame()).toContain("key: test-signup");
+    });
+    return screen;
+  }
+
+  it("shows the metadata field menu when 'e' is pressed", async () => {
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("e");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Name: Test Signup");
+    });
+    expect(lastFrame()).toContain("Status: Active");
+  });
+
+  it("edits the default field and reflects it in the menu, without saving", async () => {
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("e");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Name: Test Signup");
+    });
+
+    // Default-selected item is "Name" (the first field).
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("Status: Active");
+    });
+
+    await tick();
+    stdin.write(" Updated");
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Name: Test Signup Updated");
+    });
+    expect(updateWorkflow).not.toHaveBeenCalled();
   });
 });
 

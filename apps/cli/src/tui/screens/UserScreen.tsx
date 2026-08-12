@@ -1,31 +1,117 @@
-import { Box, Text } from "ink";
+import { Box, Text, useInput } from "ink";
+import SelectInput from "ink-select-input";
+import TextInput from "ink-text-input";
+import { useState } from "react";
 
-import { getCurrentUser } from "@subscriber.dev/api-client/cli";
+import {
+  getCurrentUser,
+  updateCurrentUser,
+} from "@subscriber.dev/api-client/cli";
 
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
 import { useAsyncData } from "../useAsyncData.js";
 
+type EditMode = "idle" | "menu" | "editing-text" | "submitting";
+type TextField = "name" | "image";
+
+const SUBMIT_VALUE = "__submit__";
+const CANCEL_VALUE = "__cancel__";
+
 export function UserScreen() {
+  const [refreshKey, setRefreshKey] = useState(0);
   const state = useAsyncData(async () => {
     const response = await getCurrentUser();
     return response.data;
-  }, []);
+  }, [refreshKey]);
+  const user = state.status === "ready" ? state.data : null;
+
+  const [editMode, setEditMode] = useState<EditMode>("idle");
+  const [values, setValues] = useState({ name: "", image: "" });
+  const [editingField, setEditingField] = useState<TextField | null>(null);
+  const [error, setError] = useState("");
+
+  useInput((input) => {
+    if (editMode !== "idle" || !user) return;
+    if (input === "e" || input === "E") {
+      setValues({ name: user.name ?? "", image: user.image ?? "" });
+      setError("");
+      setEditMode("menu");
+    }
+  });
+
+  const handleSubmit = async () => {
+    setEditMode("submitting");
+    try {
+      await updateCurrentUser({ name: values.name, image: values.image });
+      setEditMode("idle");
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setEditMode("menu");
+    }
+  };
 
   return (
     <Box flexDirection="column">
       <Text bold>My Account</Text>
       <AsyncBoundary state={state}>
-        {(user) => (
+        {(loadedUser) => (
           <Box flexDirection="column">
-            <Text>publicId: {user.publicId}</Text>
-            <Text>name: {user.name ?? "—"}</Text>
-            <Text>email: {user.email}</Text>
-            <Text>image: {user.image ?? "—"}</Text>
+            <Text>publicId: {loadedUser.publicId}</Text>
+            <Text>name: {loadedUser.name ?? "—"}</Text>
+            <Text>email: {loadedUser.email}</Text>
+            <Text>image: {loadedUser.image ?? "—"}</Text>
           </Box>
         )}
       </AsyncBoundary>
-      <Hints text="Esc back · q quit" />
+
+      {editMode === "editing-text" && editingField && (
+        <Box>
+          <Text>{editingField === "name" ? "Name" : "Image URL"}: </Text>
+          <TextInput
+            value={values[editingField]}
+            onChange={(value) =>
+              setValues((prev) => ({ ...prev, [editingField]: value }))
+            }
+            onSubmit={() => setEditMode("menu")}
+          />
+        </Box>
+      )}
+
+      {editMode === "menu" && (
+        <Box flexDirection="column">
+          {error.length > 0 && <Text color="red">{error}</Text>}
+          <SelectInput
+            items={[
+              { label: `Name: ${values.name || "—"}`, value: "name" },
+              { label: `Image URL: ${values.image || "—"}`, value: "image" },
+              { label: "Save changes", value: SUBMIT_VALUE },
+              { label: "Cancel", value: CANCEL_VALUE },
+            ]}
+            onSelect={(item) => {
+              if (item.value === SUBMIT_VALUE) {
+                void handleSubmit();
+              } else if (item.value === CANCEL_VALUE) {
+                setEditMode("idle");
+              } else {
+                setEditingField(item.value as TextField);
+                setEditMode("editing-text");
+              }
+            }}
+          />
+        </Box>
+      )}
+
+      {editMode === "submitting" && <Text color="gray">Saving…</Text>}
+
+      <Hints
+        text={
+          editMode === "idle"
+            ? "e edit · Esc back · q quit"
+            : "↑↓ navigate · Enter select"
+        }
+      />
     </Box>
   );
 }
