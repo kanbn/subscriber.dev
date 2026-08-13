@@ -25,6 +25,7 @@ vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
   listPendingRunStepsForSubscriber: vi.fn(),
   cancelPendingForSubscriber: vi.fn(),
   listRunsForWorkflow: vi.fn(),
+  listRunsForEnvironment: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
@@ -393,5 +394,63 @@ describe("listRuns", () => {
     await expect(
       service.listRuns(mockDb, 10, "wf_missing", { limit: 20, offset: 0 }),
     ).rejects.toThrow(NotFoundException);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listRunsForEnvironment
+// ---------------------------------------------------------------------------
+
+describe("listRunsForEnvironment", () => {
+  it("maps the workflow, subscriber, and steps for each run", async () => {
+    vi.mocked(workflowRunRepo.listRunsForEnvironment).mockResolvedValue([
+      {
+        publicId: "run_abc",
+        status: "active",
+        triggeredAt: new Date("2026-01-01T00:00:00Z"),
+        completedAt: null,
+        workflow: {
+          publicId: "wf_abc",
+          key: "user-signup",
+          name: "User Signup",
+        },
+        subscriber: {
+          publicId: "sub_abc",
+          email: "alice@example.com",
+          name: null,
+          externalId: null,
+        },
+        steps: [
+          {
+            stepOrder: 0,
+            type: "email",
+            status: "sent",
+            scheduledAt: new Date("2026-01-01T00:00:00Z"),
+            sentAt: new Date("2026-01-01T00:00:01Z"),
+            errorMessage: null,
+          },
+        ],
+      },
+    ] as any);
+
+    const result = await service.listRunsForEnvironment(mockDb, 10, {
+      limit: 20,
+      offset: 0,
+    });
+
+    expect(result.runs[0]?.workflow).toEqual({
+      publicId: "wf_abc",
+      key: "user-signup",
+      name: "User Signup",
+    });
+    expect(result.runs[0]?.subscriber).toEqual({
+      publicId: "sub_abc",
+      email: "alice@example.com",
+      name: null,
+      externalId: null,
+    });
+    expect(result.runs[0]?.steps[0]).toEqual(
+      expect.objectContaining({ type: "email", status: "sent" }),
+    );
   });
 });

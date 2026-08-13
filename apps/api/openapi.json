@@ -837,6 +837,70 @@
         ]
       }
     },
+    "/environments/{environmentId}/workflows/runs": {
+      "get": {
+        "operationId": "listEnvironmentRuns",
+        "summary": "List all workflow runs",
+        "description": "Returns a paginated list of trigger runs across every workflow in the environment, most recent first",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "exclusiveMaximum": false,
+              "exclusiveMinimum": false,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "exclusiveMinimum": false,
+              "default": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListEnvironmentRunsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "tags": [
+          "Workflows"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/environments/{environmentId}/workflows/{workflowId}": {
       "get": {
         "operationId": "getWorkflow",
@@ -2446,6 +2510,139 @@
         },
         "required": [
           "workflows",
+          "limit",
+          "offset"
+        ]
+      },
+      "ListEnvironmentRunsResponseDto": {
+        "type": "object",
+        "properties": {
+          "runs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "completed",
+                    "cancelled"
+                  ]
+                },
+                "triggeredAt": {},
+                "completedAt": {
+                  "nullable": true
+                },
+                "subscriber": {
+                  "type": "object",
+                  "properties": {
+                    "publicId": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "name": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "externalId": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "publicId",
+                    "email",
+                    "name",
+                    "externalId"
+                  ]
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "stepOrder": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "sent",
+                          "skipped",
+                          "failed",
+                          "cancelled"
+                        ]
+                      },
+                      "scheduledAt": {},
+                      "sentAt": {
+                        "nullable": true
+                      },
+                      "errorMessage": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "stepOrder",
+                      "type",
+                      "status",
+                      "scheduledAt",
+                      "sentAt",
+                      "errorMessage"
+                    ]
+                  }
+                },
+                "workflow": {
+                  "type": "object",
+                  "properties": {
+                    "publicId": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "publicId",
+                    "key",
+                    "name"
+                  ]
+                }
+              },
+              "required": [
+                "publicId",
+                "status",
+                "triggeredAt",
+                "completedAt",
+                "subscriber",
+                "steps",
+                "workflow"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "runs",
           "limit",
           "offset"
         ]

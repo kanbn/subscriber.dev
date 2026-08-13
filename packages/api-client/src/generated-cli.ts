@@ -590,6 +590,82 @@ export interface ListWorkflowsResponseDto {
   offset: number;
 }
 
+export type ListEnvironmentRunsResponseDtoRunsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListEnvironmentRunsResponseDtoRunsItemStatus = {
+  active: 'active',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ListEnvironmentRunsResponseDtoRunsItemCompletedAt = unknown | null;
+
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriber = {
+  publicId: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  name: string | null;
+  /** @nullable */
+  externalId: string | null;
+};
+
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = {
+  pending: 'pending',
+  sent: 'sent',
+  skipped: 'skipped',
+  failed: 'failed',
+  cancelled: 'cancelled',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt = unknown | null;
+
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItem = {
+  stepOrder: number;
+  type: string;
+  status: ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus;
+  scheduledAt: unknown;
+  /** @nullable */
+  sentAt: ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt;
+  /** @nullable */
+  errorMessage: string | null;
+};
+
+export type ListEnvironmentRunsResponseDtoRunsItemWorkflow = {
+  publicId: string;
+  key: string;
+  name: string;
+};
+
+export type ListEnvironmentRunsResponseDtoRunsItem = {
+  publicId: string;
+  status: ListEnvironmentRunsResponseDtoRunsItemStatus;
+  triggeredAt: unknown;
+  /** @nullable */
+  completedAt: ListEnvironmentRunsResponseDtoRunsItemCompletedAt;
+  subscriber: ListEnvironmentRunsResponseDtoRunsItemSubscriber;
+  steps: ListEnvironmentRunsResponseDtoRunsItemStepsItem[];
+  workflow: ListEnvironmentRunsResponseDtoRunsItemWorkflow;
+};
+
+export interface ListEnvironmentRunsResponseDto {
+  runs: ListEnvironmentRunsResponseDtoRunsItem[];
+  limit: number;
+  offset: number;
+}
+
 export type UpdateWorkflowDtoStatus = typeof UpdateWorkflowDtoStatus[keyof typeof UpdateWorkflowDtoStatus];
 
 
@@ -796,6 +872,18 @@ emailOptedIn?: boolean;
 };
 
 export type ListWorkflowsParams = {
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
+};
+
+export type ListEnvironmentRunsParams = {
 /**
  * @minimum 1
  * @maximum 100
@@ -1599,6 +1687,59 @@ export const listWorkflows = async (environmentId: string,
     params?: ListWorkflowsParams, options?: RequestInit): Promise<listWorkflowsResponse> => {
   
   return cliFetch<listWorkflowsResponse>(getListWorkflowsUrl(environmentId,params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+/**
+ * Returns a paginated list of trigger runs across every workflow in the environment, most recent first
+ * @summary List all workflow runs
+ */
+export type listEnvironmentRunsResponse200 = {
+  data: ListEnvironmentRunsResponseDto
+  status: 200
+}
+
+export type listEnvironmentRunsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type listEnvironmentRunsResponseSuccess = (listEnvironmentRunsResponse200) & {
+  headers: Headers;
+};
+export type listEnvironmentRunsResponseError = (listEnvironmentRunsResponse404) & {
+  headers: Headers;
+};
+
+export type listEnvironmentRunsResponse = (listEnvironmentRunsResponseSuccess | listEnvironmentRunsResponseError)
+
+export const getListEnvironmentRunsUrl = (environmentId: string,
+    params?: ListEnvironmentRunsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/runs?${stringifiedParams}` : `/environments/${environmentId}/workflows/runs`
+}
+
+export const listEnvironmentRuns = async (environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: RequestInit): Promise<listEnvironmentRunsResponse> => {
+  
+  return cliFetch<listEnvironmentRunsResponse>(getListEnvironmentRunsUrl(environmentId,params),
   {      
     ...options,
     method: 'GET'

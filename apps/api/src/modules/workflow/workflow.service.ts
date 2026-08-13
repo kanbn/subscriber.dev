@@ -316,6 +316,48 @@ export class WorkflowService {
     };
   }
 
+  async listRunsForEnvironment(
+    db: dbClient,
+    environmentId: number,
+    opts: { limit: number; offset: number },
+  ) {
+    const runs = await workflowRunRepo.listRunsForEnvironment(
+      db,
+      environmentId,
+      opts,
+    );
+
+    return {
+      runs: runs.map((run) => ({
+        publicId: run.publicId,
+        status: run.status,
+        triggeredAt: run.triggeredAt,
+        completedAt: run.completedAt,
+        workflow: {
+          publicId: run.workflow.publicId,
+          key: run.workflow.key,
+          name: run.workflow.name,
+        },
+        subscriber: {
+          publicId: run.subscriber.publicId,
+          email: run.subscriber.email,
+          name: run.subscriber.name,
+          externalId: run.subscriber.externalId,
+        },
+        steps: run.steps.map((s) => ({
+          stepOrder: s.stepOrder,
+          type: s.type,
+          status: s.status,
+          scheduledAt: s.scheduledAt,
+          sentAt: s.sentAt,
+          errorMessage: s.errorMessage,
+        })),
+      })),
+      limit: opts.limit,
+      offset: opts.offset,
+    };
+  }
+
   async cancelPendingRunsForSubscriber(
     db: dbClient,
     subscriberId: number,

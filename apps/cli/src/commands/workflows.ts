@@ -8,6 +8,7 @@ import {
   createWorkflow,
   deleteWorkflow,
   getWorkflow,
+  listEnvironmentRuns,
   listWorkflowRuns,
   listWorkflows,
   triggerWorkflow,
@@ -294,6 +295,40 @@ export function registerWorkflowsCommand(program: Command): void {
           });
           if (response.status === 404) {
             console.error("Workflow not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data.runs, opts);
+        },
+      ),
+    );
+
+  workflows
+    .command("run-history")
+    .description("List triggered runs across every workflow in an environment")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--limit <limit>", "max results (1-100)")
+    .option("--offset <offset>", "pagination offset")
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (opts: {
+          environment?: string;
+          limit?: string;
+          offset?: string;
+          json?: boolean;
+        }) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await listEnvironmentRuns(environmentId, {
+            limit: opts.limit ? Number(opts.limit) : undefined,
+            offset: opts.offset ? Number(opts.offset) : undefined,
+          });
+          if (response.status === 404) {
+            console.error("Environment not found.");
             process.exitCode = 1;
             return;
           }

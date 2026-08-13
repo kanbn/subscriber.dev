@@ -182,3 +182,17 @@ export const listRunsForWorkflow = async (
     with: { steps: true, subscriber: true },
   });
 };
+
+export const listRunsForEnvironment = async (
+  db: dbClient,
+  environmentId: number,
+  opts: { limit: number; offset: number },
+) => {
+  return await db.query.workflowRuns.findMany({
+    where: eq(workflowRuns.environmentId, environmentId),
+    orderBy: desc(workflowRuns.triggeredAt),
+    limit: opts.limit,
+    offset: opts.offset,
+    with: { steps: true, subscriber: true, workflow: true },
+  });
+};

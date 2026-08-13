@@ -5,6 +5,7 @@ import type { Screen } from "./navigation.js";
 import { EnvironmentsScreen } from "./screens/EnvironmentsScreen.js";
 import { IntegrationDetailScreen } from "./screens/IntegrationDetailScreen.js";
 import { IntegrationsScreen } from "./screens/IntegrationsScreen.js";
+import { RunHistoryScreen } from "./screens/RunHistoryScreen.js";
 import { SectionScreen } from "./screens/SectionScreen.js";
 import { SubscriberDetailScreen } from "./screens/SubscriberDetailScreen.js";
 import { SubscribersScreen } from "./screens/SubscribersScreen.js";
@@ -131,6 +132,10 @@ export function App() {
           environmentId={screen.environment.publicId}
           workflowId={screen.workflowId}
         />
+      )}
+
+      {screen.kind === "runHistory" && (
+        <RunHistoryScreen environmentId={screen.environment.publicId} />
       )}
 
       {screen.kind === "integrations" && (

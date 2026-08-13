@@ -11,7 +11,9 @@ export function SectionScreen({
 }: {
   workspace: WorkspaceSummary;
   environment: EnvironmentSummary;
-  onSelect: (section: "subscribers" | "workflows" | "integrations") => void;
+  onSelect: (
+    section: "subscribers" | "workflows" | "runHistory" | "integrations",
+  ) => void;
 }) {
   return (
     <Box flexDirection="column">
@@ -22,6 +24,7 @@ export function SectionScreen({
         items={[
           { label: "Subscribers", value: "subscribers" as const },
           { label: "Workflows", value: "workflows" as const },
+          { label: "Run History", value: "runHistory" as const },
           { label: "Integrations", value: "integrations" as const },
         ]}
         onSelect={(item) => onSelect(item.value)}

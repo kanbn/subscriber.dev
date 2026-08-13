@@ -23,6 +23,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   deleteWorkflow: vi.fn(),
   triggerWorkflow: vi.fn(),
   listWorkflowRuns: vi.fn(),
+  listEnvironmentRuns: vi.fn(),
   listIntegrations: vi.fn(),
   getIntegration: vi.fn(),
   deleteIntegration: vi.fn(),

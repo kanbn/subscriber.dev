@@ -31,7 +31,11 @@ import {
   CreateWorkflowDto,
   WorkflowResponseDto,
 } from "./dto/create-workflow.dto.js";
-import { ListRunsQueryDto, ListRunsResponseDto } from "./dto/list-runs.dto.js";
+import {
+  ListEnvironmentRunsResponseDto,
+  ListRunsQueryDto,
+  ListRunsResponseDto,
+} from "./dto/list-runs.dto.js";
 import {
   ListWorkflowsQueryDto,
   ListWorkflowsResponseDto,
@@ -149,6 +153,39 @@ export class WorkflowController {
     }
 
     return this.workflowService.listWorkflows(db, environment.id, {
+      limit: query.limit,
+      offset: query.offset,
+    });
+  }
+
+  @Get("runs")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "listEnvironmentRuns",
+    summary: "List all workflow runs",
+    description:
+      "Returns a paginated list of trigger runs across every workflow in the environment, most recent first",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiQuery({ name: "limit", required: false, type: Number })
+  @ApiQuery({ name: "offset", required: false, type: Number })
+  @ApiResponse({ status: 200, type: ListEnvironmentRunsResponseDto })
+  @ApiResponse({ status: 404, description: "Environment not found" })
+  async listEnvironmentRuns(
+    @Param("environmentId") environmentId: string,
+    @Query() query: ListRunsQueryDto,
+  ): Promise<ListEnvironmentRunsResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.workflowService.listRunsForEnvironment(db, environment.id, {
       limit: query.limit,
       offset: query.offset,
     });

@@ -8,36 +8,15 @@ import { listWorkflowRuns } from "@subscriber.dev/api-client/cli";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
 import { formatRelativeTime } from "../formatRelativeTime.js";
+import { stepColor, stepSummary, subscriberLabel } from "../runFormatting.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 type Run = ListRunsResponseDtoRunsItem;
 type Mode = "list" | "detail";
 
-function subscriberLabel(subscriber: Run["subscriber"]): string {
-  return (
-    subscriber.email ??
-    subscriber.name ??
-    subscriber.externalId ??
-    subscriber.publicId
-  );
-}
-
-function stepSummary(steps: Run["steps"]): string {
-  const sent = steps.filter((s) => s.status === "sent").length;
-  const failed = steps.filter((s) => s.status === "failed").length;
-  const suffix = failed > 0 ? `, ${failed} failed` : "";
-  return `${sent}/${steps.length} sent${suffix}`;
-}
-
 function runRowLabel(run: Run): string {
   const triggered = formatRelativeTime(run.triggeredAt as string);
   return `${subscriberLabel(run.subscriber)} — ${run.status} — triggered ${triggered} — ${stepSummary(run.steps)}`;
-}
-
-function stepColor(status: Run["steps"][number]["status"]): string | undefined {
-  if (status === "sent") return "green";
-  if (status === "failed") return "red";
-  return undefined;
 }
 
 export function WorkflowRunsScreen({

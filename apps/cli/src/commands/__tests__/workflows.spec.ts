@@ -6,6 +6,7 @@ import {
   createWorkflow,
   deleteWorkflow,
   getWorkflow,
+  listEnvironmentRuns,
   listWorkflowRuns,
   listWorkflows,
   triggerWorkflow,
@@ -23,6 +24,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   updateWorkflow: vi.fn(),
   deleteWorkflow: vi.fn(),
   listWorkflowRuns: vi.fn(),
+  listEnvironmentRuns: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
@@ -488,6 +490,60 @@ describe("workflows runs", () => {
     });
 
     expect(errorSpy).toHaveBeenCalledWith("Workflow not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("workflows run-history", () => {
+  it("passes pagination params through and prints the runs", async () => {
+    const testRun = {
+      publicId: "test-run-1",
+      status: "completed",
+      triggeredAt: "2026-01-01T00:00:00.000Z",
+      completedAt: "2026-01-01T00:01:00.000Z",
+      workflow: {
+        publicId: "test-workflow-1",
+        key: "test-signup",
+        name: "Test Signup",
+      },
+      steps: [],
+    };
+    vi.mocked(listEnvironmentRuns).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { runs: [testRun], limit: 10, offset: 0 },
+    } as never);
+    vi.spyOn(console, "table").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["workflows", "run-history", "--limit", "10", "--offset", "5"],
+      { from: "user" },
+    );
+
+    expect(listEnvironmentRuns).toHaveBeenCalledWith("test-environment-1", {
+      limit: 10,
+      offset: 5,
+    });
+  });
+
+  it("prints an error and exits on a 404", async () => {
+    vi.mocked(listEnvironmentRuns).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(["workflows", "run-history"], {
+      from: "user",
+    });
+
+    expect(errorSpy).toHaveBeenCalledWith("Environment not found.");
     expect(process.exitCode).toBe(1);
 
     process.exitCode = undefined;

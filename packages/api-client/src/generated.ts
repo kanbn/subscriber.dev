@@ -609,6 +609,82 @@ export interface ListWorkflowsResponseDto {
   offset: number;
 }
 
+export type ListEnvironmentRunsResponseDtoRunsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListEnvironmentRunsResponseDtoRunsItemStatus = {
+  active: 'active',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ListEnvironmentRunsResponseDtoRunsItemCompletedAt = unknown | null;
+
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriber = {
+  publicId: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  name: string | null;
+  /** @nullable */
+  externalId: string | null;
+};
+
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = {
+  pending: 'pending',
+  sent: 'sent',
+  skipped: 'skipped',
+  failed: 'failed',
+  cancelled: 'cancelled',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt = unknown | null;
+
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItem = {
+  stepOrder: number;
+  type: string;
+  status: ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus;
+  scheduledAt: unknown;
+  /** @nullable */
+  sentAt: ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt;
+  /** @nullable */
+  errorMessage: string | null;
+};
+
+export type ListEnvironmentRunsResponseDtoRunsItemWorkflow = {
+  publicId: string;
+  key: string;
+  name: string;
+};
+
+export type ListEnvironmentRunsResponseDtoRunsItem = {
+  publicId: string;
+  status: ListEnvironmentRunsResponseDtoRunsItemStatus;
+  triggeredAt: unknown;
+  /** @nullable */
+  completedAt: ListEnvironmentRunsResponseDtoRunsItemCompletedAt;
+  subscriber: ListEnvironmentRunsResponseDtoRunsItemSubscriber;
+  steps: ListEnvironmentRunsResponseDtoRunsItemStepsItem[];
+  workflow: ListEnvironmentRunsResponseDtoRunsItemWorkflow;
+};
+
+export interface ListEnvironmentRunsResponseDto {
+  runs: ListEnvironmentRunsResponseDtoRunsItem[];
+  limit: number;
+  offset: number;
+}
+
 export type UpdateWorkflowDtoStatus = typeof UpdateWorkflowDtoStatus[keyof typeof UpdateWorkflowDtoStatus];
 
 
@@ -815,6 +891,18 @@ emailOptedIn?: boolean;
 };
 
 export type ListWorkflowsParams = {
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
+};
+
+export type ListEnvironmentRunsParams = {
 /**
  * @minimum 1
  * @maximum 100
@@ -2712,6 +2800,143 @@ export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
   const queryOptions = getListWorkflowsQueryOptions(environmentId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Returns a paginated list of trigger runs across every workflow in the environment, most recent first
+ * @summary List all workflow runs
+ */
+export type listEnvironmentRunsResponse200 = {
+  data: ListEnvironmentRunsResponseDto
+  status: 200
+}
+
+export type listEnvironmentRunsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type listEnvironmentRunsResponseSuccess = (listEnvironmentRunsResponse200) & {
+  headers: Headers;
+};
+export type listEnvironmentRunsResponseError = (listEnvironmentRunsResponse404) & {
+  headers: Headers;
+};
+
+export type listEnvironmentRunsResponse = (listEnvironmentRunsResponseSuccess | listEnvironmentRunsResponseError)
+
+export const getListEnvironmentRunsUrl = (environmentId: string,
+    params?: ListEnvironmentRunsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/runs?${stringifiedParams}` : `/environments/${environmentId}/workflows/runs`
+}
+
+export const listEnvironmentRuns = async (environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: RequestInit): Promise<listEnvironmentRunsResponse> => {
+  
+  return customFetch<listEnvironmentRunsResponse>(getListEnvironmentRunsUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListEnvironmentRunsQueryKey = (environmentId?: string,
+    params?: ListEnvironmentRunsParams,) => {
+    return [
+    `/environments/${environmentId}/workflows/runs`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListEnvironmentRunsQueryOptions = <TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListEnvironmentRunsQueryKey(environmentId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listEnvironmentRuns>>> = ({ signal }) => listEnvironmentRuns(environmentId,params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListEnvironmentRunsQueryResult = NonNullable<Awaited<ReturnType<typeof listEnvironmentRuns>>>
+export type ListEnvironmentRunsQueryError = void
+
+
+export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(
+ environmentId: string,
+    params: undefined |  ListEnvironmentRunsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEnvironmentRuns>>,
+          TError,
+          Awaited<ReturnType<typeof listEnvironmentRuns>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(
+ environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEnvironmentRuns>>,
+          TError,
+          Awaited<ReturnType<typeof listEnvironmentRuns>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(
+ environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary List all workflow runs
+ */
+
+export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(
+ environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getListEnvironmentRunsQueryOptions(environmentId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 

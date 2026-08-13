@@ -5,6 +5,7 @@ import {
   cancelPendingForSubscriber,
   completeRunIfAllStepsTerminal,
   createRunWithSteps,
+  listRunsForEnvironment,
   listRunsForWorkflow,
   updateRunStepStatus,
 } from "@subscriber.dev/db/repository/workflowRun.repo";
@@ -236,5 +237,25 @@ describe("listRunsForWorkflow", () => {
 
     const [opts] = findMany.mock.calls[0];
     expect(opts.with).toEqual({ steps: true, subscriber: true });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listRunsForEnvironment
+// ---------------------------------------------------------------------------
+
+describe("listRunsForEnvironment", () => {
+  it("includes the subscriber, steps, and workflow relations", async () => {
+    const findMany = vi.fn().mockResolvedValue([]);
+    const db = makeMockDb({ findMany });
+
+    await listRunsForEnvironment(db, 1, { limit: 20, offset: 0 });
+
+    const [opts] = findMany.mock.calls[0];
+    expect(opts.with).toEqual({
+      steps: true,
+      subscriber: true,
+      workflow: true,
+    });
   });
 });

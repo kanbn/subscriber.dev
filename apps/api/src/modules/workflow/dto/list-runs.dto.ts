@@ -37,5 +37,24 @@ export const ListRunsResponseSchema = z.object({
   offset: z.number(),
 });
 
+export const WorkflowRunWorkflowSummarySchema = z.object({
+  publicId: z.string(),
+  key: z.string(),
+  name: z.string(),
+});
+
+export const EnvironmentRunSummarySchema = WorkflowRunSummarySchema.extend({
+  workflow: WorkflowRunWorkflowSummarySchema,
+});
+
+export const ListEnvironmentRunsResponseSchema = z.object({
+  runs: z.array(EnvironmentRunSummarySchema),
+  limit: z.number(),
+  offset: z.number(),
+});
+
 export class ListRunsQueryDto extends createZodDto(ListRunsQuerySchema) {}
 export class ListRunsResponseDto extends createZodDto(ListRunsResponseSchema) {}
+export class ListEnvironmentRunsResponseDto extends createZodDto(
+  ListEnvironmentRunsResponseSchema,
+) {}

@@ -24,6 +24,7 @@ describe("SectionScreen", () => {
     expect(lastFrame()).toContain("Staging");
     expect(lastFrame()).toContain("Subscribers");
     expect(lastFrame()).toContain("Workflows");
+    expect(lastFrame()).toContain("Run History");
   });
 
   it("selects 'subscribers' when it's the first item and Enter is pressed", async () => {
