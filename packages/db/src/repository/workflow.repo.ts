@@ -10,6 +10,12 @@ interface WorkflowStepInput {
   config: Record<string, unknown>;
 }
 
+export const getWorkflowById = async (db: dbClient, id: number) => {
+  return await db.query.workflows.findFirst({
+    where: and(eq(workflows.id, id), isNull(workflows.deletedAt)),
+  });
+};
+
 export const getWorkflowByPublicId = async (
   db: dbClient,
   environmentId: number,

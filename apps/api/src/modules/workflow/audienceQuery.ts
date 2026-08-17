@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { and, inArray, not, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, not, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import type { dbClient } from "@subscriber.dev/db/client";
@@ -139,4 +139,23 @@ export function buildAudienceCondition(
     case "not":
       return not(buildAudienceCondition(db, environmentId, condition.clause));
   }
+}
+
+export async function resolveAudienceSubscriberIds(
+  db: dbClient,
+  environmentId: number,
+  query: AudienceCondition,
+): Promise<number[]> {
+  const rows = await db
+    .select({ id: subscribers.id })
+    .from(subscribers)
+    .where(
+      and(
+        eq(subscribers.environmentId, environmentId),
+        isNull(subscribers.deletedAt),
+        buildAudienceCondition(db, environmentId, query),
+      ),
+    );
+
+  return rows.map((row) => row.id);
 }

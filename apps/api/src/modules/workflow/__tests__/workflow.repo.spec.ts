@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
   createWorkflow,
+  getWorkflowById,
   getWorkflowByKey,
   replaceWorkflowSteps,
   softDeleteWorkflow,
@@ -61,6 +62,25 @@ function makeMockDb(
 
   return db as unknown as dbClient;
 }
+
+// ---------------------------------------------------------------------------
+// getWorkflowById
+// ---------------------------------------------------------------------------
+
+describe("getWorkflowById", () => {
+  it("returns the workflow when found", async () => {
+    const workflow = { id: 1, key: "user-signup" };
+    const db = makeMockDb({ findFirst: vi.fn().mockResolvedValue(workflow) });
+    const result = await getWorkflowById(db, 1);
+    expect(result).toEqual(workflow);
+  });
+
+  it("returns undefined when not found", async () => {
+    const db = makeMockDb({ findFirst: vi.fn().mockResolvedValue(undefined) });
+    const result = await getWorkflowById(db, 999);
+    expect(result).toBeUndefined();
+  });
+});
 
 // ---------------------------------------------------------------------------
 // getWorkflowByKey

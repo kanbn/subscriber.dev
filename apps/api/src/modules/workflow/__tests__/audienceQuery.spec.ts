@@ -1,7 +1,8 @@
+import type { SQL } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { Pool } from "pg";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as schema from "@subscriber.dev/db/schema";
@@ -9,6 +10,7 @@ import * as schema from "@subscriber.dev/db/schema";
 import {
   AudienceConditionSchema,
   buildAudienceCondition,
+  resolveAudienceSubscriberIds,
 } from "../audienceQuery.js";
 
 const db = drizzle(
@@ -139,6 +141,36 @@ describe("buildAudienceCondition", () => {
     expect(sql).toContain(" or ");
     expect(sql).toContain("not ");
     expect(params).toEqual([10, true, 10, "vip", 10, "churned"]);
+  });
+});
+
+describe("resolveAudienceSubscriberIds", () => {
+  it("scopes by environment, excludes soft-deleted subscribers, and maps rows to ids", async () => {
+    let capturedCondition: SQL | undefined;
+    const where = vi.fn().mockImplementation((cond: SQL) => {
+      capturedCondition = cond;
+      return Promise.resolve([{ id: 1 }, { id: 2 }]);
+    });
+    const from = vi.fn().mockReturnValue({ where });
+    const select = vi.spyOn(db, "select").mockReturnValue({ from } as never);
+
+    const result = await resolveAudienceSubscriberIds(db, 10, {
+      type: "attribute",
+      field: "plan",
+      op: "equals",
+      value: "pro",
+    });
+
+    expect(result).toEqual([1, 2]);
+    expect(select).toHaveBeenCalledWith({ id: expect.anything() });
+
+    const rendered = dialect.sqlToQuery(capturedCondition!);
+    expect(rendered.sql).toContain('"subscribers"."environmentId" = $1');
+    expect(rendered.sql).toContain('"subscribers"."deletedAt" is null');
+    expect(rendered.sql).toContain('"subscribers"."attributes"');
+    expect(rendered.params[0]).toBe(10);
+
+    select.mockRestore();
   });
 });
 

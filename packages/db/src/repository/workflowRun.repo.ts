@@ -20,7 +20,7 @@ export const createRunWithSteps = async (
     environmentId: number;
     subscriberId: number;
     payload: Record<string, unknown> | null;
-    createdBy: number;
+    createdBy: number | null;
     broadcastId?: number | null;
     steps: RunStepInput[];
   },

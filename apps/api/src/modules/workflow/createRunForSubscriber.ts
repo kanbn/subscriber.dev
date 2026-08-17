@@ -20,7 +20,7 @@ interface CreateRunForSubscriberInput {
   environmentId: number;
   subscriberId: number;
   payload?: Record<string, unknown> | null;
-  createdBy: number;
+  createdBy: number | null;
   broadcastId?: number | null;
 }
 
