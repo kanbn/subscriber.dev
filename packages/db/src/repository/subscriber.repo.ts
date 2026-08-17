@@ -200,7 +200,7 @@ export const findSubscriberForUpsert = async (
   return undefined;
 };
 
-const latestOptedInOrOutSubscriberIds = (
+export const latestOptedInOrOutSubscriberIds = (
   db: dbClient,
   environmentId: number,
   emailOptedIn: boolean,
