@@ -2,15 +2,18 @@ import type { Command } from "commander";
 
 import type {
   CreateWorkflowDto,
+  TriggerBroadcastDto,
   UpdateWorkflowDto,
 } from "@subscriber.dev/api-client/cli";
 import {
   createWorkflow,
   deleteWorkflow,
   getWorkflow,
+  listBroadcasts,
   listEnvironmentRuns,
   listWorkflowRuns,
   listWorkflows,
+  triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
 } from "@subscriber.dev/api-client/cli";
@@ -333,6 +336,91 @@ export function registerWorkflowsCommand(program: Command): void {
             return;
           }
           printResult(response.data.runs, opts);
+        },
+      ),
+    );
+
+  workflows
+    .command("broadcast <workflowId>")
+    .description(
+      'Trigger a broadcast: fan this workflow out to every subscriber matching an audience filter, e.g. {"type":"optedIn"}',
+    )
+    .requiredOption(
+      "--audience <path>",
+      'path to a JSON file with the audience filter (use "-" for stdin)',
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          opts: { audience: string; environment?: string; json?: boolean },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+
+          const result = readJsonFile(opts.audience);
+          if (!result.ok) {
+            console.error(result.message);
+            process.exitCode = 1;
+            return;
+          }
+
+          const response = await triggerBroadcast(environmentId, workflowId, {
+            audience: result.data,
+          } as TriggerBroadcastDto);
+          if (response.status === 400) {
+            console.error("Workflow is paused or has no steps.");
+            process.exitCode = 1;
+            return;
+          }
+          if (response.status === 404) {
+            console.error("Workflow not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data, opts);
+        },
+      ),
+    );
+
+  workflows
+    .command("broadcasts <workflowId>")
+    .description("List broadcasts triggered for a workflow")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--limit <limit>", "max results (1-100)")
+    .option("--offset <offset>", "pagination offset")
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          opts: {
+            environment?: string;
+            limit?: string;
+            offset?: string;
+            json?: boolean;
+          },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await listBroadcasts(environmentId, workflowId, {
+            limit: opts.limit ? Number(opts.limit) : undefined,
+            offset: opts.offset ? Number(opts.offset) : undefined,
+          });
+          if (response.status === 404) {
+            console.error("Workflow not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data.broadcasts, opts);
         },
       ),
     );

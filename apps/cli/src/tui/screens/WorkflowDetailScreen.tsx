@@ -1,11 +1,16 @@
 import { Box, Text, useInput } from "ink";
+import SelectInput from "ink-select-input";
 import TextInput from "ink-text-input";
 import { useState } from "react";
 
-import type { UpdateWorkflowDto } from "@subscriber.dev/api-client/cli";
+import type {
+  TriggerBroadcastDto,
+  UpdateWorkflowDto,
+} from "@subscriber.dev/api-client/cli";
 import {
   deleteWorkflow,
   getWorkflow,
+  triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
 } from "@subscriber.dev/api-client/cli";
@@ -25,17 +30,26 @@ type TriggerStatus =
   | "success"
   | "error";
 type MetaMode = "idle" | "editing";
+type BroadcastStatus =
+  | "idle"
+  | "choosing-audience"
+  | "entering-tag"
+  | "triggering"
+  | "success"
+  | "error";
 
 export function WorkflowDetailScreen({
   environmentId,
   workflowId,
   onDeleted,
   onViewRuns,
+  onViewBroadcasts,
 }: {
   environmentId: string;
   workflowId: string;
   onDeleted: () => void;
   onViewRuns: () => void;
+  onViewBroadcasts: () => void;
 }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const state = useAsyncData(async () => {
@@ -56,12 +70,24 @@ export function WorkflowDetailScreen({
 
   const [metaMode, setMetaMode] = useState<MetaMode>("idle");
 
+  const [broadcastStatus, setBroadcastStatus] =
+    useState<BroadcastStatus>("idle");
+  const [broadcastTag, setBroadcastTag] = useState("");
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+
   const idle =
-    deleteStatus === "idle" && triggerStatus === "idle" && metaMode === "idle";
+    deleteStatus === "idle" &&
+    triggerStatus === "idle" &&
+    metaMode === "idle" &&
+    broadcastStatus === "idle";
 
   useInput((input) => {
     if (triggerStatus === "success" || triggerStatus === "error") {
       setTriggerStatus("idle");
+      return;
+    }
+    if (broadcastStatus === "success" || broadcastStatus === "error") {
+      setBroadcastStatus("idle");
       return;
     }
     if (!idle || !workflow) return;
@@ -74,6 +100,10 @@ export function WorkflowDetailScreen({
       onViewRuns();
     } else if (input === "e" || input === "E") {
       setMetaMode("editing");
+    } else if (input === "b" || input === "B") {
+      setBroadcastStatus("choosing-audience");
+    } else if (input === "h" || input === "H") {
+      onViewBroadcasts();
     }
   });
 
@@ -141,6 +171,32 @@ export function WorkflowDetailScreen({
     }
   };
 
+  const handleSubmitBroadcast = async (
+    audience: TriggerBroadcastDto["audience"],
+  ) => {
+    setBroadcastStatus("triggering");
+    try {
+      const response = await triggerBroadcast(environmentId, workflowId, {
+        audience,
+      } as TriggerBroadcastDto);
+      if (response.status === 400) {
+        setBroadcastMessage("Workflow is paused or has no steps.");
+        setBroadcastStatus("error");
+        return;
+      }
+      if (response.status === 404) {
+        setBroadcastMessage("Workflow not found.");
+        setBroadcastStatus("error");
+        return;
+      }
+      setBroadcastMessage(`Broadcast queued: ${response.data.broadcastId}`);
+      setBroadcastStatus("success");
+    } catch (err) {
+      setBroadcastMessage(err instanceof Error ? err.message : String(err));
+      setBroadcastStatus("error");
+    }
+  };
+
   return (
     <Box flexDirection="column">
       <Text bold>Workflow</Text>
@@ -203,15 +259,65 @@ export function WorkflowDetailScreen({
         />
       )}
 
+      {broadcastStatus === "choosing-audience" && (
+        <SelectInput
+          items={[
+            { label: "All opted-in subscribers", value: "all" as const },
+            {
+              label: "Opted-in subscribers with a tag",
+              value: "tag" as const,
+            },
+          ]}
+          onSelect={(item) => {
+            if (item.value === "all") {
+              void handleSubmitBroadcast({ type: "optedIn" });
+            } else {
+              setBroadcastTag("");
+              setBroadcastStatus("entering-tag");
+            }
+          }}
+        />
+      )}
+      {broadcastStatus === "entering-tag" && (
+        <Box>
+          <Text>Tag: </Text>
+          <TextInput
+            value={broadcastTag}
+            onChange={setBroadcastTag}
+            onSubmit={(value) => {
+              const trimmed = value.trim();
+              if (!trimmed) return;
+              void handleSubmitBroadcast({
+                type: "and",
+                clauses: [{ type: "optedIn" }, { type: "tag", tag: trimmed }],
+              });
+            }}
+          />
+        </Box>
+      )}
+      {broadcastStatus === "triggering" && (
+        <Text color="gray">Triggering broadcast…</Text>
+      )}
+      {broadcastStatus === "success" && (
+        <Text color="green">{broadcastMessage}</Text>
+      )}
+      {broadcastStatus === "error" && (
+        <Text color="red">{broadcastMessage}</Text>
+      )}
+
       <Hints
         text={
           idle
-            ? "d delete · e edit · t trigger · r runs · Esc back · q quit"
+            ? "d delete · e edit · t trigger · b broadcast · r runs · h broadcasts · Esc back · q quit"
             : triggerStatus === "success" || triggerStatus === "error"
               ? "any key to continue"
               : triggerStatus === "entering-email"
                 ? "Enter to trigger · Esc back"
-                : "↑↓ navigate · Enter select"
+                : broadcastStatus === "success" || broadcastStatus === "error"
+                  ? "any key to continue"
+                  : broadcastStatus === "entering-tag"
+                    ? "Enter to trigger · Esc back"
+                    : "↑↓ navigate · Enter select"
         }
       />
     </Box>

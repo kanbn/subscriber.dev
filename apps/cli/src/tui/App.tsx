@@ -2,6 +2,7 @@ import { Box, Text, useApp, useInput } from "ink";
 import { useState } from "react";
 
 import type { Screen } from "./navigation.js";
+import { BroadcastsScreen } from "./screens/BroadcastsScreen.js";
 import { EnvironmentsScreen } from "./screens/EnvironmentsScreen.js";
 import { IntegrationDetailScreen } from "./screens/IntegrationDetailScreen.js";
 import { IntegrationsScreen } from "./screens/IntegrationsScreen.js";
@@ -124,11 +125,25 @@ export function App() {
               workflowId: screen.workflowId,
             })
           }
+          onViewBroadcasts={() =>
+            push({
+              kind: "broadcasts",
+              environment: screen.environment,
+              workflowId: screen.workflowId,
+            })
+          }
         />
       )}
 
       {screen.kind === "workflowRuns" && (
         <WorkflowRunsScreen
+          environmentId={screen.environment.publicId}
+          workflowId={screen.workflowId}
+        />
+      )}
+
+      {screen.kind === "broadcasts" && (
+        <BroadcastsScreen
           environmentId={screen.environment.publicId}
           workflowId={screen.workflowId}
         />

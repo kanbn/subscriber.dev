@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   deleteWorkflow,
   getWorkflow,
+  triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
 } from "@subscriber.dev/api-client/cli";
@@ -15,6 +16,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   deleteWorkflow: vi.fn(),
   triggerWorkflow: vi.fn(),
   updateWorkflow: vi.fn(),
+  triggerBroadcast: vi.fn(),
 }));
 
 const testWorkflow = {
@@ -40,16 +42,22 @@ const testWorkflow = {
   ],
 };
 
-function renderScreen(onDeleted = vi.fn(), onViewRuns = vi.fn()) {
+function renderScreen(
+  onDeleted = vi.fn(),
+  onViewRuns = vi.fn(),
+  onViewBroadcasts = vi.fn(),
+) {
   return {
     onDeleted,
     onViewRuns,
+    onViewBroadcasts,
     ...render(
       <WorkflowDetailScreen
         environmentId="test-environment-1"
         workflowId="test-workflow-1"
         onDeleted={onDeleted}
         onViewRuns={onViewRuns}
+        onViewBroadcasts={onViewBroadcasts}
       />,
     ),
   };
@@ -88,6 +96,7 @@ describe("WorkflowDetailScreen", () => {
         workflowId="missing"
         onDeleted={vi.fn()}
         onViewRuns={vi.fn()}
+        onViewBroadcasts={vi.fn()}
       />,
     );
 
@@ -345,5 +354,108 @@ describe("WorkflowDetailScreen runs", () => {
     stdin.write("r");
 
     expect(onViewRuns).toHaveBeenCalled();
+  });
+
+  it("calls onViewBroadcasts when 'h' is pressed", async () => {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testWorkflow,
+    } as never);
+    const onViewBroadcasts = vi.fn();
+    const { lastFrame, stdin } = renderScreen(
+      vi.fn(),
+      vi.fn(),
+      onViewBroadcasts,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("key: test-signup");
+    });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    stdin.write("h");
+
+    expect(onViewBroadcasts).toHaveBeenCalled();
+  });
+});
+
+describe("WorkflowDetailScreen broadcast", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  async function loaded() {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testWorkflow,
+    } as never);
+    const screen = renderScreen();
+    await vi.waitFor(() => {
+      expect(screen.lastFrame()).toContain("key: test-signup");
+    });
+    return screen;
+  }
+
+  it("shows the audience menu when 'b' is pressed", async () => {
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("b");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("All opted-in subscribers");
+    });
+    expect(lastFrame()).toContain("Opted-in subscribers with a tag");
+  });
+
+  it("triggers with an optedIn audience for the default menu item", async () => {
+    vi.mocked(triggerBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { broadcastId: "bc_1", status: "pending" },
+    } as never);
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("b");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("All opted-in subscribers");
+    });
+
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Broadcast queued: bc_1");
+    });
+    expect(triggerBroadcast).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      { audience: { type: "optedIn" } },
+    );
+  });
+
+  it("shows an error when the workflow is paused or has no steps", async () => {
+    vi.mocked(triggerBroadcast).mockResolvedValue({
+      status: 400,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("b");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("All opted-in subscribers");
+    });
+
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Workflow is paused or has no steps.");
+    });
   });
 });

@@ -1,0 +1,191 @@
+import { render } from "ink-testing-library";
+import { describe, expect, it, vi } from "vitest";
+
+import { getBroadcast, listBroadcasts } from "@subscriber.dev/api-client/cli";
+
+import { BroadcastsScreen } from "../BroadcastsScreen.js";
+
+vi.mock("@subscriber.dev/api-client/cli", () => ({
+  listBroadcasts: vi.fn(),
+  getBroadcast: vi.fn(),
+}));
+
+const testBroadcast = {
+  publicId: "test-broadcast-1",
+  status: "queued",
+  matchedCount: 42,
+  createdAt: "2026-01-01T00:00:00.000Z",
+};
+
+const testDetail = {
+  publicId: "test-broadcast-1",
+  status: "queued",
+  matchedCount: 42,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  sentCount: 10,
+  failedCount: 1,
+  skippedCount: 2,
+  pendingCount: 29,
+};
+
+function listBroadcastsMock(broadcasts: unknown[]) {
+  vi.mocked(listBroadcasts).mockResolvedValue({
+    status: 200,
+    headers: new Headers(),
+    data: { broadcasts, limit: 50, offset: 0 },
+  } as never);
+}
+
+describe("BroadcastsScreen", () => {
+  it("lists each broadcast with its status and matched count", async () => {
+    listBroadcastsMock([testBroadcast]);
+
+    const { lastFrame } = render(
+      <BroadcastsScreen
+        environmentId="test-environment-1"
+        workflowId="test-workflow-1"
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("queued");
+    });
+    expect(lastFrame()).toContain("42 matched");
+  });
+
+  it("shows an empty-state hint when there are no broadcasts", async () => {
+    listBroadcastsMock([]);
+
+    const { lastFrame } = render(
+      <BroadcastsScreen
+        environmentId="test-environment-1"
+        workflowId="test-workflow-1"
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("No broadcasts yet.");
+    });
+  });
+
+  it("shows an error when the workflow isn't found", async () => {
+    vi.mocked(listBroadcasts).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+
+    const { lastFrame } = render(
+      <BroadcastsScreen
+        environmentId="test-environment-1"
+        workflowId="missing"
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Error");
+    });
+  });
+});
+
+describe("BroadcastsScreen detail", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  it("fetches and shows step-outcome counts when a broadcast is selected", async () => {
+    listBroadcastsMock([testBroadcast]);
+    vi.mocked(getBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testDetail,
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <BroadcastsScreen
+        environmentId="test-environment-1"
+        workflowId="test-workflow-1"
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("queued");
+    });
+
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("sent: 10");
+    });
+    expect(getBroadcast).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      "test-broadcast-1",
+    );
+    expect(lastFrame()).toContain("failed: 1");
+    expect(lastFrame()).toContain("skipped: 2");
+    expect(lastFrame()).toContain("pending: 29");
+  });
+
+  it("returns to the list when 'b' is pressed", async () => {
+    listBroadcastsMock([testBroadcast]);
+    vi.mocked(getBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testDetail,
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <BroadcastsScreen
+        environmentId="test-environment-1"
+        workflowId="test-workflow-1"
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("queued");
+    });
+
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("sent: 10");
+    });
+
+    await tick();
+    stdin.write("b");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("sent: 10");
+    });
+    expect(lastFrame()).toContain("42 matched");
+  });
+
+  it("shows an error when the broadcast fetch fails", async () => {
+    listBroadcastsMock([testBroadcast]);
+    vi.mocked(getBroadcast).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <BroadcastsScreen
+        environmentId="test-environment-1"
+        workflowId="test-workflow-1"
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("queued");
+    });
+
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Error");
+    });
+  });
+});

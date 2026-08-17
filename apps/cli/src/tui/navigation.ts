@@ -43,6 +43,11 @@ export type Screen =
       workflowId: string;
     }
   | {
+      kind: "broadcasts";
+      environment: EnvironmentSummary;
+      workflowId: string;
+    }
+  | {
       kind: "runHistory";
       workspace: WorkspaceSummary;
       environment: EnvironmentSummary;
