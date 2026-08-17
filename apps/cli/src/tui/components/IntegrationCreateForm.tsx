@@ -1,0 +1,150 @@
+import { Box, Text } from "ink";
+import SelectInput from "ink-select-input";
+import TextInput from "ink-text-input";
+import { useState } from "react";
+
+export interface IntegrationCreateValues {
+  host: string;
+  port: string;
+  secure: boolean;
+  fromEmail: string;
+  fromName: string;
+  user: string;
+  password: string;
+}
+
+const TEXT_FIELDS = [
+  { key: "host", label: "Host", mask: false },
+  { key: "port", label: "Port", mask: false },
+  { key: "fromEmail", label: "From email", mask: false },
+  { key: "fromName", label: "From name", mask: false },
+  { key: "user", label: "SMTP user", mask: false },
+  { key: "password", label: "SMTP password", mask: true },
+] as const;
+
+type TextFieldKey = (typeof TEXT_FIELDS)[number]["key"];
+
+const SECURE_VALUE = "__secure__";
+const SUBMIT_VALUE = "__submit__";
+const CANCEL_VALUE = "__cancel__";
+
+type Mode = "menu" | "editing-text" | "editing-secure" | "submitting";
+
+function fieldPreview(key: TextFieldKey, value: string): string {
+  if (value.length === 0) return "—";
+  const field = TEXT_FIELDS.find((f) => f.key === key);
+  return field?.mask ? "•".repeat(Math.min(value.length, 8)) : value;
+}
+
+export function IntegrationCreateForm({
+  onSubmit,
+  onCancel,
+}: {
+  onSubmit: (values: IntegrationCreateValues) => Promise<string | undefined>;
+  onCancel: () => void;
+}) {
+  const [values, setValues] = useState<IntegrationCreateValues>({
+    host: "",
+    port: "",
+    secure: true,
+    fromEmail: "",
+    fromName: "",
+    user: "",
+    password: "",
+  });
+  const [mode, setMode] = useState<Mode>("menu");
+  const [editingField, setEditingField] = useState<TextFieldKey | null>(null);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    if (
+      values.host.trim().length === 0 ||
+      values.port.trim().length === 0 ||
+      values.fromEmail.trim().length === 0 ||
+      values.user.trim().length === 0 ||
+      values.password.trim().length === 0
+    ) {
+      setError("Host, port, from email, user, and password are required.");
+      return;
+    }
+    setError("");
+    setMode("submitting");
+    const failure = await onSubmit(values);
+    if (failure) {
+      setError(failure);
+      setMode("menu");
+    }
+  };
+
+  if (mode === "editing-text" && editingField) {
+    const field = TEXT_FIELDS.find((f) => f.key === editingField);
+    if (!field) return null;
+    return (
+      <Box>
+        <Text>{field.label}: </Text>
+        <TextInput
+          value={values[editingField]}
+          onChange={(value) =>
+            setValues((prev) => ({ ...prev, [editingField]: value }))
+          }
+          onSubmit={() => setMode("menu")}
+          mask={field.mask ? "*" : undefined}
+        />
+      </Box>
+    );
+  }
+
+  if (mode === "editing-secure") {
+    return (
+      <Box flexDirection="column">
+        <Text color="yellow">Secure connection (TLS)?</Text>
+        <SelectInput
+          items={[
+            { label: "Yes", value: true },
+            { label: "No", value: false },
+          ]}
+          onSelect={(item) => {
+            setValues((prev) => ({ ...prev, secure: item.value }));
+            setMode("menu");
+          }}
+        />
+      </Box>
+    );
+  }
+
+  if (mode === "submitting") {
+    return <Text color="gray">Creating…</Text>;
+  }
+
+  return (
+    <Box flexDirection="column">
+      {error.length > 0 && <Text color="red">{error}</Text>}
+      <SelectInput
+        items={[
+          ...TEXT_FIELDS.map((field) => ({
+            label: `${field.label}: ${fieldPreview(field.key, values[field.key])}`,
+            value: field.key as string,
+          })),
+          {
+            label: `Secure: ${values.secure ? "Yes" : "No"}`,
+            value: SECURE_VALUE,
+          },
+          { label: "Create integration", value: SUBMIT_VALUE },
+          { label: "Cancel", value: CANCEL_VALUE },
+        ]}
+        onSelect={(item) => {
+          if (item.value === SUBMIT_VALUE) {
+            void handleSubmit();
+          } else if (item.value === CANCEL_VALUE) {
+            onCancel();
+          } else if (item.value === SECURE_VALUE) {
+            setMode("editing-secure");
+          } else {
+            setEditingField(item.value as TextFieldKey);
+            setMode("editing-text");
+          }
+        }}
+      />
+    </Box>
+  );
+}

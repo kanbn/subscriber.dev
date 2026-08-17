@@ -14,9 +14,5 @@ export const cliFetch = async <T>(
   const response = await fetch(`${baseUrl}${url}`, { ...options, headers });
   const data = await response.json().catch(() => undefined);
 
-  if (!response.ok) {
-    throw data ?? new Error(`Request failed with status ${response.status}`);
-  }
-
   return { status: response.status, data, headers: response.headers } as T;
 };

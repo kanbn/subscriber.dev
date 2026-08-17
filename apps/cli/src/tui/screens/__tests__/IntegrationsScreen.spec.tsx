@@ -1,12 +1,16 @@
 import { render } from "ink-testing-library";
 import { describe, expect, it, vi } from "vitest";
 
-import { listIntegrations } from "@subscriber.dev/api-client/cli";
+import {
+  listIntegrations,
+  upsertIntegration,
+} from "@subscriber.dev/api-client/cli";
 
 import { IntegrationsScreen } from "../IntegrationsScreen.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   listIntegrations: vi.fn(),
+  upsertIntegration: vi.fn(),
 }));
 
 const testIntegration = { type: "smtp", updatedAt: "2026-01-01T00:00:00.000Z" };
@@ -91,5 +95,81 @@ describe("IntegrationsScreen", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Error");
     });
+  });
+});
+
+describe("IntegrationsScreen create", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  it("shows the new-integration field menu when 'n' is pressed", async () => {
+    vi.mocked(listIntegrations).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { integrations: [testIntegration] },
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <IntegrationsScreen
+        environmentId="test-environment-1"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("smtp");
+    });
+
+    await tick();
+    stdin.write("n");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New SMTP integration");
+    });
+    expect(lastFrame()).toContain("Host: —");
+    expect(lastFrame()).toContain("Secure: Yes");
+    expect(lastFrame()).toContain("Create integration");
+  });
+
+  it("fills in the default field before creating", async () => {
+    vi.mocked(listIntegrations).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { integrations: [] },
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <IntegrationsScreen
+        environmentId="test-environment-1"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("No integrations configured.");
+    });
+
+    await tick();
+    stdin.write("n");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New SMTP integration");
+    });
+
+    // Default-selected item is "Host" (the first field).
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("Create integration");
+    });
+
+    await tick();
+    stdin.write("smtp.example.com");
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Host: smtp.example.com");
+    });
+    expect(upsertIntegration).not.toHaveBeenCalled();
   });
 });
