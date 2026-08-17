@@ -21,6 +21,7 @@ export const createRunWithSteps = async (
     subscriberId: number;
     payload: Record<string, unknown> | null;
     createdBy: number;
+    broadcastId?: number | null;
     steps: RunStepInput[];
   },
 ) => {
@@ -33,6 +34,7 @@ export const createRunWithSteps = async (
         environmentId: data.environmentId,
         subscriberId: data.subscriberId,
         payload: data.payload,
+        broadcastId: data.broadcastId ?? null,
         createdBy: data.createdBy,
       })
       .returning();

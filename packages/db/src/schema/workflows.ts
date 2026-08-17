@@ -47,6 +47,18 @@ export const workflowRunStepStatusEnum = pgEnum(
   workflowRunStepStatuses,
 );
 
+export const workflowBroadcastStatuses = [
+  "pending",
+  "queued",
+  "failed",
+] as const;
+export type WorkflowBroadcastStatus =
+  (typeof workflowBroadcastStatuses)[number];
+export const workflowBroadcastStatusEnum = pgEnum(
+  "workflowBroadcastStatus",
+  workflowBroadcastStatuses,
+);
+
 export const workflows = pgTable(
   "workflows",
   {
@@ -132,6 +144,53 @@ export const workflowStepsRelations = relations(workflowSteps, ({ one }) => ({
   }),
 }));
 
+export const workflowBroadcasts = pgTable(
+  "workflow_broadcasts",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    publicId: text("publicId")
+      .notNull()
+      .unique()
+      .$defaultFn(() => generateUID()),
+    workflowId: bigserial("workflowId", { mode: "number" })
+      .notNull()
+      .references(() => workflows.id, { onDelete: "cascade" }),
+    environmentId: bigserial("environmentId", { mode: "number" })
+      .notNull()
+      .references(() => environments.id, { onDelete: "cascade" }),
+    audienceQuery: jsonb("audienceQuery")
+      .notNull()
+      .$type<Record<string, unknown>>(),
+    status: workflowBroadcastStatusEnum("status").notNull().default("pending"),
+    matchedCount: integer("matchedCount"),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    createdBy: bigint("createdBy", { mode: "number" }).references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+  },
+  (table) => [
+    index("workflow_broadcasts_workflowId_idx").on(table.workflowId),
+    index("workflow_broadcasts_environmentId_idx").on(table.environmentId),
+    index("workflow_broadcasts_publicId_idx").on(table.publicId),
+  ],
+);
+
+export const workflowBroadcastsRelations = relations(
+  workflowBroadcasts,
+  ({ one, many }) => ({
+    workflow: one(workflows, {
+      fields: [workflowBroadcasts.workflowId],
+      references: [workflows.id],
+    }),
+    environment: one(environments, {
+      fields: [workflowBroadcasts.environmentId],
+      references: [environments.id],
+    }),
+    runs: many(workflowRuns),
+  }),
+);
+
 export const workflowRuns = pgTable(
   "workflow_runs",
   {
@@ -149,6 +208,10 @@ export const workflowRuns = pgTable(
     subscriberId: bigserial("subscriberId", { mode: "number" })
       .notNull()
       .references(() => subscribers.id, { onDelete: "cascade" }),
+    broadcastId: bigint("broadcastId", { mode: "number" }).references(
+      () => workflowBroadcasts.id,
+      { onDelete: "set null" },
+    ),
     status: workflowRunStatusEnum("status").notNull().default("active"),
     payload: jsonb("payload").$type<Record<string, unknown>>(),
     triggeredAt: timestamp("triggeredAt").notNull().defaultNow(),
@@ -163,6 +226,7 @@ export const workflowRuns = pgTable(
     index("workflow_runs_environmentId_idx").on(table.environmentId),
     index("workflow_runs_subscriberId_idx").on(table.subscriberId),
     index("workflow_runs_status_idx").on(table.status),
+    index("workflow_runs_broadcastId_idx").on(table.broadcastId),
   ],
 );
 
@@ -176,6 +240,10 @@ export const workflowRunsRelations = relations(
     subscriber: one(subscribers, {
       fields: [workflowRuns.subscriberId],
       references: [subscribers.id],
+    }),
+    broadcast: one(workflowBroadcasts, {
+      fields: [workflowRuns.broadcastId],
+      references: [workflowBroadcasts.id],
     }),
     steps: many(workflowRunSteps),
   }),

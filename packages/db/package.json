@@ -58,7 +58,7 @@
     "@types/node": "^20.17.7",
     "@types/pg": "^8.10.9",
     "dotenv-cli": "^7.4.4",
-    "drizzle-kit": "^0.28.1",
+    "drizzle-kit": "^0.31.10",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"

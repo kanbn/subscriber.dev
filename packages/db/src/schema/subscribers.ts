@@ -82,6 +82,7 @@ export const subscribersRelations = relations(subscribers, ({ one, many }) => ({
     references: [environments.id],
   }),
   preferences: many(subscriberPreferences),
+  tags: many(subscriberTags),
 }));
 
 export const subscriberPreferences = pgTable(
@@ -118,3 +119,43 @@ export const subscriberPreferencesRelations = relations(
     }),
   }),
 );
+
+export const subscriberTags = pgTable(
+  "subscriber_tags",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    subscriberId: bigserial("subscriberId", { mode: "number" })
+      .notNull()
+      .references(() => subscribers.id, { onDelete: "cascade" }),
+    environmentId: bigserial("environmentId", { mode: "number" })
+      .notNull()
+      .references(() => environments.id, { onDelete: "cascade" }),
+    tag: varchar("tag", { length: 100 }).notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    createdBy: bigint("createdBy", { mode: "number" }).references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+  },
+  (table) => [
+    unique("subscriber_tags_subscriberId_tag").on(
+      table.subscriberId,
+      table.tag,
+    ),
+    index("subscriber_tags_environmentId_tag_idx").on(
+      table.environmentId,
+      table.tag,
+    ),
+  ],
+);
+
+export const subscriberTagsRelations = relations(subscriberTags, ({ one }) => ({
+  subscriber: one(subscribers, {
+    fields: [subscriberTags.subscriberId],
+    references: [subscribers.id],
+  }),
+  environment: one(environments, {
+    fields: [subscriberTags.environmentId],
+    references: [environments.id],
+  }),
+}));

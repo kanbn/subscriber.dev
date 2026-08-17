@@ -9,11 +9,8 @@ import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
 import type { WorkflowStepSchema } from "./dto/create-workflow.dto.js";
-import type { WorkflowStepJobData } from "./workflow.constants.js";
-import {
-  WORKFLOW_QUEUE_NAME,
-  WORKFLOW_STEP_JOB_NAME,
-} from "./workflow.constants.js";
+import { createRunForSubscriber } from "./createRunForSubscriber.js";
+import { WORKFLOW_QUEUE_NAME } from "./workflow.constants.js";
 
 type WorkflowStepInput = z.infer<typeof WorkflowStepSchema>;
 
@@ -227,46 +224,14 @@ export class WorkflowService {
     );
     if (!subscriber) throw new NotFoundException("Subscriber not found");
 
-    let cumulativeDelayMs = 0;
-    const now = new Date();
-    const plannedSteps = steps.map((step) => {
-      cumulativeDelayMs += step.delayMs;
-      return {
-        stepId: step.id,
-        stepOrder: step.stepOrder,
-        type: step.type,
-        configSnapshot: step.config,
-        scheduledAt: new Date(now.getTime() + cumulativeDelayMs),
-        cumulativeDelayMs,
-      };
-    });
-
-    const { run, runSteps } = await workflowRunRepo.createRunWithSteps(db, {
+    const { run } = await createRunForSubscriber(db, this.queue, {
       workflowId: workflow.id,
+      steps,
       environmentId,
       subscriberId: subscriber.id,
-      payload: input.payload ?? null,
+      payload: input.payload,
       createdBy: input.triggeredBy,
-      steps: plannedSteps,
     });
-
-    for (const [i, runStep] of runSteps.entries()) {
-      const job = await this.queue.add(
-        WORKFLOW_STEP_JOB_NAME,
-        { runStepId: runStep.id } satisfies WorkflowStepJobData,
-        {
-          delay: plannedSteps[i]!.cumulativeDelayMs,
-          jobId: `run-step-${runStep.id}`,
-          attempts: 3,
-          backoff: { type: "exponential", delay: 60_000 },
-          removeOnComplete: true,
-          removeOnFail: 1000,
-        },
-      );
-      if (job.id) {
-        await workflowRunRepo.setRunStepBullJobId(db, runStep.id, job.id);
-      }
-    }
 
     return { triggered: true as const, runPublicId: run.publicId };
   }

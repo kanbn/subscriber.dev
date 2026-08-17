@@ -3,19 +3,15 @@ import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { Injectable, Logger } from "@nestjs/common";
 
 import { createDrizzleClient } from "@subscriber.dev/db/client";
-import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
-import { sendRawEmail } from "@subscriber.dev/email";
-import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
 
 import type { WorkflowStepJobData } from "./workflow.constants.js";
-import { decrypt } from "../../common/encryption.js";
-import { smtpProvider } from "../integrations/providers/index.js";
+import { sendEmailStep } from "./sendEmailStep.js";
 import { WORKFLOW_QUEUE_NAME } from "./workflow.constants.js";
 import { renderTemplate } from "./workflow.template.js";
 
-@Processor(WORKFLOW_QUEUE_NAME)
+@Processor(WORKFLOW_QUEUE_NAME, { concurrency: 5 })
 @Injectable()
 export class WorkflowProcessor extends WorkerHost {
   private readonly logger = new Logger(WorkflowProcessor.name);
@@ -65,92 +61,7 @@ export class WorkflowProcessor extends WorkerHost {
     };
 
     if (runStep.type === "email") {
-      const preferences = await subscriberRepo.getLatestPreferences(
-        db,
-        subscriber.id,
-      );
-      if (preferences && !preferences.email) {
-        await workflowRunRepo.updateRunStepStatus(
-          db,
-          runStep.id,
-          "skipped",
-          "Subscriber opted out of email",
-        );
-      } else if (!subscriber.email) {
-        await workflowRunRepo.updateRunStepStatus(
-          db,
-          runStep.id,
-          "skipped",
-          "Subscriber has no email address",
-        );
-      } else {
-        const integration =
-          await environmentIntegrationsRepo.getByEnvironmentAndType(
-            db,
-            subscriber.environmentId,
-            "smtp",
-          );
-        if (!integration) {
-          await workflowRunRepo.updateRunStepStatus(
-            db,
-            runStep.id,
-            "failed",
-            "No SMTP integration configured for this environment",
-          );
-        } else {
-          const smtpConfig = smtpProvider.configSchema.parse(
-            integration.config,
-          );
-          const smtpSecret = smtpProvider.secretSchema.parse(
-            JSON.parse(decrypt(integration.encryptedSecret!)),
-          );
-
-          const config = runStep.configSnapshot as {
-            subject: string;
-            body: string;
-          };
-          const unsubscribeUrl = await createEmailUnsubscribeLink(
-            subscriber.environmentId,
-            subscriber.publicId,
-          );
-          const context = { ...baseContext, unsubscribeUrl };
-          const subject = await renderTemplate(config.subject, context);
-          const interpolatedBody = await renderTemplate(config.body, context);
-          const bodyHasUnsubscribeToken =
-            config.body.includes("{{unsubscribeUrl}}");
-          const html =
-            unsubscribeUrl && !bodyHasUnsubscribeToken
-              ? `${interpolatedBody}<p style="font-size:12px;color:#666;">Don't want these emails? <a href="${unsubscribeUrl}">Unsubscribe</a></p>`
-              : interpolatedBody;
-
-          try {
-            await sendRawEmail(
-              {
-                host: smtpConfig.host,
-                port: smtpConfig.port,
-                secure: smtpConfig.secure,
-                user: smtpSecret.user,
-                password: smtpSecret.password,
-                from: smtpConfig.fromName
-                  ? `${smtpConfig.fromName} <${smtpConfig.fromEmail}>`
-                  : smtpConfig.fromEmail,
-              },
-              subscriber.email,
-              subject,
-              html,
-            );
-            await workflowRunRepo.updateRunStepStatus(db, runStep.id, "sent");
-          } catch (error) {
-            await workflowRunRepo.updateRunStepStatus(
-              db,
-              runStep.id,
-              "failed",
-              error instanceof Error ? error.message : "Unknown error",
-            );
-            throw error;
-          }
-        }
-      }
+      await sendEmailStep(db, runStep, subscriber, baseContext);
     } else if (runStep.type === "webhook") {
       const config = runStep.configSnapshot as { url: string; body: string };
       const payload = await renderTemplate(config.body, baseContext);
