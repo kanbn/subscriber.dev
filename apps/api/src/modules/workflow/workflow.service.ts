@@ -1,16 +1,27 @@
 import type { z } from "zod";
 import { InjectQueue } from "@nestjs/bullmq";
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { Queue } from "bullmq";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
+import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBroadcast.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
+import type { AudienceCondition } from "./audienceQuery.js";
 import type { WorkflowStepSchema } from "./dto/create-workflow.dto.js";
+import type { BroadcastDispatchJobData } from "./workflow.constants.js";
 import { createRunForSubscriber } from "./createRunForSubscriber.js";
-import { WORKFLOW_QUEUE_NAME } from "./workflow.constants.js";
+import {
+  BROADCAST_DISPATCH_JOB_NAME,
+  BROADCAST_DISPATCH_QUEUE_NAME,
+  WORKFLOW_QUEUE_NAME,
+} from "./workflow.constants.js";
 
 type WorkflowStepInput = z.infer<typeof WorkflowStepSchema>;
 
@@ -50,6 +61,8 @@ interface WorkflowStepRow {
 export class WorkflowService {
   constructor(
     @InjectQueue(WORKFLOW_QUEUE_NAME) private readonly queue: Queue,
+    @InjectQueue(BROADCAST_DISPATCH_QUEUE_NAME)
+    private readonly broadcastDispatchQueue: Queue,
   ) {}
 
   private toWorkflowDto(
@@ -346,5 +359,116 @@ export class WorkflowService {
       pending.map((s) => s.id),
       reason,
     );
+  }
+
+  async triggerBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    audience: AudienceCondition,
+    triggeredBy: number,
+  ) {
+    const workflow = await workflowRepo.getWorkflowByPublicId(
+      db,
+      environmentId,
+      workflowPublicId,
+    );
+    if (!workflow) throw new NotFoundException("Workflow not found");
+    if (workflow.status === "paused") {
+      throw new BadRequestException("Workflow is paused");
+    }
+
+    const steps = await workflowRepo.listStepsForWorkflow(db, workflow.id);
+    if (steps.length === 0) {
+      throw new BadRequestException("Workflow has no steps");
+    }
+
+    const broadcast = await workflowBroadcastRepo.createBroadcast(db, {
+      workflowId: workflow.id,
+      environmentId,
+      audienceQuery: audience as Record<string, unknown>,
+      createdBy: triggeredBy,
+    });
+
+    await this.broadcastDispatchQueue.add(
+      BROADCAST_DISPATCH_JOB_NAME,
+      { broadcastId: broadcast.id } satisfies BroadcastDispatchJobData,
+      {
+        attempts: 3,
+        backoff: { type: "exponential", delay: 60_000 },
+        removeOnComplete: true,
+        removeOnFail: 1000,
+      },
+    );
+
+    return { broadcastId: broadcast.publicId, status: broadcast.status };
+  }
+
+  async listBroadcasts(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    opts: { limit: number; offset: number },
+  ) {
+    const workflow = await workflowRepo.getWorkflowByPublicId(
+      db,
+      environmentId,
+      workflowPublicId,
+    );
+    if (!workflow) throw new NotFoundException("Workflow not found");
+
+    const rows = await workflowBroadcastRepo.listBroadcastsForWorkflow(
+      db,
+      workflow.id,
+      opts,
+    );
+
+    return {
+      broadcasts: rows.map((b) => ({
+        publicId: b.publicId,
+        status: b.status,
+        matchedCount: b.matchedCount,
+        createdAt: b.createdAt,
+      })),
+      limit: opts.limit,
+      offset: opts.offset,
+    };
+  }
+
+  async getBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    broadcastPublicId: string,
+  ) {
+    const workflow = await workflowRepo.getWorkflowByPublicId(
+      db,
+      environmentId,
+      workflowPublicId,
+    );
+    if (!workflow) throw new NotFoundException("Workflow not found");
+
+    const broadcast = await workflowBroadcastRepo.getBroadcastByPublicId(
+      db,
+      workflow.id,
+      broadcastPublicId,
+    );
+    if (!broadcast) throw new NotFoundException("Broadcast not found");
+
+    const counts = await workflowBroadcastRepo.getBroadcastStepCounts(
+      db,
+      broadcast.id,
+    );
+
+    return {
+      publicId: broadcast.publicId,
+      status: broadcast.status,
+      matchedCount: broadcast.matchedCount,
+      createdAt: broadcast.createdAt,
+      sentCount: counts.sent,
+      failedCount: counts.failed,
+      skippedCount: counts.skipped,
+      pendingCount: counts.pending,
+    };
   }
 }

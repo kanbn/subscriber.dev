@@ -1,8 +1,12 @@
-import { eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import type { WorkflowBroadcastStatus } from "@subscriber.dev/db/schema";
-import { workflowBroadcasts } from "@subscriber.dev/db/schema";
+import {
+  workflowBroadcasts,
+  workflowRuns,
+  workflowRunSteps,
+} from "@subscriber.dev/db/schema";
 import { generateUID } from "@subscriber.dev/shared/utils";
 
 export const createBroadcast = async (
@@ -47,4 +51,48 @@ export const updateBroadcastProgress = async (
     .returning();
 
   return result;
+};
+
+export const getBroadcastByPublicId = async (
+  db: dbClient,
+  workflowId: number,
+  publicId: string,
+) => {
+  return await db.query.workflowBroadcasts.findFirst({
+    where: and(
+      eq(workflowBroadcasts.workflowId, workflowId),
+      eq(workflowBroadcasts.publicId, publicId),
+    ),
+  });
+};
+
+export const listBroadcastsForWorkflow = async (
+  db: dbClient,
+  workflowId: number,
+  opts: { limit: number; offset: number },
+) => {
+  return await db.query.workflowBroadcasts.findMany({
+    where: eq(workflowBroadcasts.workflowId, workflowId),
+    orderBy: desc(workflowBroadcasts.createdAt),
+    limit: opts.limit,
+    offset: opts.offset,
+  });
+};
+
+export const getBroadcastStepCounts = async (
+  db: dbClient,
+  broadcastId: number,
+) => {
+  const rows = await db
+    .select({ status: workflowRunSteps.status, count: count() })
+    .from(workflowRunSteps)
+    .innerJoin(workflowRuns, eq(workflowRunSteps.runId, workflowRuns.id))
+    .where(eq(workflowRuns.broadcastId, broadcastId))
+    .groupBy(workflowRunSteps.status);
+
+  const counts = { pending: 0, sent: 0, skipped: 0, failed: 0, cancelled: 0 };
+  for (const row of rows) {
+    counts[row.status] = row.count;
+  }
+  return counts;
 };

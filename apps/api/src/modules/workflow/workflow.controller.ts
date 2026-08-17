@@ -28,6 +28,13 @@ import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import {
+  BroadcastDetailResponseDto,
+  ListBroadcastsQueryDto,
+  ListBroadcastsResponseDto,
+  TriggerBroadcastDto,
+  TriggerBroadcastResponseDto,
+} from "./dto/broadcast.dto.js";
+import {
   CreateWorkflowDto,
   WorkflowResponseDto,
 } from "./dto/create-workflow.dto.js";
@@ -325,5 +332,117 @@ export class WorkflowController {
       limit: query.limit,
       offset: query.offset,
     });
+  }
+
+  @Post(":workflowId/broadcast")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "triggerBroadcast",
+    summary: "Trigger a broadcast",
+    description:
+      "Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "workflowId", type: "string" })
+  @ApiResponse({ status: 200, type: TriggerBroadcastResponseDto })
+  @ApiResponse({
+    status: 400,
+    description: "Workflow is paused or has no steps",
+  })
+  @ApiResponse({ status: 404, description: "Workflow not found" })
+  async triggerBroadcast(
+    @CurrentUser() user: User,
+    @Param("environmentId") environmentId: string,
+    @Param("workflowId") workflowId: string,
+    @Body() input: TriggerBroadcastDto,
+  ): Promise<TriggerBroadcastResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.workflowService.triggerBroadcast(
+      db,
+      environment.id,
+      workflowId,
+      input.audience,
+      user.id,
+    );
+  }
+
+  @Get(":workflowId/broadcasts")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "listBroadcasts",
+    summary: "List broadcasts for a workflow",
+    description:
+      "Returns a paginated list of broadcasts triggered for this workflow, most recent first",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "workflowId", type: "string" })
+  @ApiQuery({ name: "limit", required: false, type: Number })
+  @ApiQuery({ name: "offset", required: false, type: Number })
+  @ApiResponse({ status: 200, type: ListBroadcastsResponseDto })
+  @ApiResponse({ status: 404, description: "Workflow not found" })
+  async listBroadcasts(
+    @Param("environmentId") environmentId: string,
+    @Param("workflowId") workflowId: string,
+    @Query() query: ListBroadcastsQueryDto,
+  ): Promise<ListBroadcastsResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.workflowService.listBroadcasts(db, environment.id, workflowId, {
+      limit: query.limit,
+      offset: query.offset,
+    });
+  }
+
+  @Get(":workflowId/broadcasts/:broadcastId")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "getBroadcast",
+    summary: "Get a broadcast",
+    description:
+      "Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "workflowId", type: "string" })
+  @ApiParam({ name: "broadcastId", type: "string" })
+  @ApiResponse({ status: 200, type: BroadcastDetailResponseDto })
+  @ApiResponse({ status: 404, description: "Workflow or broadcast not found" })
+  async getBroadcast(
+    @Param("environmentId") environmentId: string,
+    @Param("workflowId") workflowId: string,
+    @Param("broadcastId") broadcastId: string,
+  ): Promise<BroadcastDetailResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.workflowService.getBroadcast(
+      db,
+      environment.id,
+      workflowId,
+      broadcastId,
+    );
   }
 }

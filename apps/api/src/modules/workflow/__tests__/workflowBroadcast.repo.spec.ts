@@ -4,6 +4,9 @@ import type { dbClient } from "@subscriber.dev/db/client";
 import {
   createBroadcast,
   getBroadcastById,
+  getBroadcastByPublicId,
+  getBroadcastStepCounts,
+  listBroadcastsForWorkflow,
   updateBroadcastProgress,
 } from "@subscriber.dev/db/repository/workflowBroadcast.repo";
 
@@ -23,18 +26,29 @@ function makeUpdateChain(value: unknown) {
 function makeMockDb(
   overrides: Partial<{
     findFirst: ReturnType<typeof vi.fn>;
+    findMany: ReturnType<typeof vi.fn>;
     insertChain: { values: ReturnType<typeof vi.fn> };
     updateChain: ReturnType<typeof makeUpdateChain>;
+    groupByResult: ReturnType<typeof vi.fn>;
   }> = {},
 ) {
   const findFirst = overrides.findFirst ?? vi.fn();
+  const findMany = overrides.findMany ?? vi.fn();
   const insertChain = overrides.insertChain ?? makeInsertChain([]);
   const updateChain = overrides.updateChain ?? makeUpdateChain([]);
+  const groupByResult =
+    overrides.groupByResult ?? vi.fn().mockResolvedValue([]);
+
+  const groupBy = vi.fn().mockImplementation(() => groupByResult());
+  const selectWhere = vi.fn().mockReturnValue({ groupBy });
+  const innerJoin = vi.fn().mockReturnValue({ where: selectWhere });
+  const from = vi.fn().mockReturnValue({ innerJoin });
 
   const db = {
-    query: { workflowBroadcasts: { findFirst } },
+    query: { workflowBroadcasts: { findFirst, findMany } },
     insert: vi.fn().mockReturnValue(insertChain),
     update: vi.fn().mockReturnValue(updateChain),
+    select: vi.fn().mockReturnValue({ from }),
   };
 
   return db as unknown as dbClient;
@@ -113,5 +127,71 @@ describe("updateBroadcastProgress", () => {
     await updateBroadcastProgress(db, 1, { status: "failed" });
 
     expect(updateChain.set).toHaveBeenCalledWith({ status: "failed" });
+  });
+});
+
+describe("getBroadcastByPublicId", () => {
+  it("returns the broadcast scoped to the workflow", async () => {
+    const row = { id: 1, workflowId: 5, publicId: "bc_abc" };
+    const db = makeMockDb({ findFirst: vi.fn().mockResolvedValue(row) });
+
+    const result = await getBroadcastByPublicId(db, 5, "bc_abc");
+    expect(result).toEqual(row);
+  });
+
+  it("returns undefined when not found", async () => {
+    const db = makeMockDb({ findFirst: vi.fn().mockResolvedValue(undefined) });
+
+    const result = await getBroadcastByPublicId(db, 5, "bc_missing");
+    expect(result).toBeUndefined();
+  });
+});
+
+describe("listBroadcastsForWorkflow", () => {
+  it("returns every broadcast for the workflow", async () => {
+    const rows = [{ id: 1, publicId: "bc_abc" }];
+    const db = makeMockDb({ findMany: vi.fn().mockResolvedValue(rows) });
+
+    const result = await listBroadcastsForWorkflow(db, 5, {
+      limit: 20,
+      offset: 0,
+    });
+    expect(result).toEqual(rows);
+  });
+});
+
+describe("getBroadcastStepCounts", () => {
+  it("returns zero counts when the broadcast has no run-steps yet", async () => {
+    const db = makeMockDb({ groupByResult: vi.fn().mockResolvedValue([]) });
+
+    const result = await getBroadcastStepCounts(db, 1);
+
+    expect(result).toEqual({
+      pending: 0,
+      sent: 0,
+      skipped: 0,
+      failed: 0,
+      cancelled: 0,
+    });
+  });
+
+  it("maps grouped counts per status", async () => {
+    const db = makeMockDb({
+      groupByResult: vi.fn().mockResolvedValue([
+        { status: "sent", count: 8 },
+        { status: "failed", count: 1 },
+        { status: "pending", count: 3 },
+      ]),
+    });
+
+    const result = await getBroadcastStepCounts(db, 1);
+
+    expect(result).toEqual({
+      pending: 3,
+      sent: 8,
+      skipped: 0,
+      failed: 1,
+      cancelled: 0,
+    });
   });
 });

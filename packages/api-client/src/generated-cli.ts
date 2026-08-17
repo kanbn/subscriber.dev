@@ -839,6 +839,166 @@ export interface ListRunsResponseDto {
   offset: number;
 }
 
+export type TriggerBroadcastDtoAudienceOneOfType = typeof TriggerBroadcastDtoAudienceOneOfType[keyof typeof TriggerBroadcastDtoAudienceOneOfType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TriggerBroadcastDtoAudienceOneOfType = {
+  optedIn: 'optedIn',
+} as const;
+
+export type TriggerBroadcastDtoAudienceOneOf = {
+  type: TriggerBroadcastDtoAudienceOneOfType;
+};
+
+export type TriggerBroadcastDtoAudienceOneOfThreeType = typeof TriggerBroadcastDtoAudienceOneOfThreeType[keyof typeof TriggerBroadcastDtoAudienceOneOfThreeType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TriggerBroadcastDtoAudienceOneOfThreeType = {
+  tag: 'tag',
+} as const;
+
+export type TriggerBroadcastDtoAudienceOneOfThree = {
+  type: TriggerBroadcastDtoAudienceOneOfThreeType;
+  /** @minLength 1 */
+  tag: string;
+};
+
+export type TriggerBroadcastDtoAudienceOneOfFiveType = typeof TriggerBroadcastDtoAudienceOneOfFiveType[keyof typeof TriggerBroadcastDtoAudienceOneOfFiveType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TriggerBroadcastDtoAudienceOneOfFiveType = {
+  attribute: 'attribute',
+} as const;
+
+export type TriggerBroadcastDtoAudienceOneOfFiveOp = typeof TriggerBroadcastDtoAudienceOneOfFiveOp[keyof typeof TriggerBroadcastDtoAudienceOneOfFiveOp];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TriggerBroadcastDtoAudienceOneOfFiveOp = {
+  equals: 'equals',
+  contains: 'contains',
+  exists: 'exists',
+} as const;
+
+export type TriggerBroadcastDtoAudienceOneOfFive = {
+  type: TriggerBroadcastDtoAudienceOneOfFiveType;
+  /** @minLength 1 */
+  field: string;
+  op: TriggerBroadcastDtoAudienceOneOfFiveOp;
+  value?: string;
+};
+
+export type TriggerBroadcastDtoAudienceOneOfEightType = typeof TriggerBroadcastDtoAudienceOneOfEightType[keyof typeof TriggerBroadcastDtoAudienceOneOfEightType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TriggerBroadcastDtoAudienceOneOfEightType = {
+  and: 'and',
+} as const;
+
+export type TriggerBroadcastDtoAudienceOneOfEight = {
+  type: TriggerBroadcastDtoAudienceOneOfEightType;
+  /** @minItems 1 */
+  clauses: unknown[];
+};
+
+export type TriggerBroadcastDtoAudienceOneOfOnezeroType = typeof TriggerBroadcastDtoAudienceOneOfOnezeroType[keyof typeof TriggerBroadcastDtoAudienceOneOfOnezeroType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TriggerBroadcastDtoAudienceOneOfOnezeroType = {
+  or: 'or',
+} as const;
+
+export type TriggerBroadcastDtoAudienceOneOfOnezero = {
+  type: TriggerBroadcastDtoAudienceOneOfOnezeroType;
+  /** @minItems 1 */
+  clauses: unknown[];
+};
+
+export type TriggerBroadcastDtoAudienceOneOfOnetwoType = typeof TriggerBroadcastDtoAudienceOneOfOnetwoType[keyof typeof TriggerBroadcastDtoAudienceOneOfOnetwoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TriggerBroadcastDtoAudienceOneOfOnetwoType = {
+  not: 'not',
+} as const;
+
+export type TriggerBroadcastDtoAudienceOneOfOnetwo = {
+  type: TriggerBroadcastDtoAudienceOneOfOnetwoType;
+  clause: unknown;
+};
+
+export type TriggerBroadcastDtoAudience = TriggerBroadcastDtoAudienceOneOf | TriggerBroadcastDtoAudienceOneOfThree | TriggerBroadcastDtoAudienceOneOfFive | TriggerBroadcastDtoAudienceOneOfEight | TriggerBroadcastDtoAudienceOneOfOnezero | TriggerBroadcastDtoAudienceOneOfOnetwo;
+
+export interface TriggerBroadcastDto {
+  audience: TriggerBroadcastDtoAudience;
+}
+
+export type TriggerBroadcastResponseDtoStatus = typeof TriggerBroadcastResponseDtoStatus[keyof typeof TriggerBroadcastResponseDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TriggerBroadcastResponseDtoStatus = {
+  pending: 'pending',
+  queued: 'queued',
+  failed: 'failed',
+} as const;
+
+export interface TriggerBroadcastResponseDto {
+  broadcastId: string;
+  status: TriggerBroadcastResponseDtoStatus;
+}
+
+export type ListBroadcastsResponseDtoBroadcastsItemStatus = typeof ListBroadcastsResponseDtoBroadcastsItemStatus[keyof typeof ListBroadcastsResponseDtoBroadcastsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListBroadcastsResponseDtoBroadcastsItemStatus = {
+  pending: 'pending',
+  queued: 'queued',
+  failed: 'failed',
+} as const;
+
+export type ListBroadcastsResponseDtoBroadcastsItem = {
+  publicId: string;
+  status: ListBroadcastsResponseDtoBroadcastsItemStatus;
+  /** @nullable */
+  matchedCount: number | null;
+  createdAt: unknown;
+};
+
+export interface ListBroadcastsResponseDto {
+  broadcasts: ListBroadcastsResponseDtoBroadcastsItem[];
+  limit: number;
+  offset: number;
+}
+
+export type BroadcastDetailResponseDtoStatus = typeof BroadcastDetailResponseDtoStatus[keyof typeof BroadcastDetailResponseDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BroadcastDetailResponseDtoStatus = {
+  pending: 'pending',
+  queued: 'queued',
+  failed: 'failed',
+} as const;
+
+export interface BroadcastDetailResponseDto {
+  publicId: string;
+  status: BroadcastDetailResponseDtoStatus;
+  /** @nullable */
+  matchedCount: number | null;
+  createdAt: unknown;
+  sentCount: number;
+  failedCount: number;
+  skippedCount: number;
+  pendingCount: number;
+}
+
 export type UpsertIntegrationDtoRoot = { [key: string]: unknown };
 
 export interface UpsertIntegrationDto {
@@ -913,6 +1073,18 @@ offset?: number;
 };
 
 export type ListWorkflowRunsParams = {
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
+};
+
+export type ListBroadcastsParams = {
 /**
  * @minimum 1
  * @maximum 100
@@ -2091,6 +2263,162 @@ export const listWorkflowRuns = async (environmentId: string,
     params?: ListWorkflowRunsParams, options?: RequestInit): Promise<listWorkflowRunsResponse> => {
   
   return cliFetch<listWorkflowRunsResponse>(getListWorkflowRunsUrl(environmentId,workflowId,params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+/**
+ * Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.
+ * @summary Trigger a broadcast
+ */
+export type triggerBroadcastResponse200 = {
+  data: TriggerBroadcastResponseDto
+  status: 200
+}
+
+export type triggerBroadcastResponse400 = {
+  data: void
+  status: 400
+}
+
+export type triggerBroadcastResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type triggerBroadcastResponseSuccess = (triggerBroadcastResponse200) & {
+  headers: Headers;
+};
+export type triggerBroadcastResponseError = (triggerBroadcastResponse400 | triggerBroadcastResponse404) & {
+  headers: Headers;
+};
+
+export type triggerBroadcastResponse = (triggerBroadcastResponseSuccess | triggerBroadcastResponseError)
+
+export const getTriggerBroadcastUrl = (environmentId: string,
+    workflowId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcast`
+}
+
+export const triggerBroadcast = async (environmentId: string,
+    workflowId: string,
+    triggerBroadcastDto: TriggerBroadcastDto, options?: RequestInit): Promise<triggerBroadcastResponse> => {
+  
+  return cliFetch<triggerBroadcastResponse>(getTriggerBroadcastUrl(environmentId,workflowId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      triggerBroadcastDto,)
+  }
+);}
+
+
+
+/**
+ * Returns a paginated list of broadcasts triggered for this workflow, most recent first
+ * @summary List broadcasts for a workflow
+ */
+export type listBroadcastsResponse200 = {
+  data: ListBroadcastsResponseDto
+  status: 200
+}
+
+export type listBroadcastsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type listBroadcastsResponseSuccess = (listBroadcastsResponse200) & {
+  headers: Headers;
+};
+export type listBroadcastsResponseError = (listBroadcastsResponse404) & {
+  headers: Headers;
+};
+
+export type listBroadcastsResponse = (listBroadcastsResponseSuccess | listBroadcastsResponseError)
+
+export const getListBroadcastsUrl = (environmentId: string,
+    workflowId: string,
+    params?: ListBroadcastsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/${workflowId}/broadcasts?${stringifiedParams}` : `/environments/${environmentId}/workflows/${workflowId}/broadcasts`
+}
+
+export const listBroadcasts = async (environmentId: string,
+    workflowId: string,
+    params?: ListBroadcastsParams, options?: RequestInit): Promise<listBroadcastsResponse> => {
+  
+  return cliFetch<listBroadcastsResponse>(getListBroadcastsUrl(environmentId,workflowId,params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+/**
+ * Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)
+ * @summary Get a broadcast
+ */
+export type getBroadcastResponse200 = {
+  data: BroadcastDetailResponseDto
+  status: 200
+}
+
+export type getBroadcastResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type getBroadcastResponseSuccess = (getBroadcastResponse200) & {
+  headers: Headers;
+};
+export type getBroadcastResponseError = (getBroadcastResponse404) & {
+  headers: Headers;
+};
+
+export type getBroadcastResponse = (getBroadcastResponseSuccess | getBroadcastResponseError)
+
+export const getGetBroadcastUrl = (environmentId: string,
+    workflowId: string,
+    broadcastId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}`
+}
+
+export const getBroadcast = async (environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: RequestInit): Promise<getBroadcastResponse> => {
+  
+  return cliFetch<getBroadcastResponse>(getGetBroadcastUrl(environmentId,workflowId,broadcastId),
   {      
     ...options,
     method: 'GET'

@@ -1,9 +1,10 @@
-import { NotFoundException } from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
+import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBroadcast.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
 import { WorkflowService } from "../workflow.service.js";
@@ -17,6 +18,13 @@ vi.mock("@subscriber.dev/db/repository/workflow.repo", () => ({
   replaceWorkflowSteps: vi.fn(),
   updateWorkflow: vi.fn(),
   softDeleteWorkflow: vi.fn(),
+}));
+
+vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
+  createBroadcast: vi.fn(),
+  listBroadcastsForWorkflow: vi.fn(),
+  getBroadcastByPublicId: vi.fn(),
+  getBroadcastStepCounts: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
@@ -39,12 +47,19 @@ const mockQueue = {
   remove: vi.fn(),
 };
 
+const mockBroadcastDispatchQueue = {
+  add: vi.fn(),
+};
+
 let service: WorkflowService;
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockQueue.remove.mockResolvedValue(undefined);
-  service = new WorkflowService(mockQueue as any);
+  service = new WorkflowService(
+    mockQueue as any,
+    mockBroadcastDispatchQueue as any,
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -452,5 +467,193 @@ describe("listRunsForEnvironment", () => {
     expect(result.runs[0]?.steps[0]).toEqual(
       expect.objectContaining({ type: "email", status: "sent" }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// triggerBroadcast
+// ---------------------------------------------------------------------------
+
+describe("triggerBroadcast", () => {
+  const workflow = { id: 1, key: "user-signup", status: "active" as const };
+  const steps = [
+    { id: 10, stepOrder: 0, type: "email", delayMs: 0, config: {} },
+  ];
+  const audience = { type: "optedIn" as const };
+
+  it("throws NotFoundException when the workflow does not exist", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(undefined);
+
+    await expect(
+      service.triggerBroadcast(mockDb, 10, "wf_missing", audience, 1),
+    ).rejects.toThrow(NotFoundException);
+    expect(workflowBroadcastRepo.createBroadcast).not.toHaveBeenCalled();
+  });
+
+  it("throws BadRequestException when the workflow is paused", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      ...workflow,
+      status: "paused",
+    } as any);
+
+    await expect(
+      service.triggerBroadcast(mockDb, 10, "wf_abc", audience, 1),
+    ).rejects.toThrow(BadRequestException);
+    expect(workflowBroadcastRepo.createBroadcast).not.toHaveBeenCalled();
+  });
+
+  it("throws BadRequestException when the workflow has no steps", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+
+    await expect(
+      service.triggerBroadcast(mockDb, 10, "wf_abc", audience, 1),
+    ).rejects.toThrow(BadRequestException);
+    expect(workflowBroadcastRepo.createBroadcast).not.toHaveBeenCalled();
+  });
+
+  it("creates the broadcast row and enqueues the dispatch job", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue(
+      steps as any,
+    );
+    vi.mocked(workflowBroadcastRepo.createBroadcast).mockResolvedValue({
+      id: 5,
+      publicId: "bc_abc",
+      status: "pending",
+    } as any);
+
+    const result = await service.triggerBroadcast(
+      mockDb,
+      10,
+      "wf_abc",
+      audience,
+      1,
+    );
+
+    expect(result).toEqual({ broadcastId: "bc_abc", status: "pending" });
+    expect(workflowBroadcastRepo.createBroadcast).toHaveBeenCalledWith(mockDb, {
+      workflowId: 1,
+      environmentId: 10,
+      audienceQuery: audience,
+      createdBy: 1,
+    });
+    expect(mockBroadcastDispatchQueue.add).toHaveBeenCalledWith(
+      "dispatch",
+      { broadcastId: 5 },
+      expect.objectContaining({ attempts: 3 }),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listBroadcasts
+// ---------------------------------------------------------------------------
+
+describe("listBroadcasts", () => {
+  it("maps broadcast rows to summaries", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      id: 1,
+    } as any);
+    vi.mocked(
+      workflowBroadcastRepo.listBroadcastsForWorkflow,
+    ).mockResolvedValue([
+      {
+        publicId: "bc_abc",
+        status: "queued",
+        matchedCount: 42,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+      },
+    ] as any);
+
+    const result = await service.listBroadcasts(mockDb, 10, "wf_abc", {
+      limit: 20,
+      offset: 0,
+    });
+
+    expect(result.broadcasts).toEqual([
+      {
+        publicId: "bc_abc",
+        status: "queued",
+        matchedCount: 42,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+      },
+    ]);
+    expect(result.limit).toBe(20);
+  });
+
+  it("throws NotFoundException when the workflow does not exist", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(undefined);
+
+    await expect(
+      service.listBroadcasts(mockDb, 10, "wf_missing", {
+        limit: 20,
+        offset: 0,
+      }),
+    ).rejects.toThrow(NotFoundException);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getBroadcast
+// ---------------------------------------------------------------------------
+
+describe("getBroadcast", () => {
+  it("returns the broadcast with derived step-outcome counts", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      id: 1,
+    } as any);
+    vi.mocked(workflowBroadcastRepo.getBroadcastByPublicId).mockResolvedValue({
+      id: 5,
+      publicId: "bc_abc",
+      status: "queued",
+      matchedCount: 3,
+      createdAt: new Date("2026-01-01T00:00:00Z"),
+    } as any);
+    vi.mocked(workflowBroadcastRepo.getBroadcastStepCounts).mockResolvedValue({
+      pending: 1,
+      sent: 2,
+      skipped: 0,
+      failed: 0,
+      cancelled: 0,
+    });
+
+    const result = await service.getBroadcast(mockDb, 10, "wf_abc", "bc_abc");
+
+    expect(result).toEqual({
+      publicId: "bc_abc",
+      status: "queued",
+      matchedCount: 3,
+      createdAt: new Date("2026-01-01T00:00:00Z"),
+      sentCount: 2,
+      failedCount: 0,
+      skippedCount: 0,
+      pendingCount: 1,
+    });
+  });
+
+  it("throws NotFoundException when the workflow does not exist", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(undefined);
+
+    await expect(
+      service.getBroadcast(mockDb, 10, "wf_missing", "bc_abc"),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it("throws NotFoundException when the broadcast does not exist", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      id: 1,
+    } as any);
+    vi.mocked(workflowBroadcastRepo.getBroadcastByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      service.getBroadcast(mockDb, 10, "wf_abc", "bc_missing"),
+    ).rejects.toThrow(NotFoundException);
   });
 });
