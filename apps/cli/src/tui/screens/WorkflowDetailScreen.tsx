@@ -10,6 +10,7 @@ import type {
 import {
   deleteWorkflow,
   getWorkflow,
+  previewBroadcast,
   triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
@@ -34,6 +35,8 @@ type BroadcastStatus =
   | "idle"
   | "choosing-audience"
   | "entering-tag"
+  | "previewing"
+  | "confirming"
   | "triggering"
   | "success"
   | "error";
@@ -74,6 +77,10 @@ export function WorkflowDetailScreen({
     useState<BroadcastStatus>("idle");
   const [broadcastTag, setBroadcastTag] = useState("");
   const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [pendingAudience, setPendingAudience] = useState<
+    TriggerBroadcastDto["audience"] | null
+  >(null);
+  const [pendingCount, setPendingCount] = useState<number | null>(null);
 
   const idle =
     deleteStatus === "idle" &&
@@ -171,13 +178,40 @@ export function WorkflowDetailScreen({
     }
   };
 
-  const handleSubmitBroadcast = async (
+  const handlePreviewBroadcast = async (
     audience: TriggerBroadcastDto["audience"],
   ) => {
+    setPendingAudience(audience);
+    setBroadcastStatus("previewing");
+    try {
+      const response = await previewBroadcast(environmentId, workflowId, {
+        audience,
+      } as TriggerBroadcastDto);
+      if (response.status === 400) {
+        setBroadcastMessage("Workflow is paused or has no steps.");
+        setBroadcastStatus("error");
+        return;
+      }
+      if (response.status === 404) {
+        setBroadcastMessage("Workflow not found.");
+        setBroadcastStatus("error");
+        return;
+      }
+      setPendingCount(response.data.matchedCount);
+      setBroadcastStatus("confirming");
+    } catch (err) {
+      setBroadcastMessage(err instanceof Error ? err.message : String(err));
+      setBroadcastStatus("error");
+    }
+  };
+
+  const handleSubmitBroadcast = async () => {
+    if (!pendingAudience) return;
+
     setBroadcastStatus("triggering");
     try {
       const response = await triggerBroadcast(environmentId, workflowId, {
-        audience,
+        audience: pendingAudience,
       } as TriggerBroadcastDto);
       if (response.status === 400) {
         setBroadcastMessage("Workflow is paused or has no steps.");
@@ -270,7 +304,7 @@ export function WorkflowDetailScreen({
           ]}
           onSelect={(item) => {
             if (item.value === "all") {
-              void handleSubmitBroadcast({ type: "optedIn" });
+              void handlePreviewBroadcast({ type: "optedIn" });
             } else {
               setBroadcastTag("");
               setBroadcastStatus("entering-tag");
@@ -287,13 +321,28 @@ export function WorkflowDetailScreen({
             onSubmit={(value) => {
               const trimmed = value.trim();
               if (!trimmed) return;
-              void handleSubmitBroadcast({
+              void handlePreviewBroadcast({
                 type: "and",
                 clauses: [{ type: "optedIn" }, { type: "tag", tag: trimmed }],
               });
             }}
           />
         </Box>
+      )}
+      {broadcastStatus === "previewing" && (
+        <Text color="gray">Checking audience size…</Text>
+      )}
+      {broadcastStatus === "confirming" && pendingCount !== null && (
+        <ConfirmPrompt
+          message={`Broadcast to ${pendingCount} matched subscriber${pendingCount === 1 ? "" : "s"}? This cannot be undone.`}
+          confirmLabel="Yes, send"
+          onConfirm={() => void handleSubmitBroadcast()}
+          onCancel={() => {
+            setPendingAudience(null);
+            setPendingCount(null);
+            setBroadcastStatus("idle");
+          }}
+        />
       )}
       {broadcastStatus === "triggering" && (
         <Text color="gray">Triggering broadcast…</Text>

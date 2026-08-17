@@ -1262,6 +1262,67 @@
         ]
       }
     },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcast/preview": {
+      "post": {
+        "operationId": "previewBroadcast",
+        "summary": "Preview a broadcast's audience size",
+        "description": "Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerBroadcastDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewBroadcastResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Workflow is paused or has no steps"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        },
+        "tags": [
+          "Workflows"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/environments/{environmentId}/workflows/{workflowId}/broadcast": {
       "post": {
         "operationId": "triggerBroadcast",
@@ -3373,6 +3434,17 @@
         },
         "required": [
           "audience"
+        ]
+      },
+      "PreviewBroadcastResponseDto": {
+        "type": "object",
+        "properties": {
+          "matchedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "matchedCount"
         ]
       },
       "TriggerBroadcastResponseDto": {

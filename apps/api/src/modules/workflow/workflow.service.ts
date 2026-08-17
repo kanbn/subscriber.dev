@@ -16,6 +16,7 @@ import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo
 import type { AudienceCondition } from "./audienceQuery.js";
 import type { WorkflowStepSchema } from "./dto/create-workflow.dto.js";
 import type { BroadcastDispatchJobData } from "./workflow.constants.js";
+import { resolveAudienceSubscriberIds } from "./audienceQuery.js";
 import { createRunForSubscriber } from "./createRunForSubscriber.js";
 import {
   BROADCAST_DISPATCH_JOB_NAME,
@@ -361,12 +362,10 @@ export class WorkflowService {
     );
   }
 
-  async triggerBroadcast(
+  private async getWorkflowReadyForBroadcast(
     db: dbClient,
     environmentId: number,
     workflowPublicId: string,
-    audience: AudienceCondition,
-    triggeredBy: number,
   ) {
     const workflow = await workflowRepo.getWorkflowByPublicId(
       db,
@@ -382,6 +381,43 @@ export class WorkflowService {
     if (steps.length === 0) {
       throw new BadRequestException("Workflow has no steps");
     }
+
+    return workflow;
+  }
+
+  async previewBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    audience: AudienceCondition,
+  ) {
+    await this.getWorkflowReadyForBroadcast(
+      db,
+      environmentId,
+      workflowPublicId,
+    );
+
+    const subscriberIds = await resolveAudienceSubscriberIds(
+      db,
+      environmentId,
+      audience,
+    );
+
+    return { matchedCount: subscriberIds.length };
+  }
+
+  async triggerBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    audience: AudienceCondition,
+    triggeredBy: number,
+  ) {
+    const workflow = await this.getWorkflowReadyForBroadcast(
+      db,
+      environmentId,
+      workflowPublicId,
+    );
 
     const broadcast = await workflowBroadcastRepo.createBroadcast(db, {
       workflowId: workflow.id,

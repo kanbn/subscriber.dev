@@ -27,6 +27,7 @@ const mockService = {
   triggerWorkflow: vi.fn(),
   listRuns: vi.fn(),
   triggerBroadcast: vi.fn(),
+  previewBroadcast: vi.fn(),
   listBroadcasts: vi.fn(),
   getBroadcast: vi.fn(),
 };
@@ -145,6 +146,37 @@ describe("listWorkflowRuns", () => {
       limit: 20,
       offset: 0,
     });
+  });
+});
+
+describe("previewBroadcast", () => {
+  it("delegates to the service when the environment exists", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    mockService.previewBroadcast.mockResolvedValue({ matchedCount: 42 });
+
+    const result = await controller.previewBroadcast("env_abc", "wf_1", {
+      audience: { type: "optedIn" },
+    } as any);
+
+    expect(result).toEqual({ matchedCount: 42 });
+    expect(mockService.previewBroadcast).toHaveBeenCalledWith({}, 10, "wf_1", {
+      type: "optedIn",
+    });
+  });
+
+  it("throws NotFoundException when the environment doesn't exist", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      controller.previewBroadcast("env_missing", "wf_1", {
+        audience: { type: "optedIn" },
+      } as any),
+    ).rejects.toThrow(NotFoundException);
+    expect(mockService.previewBroadcast).not.toHaveBeenCalled();
   });
 });
 

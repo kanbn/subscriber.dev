@@ -31,6 +31,7 @@ import {
   BroadcastDetailResponseDto,
   ListBroadcastsQueryDto,
   ListBroadcastsResponseDto,
+  PreviewBroadcastResponseDto,
   TriggerBroadcastDto,
   TriggerBroadcastResponseDto,
 } from "./dto/broadcast.dto.js";
@@ -332,6 +333,45 @@ export class WorkflowController {
       limit: query.limit,
       offset: query.offset,
     });
+  }
+
+  @Post(":workflowId/broadcast/preview")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "previewBroadcast",
+    summary: "Preview a broadcast's audience size",
+    description:
+      "Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "workflowId", type: "string" })
+  @ApiResponse({ status: 200, type: PreviewBroadcastResponseDto })
+  @ApiResponse({
+    status: 400,
+    description: "Workflow is paused or has no steps",
+  })
+  @ApiResponse({ status: 404, description: "Workflow not found" })
+  async previewBroadcast(
+    @Param("environmentId") environmentId: string,
+    @Param("workflowId") workflowId: string,
+    @Body() input: TriggerBroadcastDto,
+  ): Promise<PreviewBroadcastResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.workflowService.previewBroadcast(
+      db,
+      environment.id,
+      workflowId,
+      input.audience,
+    );
   }
 
   @Post(":workflowId/broadcast")

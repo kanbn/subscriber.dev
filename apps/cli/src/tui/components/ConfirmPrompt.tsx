@@ -3,10 +3,14 @@ import SelectInput from "ink-select-input";
 
 export function ConfirmPrompt({
   message,
+  confirmLabel = "Yes, delete",
+  cancelLabel = "No, cancel",
   onConfirm,
   onCancel,
 }: {
   message: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -15,8 +19,8 @@ export function ConfirmPrompt({
       <Text color="yellow">{message}</Text>
       <SelectInput
         items={[
-          { label: "No, cancel", value: "cancel" as const },
-          { label: "Yes, delete", value: "confirm" as const },
+          { label: cancelLabel, value: "cancel" as const },
+          { label: confirmLabel, value: "confirm" as const },
         ]}
         onSelect={(item) => {
           if (item.value === "confirm") onConfirm();

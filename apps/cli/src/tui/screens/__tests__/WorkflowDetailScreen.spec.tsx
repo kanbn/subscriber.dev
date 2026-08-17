@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   deleteWorkflow,
   getWorkflow,
+  previewBroadcast,
   triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
@@ -17,6 +18,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   triggerWorkflow: vi.fn(),
   updateWorkflow: vi.fn(),
   triggerBroadcast: vi.fn(),
+  previewBroadcast: vi.fn(),
 }));
 
 const testWorkflow = {
@@ -410,11 +412,11 @@ describe("WorkflowDetailScreen broadcast", () => {
     expect(lastFrame()).toContain("Opted-in subscribers with a tag");
   });
 
-  it("triggers with an optedIn audience for the default menu item", async () => {
-    vi.mocked(triggerBroadcast).mockResolvedValue({
+  it("previews the matched audience size before asking to confirm, defaulting to cancel", async () => {
+    vi.mocked(previewBroadcast).mockResolvedValue({
       status: 200,
       headers: new Headers(),
-      data: { broadcastId: "bc_1", status: "pending" },
+      data: { matchedCount: 4231 },
     } as never);
     const { lastFrame, stdin } = await loaded();
 
@@ -428,17 +430,50 @@ describe("WorkflowDetailScreen broadcast", () => {
     stdin.write("\r");
 
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain("Broadcast queued: bc_1");
+      expect(lastFrame()).toContain(
+        "Broadcast to 4231 matched subscribers? This cannot be undone.",
+      );
     });
-    expect(triggerBroadcast).toHaveBeenCalledWith(
+    expect(previewBroadcast).toHaveBeenCalledWith(
       "test-environment-1",
       "test-workflow-1",
       { audience: { type: "optedIn" } },
     );
+    // Default-selected item is "No, cancel" — the confirm step must not
+    // fire the actual broadcast on its own.
+    expect(triggerBroadcast).not.toHaveBeenCalled();
   });
 
-  it("shows an error when the workflow is paused or has no steps", async () => {
-    vi.mocked(triggerBroadcast).mockResolvedValue({
+  it("cancels without triggering when 'No, cancel' (the default) is confirmed", async () => {
+    vi.mocked(previewBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { matchedCount: 4231 },
+    } as never);
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("b");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("All opted-in subscribers");
+    });
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("This cannot be undone.");
+    });
+
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("This cannot be undone.");
+    });
+    expect(triggerBroadcast).not.toHaveBeenCalled();
+  });
+
+  it("shows an error from the preview when the workflow is paused or has no steps", async () => {
+    vi.mocked(previewBroadcast).mockResolvedValue({
       status: 400,
       headers: new Headers(),
       data: undefined,
@@ -457,5 +492,6 @@ describe("WorkflowDetailScreen broadcast", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Workflow is paused or has no steps.");
     });
+    expect(triggerBroadcast).not.toHaveBeenCalled();
   });
 });

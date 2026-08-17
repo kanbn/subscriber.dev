@@ -14,6 +14,10 @@ export const TriggerBroadcastResponseSchema = z.object({
   status: z.enum(workflowBroadcastStatuses),
 });
 
+export const PreviewBroadcastResponseSchema = z.object({
+  matchedCount: z.number(),
+});
+
 export const ListBroadcastsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
   offset: z.coerce.number().int().min(0).default(0),
@@ -42,6 +46,9 @@ export const BroadcastDetailResponseSchema = BroadcastSummarySchema.extend({
 export class TriggerBroadcastDto extends createZodDto(TriggerBroadcastSchema) {}
 export class TriggerBroadcastResponseDto extends createZodDto(
   TriggerBroadcastResponseSchema,
+) {}
+export class PreviewBroadcastResponseDto extends createZodDto(
+  PreviewBroadcastResponseSchema,
 ) {}
 export class ListBroadcastsQueryDto extends createZodDto(
   ListBroadcastsQuerySchema,

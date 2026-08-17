@@ -7,7 +7,12 @@ import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBroadcast.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
+import { resolveAudienceSubscriberIds } from "../audienceQuery.js";
 import { WorkflowService } from "../workflow.service.js";
+
+vi.mock("../audienceQuery.js", () => ({
+  resolveAudienceSubscriberIds: vi.fn(),
+}));
 
 vi.mock("@subscriber.dev/db/repository/workflow.repo", () => ({
   getWorkflowByKey: vi.fn(),
@@ -467,6 +472,72 @@ describe("listRunsForEnvironment", () => {
     expect(result.runs[0]?.steps[0]).toEqual(
       expect.objectContaining({ type: "email", status: "sent" }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// previewBroadcast
+// ---------------------------------------------------------------------------
+
+describe("previewBroadcast", () => {
+  const workflow = { id: 1, key: "user-signup", status: "active" as const };
+  const steps = [
+    { id: 10, stepOrder: 0, type: "email", delayMs: 0, config: {} },
+  ];
+  const audience = { type: "optedIn" as const };
+
+  it("returns the resolved audience size without creating a broadcast", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue(
+      steps as any,
+    );
+    vi.mocked(resolveAudienceSubscriberIds).mockResolvedValue([1, 2, 3]);
+
+    const result = await service.previewBroadcast(
+      mockDb,
+      10,
+      "wf_abc",
+      audience,
+    );
+
+    expect(result).toEqual({ matchedCount: 3 });
+    expect(workflowBroadcastRepo.createBroadcast).not.toHaveBeenCalled();
+    expect(mockBroadcastDispatchQueue.add).not.toHaveBeenCalled();
+  });
+
+  it("throws NotFoundException when the workflow does not exist", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(undefined);
+
+    await expect(
+      service.previewBroadcast(mockDb, 10, "wf_missing", audience),
+    ).rejects.toThrow(NotFoundException);
+    expect(resolveAudienceSubscriberIds).not.toHaveBeenCalled();
+  });
+
+  it("throws BadRequestException when the workflow is paused", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      ...workflow,
+      status: "paused",
+    } as any);
+
+    await expect(
+      service.previewBroadcast(mockDb, 10, "wf_abc", audience),
+    ).rejects.toThrow(BadRequestException);
+    expect(resolveAudienceSubscriberIds).not.toHaveBeenCalled();
+  });
+
+  it("throws BadRequestException when the workflow has no steps", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+
+    await expect(
+      service.previewBroadcast(mockDb, 10, "wf_abc", audience),
+    ).rejects.toThrow(BadRequestException);
+    expect(resolveAudienceSubscriberIds).not.toHaveBeenCalled();
   });
 });
 
