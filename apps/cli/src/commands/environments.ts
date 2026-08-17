@@ -1,6 +1,9 @@
 import type { Command } from "commander";
 
-import { listEnvironments } from "@subscriber.dev/api-client/cli";
+import {
+  createEnvironment,
+  listEnvironments,
+} from "@subscriber.dev/api-client/cli";
 import { updateCliConfig } from "@subscriber.dev/shared";
 
 import { ensureLoggedIn } from "../auth.js";
@@ -35,6 +38,32 @@ export function registerEnvironmentsCommand(program: Command): void {
 
         printResult(response.data.environments, opts);
       }),
+    );
+
+  environments
+    .command("create <name>")
+    .description("Create a new environment in a workspace")
+    .option(
+      "--workspace <workspaceId>",
+      "workspace public ID (defaults to the current workspace)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (name: string, opts: { workspace?: string; json?: boolean }) => {
+          ensureLoggedIn();
+          const workspaceId = requireWorkspaceId(opts);
+
+          const response = await createEnvironment(workspaceId, { name });
+          if (response.status === 404) {
+            console.error("Workspace not found.");
+            process.exitCode = 1;
+            return;
+          }
+
+          printResult(response.data, opts);
+        },
+      ),
     );
 
   environments

@@ -1,13 +1,17 @@
 import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { listEnvironments } from "@subscriber.dev/api-client/cli";
+import {
+  createEnvironment,
+  listEnvironments,
+} from "@subscriber.dev/api-client/cli";
 import { readCliConfig, updateCliConfig } from "@subscriber.dev/shared";
 
 import { registerEnvironmentsCommand } from "../environments.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   listEnvironments: vi.fn(),
+  createEnvironment: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
@@ -108,6 +112,92 @@ describe("environments list", () => {
     expect(listEnvironments).not.toHaveBeenCalled();
 
     exitSpy.mockRestore();
+  });
+});
+
+describe("environments create", () => {
+  beforeEach(() => {
+    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+  });
+
+  it("uses the --workspace flag when passed", async () => {
+    vi.mocked(createEnvironment).mockResolvedValue({
+      status: 201,
+      headers: new Headers(),
+      data: {
+        id: 2,
+        publicId: "test-environment-2",
+        name: "Staging",
+        slug: "staging",
+      },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      [
+        "environments",
+        "create",
+        "Staging",
+        "--workspace",
+        "explicit-workspace",
+      ],
+      { from: "user" },
+    );
+
+    expect(createEnvironment).toHaveBeenCalledWith("explicit-workspace", {
+      name: "Staging",
+    });
+  });
+
+  it("falls back to the stored current workspace", async () => {
+    vi.mocked(readCliConfig).mockReturnValue({
+      apiKey: "test-key",
+      currentWorkspaceId: "stored-workspace",
+    });
+    vi.mocked(createEnvironment).mockResolvedValue({
+      status: 201,
+      headers: new Headers(),
+      data: {
+        id: 2,
+        publicId: "test-environment-2",
+        name: "Staging",
+        slug: "staging",
+      },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(["environments", "create", "Staging"], {
+      from: "user",
+    });
+
+    expect(createEnvironment).toHaveBeenCalledWith("stored-workspace", {
+      name: "Staging",
+    });
+  });
+
+  it("prints an error and exits when the workspace isn't found", async () => {
+    vi.mocked(readCliConfig).mockReturnValue({
+      apiKey: "test-key",
+      currentWorkspaceId: "stored-workspace",
+    });
+    vi.mocked(createEnvironment).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(["environments", "create", "Staging"], {
+      from: "user",
+    });
+
+    expect(errorSpy).toHaveBeenCalledWith("Workspace not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
   });
 });
 

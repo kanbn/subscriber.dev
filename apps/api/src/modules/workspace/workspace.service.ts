@@ -92,6 +92,35 @@ export class WorkspaceService {
     return result;
   }
 
+  async createEnvironment(
+    db: dbClient,
+    workspaceId: number,
+    userId: number,
+    data: { name: string },
+  ) {
+    const slug = generateSlug(data.name);
+
+    const [environment] = await db
+      .insert(environments)
+      .values({
+        workspaceId,
+        name: data.name,
+        slug,
+        createdBy: userId,
+        updatedBy: userId,
+      })
+      .returning();
+
+    if (!environment) throw new Error("Failed to create environment");
+
+    return {
+      id: environment.id,
+      publicId: environment.publicId,
+      name: environment.name,
+      slug: environment.slug,
+    };
+  }
+
   async listEnvironmentsForWorkspace(db: dbClient, workspaceId: number) {
     return await db
       .select({

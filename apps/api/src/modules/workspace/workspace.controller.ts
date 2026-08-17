@@ -23,11 +23,13 @@ import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { UserService } from "../user/user.service.js";
+import { CreateEnvironmentDto } from "./dto/create-environment.dto.js";
 import {
   CreateWorkspaceDto,
   CreateWorkspaceResponseDto,
 } from "./dto/create-workspace.dto.js";
 import {
+  EnvironmentDto,
   ListEnvironmentsResponseDto,
   WorkspaceDto,
 } from "./dto/get-workspace.dto.js";
@@ -102,5 +104,34 @@ export class WorkspaceController {
       );
 
     return { environments };
+  }
+
+  @Post(":workspaceId/environments")
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    operationId: "createEnvironment",
+    summary: "Create a new environment in a workspace",
+  })
+  @ApiParam({ name: "workspaceId", type: "string" })
+  @ApiResponse({ status: 201, type: EnvironmentDto })
+  @ApiResponse({ status: 404, description: "Workspace not found" })
+  async createEnvironment(
+    @CurrentUser() user: User,
+    @Param("workspaceId") workspaceId: string,
+    @Body() input: CreateEnvironmentDto,
+  ): Promise<EnvironmentDto> {
+    const db = createDrizzleClient();
+    const workspace = await this.workspaceService.getWorkspaceForUser(
+      db,
+      user.id,
+      workspaceId,
+    );
+    if (!workspace) {
+      throw new NotFoundException("Workspace not found");
+    }
+
+    return this.workspaceService.createEnvironment(db, workspace.id, user.id, {
+      name: input.name,
+    });
   }
 }
