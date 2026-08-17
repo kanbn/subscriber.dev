@@ -6,11 +6,13 @@ import type {
   UpdateSubscriberDto,
 } from "@subscriber.dev/api-client/cli";
 import {
+  addSubscriberTag,
   bulkUpsertSubscribers,
   createSubscriber,
   deleteSubscriber,
   getSubscriber,
   listSubscribers,
+  removeSubscriberTag,
   updateSubscriber,
   updateSubscriberPreferences,
 } from "@subscriber.dev/api-client/cli";
@@ -292,6 +294,71 @@ export function registerSubscribersCommand(program: Command): void {
             return;
           }
           printResult(response.data, opts);
+        },
+      ),
+    );
+
+  subscribers
+    .command("tag <subscriberId>")
+    .description("Add or remove a tag on a subscriber")
+    .option("--add <tag>", "tag to add")
+    .option("--remove <tag>", "tag to remove")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          subscriberId: string,
+          opts: {
+            add?: string;
+            remove?: string;
+            environment?: string;
+            json?: boolean;
+          },
+        ) => {
+          ensureLoggedIn();
+
+          const tagToAdd = opts.add;
+          const tagToRemove = opts.remove;
+
+          if ((tagToAdd && tagToRemove) || (!tagToAdd && !tagToRemove)) {
+            console.error("Pass exactly one of --add or --remove.");
+            process.exitCode = 1;
+            return;
+          }
+
+          const environmentId = requireEnvironmentId(opts);
+
+          if (tagToAdd) {
+            const response = await addSubscriberTag(
+              environmentId,
+              subscriberId,
+              { tag: tagToAdd },
+            );
+            if (response.status === 404) {
+              console.error("Subscriber not found.");
+              process.exitCode = 1;
+              return;
+            }
+            printResult(response.data, opts);
+            return;
+          }
+          if (!tagToRemove) return;
+
+          const response = await removeSubscriberTag(
+            environmentId,
+            subscriberId,
+            tagToRemove,
+          );
+          if (response.status === 404) {
+            console.error("Subscriber not found.");
+            process.exitCode = 1;
+            return;
+          }
+          console.log(`Removed tag "${opts.remove}" from ${subscriberId}.`);
         },
       ),
     );

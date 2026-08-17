@@ -64,6 +64,9 @@ const mockService = {
   deleteSubscriber: vi.fn(),
   updatePreferences: vi.fn(),
   bulkUpsertSubscribers: vi.fn(),
+  addTag: vi.fn(),
+  removeTag: vi.fn(),
+  listTags: vi.fn(),
 };
 
 let controller: SubscriberController;
@@ -400,5 +403,124 @@ describe("deleteSubscriber", () => {
     await expect(
       controller.deleteSubscriber(mockUser as any, "env_abc", "sub_missing"),
     ).rejects.toThrow(NotFoundException);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// POST /:subscriberId/tags — addTag
+// ---------------------------------------------------------------------------
+
+describe("addTag", () => {
+  it("adds the tag when environment exists", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    mockService.addTag.mockResolvedValue({ tag: "vip" });
+
+    const result = await controller.addTag(
+      mockUser as any,
+      "env_abc",
+      "sub_abc",
+      {
+        tag: "vip",
+      } as any,
+    );
+
+    expect(result).toEqual({ tag: "vip" });
+    expect(mockService.addTag).toHaveBeenCalledWith(
+      {},
+      10,
+      "sub_abc",
+      "vip",
+      1,
+    );
+  });
+
+  it("throws NotFoundException when environment does not exist", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      controller.addTag(mockUser as any, "env_missing", "sub_abc", {
+        tag: "vip",
+      } as any),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it("propagates NotFoundException from service", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    mockService.addTag.mockRejectedValue(
+      new NotFoundException("Subscriber not found"),
+    );
+
+    await expect(
+      controller.addTag(mockUser as any, "env_abc", "sub_missing", {
+        tag: "vip",
+      } as any),
+    ).rejects.toThrow(NotFoundException);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// DELETE /:subscriberId/tags/:tag — removeTag
+// ---------------------------------------------------------------------------
+
+describe("removeTag", () => {
+  it("removes the tag and returns void", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    mockService.removeTag.mockResolvedValue(undefined);
+
+    const result = await controller.removeTag("env_abc", "sub_abc", "vip");
+
+    expect(result).toBeUndefined();
+    expect(mockService.removeTag).toHaveBeenCalledWith(
+      {},
+      10,
+      "sub_abc",
+      "vip",
+    );
+  });
+
+  it("throws NotFoundException when environment does not exist", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      controller.removeTag("env_missing", "sub_abc", "vip"),
+    ).rejects.toThrow(NotFoundException);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /tags — listTags
+// ---------------------------------------------------------------------------
+
+describe("listTags", () => {
+  it("returns the distinct tags when environment exists", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    mockService.listTags.mockResolvedValue({ tags: ["beta", "vip"] });
+
+    const result = await controller.listTags("env_abc");
+
+    expect(result).toEqual({ tags: ["beta", "vip"] });
+    expect(mockService.listTags).toHaveBeenCalledWith({}, 10);
+  });
+
+  it("throws NotFoundException when environment does not exist", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(controller.listTags("env_missing")).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });

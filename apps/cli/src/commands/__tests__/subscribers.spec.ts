@@ -3,11 +3,13 @@ import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  addSubscriberTag,
   bulkUpsertSubscribers,
   createSubscriber,
   deleteSubscriber,
   getSubscriber,
   listSubscribers,
+  removeSubscriberTag,
   updateSubscriber,
   updateSubscriberPreferences,
 } from "@subscriber.dev/api-client/cli";
@@ -23,6 +25,8 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   deleteSubscriber: vi.fn(),
   bulkUpsertSubscribers: vi.fn(),
   updateSubscriberPreferences: vi.fn(),
+  addSubscriberTag: vi.fn(),
+  removeSubscriberTag: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
@@ -606,6 +610,123 @@ describe("subscribers bulk", () => {
     );
 
     expect(errorSpy).toHaveBeenCalledWith("Environment not found.");
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("subscribers tag", () => {
+  it("adds a tag with --add", async () => {
+    vi.mocked(addSubscriberTag).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { tag: "vip" },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["subscribers", "tag", "test-subscriber-1", "--add", "vip"],
+      { from: "user" },
+    );
+
+    expect(addSubscriberTag).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-subscriber-1",
+      { tag: "vip" },
+    );
+  });
+
+  it("removes a tag with --remove", async () => {
+    vi.mocked(removeSubscriberTag).mockResolvedValue({
+      status: 204,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["subscribers", "tag", "test-subscriber-1", "--remove", "vip"],
+      { from: "user" },
+    );
+
+    expect(removeSubscriberTag).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-subscriber-1",
+      "vip",
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      'Removed tag "vip" from test-subscriber-1.',
+    );
+  });
+
+  it("errors without calling the API when neither flag is passed", async () => {
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["subscribers", "tag", "test-subscriber-1"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Pass exactly one of --add or --remove.",
+    );
+    expect(process.exitCode).toBe(1);
+    expect(addSubscriberTag).not.toHaveBeenCalled();
+    expect(removeSubscriberTag).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("errors without calling the API when both flags are passed", async () => {
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      [
+        "subscribers",
+        "tag",
+        "test-subscriber-1",
+        "--add",
+        "vip",
+        "--remove",
+        "beta",
+      ],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Pass exactly one of --add or --remove.",
+    );
+    expect(process.exitCode).toBe(1);
+    expect(addSubscriberTag).not.toHaveBeenCalled();
+    expect(removeSubscriberTag).not.toHaveBeenCalled();
+
+    process.exitCode = undefined;
+  });
+
+  it("prints an error and exits on a 404 when adding", async () => {
+    vi.mocked(addSubscriberTag).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["subscribers", "tag", "missing", "--add", "vip"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith("Subscriber not found.");
     expect(process.exitCode).toBe(1);
 
     process.exitCode = undefined;

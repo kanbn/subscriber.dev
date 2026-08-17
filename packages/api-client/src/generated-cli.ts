@@ -139,6 +139,10 @@ export interface ListSubscribersResponseDto {
   offset: number;
 }
 
+export interface ListTagsResponseDto {
+  tags: string[];
+}
+
 /**
  * @nullable
  */
@@ -164,6 +168,7 @@ export type GetSubscriberResponseDtoSubscriber = {
   updatedAt?: unknown;
   /** @nullable */
   unsubscribeUrl?: string | null;
+  tags?: string[];
 };
 
 /**
@@ -409,6 +414,18 @@ export type UpdatePreferencesResponseDtoPreferences = {
 
 export interface UpdatePreferencesResponseDto {
   preferences: UpdatePreferencesResponseDtoPreferences;
+}
+
+export interface AddTagDto {
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  tag: string;
+}
+
+export interface TagResponseDto {
+  tag: string;
 }
 
 export interface UnsubscribeBodyDto {
@@ -1274,6 +1291,50 @@ export const createSubscriber = async (environmentId: string,
 
 
 /**
+ * Returns every distinct tag currently in use across subscribers in the environment
+ * @summary List distinct tags
+ */
+export type listTagsResponse200 = {
+  data: ListTagsResponseDto
+  status: 200
+}
+
+export type listTagsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type listTagsResponseSuccess = (listTagsResponse200) & {
+  headers: Headers;
+};
+export type listTagsResponseError = (listTagsResponse404) & {
+  headers: Headers;
+};
+
+export type listTagsResponse = (listTagsResponseSuccess | listTagsResponseError)
+
+export const getListTagsUrl = (environmentId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/subscribers/tags`
+}
+
+export const listTags = async (environmentId: string, options?: RequestInit): Promise<listTagsResponse> => {
+  
+  return cliFetch<listTagsResponse>(getListTagsUrl(environmentId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+/**
  * Returns a single subscriber with their latest preferences
  * @summary Get a subscriber
  */
@@ -1502,6 +1563,101 @@ export const updateSubscriberPreferences = async (environmentId: string,
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
       updatePreferencesDto,)
+  }
+);}
+
+
+
+/**
+ * Adds a tag to the subscriber. Adding a tag that's already present is a no-op.
+ * @summary Add a tag to a subscriber
+ */
+export type addSubscriberTagResponse200 = {
+  data: TagResponseDto
+  status: 200
+}
+
+export type addSubscriberTagResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type addSubscriberTagResponseSuccess = (addSubscriberTagResponse200) & {
+  headers: Headers;
+};
+export type addSubscriberTagResponseError = (addSubscriberTagResponse404) & {
+  headers: Headers;
+};
+
+export type addSubscriberTagResponse = (addSubscriberTagResponseSuccess | addSubscriberTagResponseError)
+
+export const getAddSubscriberTagUrl = (environmentId: string,
+    subscriberId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/subscribers/${subscriberId}/tags`
+}
+
+export const addSubscriberTag = async (environmentId: string,
+    subscriberId: string,
+    addTagDto: AddTagDto, options?: RequestInit): Promise<addSubscriberTagResponse> => {
+  
+  return cliFetch<addSubscriberTagResponse>(getAddSubscriberTagUrl(environmentId,subscriberId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      addTagDto,)
+  }
+);}
+
+
+
+/**
+ * @summary Remove a tag from a subscriber
+ */
+export type removeSubscriberTagResponse204 = {
+  data: void
+  status: 204
+}
+
+export type removeSubscriberTagResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type removeSubscriberTagResponseSuccess = (removeSubscriberTagResponse204) & {
+  headers: Headers;
+};
+export type removeSubscriberTagResponseError = (removeSubscriberTagResponse404) & {
+  headers: Headers;
+};
+
+export type removeSubscriberTagResponse = (removeSubscriberTagResponseSuccess | removeSubscriberTagResponseError)
+
+export const getRemoveSubscriberTagUrl = (environmentId: string,
+    subscriberId: string,
+    tag: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/subscribers/${subscriberId}/tags/${tag}`
+}
+
+export const removeSubscriberTag = async (environmentId: string,
+    subscriberId: string,
+    tag: string, options?: RequestInit): Promise<removeSubscriberTagResponse> => {
+  
+  return cliFetch<removeSubscriberTagResponse>(getRemoveSubscriberTagUrl(environmentId,subscriberId,tag),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
   }
 );}
 

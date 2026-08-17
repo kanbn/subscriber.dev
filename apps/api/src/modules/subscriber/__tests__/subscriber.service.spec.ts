@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as repo from "@subscriber.dev/db/repository/subscriber.repo";
+import * as tagRepo from "@subscriber.dev/db/repository/subscriberTag.repo";
 import * as sharedUtils from "@subscriber.dev/shared/utils";
 
 import { SubscriberService } from "../subscriber.service.js";
@@ -21,6 +22,13 @@ vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
   softDeleteSubscriber: vi.fn(),
   createSubscriberPreferences: vi.fn(),
   getLatestPreferences: vi.fn(),
+}));
+
+vi.mock("@subscriber.dev/db/repository/subscriberTag.repo", () => ({
+  addTag: vi.fn(),
+  removeTag: vi.fn(),
+  listTagsForSubscriber: vi.fn(),
+  listDistinctTagsForEnvironment: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared/utils", () => ({
@@ -85,6 +93,7 @@ let service: SubscriberService;
 beforeEach(() => {
   vi.clearAllMocks();
   service = new SubscriberService(mockWorkflowService as any);
+  vi.mocked(tagRepo.listTagsForSubscriber).mockResolvedValue([]);
 });
 
 // ---------------------------------------------------------------------------
@@ -99,6 +108,9 @@ describe("getSubscriber", () => {
     vi.mocked(repo.getLatestPreferences).mockResolvedValue(
       mockPreferences as any,
     );
+    vi.mocked(tagRepo.listTagsForSubscriber).mockResolvedValue([
+      { id: 1, tag: "vip" } as any,
+    ]);
 
     const result = await service.getSubscriber(mockDb, 10, "sub_abc");
 
@@ -106,6 +118,7 @@ describe("getSubscriber", () => {
     expect(result.subscriber.unsubscribeUrl).toBe(
       "https://api.example.com/unsubscribe?token=sub_abc",
     );
+    expect(result.subscriber.tags).toEqual(["vip"]);
     expect(result.preferences?.email).toBe(true);
   });
 
@@ -606,5 +619,70 @@ describe("unsubscribeByToken", () => {
 
     expect(result).toEqual({ unsubscribed: true });
     expect(repo.createSubscriberPreferences).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// addTag / removeTag / listTags
+// ---------------------------------------------------------------------------
+
+describe("addTag", () => {
+  it("adds the tag and returns it", async () => {
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
+      mockSubscriber as any,
+    );
+
+    const result = await service.addTag(mockDb, 10, "sub_abc", "vip", 1);
+
+    expect(result).toEqual({ tag: "vip" });
+    expect(tagRepo.addTag).toHaveBeenCalledWith(mockDb, {
+      subscriberId: 1,
+      environmentId: 10,
+      tag: "vip",
+      createdBy: 1,
+    });
+  });
+
+  it("throws NotFoundException when the subscriber does not exist", async () => {
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(undefined);
+
+    await expect(
+      service.addTag(mockDb, 10, "sub_missing", "vip", 1),
+    ).rejects.toThrow(NotFoundException);
+    expect(tagRepo.addTag).not.toHaveBeenCalled();
+  });
+});
+
+describe("removeTag", () => {
+  it("removes the tag", async () => {
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(
+      mockSubscriber as any,
+    );
+
+    await service.removeTag(mockDb, 10, "sub_abc", "vip");
+
+    expect(tagRepo.removeTag).toHaveBeenCalledWith(mockDb, 1, "vip");
+  });
+
+  it("throws NotFoundException when the subscriber does not exist", async () => {
+    vi.mocked(repo.getSubscriberByPublicId).mockResolvedValue(undefined);
+
+    await expect(
+      service.removeTag(mockDb, 10, "sub_missing", "vip"),
+    ).rejects.toThrow(NotFoundException);
+    expect(tagRepo.removeTag).not.toHaveBeenCalled();
+  });
+});
+
+describe("listTags", () => {
+  it("returns the distinct tags for the environment", async () => {
+    vi.mocked(tagRepo.listDistinctTagsForEnvironment).mockResolvedValue([
+      "beta",
+      "vip",
+    ]);
+
+    const result = await service.listTags(mockDb, 10);
+
+    expect(result).toEqual({ tags: ["beta", "vip"] });
   });
 });

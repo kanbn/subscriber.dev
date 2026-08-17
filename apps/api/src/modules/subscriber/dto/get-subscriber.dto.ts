@@ -6,8 +6,12 @@ import {
   SubscriberSchema,
 } from "./create-subscriber.dto.js";
 
+export const SubscriberWithTagsSchema = SubscriberSchema.extend({
+  tags: z.array(z.string()),
+});
+
 export const GetSubscriberResponseSchema = z.object({
-  subscriber: SubscriberSchema,
+  subscriber: SubscriberWithTagsSchema,
   preferences: SubscriberPreferencesSchema.nullable(),
 });
 

@@ -7,6 +7,7 @@ import {
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
+import * as subscriberTagRepo from "@subscriber.dev/db/repository/subscriberTag.repo";
 import {
   createEmailUnsubscribeLink,
   verifyEmailUnsubscribeToken,
@@ -497,9 +498,16 @@ export class SubscriberService {
       db,
       subscriber.id,
     );
+    const tags = await subscriberTagRepo.listTagsForSubscriber(
+      db,
+      subscriber.id,
+    );
 
     return {
-      subscriber: await this.toSubscriberDto(subscriber),
+      subscriber: {
+        ...(await this.toSubscriberDto(subscriber)),
+        tags: tags.map((t) => t.tag),
+      },
       preferences: preferences
         ? {
             publicId: preferences.publicId,
@@ -509,6 +517,58 @@ export class SubscriberService {
           }
         : null,
     };
+  }
+
+  async addTag(
+    db: dbClient,
+    environmentId: number,
+    subscriberPublicId: string,
+    tag: string,
+    createdBy: number,
+  ) {
+    const subscriber = await subscriberRepo.getSubscriberByPublicId(
+      db,
+      environmentId,
+      subscriberPublicId,
+    );
+    if (!subscriber) {
+      throw new NotFoundException("Subscriber not found");
+    }
+
+    await subscriberTagRepo.addTag(db, {
+      subscriberId: subscriber.id,
+      environmentId,
+      tag,
+      createdBy,
+    });
+
+    return { tag };
+  }
+
+  async removeTag(
+    db: dbClient,
+    environmentId: number,
+    subscriberPublicId: string,
+    tag: string,
+  ): Promise<void> {
+    const subscriber = await subscriberRepo.getSubscriberByPublicId(
+      db,
+      environmentId,
+      subscriberPublicId,
+    );
+    if (!subscriber) {
+      throw new NotFoundException("Subscriber not found");
+    }
+
+    await subscriberTagRepo.removeTag(db, subscriber.id, tag);
+  }
+
+  async listTags(db: dbClient, environmentId: number) {
+    const tags = await subscriberTagRepo.listDistinctTagsForEnvironment(
+      db,
+      environmentId,
+    );
+    return { tags };
   }
 
   async listSubscribers(

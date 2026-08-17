@@ -41,6 +41,11 @@ import {
   ListSubscribersResponseDto,
 } from "./dto/list-subscribers.dto.js";
 import {
+  AddTagDto,
+  ListTagsResponseDto,
+  TagResponseDto,
+} from "./dto/tag.dto.js";
+import {
   UpdatePreferencesDto,
   UpdatePreferencesResponseDto,
 } from "./dto/update-preferences.dto.js";
@@ -118,6 +123,33 @@ export class SubscriberController {
       emailOptedIn: query.emailOptedIn,
       q: query.q,
     });
+  }
+
+  @Get("tags")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "listTags",
+    summary: "List distinct tags",
+    description:
+      "Returns every distinct tag currently in use across subscribers in the environment",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiResponse({ status: 200, type: ListTagsResponseDto })
+  @ApiResponse({ status: 404, description: "Environment not found" })
+  async listTags(
+    @Param("environmentId") environmentId: string,
+  ): Promise<ListTagsResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.subscriberService.listTags(db, environment.id);
   }
 
   @Get(":subscriberId")
@@ -367,5 +399,76 @@ export class SubscriberController {
       subscriberId: subscriber.id,
       email: input.email,
     });
+  }
+
+  @Post(":subscriberId/tags")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "addSubscriberTag",
+    summary: "Add a tag to a subscriber",
+    description:
+      "Adds a tag to the subscriber. Adding a tag that's already present is a no-op.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "subscriberId", type: "string" })
+  @ApiResponse({ status: 200, type: TagResponseDto })
+  @ApiResponse({ status: 404, description: "Subscriber not found" })
+  async addTag(
+    @CurrentUser() user: User,
+    @Param("environmentId") environmentId: string,
+    @Param("subscriberId") subscriberId: string,
+    @Body() input: AddTagDto,
+  ): Promise<TagResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.subscriberService.addTag(
+      db,
+      environment.id,
+      subscriberId,
+      input.tag,
+      user.id,
+    );
+  }
+
+  @Delete(":subscriberId/tags/:tag")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    operationId: "removeSubscriberTag",
+    summary: "Remove a tag from a subscriber",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "subscriberId", type: "string" })
+  @ApiParam({ name: "tag", type: "string" })
+  @ApiResponse({ status: 204, description: "Tag removed" })
+  @ApiResponse({ status: 404, description: "Subscriber not found" })
+  async removeTag(
+    @Param("environmentId") environmentId: string,
+    @Param("subscriberId") subscriberId: string,
+    @Param("tag") tag: string,
+  ): Promise<void> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    await this.subscriberService.removeTag(
+      db,
+      environment.id,
+      subscriberId,
+      tag,
+    );
   }
 }

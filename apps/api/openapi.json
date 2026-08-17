@@ -18,9 +18,7 @@
             }
           }
         },
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
             "bearer": []
@@ -55,9 +53,7 @@
             }
           }
         },
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
             "bearer": []
@@ -82,9 +78,7 @@
             }
           }
         },
-        "tags": [
-          "Test"
-        ],
+        "tags": ["Test"],
         "security": [
           {
             "bearer": []
@@ -117,9 +111,7 @@
             }
           }
         },
-        "tags": [
-          "Test"
-        ],
+        "tags": ["Test"],
         "security": [
           {
             "bearer": []
@@ -147,9 +139,7 @@
             }
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -182,9 +172,7 @@
             }
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -221,9 +209,7 @@
             "description": "Workspace not found"
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -304,10 +290,7 @@
             "in": "query",
             "description": "Filter by the subscriber's latest email preference (true = opted in, false = opted out)",
             "schema": {
-              "enum": [
-                "true",
-                "false"
-              ],
+              "enum": ["true", "false"],
               "type": "boolean"
             }
           }
@@ -327,9 +310,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -378,9 +359,45 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
+        "tags": ["Subscribers"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/tags": {
+      "get": {
+        "operationId": "listTags",
+        "summary": "List distinct tags",
+        "description": "Returns every distinct tag currently in use across subscribers in the environment",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTagsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -426,9 +443,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -482,9 +497,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -521,9 +534,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -571,9 +582,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -629,9 +638,109 @@
             "description": "Subscriber or preferences not found"
           }
         },
-        "tags": [
-          "Subscribers"
+        "tags": ["Subscribers"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/{subscriberId}/tags": {
+      "post": {
+        "operationId": "addSubscriberTag",
+        "summary": "Add a tag to a subscriber",
+        "description": "Adds a tag to the subscriber. Adding a tag that's already present is a no-op.",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "tags": ["Subscribers"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/{subscriberId}/tags/{tag}": {
+      "delete": {
+        "operationId": "removeSubscriberTag",
+        "summary": "Remove a tag from a subscriber",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tag",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tag removed"
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -670,9 +779,7 @@
             "description": "Invalid or expired unsubscribe link"
           }
         },
-        "tags": [
-          "Unsubscribe"
-        ]
+        "tags": ["Unsubscribe"]
       }
     },
     "/environments/{environmentId}/workflows/trigger": {
@@ -715,9 +822,7 @@
             "description": "Environment, workflow, or subscriber not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -765,9 +870,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -827,9 +930,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -891,9 +992,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -939,9 +1038,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -995,9 +1092,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1034,9 +1129,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1106,9 +1199,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1167,9 +1258,7 @@
             "description": "Environment or integration type not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1213,9 +1302,7 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1251,9 +1338,7 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1291,9 +1376,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1368,11 +1451,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id",
-                "prefix",
-                "key"
-              ]
+              "required": ["id", "prefix", "key"]
             }
           }
         },
@@ -1415,12 +1494,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "publicId",
-          "name",
-          "image",
-          "stripeCustomerId"
-        ]
+        "required": ["publicId", "name", "image", "stripeCustomerId"]
       },
       "TestResponseDto": {
         "type": "object",
@@ -1449,12 +1523,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "message",
-          "timestamp",
-          "success",
-          "echo"
-        ]
+        "required": ["message", "timestamp", "success", "echo"]
       },
       "TestRequestDto": {
         "type": "object",
@@ -1468,9 +1537,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "WorkspaceDto": {
         "type": "object",
@@ -1488,12 +1555,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "publicId",
-          "name",
-          "slug"
-        ]
+        "required": ["id", "publicId", "name", "slug"]
       },
       "CreateWorkspaceDto": {
         "type": "object",
@@ -1504,9 +1566,7 @@
             "maxLength": 255
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "CreateWorkspaceResponseDto": {
         "type": "object",
@@ -1548,10 +1608,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "workspace",
-          "environment"
-        ]
+        "required": ["workspace", "environment"]
       },
       "ListEnvironmentsResponseDto": {
         "type": "object",
@@ -1574,18 +1631,11 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id",
-                "publicId",
-                "name",
-                "slug"
-              ]
+              "required": ["id", "publicId", "name", "slug"]
             }
           }
         },
-        "required": [
-          "environments"
-        ]
+        "required": ["environments"]
       },
       "ListSubscribersResponseDto": {
         "type": "object",
@@ -1656,11 +1706,19 @@
             "type": "number"
           }
         },
-        "required": [
-          "subscribers",
-          "limit",
-          "offset"
-        ]
+        "required": ["subscribers", "limit", "offset"]
+      },
+      "ListTagsResponseDto": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["tags"]
       },
       "GetSubscriberResponseDto": {
         "type": "object",
@@ -1705,6 +1763,12 @@
               "unsubscribeUrl": {
                 "type": "string",
                 "nullable": true
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             },
             "selfRequired": true
@@ -1727,10 +1791,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "subscriber",
-          "preferences"
-        ]
+        "required": ["subscriber", "preferences"]
       },
       "CreateSubscriberDto": {
         "type": "object",
@@ -1779,10 +1840,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "attributes",
-          "preferences"
-        ]
+        "required": ["attributes", "preferences"]
       },
       "CreateSubscriberResponseDto": {
         "type": "object",
@@ -1848,10 +1906,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "subscriber",
-          "preferences"
-        ]
+        "required": ["subscriber", "preferences"]
       },
       "BulkUpsertSubscribersDto": {
         "type": "object",
@@ -1905,9 +1960,7 @@
             }
           }
         },
-        "required": [
-          "subscribers"
-        ]
+        "required": ["subscribers"]
       },
       "BulkUpsertSubscribersResponseDto": {
         "type": "object",
@@ -1922,11 +1975,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "created",
-                    "updated",
-                    "error"
-                  ]
+                  "enum": ["created", "updated", "error"]
                 },
                 "subscriber": {
                   "type": "object",
@@ -1998,21 +2047,13 @@
                     },
                     "createdAt": {}
                   },
-                  "required": [
-                    "publicId",
-                    "email",
-                    "version",
-                    "createdAt"
-                  ]
+                  "required": ["publicId", "email", "version", "createdAt"]
                 },
                 "error": {
                   "type": "string"
                 }
               },
-              "required": [
-                "index",
-                "status"
-              ]
+              "required": ["index", "status"]
             }
           },
           "summary": {
@@ -2031,10 +2072,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "results",
-          "summary"
-        ]
+        "required": ["results", "summary"]
       },
       "UpdateSubscriberDto": {
         "type": "object",
@@ -2129,9 +2167,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "subscriber"
-        ]
+        "required": ["subscriber"]
       },
       "UpdatePreferencesDto": {
         "type": "object",
@@ -2164,9 +2200,27 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "preferences"
-        ]
+        "required": ["preferences"]
+      },
+      "AddTagDto": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": ["tag"]
+      },
+      "TagResponseDto": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "type": "string"
+          }
+        },
+        "required": ["tag"]
       },
       "UnsubscribeBodyDto": {
         "type": "object",
@@ -2176,9 +2230,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "token"
-        ]
+        "required": ["token"]
       },
       "UnsubscribeResponseDto": {
         "type": "object",
@@ -2187,9 +2239,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "unsubscribed"
-        ]
+        "required": ["unsubscribed"]
       },
       "TriggerWorkflowDto": {
         "type": "object",
@@ -2222,11 +2272,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "key",
-          "subscriber",
-          "payload"
-        ]
+        "required": ["key", "subscriber", "payload"]
       },
       "TriggerWorkflowResponseDto": {
         "type": "object",
@@ -2241,9 +2287,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "triggered"
-        ]
+        "required": ["triggered"]
       },
       "CreateWorkflowDto": {
         "type": "object",
@@ -2274,9 +2318,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "email"
-                      ]
+                      "enum": ["email"]
                     },
                     "delayMs": {
                       "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
@@ -2296,20 +2338,14 @@
                       "minLength": 1
                     }
                   },
-                  "required": [
-                    "type",
-                    "subject",
-                    "body"
-                  ]
+                  "required": ["type", "subject", "body"]
                 },
                 {
                   "type": "object",
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "webhook"
-                      ]
+                      "enum": ["webhook"]
                     },
                     "delayMs": {
                       "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
@@ -2329,21 +2365,13 @@
                       "minLength": 1
                     }
                   },
-                  "required": [
-                    "type",
-                    "url",
-                    "body"
-                  ]
+                  "required": ["type", "url", "body"]
                 }
               ]
             }
           }
         },
-        "required": [
-          "key",
-          "name",
-          "steps"
-        ]
+        "required": ["key", "name", "steps"]
       },
       "WorkflowResponseDto": {
         "type": "object",
@@ -2363,10 +2391,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "paused"
-            ]
+            "enum": ["active", "paused"]
           },
           "steps": {
             "type": "array",
@@ -2395,12 +2420,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "publicId",
-                "stepOrder",
-                "type",
-                "delayMs"
-              ]
+              "required": ["publicId", "stepOrder", "type", "delayMs"]
             }
           },
           "createdAt": {
@@ -2446,10 +2466,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "active",
-                    "paused"
-                  ]
+                  "enum": ["active", "paused"]
                 },
                 "steps": {
                   "type": "array",
@@ -2478,12 +2495,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "publicId",
-                      "stepOrder",
-                      "type",
-                      "delayMs"
-                    ]
+                    "required": ["publicId", "stepOrder", "type", "delayMs"]
                   }
                 },
                 "createdAt": {},
@@ -2508,11 +2520,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "workflows",
-          "limit",
-          "offset"
-        ]
+        "required": ["workflows", "limit", "offset"]
       },
       "ListEnvironmentRunsResponseDto": {
         "type": "object",
@@ -2527,11 +2535,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "active",
-                    "completed",
-                    "cancelled"
-                  ]
+                  "enum": ["active", "completed", "cancelled"]
                 },
                 "triggeredAt": {},
                 "completedAt": {
@@ -2556,12 +2560,7 @@
                       "nullable": true
                     }
                   },
-                  "required": [
-                    "publicId",
-                    "email",
-                    "name",
-                    "externalId"
-                  ]
+                  "required": ["publicId", "email", "name", "externalId"]
                 },
                 "steps": {
                   "type": "array",
@@ -2616,11 +2615,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "publicId",
-                    "key",
-                    "name"
-                  ]
+                  "required": ["publicId", "key", "name"]
                 }
               },
               "required": [
@@ -2641,11 +2636,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "runs",
-          "limit",
-          "offset"
-        ]
+        "required": ["runs", "limit", "offset"]
       },
       "UpdateWorkflowDto": {
         "type": "object",
@@ -2667,10 +2658,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "paused"
-            ]
+            "enum": ["active", "paused"]
           },
           "steps": {
             "description": "If provided, replaces ALL existing steps for this workflow.",
@@ -2684,9 +2672,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "email"
-                      ]
+                      "enum": ["email"]
                     },
                     "delayMs": {
                       "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
@@ -2706,20 +2692,14 @@
                       "minLength": 1
                     }
                   },
-                  "required": [
-                    "type",
-                    "subject",
-                    "body"
-                  ]
+                  "required": ["type", "subject", "body"]
                 },
                 {
                   "type": "object",
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "webhook"
-                      ]
+                      "enum": ["webhook"]
                     },
                     "delayMs": {
                       "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
@@ -2739,11 +2719,7 @@
                       "minLength": 1
                     }
                   },
-                  "required": [
-                    "type",
-                    "url",
-                    "body"
-                  ]
+                  "required": ["type", "url", "body"]
                 }
               ]
             }
@@ -2763,11 +2739,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "active",
-                    "completed",
-                    "cancelled"
-                  ]
+                  "enum": ["active", "completed", "cancelled"]
                 },
                 "triggeredAt": {},
                 "completedAt": {
@@ -2792,12 +2764,7 @@
                       "nullable": true
                     }
                   },
-                  "required": [
-                    "publicId",
-                    "email",
-                    "name",
-                    "externalId"
-                  ]
+                  "required": ["publicId", "email", "name", "externalId"]
                 },
                 "steps": {
                   "type": "array",
@@ -2857,11 +2824,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "runs",
-          "limit",
-          "offset"
-        ]
+        "required": ["runs", "limit", "offset"]
       },
       "UpsertIntegrationDto": {
         "type": "object",
@@ -2873,9 +2836,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "root"
-        ]
+        "required": ["root"]
       },
       "IntegrationResponseDto": {
         "type": "object",
@@ -2888,10 +2849,7 @@
             "x-nestjs_zod-empty-type": true
           }
         },
-        "required": [
-          "type",
-          "updatedAt"
-        ]
+        "required": ["type", "updatedAt"]
       },
       "ListIntegrationsResponseDto": {
         "type": "object",
@@ -2906,16 +2864,11 @@
                 },
                 "updatedAt": {}
               },
-              "required": [
-                "type",
-                "updatedAt"
-              ]
+              "required": ["type", "updatedAt"]
             }
           }
         },
-        "required": [
-          "integrations"
-        ]
+        "required": ["integrations"]
       }
     }
   }
