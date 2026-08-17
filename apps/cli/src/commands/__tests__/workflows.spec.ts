@@ -91,6 +91,25 @@ describe("workflows list", () => {
     });
   });
 
+  it("passes --type through as a filter", async () => {
+    vi.mocked(listWorkflows).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { workflows: [testWorkflow], limit: 20, offset: 0 },
+    } as never);
+    vi.spyOn(console, "table").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["workflows", "list", "--type", "broadcast"],
+      { from: "user" },
+    );
+
+    expect(listWorkflows).toHaveBeenCalledWith(
+      "test-environment-1",
+      expect.objectContaining({ type: "broadcast" }),
+    );
+  });
+
   it("prints an error and exits on a 404", async () => {
     vi.mocked(listWorkflows).mockResolvedValue({
       status: 404,

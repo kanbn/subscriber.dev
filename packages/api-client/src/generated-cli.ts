@@ -480,6 +480,18 @@ export interface TriggerWorkflowResponseDto {
   reason?: string;
 }
 
+/**
+ * Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.
+ */
+export type CreateWorkflowDtoType = typeof CreateWorkflowDtoType[keyof typeof CreateWorkflowDtoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateWorkflowDtoType = {
+  automation: 'automation',
+  broadcast: 'broadcast',
+} as const;
+
 export type CreateWorkflowDtoStepsItemOneOfType = typeof CreateWorkflowDtoStepsItemOneOfType[keyof typeof CreateWorkflowDtoStepsItemOneOfType];
 
 
@@ -547,6 +559,8 @@ export interface CreateWorkflowDto {
   name: string;
   /** @maxLength 2000 */
   description?: string;
+  /** Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way. */
+  type?: CreateWorkflowDtoType;
   /**
    * @minItems 1
    * @maxItems 50
@@ -561,6 +575,15 @@ export type WorkflowResponseDtoStatus = typeof WorkflowResponseDtoStatus[keyof t
 export const WorkflowResponseDtoStatus = {
   active: 'active',
   paused: 'paused',
+} as const;
+
+export type WorkflowResponseDtoType = typeof WorkflowResponseDtoType[keyof typeof WorkflowResponseDtoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkflowResponseDtoType = {
+  automation: 'automation',
+  broadcast: 'broadcast',
 } as const;
 
 export type WorkflowResponseDtoStepsItem = {
@@ -580,6 +603,7 @@ export interface WorkflowResponseDto {
   /** @nullable */
   description: string | null;
   status: WorkflowResponseDtoStatus;
+  type: WorkflowResponseDtoType;
   steps: WorkflowResponseDtoStepsItem[];
   createdAt: unknown;
   updatedAt: unknown;
@@ -592,6 +616,15 @@ export type ListWorkflowsResponseDtoWorkflowsItemStatus = typeof ListWorkflowsRe
 export const ListWorkflowsResponseDtoWorkflowsItemStatus = {
   active: 'active',
   paused: 'paused',
+} as const;
+
+export type ListWorkflowsResponseDtoWorkflowsItemType = typeof ListWorkflowsResponseDtoWorkflowsItemType[keyof typeof ListWorkflowsResponseDtoWorkflowsItemType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListWorkflowsResponseDtoWorkflowsItemType = {
+  automation: 'automation',
+  broadcast: 'broadcast',
 } as const;
 
 export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
@@ -611,6 +644,7 @@ export type ListWorkflowsResponseDtoWorkflowsItem = {
   /** @nullable */
   description: string | null;
   status: ListWorkflowsResponseDtoWorkflowsItemStatus;
+  type: ListWorkflowsResponseDtoWorkflowsItemType;
   steps: ListWorkflowsResponseDtoWorkflowsItemStepsItem[];
   createdAt: unknown;
   updatedAt: unknown;
@@ -1077,7 +1111,17 @@ limit?: number;
  * @minimum 0
  */
 offset?: number;
+type?: ListWorkflowsType;
 };
+
+export type ListWorkflowsType = typeof ListWorkflowsType[keyof typeof ListWorkflowsType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListWorkflowsType = {
+  automation: 'automation',
+  broadcast: 'broadcast',
+} as const;
 
 export type ListEnvironmentRunsParams = {
 /**

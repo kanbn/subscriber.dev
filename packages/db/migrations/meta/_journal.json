@@ -57,6 +57,13 @@
       "when": 1786964114716,
       "tag": "20260817105514_AddBroadcastsAndTags",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786994210635,
+      "tag": "20260817191650_AddWorkflowType",
+      "breakpoints": true
     }
   ]
 }

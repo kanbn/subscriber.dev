@@ -30,6 +30,7 @@ interface CreateWorkflowData {
   key: string;
   name: string;
   description?: string;
+  type: "automation" | "broadcast";
   steps: WorkflowStepInput[];
   createdBy: number;
 }
@@ -73,6 +74,7 @@ export class WorkflowService {
       name: string;
       description: string | null;
       status: "active" | "paused";
+      type: "automation" | "broadcast";
       createdAt: Date;
       updatedAt: Date;
     },
@@ -84,6 +86,7 @@ export class WorkflowService {
       name: workflow.name,
       description: workflow.description,
       status: workflow.status,
+      type: workflow.type,
       steps: steps.map((s) => ({
         ...s.config,
         publicId: s.publicId,
@@ -113,6 +116,7 @@ export class WorkflowService {
       key: data.key,
       name: data.name,
       description: data.description ?? null,
+      type: data.type,
       steps: this.toStepInputs(data.steps),
       createdBy: data.createdBy,
     });
@@ -123,7 +127,11 @@ export class WorkflowService {
   async listWorkflows(
     db: dbClient,
     environmentId: number,
-    opts: { limit: number; offset: number },
+    opts: {
+      limit: number;
+      offset: number;
+      type?: "automation" | "broadcast";
+    },
   ) {
     const rows = await workflowRepo.listWorkflows(db, environmentId, opts);
     const workflows = await Promise.all(

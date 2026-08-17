@@ -129,6 +129,7 @@ export class WorkflowController {
       key: input.key,
       name: input.name,
       description: input.description,
+      type: input.type,
       steps: input.steps,
       createdBy: user.id,
     });
@@ -144,6 +145,11 @@ export class WorkflowController {
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
+  @ApiQuery({
+    name: "type",
+    required: false,
+    enum: ["automation", "broadcast"],
+  })
   @ApiResponse({ status: 200, type: ListWorkflowsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async listWorkflows(
@@ -163,6 +169,7 @@ export class WorkflowController {
     return this.workflowService.listWorkflows(db, environment.id, {
       limit: query.limit,
       offset: query.offset,
+      type: query.type,
     });
   }
 

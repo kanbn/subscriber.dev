@@ -53,6 +53,12 @@ export const CreateWorkflowSchema = z.object({
     ),
   name: z.string().min(1).max(255),
   description: z.string().max(2000).optional(),
+  type: z
+    .enum(["automation", "broadcast"])
+    .default("automation")
+    .describe(
+      "Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.",
+    ),
   steps: z.array(WorkflowStepSchema).min(1).max(50),
 });
 
@@ -72,6 +78,7 @@ export const WorkflowSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   status: z.enum(["active", "paused"]),
+  type: z.enum(["automation", "broadcast"]),
   steps: z.array(WorkflowStepResponseSchema),
   createdAt: z.date(),
   updatedAt: z.date(),

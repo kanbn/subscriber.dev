@@ -36,6 +36,10 @@ export function registerWorkflowsCommand(program: Command): void {
       "--environment <environmentId>",
       "environment public ID (defaults to the current environment)",
     )
+    .option(
+      "--type <type>",
+      'filter by workflow type: "automation" or "broadcast"',
+    )
     .option("--limit <limit>", "max results (1-100)")
     .option("--offset <offset>", "pagination offset")
     .option("--json", "output as JSON")
@@ -43,6 +47,7 @@ export function registerWorkflowsCommand(program: Command): void {
       run(
         async (opts: {
           environment?: string;
+          type?: "automation" | "broadcast";
           limit?: string;
           offset?: string;
           json?: boolean;
@@ -50,6 +55,7 @@ export function registerWorkflowsCommand(program: Command): void {
           ensureLoggedIn();
           const environmentId = requireEnvironmentId(opts);
           const response = await listWorkflows(environmentId, {
+            type: opts.type,
             limit: opts.limit ? Number(opts.limit) : undefined,
             offset: opts.offset ? Number(opts.offset) : undefined,
           });
@@ -160,7 +166,7 @@ export function registerWorkflowsCommand(program: Command): void {
   workflows
     .command("create")
     .description(
-      'Create a workflow from a JSON file: {"key", "name", "description"?, "steps": [...]}',
+      'Create a workflow from a JSON file: {"key", "name", "description"?, "type"?: "automation"|"broadcast", "steps": [...]}',
     )
     .requiredOption(
       "--file <path>",

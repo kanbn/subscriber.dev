@@ -69,13 +69,23 @@ export function App() {
         <SectionScreen
           workspace={screen.workspace}
           environment={screen.environment}
-          onSelect={(section) =>
+          onSelect={(section) => {
+            if (section === "workflows" || section === "broadcastWorkflows") {
+              push({
+                kind: "workflows",
+                workspace: screen.workspace,
+                environment: screen.environment,
+                workflowType:
+                  section === "workflows" ? "automation" : "broadcast",
+              });
+              return;
+            }
             push({
               kind: section,
               workspace: screen.workspace,
               environment: screen.environment,
-            })
-          }
+            });
+          }}
         />
       )}
 
@@ -103,6 +113,7 @@ export function App() {
       {screen.kind === "workflows" && (
         <WorkflowsScreen
           environmentId={screen.environment.publicId}
+          workflowType={screen.workflowType}
           onSelect={(workflowId) =>
             push({
               kind: "workflowDetail",

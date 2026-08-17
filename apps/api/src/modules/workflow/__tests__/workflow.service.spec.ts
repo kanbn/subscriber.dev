@@ -295,6 +295,7 @@ describe("createWorkflow", () => {
     const result = await service.createWorkflow(mockDb, 10, {
       key: "user-signup",
       name: "Signup",
+      type: "automation",
       steps: [{ type: "email", delayMs: 0, subject: "hi", body: "hi" }],
       createdBy: 1,
     });
@@ -342,6 +343,7 @@ describe("createWorkflow", () => {
     const result = await service.createWorkflow(mockDb, 10, {
       key: "user-signup",
       name: "Signup",
+      type: "automation",
       steps: [{ type: "webhook", delayMs: 0, ...webhookConfig }],
       createdBy: 1,
     });

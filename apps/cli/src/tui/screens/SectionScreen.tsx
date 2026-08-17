@@ -12,7 +12,12 @@ export function SectionScreen({
   workspace: WorkspaceSummary;
   environment: EnvironmentSummary;
   onSelect: (
-    section: "subscribers" | "workflows" | "runHistory" | "integrations",
+    section:
+      | "subscribers"
+      | "workflows"
+      | "broadcastWorkflows"
+      | "runHistory"
+      | "integrations",
   ) => void;
 }) {
   return (
@@ -24,6 +29,7 @@ export function SectionScreen({
         items={[
           { label: "Subscribers", value: "subscribers" as const },
           { label: "Workflows", value: "workflows" as const },
+          { label: "Broadcasts", value: "broadcastWorkflows" as const },
           { label: "Run History", value: "runHistory" as const },
           { label: "Integrations", value: "integrations" as const },
         ]}

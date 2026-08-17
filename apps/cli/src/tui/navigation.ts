@@ -31,6 +31,7 @@ export type Screen =
       kind: "workflows";
       workspace: WorkspaceSummary;
       environment: EnvironmentSummary;
+      workflowType: "automation" | "broadcast";
     }
   | {
       kind: "workflowDetail";

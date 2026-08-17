@@ -23,6 +23,10 @@ export const workflowStatuses = ["active", "paused"] as const;
 export type WorkflowStatus = (typeof workflowStatuses)[number];
 export const workflowStatusEnum = pgEnum("workflowStatus", workflowStatuses);
 
+export const workflowTypes = ["automation", "broadcast"] as const;
+export type WorkflowType = (typeof workflowTypes)[number];
+export const workflowTypeEnum = pgEnum("workflowType", workflowTypes);
+
 export const workflowRunStatuses = [
   "active",
   "completed",
@@ -73,6 +77,7 @@ export const workflows = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     description: text("description"),
     status: workflowStatusEnum("status").notNull().default("active"),
+    type: workflowTypeEnum("type").notNull().default("automation"),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt").notNull().defaultNow(),
     deletedAt: timestamp("deletedAt"),

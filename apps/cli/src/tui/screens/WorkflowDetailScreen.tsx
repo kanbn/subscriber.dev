@@ -100,16 +100,25 @@ export function WorkflowDetailScreen({
     if (!idle || !workflow) return;
     if (input === "d" || input === "D") {
       setDeleteStatus("confirming");
-    } else if (input === "t" || input === "T") {
+    } else if (
+      (input === "t" || input === "T") &&
+      workflow.type === "automation"
+    ) {
       setTriggerEmail("");
       setTriggerStatus("entering-email");
     } else if (input === "r" || input === "R") {
       onViewRuns();
     } else if (input === "e" || input === "E") {
       setMetaMode("editing");
-    } else if (input === "b" || input === "B") {
+    } else if (
+      (input === "b" || input === "B") &&
+      workflow.type === "broadcast"
+    ) {
       setBroadcastStatus("choosing-audience");
-    } else if (input === "h" || input === "H") {
+    } else if (
+      (input === "h" || input === "H") &&
+      workflow.type === "broadcast"
+    ) {
       onViewBroadcasts();
     }
   });
@@ -233,7 +242,9 @@ export function WorkflowDetailScreen({
 
   return (
     <Box flexDirection="column">
-      <Text bold>Workflow</Text>
+      <Text bold>
+        {workflow?.type === "broadcast" ? "Broadcast" : "Workflow"}
+      </Text>
       <AsyncBoundary state={state}>
         {(loadedWorkflow) => (
           <Box flexDirection="column">
@@ -357,7 +368,9 @@ export function WorkflowDetailScreen({
       <Hints
         text={
           idle
-            ? "d delete · e edit · t trigger · b broadcast · r runs · h broadcasts · Esc back · q quit"
+            ? workflow?.type === "broadcast"
+              ? "d delete · e edit · b broadcast · r runs · h broadcasts · Esc back · q quit"
+              : "d delete · e edit · t trigger · r runs · Esc back · q quit"
             : triggerStatus === "success" || triggerStatus === "error"
               ? "any key to continue"
               : triggerStatus === "entering-email"

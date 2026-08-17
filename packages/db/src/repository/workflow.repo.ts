@@ -47,12 +47,13 @@ export const getWorkflowByKey = async (
 export const listWorkflows = async (
   db: dbClient,
   environmentId: number,
-  opts: { limit: number; offset: number },
+  opts: { limit: number; offset: number; type?: "automation" | "broadcast" },
 ) => {
   return await db.query.workflows.findMany({
     where: and(
       eq(workflows.environmentId, environmentId),
       isNull(workflows.deletedAt),
+      opts.type ? eq(workflows.type, opts.type) : undefined,
     ),
     orderBy: asc(workflows.createdAt),
     limit: opts.limit,
@@ -77,6 +78,7 @@ export const createWorkflow = async (
     key: string;
     name: string;
     description?: string | null;
+    type?: "automation" | "broadcast";
     steps: WorkflowStepInput[];
     createdBy: number;
   },
@@ -90,6 +92,7 @@ export const createWorkflow = async (
         key: data.key,
         name: data.name,
         description: data.description ?? null,
+        type: data.type ?? "automation",
         createdBy: data.createdBy,
         updatedBy: data.createdBy,
       })

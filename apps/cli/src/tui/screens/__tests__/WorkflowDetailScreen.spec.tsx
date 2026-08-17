@@ -27,6 +27,7 @@ const testWorkflow = {
   name: "Test Signup",
   description: "Fires when a user signs up",
   status: "active",
+  type: "automation",
   steps: [
     {
       publicId: "test-step-1",
@@ -362,7 +363,7 @@ describe("WorkflowDetailScreen runs", () => {
     vi.mocked(getWorkflow).mockResolvedValue({
       status: 200,
       headers: new Headers(),
-      data: testWorkflow,
+      data: { ...testWorkflow, type: "broadcast" },
     } as never);
     const onViewBroadcasts = vi.fn();
     const { lastFrame, stdin } = renderScreen(
@@ -391,7 +392,7 @@ describe("WorkflowDetailScreen broadcast", () => {
     vi.mocked(getWorkflow).mockResolvedValue({
       status: 200,
       headers: new Headers(),
-      data: testWorkflow,
+      data: { ...testWorkflow, type: "broadcast" },
     } as never);
     const screen = renderScreen();
     await vi.waitFor(() => {

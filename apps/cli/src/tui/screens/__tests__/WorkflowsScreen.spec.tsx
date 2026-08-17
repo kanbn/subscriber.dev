@@ -26,7 +26,11 @@ describe("WorkflowsScreen", () => {
     } as never);
 
     const { lastFrame } = render(
-      <WorkflowsScreen environmentId="test-environment-1" onSelect={vi.fn()} />,
+      <WorkflowsScreen
+        environmentId="test-environment-1"
+        workflowType="automation"
+        onSelect={vi.fn()}
+      />,
     );
 
     await vi.waitFor(() => {
@@ -47,6 +51,7 @@ describe("WorkflowsScreen", () => {
     const { lastFrame, stdin } = render(
       <WorkflowsScreen
         environmentId="test-environment-1"
+        workflowType="automation"
         onSelect={onSelect}
       />,
     );
@@ -68,7 +73,11 @@ describe("WorkflowsScreen", () => {
     } as never);
 
     const { lastFrame } = render(
-      <WorkflowsScreen environmentId="test-environment-1" onSelect={vi.fn()} />,
+      <WorkflowsScreen
+        environmentId="test-environment-1"
+        workflowType="automation"
+        onSelect={vi.fn()}
+      />,
     );
 
     await vi.waitFor(() => {
@@ -84,12 +93,43 @@ describe("WorkflowsScreen", () => {
     } as never);
 
     const { lastFrame } = render(
-      <WorkflowsScreen environmentId="test-environment-1" onSelect={vi.fn()} />,
+      <WorkflowsScreen
+        environmentId="test-environment-1"
+        workflowType="automation"
+        onSelect={vi.fn()}
+      />,
     );
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Error");
     });
+  });
+});
+
+describe("WorkflowsScreen with workflowType=broadcast", () => {
+  it("filters by type and shows the Broadcasts title", async () => {
+    vi.mocked(listWorkflows).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { workflows: [], limit: 100, offset: 0 },
+    } as never);
+
+    const { lastFrame } = render(
+      <WorkflowsScreen
+        environmentId="test-environment-1"
+        workflowType="broadcast"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("No broadcasts");
+    });
+    expect(lastFrame()).toContain("Broadcasts");
+    expect(listWorkflows).toHaveBeenCalledWith(
+      "test-environment-1",
+      expect.objectContaining({ type: "broadcast" }),
+    );
   });
 });
 
@@ -106,7 +146,11 @@ describe("WorkflowsScreen create", () => {
     } as never);
 
     const { lastFrame, stdin } = render(
-      <WorkflowsScreen environmentId="test-environment-1" onSelect={vi.fn()} />,
+      <WorkflowsScreen
+        environmentId="test-environment-1"
+        workflowType="automation"
+        onSelect={vi.fn()}
+      />,
     );
 
     await vi.waitFor(() => {
@@ -132,7 +176,11 @@ describe("WorkflowsScreen create", () => {
     } as never);
 
     const { lastFrame, stdin } = render(
-      <WorkflowsScreen environmentId="test-environment-1" onSelect={vi.fn()} />,
+      <WorkflowsScreen
+        environmentId="test-environment-1"
+        workflowType="automation"
+        onSelect={vi.fn()}
+      />,
     );
 
     await vi.waitFor(() => {

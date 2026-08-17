@@ -1003,6 +1003,18 @@
               "default": 0,
               "type": "number"
             }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "automation",
+                "broadcast"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2786,6 +2798,15 @@
             "type": "string",
             "maxLength": 2000
           },
+          "type": {
+            "description": "Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.",
+            "type": "string",
+            "enum": [
+              "automation",
+              "broadcast"
+            ],
+            "default": "automation"
+          },
           "steps": {
             "type": "array",
             "minItems": 1,
@@ -2891,6 +2912,13 @@
               "paused"
             ]
           },
+          "type": {
+            "type": "string",
+            "enum": [
+              "automation",
+              "broadcast"
+            ]
+          },
           "steps": {
             "type": "array",
             "items": {
@@ -2941,6 +2969,7 @@
           "name",
           "description",
           "status",
+          "type",
           "steps",
           "createdAt",
           "updatedAt"
@@ -2972,6 +3001,13 @@
                   "enum": [
                     "active",
                     "paused"
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "automation",
+                    "broadcast"
                   ]
                 },
                 "steps": {
@@ -3018,6 +3054,7 @@
                 "name",
                 "description",
                 "status",
+                "type",
                 "steps",
                 "createdAt",
                 "updatedAt"

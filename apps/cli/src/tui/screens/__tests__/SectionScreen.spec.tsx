@@ -24,6 +24,7 @@ describe("SectionScreen", () => {
     expect(lastFrame()).toContain("Staging");
     expect(lastFrame()).toContain("Subscribers");
     expect(lastFrame()).toContain("Workflows");
+    expect(lastFrame()).toContain("Broadcasts");
     expect(lastFrame()).toContain("Run History");
   });
 

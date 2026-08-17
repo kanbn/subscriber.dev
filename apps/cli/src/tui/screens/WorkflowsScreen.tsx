@@ -15,20 +15,26 @@ type Mode = "list" | "creating";
 
 export function WorkflowsScreen({
   environmentId,
+  workflowType,
   onSelect,
 }: {
   environmentId: string;
+  workflowType: "automation" | "broadcast";
   onSelect: (workflowId: string) => void;
 }) {
   const state = useAsyncData(async () => {
-    const response = await listWorkflows(environmentId, { limit: 100 });
+    const response = await listWorkflows(environmentId, {
+      limit: 100,
+      type: workflowType,
+    });
     if (response.status !== 200) {
       throw new Error("Environment not found.");
     }
     return response.data.workflows;
-  }, [environmentId]);
+  }, [environmentId, workflowType]);
 
   const [mode, setMode] = useState<Mode>("list");
+  const title = workflowType === "broadcast" ? "Broadcasts" : "Workflows";
 
   useInput((input) => {
     if (mode !== "list") return;
@@ -54,6 +60,7 @@ export function WorkflowsScreen({
         key: values.key.trim(),
         name: values.name.trim(),
         description: values.description.trim() || undefined,
+        type: workflowType,
         steps: [step],
       });
       if (response.status !== 201) {
@@ -69,7 +76,9 @@ export function WorkflowsScreen({
   if (mode === "creating") {
     return (
       <Box flexDirection="column">
-        <Text bold>New workflow</Text>
+        <Text bold>
+          New {workflowType === "broadcast" ? "broadcast" : "workflow"}
+        </Text>
         <WorkflowCreateForm
           onSubmit={handleCreate}
           onCancel={() => setMode("list")}
@@ -81,11 +90,14 @@ export function WorkflowsScreen({
 
   return (
     <Box flexDirection="column">
-      <Text bold>Workflows</Text>
+      <Text bold>{title}</Text>
       <AsyncBoundary state={state}>
         {(workflows) =>
           workflows.length === 0 ? (
-            <Text dimColor>No workflows in this environment.</Text>
+            <Text dimColor>
+              No {workflowType === "broadcast" ? "broadcasts" : "workflows"} in
+              this environment.
+            </Text>
           ) : (
             <SelectInput
               limit={10}
