@@ -2,15 +2,15 @@ import type { dbClient } from "@subscriber.dev/db/client";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
-import { sendRawEmail } from "@subscriber.dev/email";
 import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
 
 import { decrypt } from "../../common/encryption.js";
-import { smtpProvider } from "../integrations/providers/index.js";
+import { INTEGRATION_PROVIDERS } from "../integrations/providers/index.js";
 import { renderTemplate } from "./workflow.template.js";
 
 interface RunStepForSend {
   id: number;
+  publicId: string;
   configSnapshot: Record<string, unknown>;
 }
 
@@ -19,6 +19,12 @@ interface SubscriberForSend {
   environmentId: number;
   publicId: string;
   email: string | null;
+}
+
+function buildBounceEnvelopeFrom(runStepPublicId: string): string | undefined {
+  const bounceDomain = process.env.BOUNCE_DOMAIN;
+  if (!bounceDomain) return undefined;
+  return `bounce+${runStepPublicId}@${bounceDomain}`;
 }
 
 export async function sendEmailStep(
@@ -65,42 +71,54 @@ export async function sendEmailStep(
     return;
   }
 
-  const smtpConfig = smtpProvider.configSchema.parse(integration.config);
-  const smtpSecret = smtpProvider.secretSchema.parse(
+  const provider = INTEGRATION_PROVIDERS[integration.type];
+  if (!provider) {
+    await workflowRunRepo.updateRunStepStatus(
+      db,
+      runStep.id,
+      "failed",
+      `Unknown integration provider: ${integration.type}`,
+    );
+    return;
+  }
+
+  const providerConfig = provider.configSchema.parse(integration.config);
+  const providerSecret = provider.secretSchema.parse(
     JSON.parse(decrypt(integration.encryptedSecret!)),
   );
 
-  const config = runStep.configSnapshot as { subject: string; body: string };
+  const stepConfig = runStep.configSnapshot as {
+    subject: string;
+    body: string;
+  };
   const unsubscribeUrl = await createEmailUnsubscribeLink(
     subscriber.environmentId,
     subscriber.publicId,
   );
   const context = { ...baseContext, unsubscribeUrl };
-  const subject = await renderTemplate(config.subject, context);
-  const interpolatedBody = await renderTemplate(config.body, context);
-  const bodyHasUnsubscribeToken = config.body.includes("{{unsubscribeUrl}}");
+  const subject = await renderTemplate(stepConfig.subject, context);
+  const interpolatedBody = await renderTemplate(stepConfig.body, context);
+  const bodyHasUnsubscribeToken =
+    stepConfig.body.includes("{{unsubscribeUrl}}");
   const html =
     unsubscribeUrl && !bodyHasUnsubscribeToken
       ? `${interpolatedBody}<p style="font-size:12px;color:#666;">Don't want these emails? <a href="${unsubscribeUrl}">Unsubscribe</a></p>`
       : interpolatedBody;
 
   try {
-    await sendRawEmail(
-      {
-        host: smtpConfig.host,
-        port: smtpConfig.port,
-        secure: smtpConfig.secure,
-        user: smtpSecret.user,
-        password: smtpSecret.password,
-        from: smtpConfig.fromName
-          ? `${smtpConfig.fromName} <${smtpConfig.fromEmail}>`
-          : smtpConfig.fromEmail,
-      },
-      subscriber.email,
+    const result = await provider.send(providerConfig, providerSecret, {
+      to: subscriber.email,
       subject,
       html,
+      envelopeFrom: buildBounceEnvelopeFrom(runStep.publicId),
+    });
+    await workflowRunRepo.updateRunStepStatus(
+      db,
+      runStep.id,
+      "sent",
+      undefined,
+      result.providerMessageId,
     );
-    await workflowRunRepo.updateRunStepStatus(db, runStep.id, "sent");
   } catch (error) {
     await workflowRunRepo.updateRunStepStatus(
       db,

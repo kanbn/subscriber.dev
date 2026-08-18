@@ -97,6 +97,7 @@ export const updateRunStepStatus = async (
   id: number,
   status: Extract<WorkflowRunStepStatus, "sent" | "skipped" | "failed">,
   errorMessage?: string,
+  providerMessageId?: string,
 ) => {
   await db
     .update(workflowRunSteps)
@@ -104,6 +105,7 @@ export const updateRunStepStatus = async (
       status,
       errorMessage: errorMessage ?? null,
       sentAt: status === "sent" ? new Date() : undefined,
+      providerMessageId,
       updatedAt: new Date(),
     })
     .where(eq(workflowRunSteps.id, id));

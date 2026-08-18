@@ -49,6 +49,7 @@ vi.mock("@subscriber.dev/email", () => ({
 
 const mockRunStep = {
   id: 1,
+  publicId: "run_step_1",
   runId: 5,
   status: "pending" as const,
   type: "email",
@@ -86,13 +87,17 @@ beforeEach(() => {
   vi.mocked(subscriberRepo.getLatestPreferences).mockResolvedValue({
     email: true,
   } as any);
-  vi.mocked(sendRawEmail).mockResolvedValue(undefined as any);
+  vi.mocked(sendRawEmail).mockResolvedValue({
+    accepted: ["alice@example.com"],
+    messageId: "msg-1",
+  } as any);
   vi.mocked(createEmailUnsubscribeLink).mockResolvedValue(
     "https://example.com/unsubscribe?token=abc",
   );
   vi.mocked(
     environmentIntegrationsRepo.getByEnvironmentAndType,
   ).mockResolvedValue({
+    type: "smtp",
     config: {
       host: "smtp.example.com",
       port: 587,
@@ -148,10 +153,58 @@ describe("process", () => {
       expect.anything(),
       1,
       "sent",
+      undefined,
+      "msg-1",
     );
     expect(workflowRunRepo.completeRunIfAllStepsTerminal).toHaveBeenCalledWith(
       expect.anything(),
       5,
+    );
+  });
+
+  it("sets a VERP envelope-from using BOUNCE_DOMAIN and the run step's publicId, when configured", async () => {
+    const previous = process.env.BOUNCE_DOMAIN;
+    process.env.BOUNCE_DOMAIN = "bounces.example.com";
+    try {
+      await processor.process(makeJob());
+
+      const [, , , , envelopeFrom] = vi.mocked(sendRawEmail).mock.calls[0]!;
+      expect(envelopeFrom).toBe("bounce+run_step_1@bounces.example.com");
+    } finally {
+      process.env.BOUNCE_DOMAIN = previous;
+    }
+  });
+
+  it("omits the envelope-from override when BOUNCE_DOMAIN isn't configured", async () => {
+    const previous = process.env.BOUNCE_DOMAIN;
+    delete process.env.BOUNCE_DOMAIN;
+    try {
+      await processor.process(makeJob());
+
+      const [, , , , envelopeFrom] = vi.mocked(sendRawEmail).mock.calls[0]!;
+      expect(envelopeFrom).toBeUndefined();
+    } finally {
+      process.env.BOUNCE_DOMAIN = previous;
+    }
+  });
+
+  it("marks the run-step failed when the integration's provider type isn't registered", async () => {
+    vi.mocked(
+      environmentIntegrationsRepo.getByEnvironmentAndType,
+    ).mockResolvedValue({
+      type: "unknown-provider",
+      config: {},
+      encryptedSecret: "encrypted-blob",
+    } as any);
+
+    await processor.process(makeJob());
+
+    expect(sendRawEmail).not.toHaveBeenCalled();
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      1,
+      "failed",
+      "Unknown integration provider: unknown-provider",
     );
   });
 
