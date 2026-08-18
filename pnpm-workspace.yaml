@@ -1,5 +1,7 @@
 packages:
   - apps/*
+  - apps/workers/*
+  - "!apps/workers"
   - packages/*
   - tooling/*
 
