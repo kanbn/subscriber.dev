@@ -2,6 +2,7 @@ import { render } from "ink-testing-library";
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  addSubscriberTag,
   deleteSubscriber,
   getSubscriber,
   updateSubscriber,
@@ -15,6 +16,8 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   deleteSubscriber: vi.fn(),
   updateSubscriber: vi.fn(),
   updateSubscriberPreferences: vi.fn(),
+  addSubscriberTag: vi.fn(),
+  removeSubscriberTag: vi.fn(),
 }));
 
 const testSubscriber = {
@@ -25,6 +28,7 @@ const testSubscriber = {
   firstName: "Ada",
   lastName: "Lovelace",
   name: "should not be used",
+  tags: ["vip"],
 };
 
 function renderScreen(onDeleted = vi.fn()) {
@@ -56,6 +60,7 @@ describe("SubscriberDetailScreen", () => {
     expect(lastFrame()).toContain("email: test@example.com");
     expect(lastFrame()).toContain("phone: —");
     expect(lastFrame()).toContain("emailOptedIn: true");
+    expect(lastFrame()).toContain("tags: vip");
   });
 
   it("falls back to the free-text name field when first/last are absent", async () => {
@@ -316,6 +321,112 @@ describe("SubscriberDetailScreen preferences", () => {
       expect(lastFrame()).toContain("Opted in");
     });
 
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Error: Subscriber not found.");
+    });
+
+    await tick();
+    stdin.write("x");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("Error");
+    });
+  });
+});
+
+describe("SubscriberDetailScreen tags", () => {
+  function tick() {
+    return new Promise<void>((resolve) => setTimeout(resolve, 50));
+  }
+
+  async function loaded() {
+    vi.mocked(getSubscriber).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { subscriber: testSubscriber, preferences: { email: true } },
+    } as never);
+    const screen = renderScreen();
+    await vi.waitFor(() => {
+      expect(screen.lastFrame()).toContain("name: Ada Lovelace");
+    });
+    return screen;
+  }
+
+  it("shows the tags menu with add and remove options when 't' is pressed", async () => {
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Tags for test-subscriber-1:");
+    });
+    expect(lastFrame()).toContain("Add tag");
+    expect(lastFrame()).toContain('Remove "vip"');
+  });
+
+  it("adds a tag with the default selection", async () => {
+    vi.mocked(addSubscriberTag).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { tag: "new-tag" },
+    } as never);
+
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Add tag");
+    });
+
+    // "Add tag" is the default-selected (first) item.
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Tag:");
+    });
+
+    await tick();
+    stdin.write("new-tag");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(addSubscriberTag).toHaveBeenCalledWith(
+        "test-environment-1",
+        "test-subscriber-1",
+        { tag: "new-tag" },
+      );
+    });
+  });
+
+  it("shows an error and lets any key dismiss it on failure", async () => {
+    vi.mocked(addSubscriberTag).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Add tag");
+    });
+
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Tag:");
+    });
+
+    await tick();
+    stdin.write("new-tag");
     await tick();
     stdin.write("\r");
 

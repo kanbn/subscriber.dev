@@ -1,11 +1,14 @@
 import { Box, Text, useInput } from "ink";
 import SelectInput from "ink-select-input";
+import TextInput from "ink-text-input";
 import { useState } from "react";
 
 import type { UpdateSubscriberDto } from "@subscriber.dev/api-client/cli";
 import {
+  addSubscriberTag,
   deleteSubscriber,
   getSubscriber,
+  removeSubscriberTag,
   updateSubscriber,
   updateSubscriberPreferences,
 } from "@subscriber.dev/api-client/cli";
@@ -20,6 +23,7 @@ import { useAsyncData } from "../useAsyncData.js";
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
 type FieldsMode = "idle" | "editing";
 type PrefsStatus = "idle" | "selecting" | "saving" | "error";
+type TagsStatus = "idle" | "choosing" | "adding" | "saving" | "error";
 
 export function SubscriberDetailScreen({
   environmentId,
@@ -48,12 +52,23 @@ export function SubscriberDetailScreen({
   const [prefsStatus, setPrefsStatus] = useState<PrefsStatus>("idle");
   const [prefsError, setPrefsError] = useState("");
 
+  const [tagsStatus, setTagsStatus] = useState<TagsStatus>("idle");
+  const [tagInput, setTagInput] = useState("");
+  const [tagsError, setTagsError] = useState("");
+
   const idle =
-    deleteStatus === "idle" && fieldsMode === "idle" && prefsStatus === "idle";
+    deleteStatus === "idle" &&
+    fieldsMode === "idle" &&
+    prefsStatus === "idle" &&
+    tagsStatus === "idle";
 
   useInput((input) => {
     if (prefsStatus === "error") {
       setPrefsStatus("idle");
+      return;
+    }
+    if (tagsStatus === "error") {
+      setTagsStatus("idle");
       return;
     }
     if (!idle || !subscriber) return;
@@ -63,6 +78,8 @@ export function SubscriberDetailScreen({
       setFieldsMode("editing");
     } else if (input === "p" || input === "P") {
       setPrefsStatus("selecting");
+    } else if (input === "t" || input === "T") {
+      setTagsStatus("choosing");
     }
   });
 
@@ -123,6 +140,49 @@ export function SubscriberDetailScreen({
     }
   };
 
+  const handleAddTag = async (tag: string) => {
+    const trimmed = tag.trim();
+    if (trimmed.length === 0) return;
+
+    setTagsStatus("saving");
+    try {
+      const response = await addSubscriberTag(environmentId, subscriberId, {
+        tag: trimmed,
+      });
+      if (response.status === 404) {
+        setTagsError("Subscriber not found.");
+        setTagsStatus("error");
+        return;
+      }
+      setTagsStatus("idle");
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      setTagsError(err instanceof Error ? err.message : String(err));
+      setTagsStatus("error");
+    }
+  };
+
+  const handleRemoveTag = async (tag: string) => {
+    setTagsStatus("saving");
+    try {
+      const response = await removeSubscriberTag(
+        environmentId,
+        subscriberId,
+        tag,
+      );
+      if (response.status === 404) {
+        setTagsError("Subscriber not found.");
+        setTagsStatus("error");
+        return;
+      }
+      setTagsStatus("idle");
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      setTagsError(err instanceof Error ? err.message : String(err));
+      setTagsStatus("error");
+    }
+  };
+
   return (
     <Box flexDirection="column">
       <Text bold>Subscriber</Text>
@@ -145,6 +205,12 @@ export function SubscriberDetailScreen({
               <Text>externalId: {loadedSubscriber.externalId ?? "—"}</Text>
               <Text>name: {displayName}</Text>
               <Text>emailOptedIn: {String(preferences?.email ?? "—")}</Text>
+              <Text>
+                tags:{" "}
+                {loadedSubscriber.tags && loadedSubscriber.tags.length > 0
+                  ? loadedSubscriber.tags.join(", ")
+                  : "—"}
+              </Text>
             </Box>
           );
         }}
@@ -193,13 +259,50 @@ export function SubscriberDetailScreen({
       {prefsStatus === "saving" && <Text color="gray">Saving…</Text>}
       {prefsStatus === "error" && <Text color="red">Error: {prefsError}</Text>}
 
+      {tagsStatus === "choosing" && subscriber && (
+        <Box flexDirection="column">
+          <Text color="yellow">Tags for {subscriberId}:</Text>
+          <SelectInput
+            items={[
+              { label: "Add tag", value: "__add__" },
+              ...(subscriber.tags ?? []).map((tag) => ({
+                label: `Remove "${tag}"`,
+                value: `remove:${tag}`,
+              })),
+            ]}
+            onSelect={(item) => {
+              if (item.value === "__add__") {
+                setTagInput("");
+                setTagsStatus("adding");
+              } else {
+                void handleRemoveTag(item.value.slice("remove:".length));
+              }
+            }}
+          />
+        </Box>
+      )}
+      {tagsStatus === "adding" && (
+        <Box>
+          <Text>Tag: </Text>
+          <TextInput
+            value={tagInput}
+            onChange={setTagInput}
+            onSubmit={(value) => void handleAddTag(value)}
+          />
+        </Box>
+      )}
+      {tagsStatus === "saving" && <Text color="gray">Saving…</Text>}
+      {tagsStatus === "error" && <Text color="red">Error: {tagsError}</Text>}
+
       <Hints
         text={
           idle
-            ? "d delete · e edit · p preferences · Esc back · q quit"
-            : prefsStatus === "error"
+            ? "d delete · e edit · p preferences · t tags · Esc back · q quit"
+            : prefsStatus === "error" || tagsStatus === "error"
               ? "any key to continue"
-              : "↑↓ navigate · Enter select"
+              : tagsStatus === "adding"
+                ? "Enter to add · Esc back"
+                : "↑↓ navigate · Enter select"
         }
       />
     </Box>
