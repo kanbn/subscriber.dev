@@ -90,7 +90,14 @@ export const getBroadcastStepCounts = async (
     .where(eq(workflowRuns.broadcastId, broadcastId))
     .groupBy(workflowRunSteps.status);
 
-  const counts = { pending: 0, sent: 0, skipped: 0, failed: 0, cancelled: 0 };
+  const counts = {
+    pending: 0,
+    sent: 0,
+    skipped: 0,
+    failed: 0,
+    cancelled: 0,
+    bounced: 0,
+  };
   for (const row of rows) {
     counts[row.status] = row.count;
   }

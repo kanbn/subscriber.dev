@@ -41,6 +41,7 @@ export const BroadcastDetailResponseSchema = BroadcastSummarySchema.extend({
   failedCount: z.number(),
   skippedCount: z.number(),
   pendingCount: z.number(),
+  bouncedCount: z.number(),
 });
 
 export class TriggerBroadcastDto extends createZodDto(TriggerBroadcastSchema) {}

@@ -172,6 +172,7 @@ describe("getBroadcastStepCounts", () => {
       skipped: 0,
       failed: 0,
       cancelled: 0,
+      bounced: 0,
     });
   });
 
@@ -192,6 +193,7 @@ describe("getBroadcastStepCounts", () => {
       skipped: 0,
       failed: 1,
       cancelled: 0,
+      bounced: 0,
     });
   });
 });

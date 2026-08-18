@@ -44,12 +44,17 @@ export const workflowRunStepStatuses = [
   "skipped",
   "failed",
   "cancelled",
+  "bounced",
 ] as const;
 export type WorkflowRunStepStatus = (typeof workflowRunStepStatuses)[number];
 export const workflowRunStepStatusEnum = pgEnum(
   "workflowRunStepStatus",
   workflowRunStepStatuses,
 );
+
+export const bounceTypes = ["hard", "soft"] as const;
+export type BounceType = (typeof bounceTypes)[number];
+export const bounceTypeEnum = pgEnum("bounceType", bounceTypes);
 
 export const workflowBroadcastStatuses = [
   "pending",
@@ -279,6 +284,8 @@ export const workflowRunSteps = pgTable(
     status: workflowRunStepStatusEnum("status").notNull().default("pending"),
     bullJobId: varchar("bullJobId", { length: 255 }),
     errorMessage: text("errorMessage"),
+    bounceType: bounceTypeEnum("bounceType"),
+    providerMessageId: varchar("providerMessageId", { length: 255 }),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt").notNull().defaultNow(),
   },
@@ -291,6 +298,9 @@ export const workflowRunSteps = pgTable(
     index("workflow_run_steps_stepId_idx").on(table.stepId),
     index("workflow_run_steps_bullJobId_idx").on(table.bullJobId),
     index("workflow_run_steps_status_idx").on(table.status),
+    index("workflow_run_steps_providerMessageId_idx").on(
+      table.providerMessageId,
+    ),
   ],
 );
 

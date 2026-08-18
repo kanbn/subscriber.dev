@@ -296,6 +296,7 @@ export class WorkflowService {
           scheduledAt: s.scheduledAt,
           sentAt: s.sentAt,
           errorMessage: s.errorMessage,
+          bounceType: s.bounceType,
         })),
       })),
       limit: opts.limit,
@@ -338,6 +339,7 @@ export class WorkflowService {
           scheduledAt: s.scheduledAt,
           sentAt: s.sentAt,
           errorMessage: s.errorMessage,
+          bounceType: s.bounceType,
         })),
       })),
       limit: opts.limit,
@@ -513,6 +515,7 @@ export class WorkflowService {
       failedCount: counts.failed,
       skippedCount: counts.skipped,
       pendingCount: counts.pending,
+      bouncedCount: counts.bounced,
     };
   }
 }

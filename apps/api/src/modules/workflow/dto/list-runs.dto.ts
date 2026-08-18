@@ -9,10 +9,18 @@ export const ListRunsQuerySchema = z.object({
 export const WorkflowRunStepSummarySchema = z.object({
   stepOrder: z.number(),
   type: z.string(),
-  status: z.enum(["pending", "sent", "skipped", "failed", "cancelled"]),
+  status: z.enum([
+    "pending",
+    "sent",
+    "skipped",
+    "failed",
+    "cancelled",
+    "bounced",
+  ]),
   scheduledAt: z.date(),
   sentAt: z.date().nullable(),
   errorMessage: z.string().nullable(),
+  bounceType: z.enum(["hard", "soft"]).nullable(),
 });
 
 export const WorkflowRunSubscriberSummarySchema = z.object({

@@ -693,6 +693,7 @@ describe("getBroadcast", () => {
       skipped: 0,
       failed: 0,
       cancelled: 0,
+      bounced: 0,
     });
 
     const result = await service.getBroadcast(mockDb, 10, "wf_abc", "bc_abc");
@@ -706,6 +707,7 @@ describe("getBroadcast", () => {
       failedCount: 0,
       skippedCount: 0,
       pendingCount: 1,
+      bouncedCount: 0,
     });
   });
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { verifySmtpConnection } from "@subscriber.dev/email";
+import { sendRawEmail, verifySmtpConnection } from "@subscriber.dev/email";
 
 import type { IntegrationProvider } from "./types.js";
 
@@ -35,5 +35,27 @@ export const smtpProvider: IntegrationProvider<SmtpConfig, SmtpSecret> = {
       user: secret.user,
       password: secret.password,
     });
+  },
+  send: async (config, secret, message) => {
+    const from = config.fromName
+      ? `${config.fromName} <${config.fromEmail}>`
+      : config.fromEmail;
+
+    const response = await sendRawEmail(
+      {
+        host: config.host,
+        port: config.port,
+        secure: config.secure,
+        user: secret.user,
+        password: secret.password,
+        from,
+      },
+      message.to,
+      message.subject,
+      message.html,
+      message.envelopeFrom,
+    );
+
+    return { providerMessageId: response.messageId };
   },
 };
