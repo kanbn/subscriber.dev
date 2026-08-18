@@ -86,6 +86,12 @@ export const getRunStepByBullJobId = async (
   });
 };
 
+export const getRunStepByPublicId = async (db: dbClient, publicId: string) => {
+  return await db.query.workflowRunSteps.findFirst({
+    where: eq(workflowRunSteps.publicId, publicId),
+  });
+};
+
 export const getRunById = async (db: dbClient, id: number) => {
   return await db.query.workflowRuns.findFirst({
     where: eq(workflowRuns.id, id),
@@ -106,6 +112,22 @@ export const updateRunStepStatus = async (
       errorMessage: errorMessage ?? null,
       sentAt: status === "sent" ? new Date() : undefined,
       providerMessageId,
+      updatedAt: new Date(),
+    })
+    .where(eq(workflowRunSteps.id, id));
+};
+
+export const markRunStepBounced = async (
+  db: dbClient,
+  id: number,
+  data: { bounceType: "hard" | "soft"; reason: string },
+) => {
+  await db
+    .update(workflowRunSteps)
+    .set({
+      status: "bounced",
+      bounceType: data.bounceType,
+      errorMessage: data.reason,
       updatedAt: new Date(),
     })
     .where(eq(workflowRunSteps.id, id));

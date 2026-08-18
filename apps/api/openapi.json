@@ -1571,6 +1571,38 @@
         ]
       }
     },
+    "/bounces/inbound": {
+      "post": {
+        "operationId": "recordInboundBounce",
+        "summary": "Record an inbound bounce event",
+        "description": "Generic bounce-recording endpoint: identifies the send by the run step's publicId (embedded in the VERP return-path address, e.g. bounce+<publicId>@yourdomain) rather than any particular inbound-email provider. Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BounceWebhookBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Bounce event enqueued"
+          },
+          "401": {
+            "description": "Invalid or missing shared secret"
+          },
+          "404": {
+            "description": "Run step not found"
+          }
+        },
+        "tags": [
+          "Bounces"
+        ]
+      }
+    },
     "/environments/{environmentId}/integrations/{type}": {
       "patch": {
         "operationId": "upsertIntegration",
@@ -3141,7 +3173,8 @@
                           "sent",
                           "skipped",
                           "failed",
-                          "cancelled"
+                          "cancelled",
+                          "bounced"
                         ]
                       },
                       "scheduledAt": {},
@@ -3151,6 +3184,14 @@
                       "errorMessage": {
                         "type": "string",
                         "nullable": true
+                      },
+                      "bounceType": {
+                        "type": "string",
+                        "enum": [
+                          "hard",
+                          "soft"
+                        ],
+                        "nullable": true
                       }
                     },
                     "required": [
@@ -3159,7 +3200,8 @@
                       "status",
                       "scheduledAt",
                       "sentAt",
-                      "errorMessage"
+                      "errorMessage",
+                      "bounceType"
                     ]
                   }
                 },
@@ -3377,7 +3419,8 @@
                           "sent",
                           "skipped",
                           "failed",
-                          "cancelled"
+                          "cancelled",
+                          "bounced"
                         ]
                       },
                       "scheduledAt": {},
@@ -3387,6 +3430,14 @@
                       "errorMessage": {
                         "type": "string",
                         "nullable": true
+                      },
+                      "bounceType": {
+                        "type": "string",
+                        "enum": [
+                          "hard",
+                          "soft"
+                        ],
+                        "nullable": true
                       }
                     },
                     "required": [
@@ -3395,7 +3446,8 @@
                       "status",
                       "scheduledAt",
                       "sentAt",
-                      "errorMessage"
+                      "errorMessage",
+                      "bounceType"
                     ]
                   }
                 }
@@ -3666,6 +3718,9 @@
           },
           "pendingCount": {
             "type": "number"
+          },
+          "bouncedCount": {
+            "type": "number"
           }
         },
         "required": [
@@ -3676,7 +3731,34 @@
           "sentCount",
           "failedCount",
           "skippedCount",
-          "pendingCount"
+          "pendingCount",
+          "bouncedCount"
+        ]
+      },
+      "BounceWebhookBodyDto": {
+        "type": "object",
+        "properties": {
+          "runStepPublicId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bounceType": {
+            "type": "string",
+            "enum": [
+              "hard",
+              "soft"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "runStepPublicId",
+          "bounceType",
+          "reason"
         ]
       },
       "UpsertIntegrationDto": {

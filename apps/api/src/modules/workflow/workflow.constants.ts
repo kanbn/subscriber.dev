@@ -21,3 +21,12 @@ export interface BroadcastSetupJobData {
 }
 
 export const BROADCAST_STEPS_QUEUE_NAME = "broadcast-steps";
+
+export const BOUNCE_EVENTS_QUEUE_NAME = "bounce-events";
+export const BOUNCE_EVENT_JOB_NAME = "record-bounce";
+
+export interface BounceEventJobData {
+  runStepId: number;
+  bounceType: "hard" | "soft";
+  reason: string;
+}

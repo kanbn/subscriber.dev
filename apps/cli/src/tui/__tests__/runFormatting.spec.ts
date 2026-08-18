@@ -52,12 +52,26 @@ describe("stepSummary", () => {
       "1/2 sent, 1 failed",
     );
   });
+
+  it("appends a bounced count when any bounced, alongside failed", () => {
+    expect(stepSummary([{ status: "sent" }, { status: "bounced" }])).toBe(
+      "1/2 sent, 1 bounced",
+    );
+    expect(
+      stepSummary([
+        { status: "sent" },
+        { status: "failed" },
+        { status: "bounced" },
+      ]),
+    ).toBe("1/3 sent, 1 failed, 1 bounced");
+  });
 });
 
 describe("stepColor", () => {
-  it("colors sent green and failed red, otherwise undefined", () => {
+  it("colors sent green, failed red, bounced yellow, otherwise undefined", () => {
     expect(stepColor("sent")).toBe("green");
     expect(stepColor("failed")).toBe("red");
+    expect(stepColor("bounced")).toBe("yellow");
     expect(stepColor("pending")).toBeUndefined();
   });
 });

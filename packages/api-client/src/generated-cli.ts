@@ -691,12 +691,25 @@ export const ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = {
   skipped: 'skipped',
   failed: 'failed',
   cancelled: 'cancelled',
+  bounced: 'bounced',
 } as const;
 
 /**
  * @nullable
  */
 export type ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt = unknown | null;
+
+/**
+ * @nullable
+ */
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType] | null;
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = {
+  hard: 'hard',
+  soft: 'soft',
+} as const;
 
 export type ListEnvironmentRunsResponseDtoRunsItemStepsItem = {
   stepOrder: number;
@@ -707,6 +720,8 @@ export type ListEnvironmentRunsResponseDtoRunsItemStepsItem = {
   sentAt: ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt;
   /** @nullable */
   errorMessage: string | null;
+  /** @nullable */
+  bounceType: ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType;
 };
 
 export type ListEnvironmentRunsResponseDtoRunsItemWorkflow = {
@@ -854,12 +869,25 @@ export const ListRunsResponseDtoRunsItemStepsItemStatus = {
   skipped: 'skipped',
   failed: 'failed',
   cancelled: 'cancelled',
+  bounced: 'bounced',
 } as const;
 
 /**
  * @nullable
  */
 export type ListRunsResponseDtoRunsItemStepsItemSentAt = unknown | null;
+
+/**
+ * @nullable
+ */
+export type ListRunsResponseDtoRunsItemStepsItemBounceType = typeof ListRunsResponseDtoRunsItemStepsItemBounceType[keyof typeof ListRunsResponseDtoRunsItemStepsItemBounceType] | null;
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListRunsResponseDtoRunsItemStepsItemBounceType = {
+  hard: 'hard',
+  soft: 'soft',
+} as const;
 
 export type ListRunsResponseDtoRunsItemStepsItem = {
   stepOrder: number;
@@ -870,6 +898,8 @@ export type ListRunsResponseDtoRunsItemStepsItem = {
   sentAt: ListRunsResponseDtoRunsItemStepsItemSentAt;
   /** @nullable */
   errorMessage: string | null;
+  /** @nullable */
+  bounceType: ListRunsResponseDtoRunsItemStepsItemBounceType;
 };
 
 export type ListRunsResponseDtoRunsItem = {
@@ -1050,6 +1080,27 @@ export interface BroadcastDetailResponseDto {
   failedCount: number;
   skippedCount: number;
   pendingCount: number;
+  bouncedCount: number;
+}
+
+export type BounceWebhookBodyDtoBounceType = typeof BounceWebhookBodyDtoBounceType[keyof typeof BounceWebhookBodyDtoBounceType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BounceWebhookBodyDtoBounceType = {
+  hard: 'hard',
+  soft: 'soft',
+} as const;
+
+export interface BounceWebhookBodyDto {
+  /** @minLength 1 */
+  runStepPublicId: string;
+  bounceType: BounceWebhookBodyDtoBounceType;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  reason: string;
 }
 
 export type UpsertIntegrationDtoRoot = { [key: string]: unknown };
@@ -2585,6 +2636,56 @@ export const getBroadcast = async (environmentId: string,
     method: 'GET'
     
     
+  }
+);}
+
+
+
+/**
+ * Generic bounce-recording endpoint: identifies the send by the run step's publicId (embedded in the VERP return-path address, e.g. bounce+<publicId>@yourdomain) rather than any particular inbound-email provider. Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.
+ * @summary Record an inbound bounce event
+ */
+export type recordInboundBounceResponse202 = {
+  data: void
+  status: 202
+}
+
+export type recordInboundBounceResponse401 = {
+  data: void
+  status: 401
+}
+
+export type recordInboundBounceResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type recordInboundBounceResponseSuccess = (recordInboundBounceResponse202) & {
+  headers: Headers;
+};
+export type recordInboundBounceResponseError = (recordInboundBounceResponse401 | recordInboundBounceResponse404) & {
+  headers: Headers;
+};
+
+export type recordInboundBounceResponse = (recordInboundBounceResponseSuccess | recordInboundBounceResponseError)
+
+export const getRecordInboundBounceUrl = () => {
+
+
+  
+
+  return `/bounces/inbound`
+}
+
+export const recordInboundBounce = async (bounceWebhookBodyDto: BounceWebhookBodyDto, options?: RequestInit): Promise<recordInboundBounceResponse> => {
+  
+  return cliFetch<recordInboundBounceResponse>(getRecordInboundBounceUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bounceWebhookBodyDto,)
   }
 );}
 

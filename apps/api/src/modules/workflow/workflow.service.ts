@@ -15,10 +15,15 @@ import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo
 
 import type { AudienceCondition } from "./audienceQuery.js";
 import type { WorkflowStepSchema } from "./dto/create-workflow.dto.js";
-import type { BroadcastDispatchJobData } from "./workflow.constants.js";
+import type {
+  BounceEventJobData,
+  BroadcastDispatchJobData,
+} from "./workflow.constants.js";
 import { resolveAudienceSubscriberIds } from "./audienceQuery.js";
 import { createRunForSubscriber } from "./createRunForSubscriber.js";
 import {
+  BOUNCE_EVENT_JOB_NAME,
+  BOUNCE_EVENTS_QUEUE_NAME,
   BROADCAST_DISPATCH_JOB_NAME,
   BROADCAST_DISPATCH_QUEUE_NAME,
   WORKFLOW_QUEUE_NAME,
@@ -65,6 +70,8 @@ export class WorkflowService {
     @InjectQueue(WORKFLOW_QUEUE_NAME) private readonly queue: Queue,
     @InjectQueue(BROADCAST_DISPATCH_QUEUE_NAME)
     private readonly broadcastDispatchQueue: Queue,
+    @InjectQueue(BOUNCE_EVENTS_QUEUE_NAME)
+    private readonly bounceEventsQueue: Queue,
   ) {}
 
   private toWorkflowDto(
@@ -517,5 +524,38 @@ export class WorkflowService {
       pendingCount: counts.pending,
       bouncedCount: counts.bounced,
     };
+  }
+
+  async recordBounceEvent(
+    db: dbClient,
+    data: {
+      runStepPublicId: string;
+      bounceType: "hard" | "soft";
+      reason: string;
+    },
+  ) {
+    const runStep = await workflowRunRepo.getRunStepByPublicId(
+      db,
+      data.runStepPublicId,
+    );
+    if (!runStep) throw new NotFoundException("Run step not found");
+
+    // Deterministic jobId: a retried/duplicate webhook delivery (any bounce
+    // source retrying on a non-2xx) no-ops instead of double-recording.
+    await this.bounceEventsQueue.add(
+      BOUNCE_EVENT_JOB_NAME,
+      {
+        runStepId: runStep.id,
+        bounceType: data.bounceType,
+        reason: data.reason,
+      } satisfies BounceEventJobData,
+      {
+        jobId: `bounce-${runStep.id}`,
+        attempts: 3,
+        backoff: { type: "exponential", delay: 60_000 },
+        removeOnComplete: true,
+        removeOnFail: 1000,
+      },
+    );
   }
 }

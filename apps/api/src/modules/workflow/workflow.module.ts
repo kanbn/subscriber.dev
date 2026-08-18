@@ -1,10 +1,13 @@
 import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 
+import { BounceEventsProcessor } from "./bounceEvents.processor.js";
+import { BouncesController } from "./bounces.controller.js";
 import { BroadcastDispatchProcessor } from "./broadcastDispatch.processor.js";
 import { BroadcastSetupProcessor } from "./broadcastSetup.processor.js";
 import { BroadcastStepsProcessor } from "./broadcastSteps.processor.js";
 import {
+  BOUNCE_EVENTS_QUEUE_NAME,
   BROADCAST_DISPATCH_QUEUE_NAME,
   BROADCAST_SETUP_QUEUE_NAME,
   BROADCAST_STEPS_QUEUE_NAME,
@@ -21,15 +24,17 @@ import { WorkflowService } from "./workflow.service.js";
       { name: BROADCAST_DISPATCH_QUEUE_NAME },
       { name: BROADCAST_SETUP_QUEUE_NAME },
       { name: BROADCAST_STEPS_QUEUE_NAME },
+      { name: BOUNCE_EVENTS_QUEUE_NAME },
     ),
   ],
-  controllers: [WorkflowController],
+  controllers: [WorkflowController, BouncesController],
   providers: [
     WorkflowService,
     WorkflowProcessor,
     BroadcastDispatchProcessor,
     BroadcastSetupProcessor,
     BroadcastStepsProcessor,
+    BounceEventsProcessor,
   ],
   exports: [WorkflowService],
 })

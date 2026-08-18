@@ -39,6 +39,7 @@ vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
   cancelPendingForSubscriber: vi.fn(),
   listRunsForWorkflow: vi.fn(),
   listRunsForEnvironment: vi.fn(),
+  getRunStepByPublicId: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
@@ -56,6 +57,10 @@ const mockBroadcastDispatchQueue = {
   add: vi.fn(),
 };
 
+const mockBounceEventsQueue = {
+  add: vi.fn(),
+};
+
 let service: WorkflowService;
 
 beforeEach(() => {
@@ -64,6 +69,7 @@ beforeEach(() => {
   service = new WorkflowService(
     mockQueue as any,
     mockBroadcastDispatchQueue as any,
+    mockBounceEventsQueue as any,
   );
 });
 
@@ -730,5 +736,40 @@ describe("getBroadcast", () => {
     await expect(
       service.getBroadcast(mockDb, 10, "wf_abc", "bc_missing"),
     ).rejects.toThrow(NotFoundException);
+  });
+});
+
+describe("recordBounceEvent", () => {
+  it("enqueues a bounce-events job with a deterministic jobId keyed by the run step", async () => {
+    vi.mocked(workflowRunRepo.getRunStepByPublicId).mockResolvedValue({
+      id: 42,
+    } as any);
+
+    await service.recordBounceEvent(mockDb, {
+      runStepPublicId: "run_step_abc",
+      bounceType: "hard",
+      reason: "no such user",
+    });
+
+    expect(mockBounceEventsQueue.add).toHaveBeenCalledWith(
+      "record-bounce",
+      { runStepId: 42, bounceType: "hard", reason: "no such user" },
+      expect.objectContaining({ jobId: "bounce-42" }),
+    );
+  });
+
+  it("throws NotFoundException when the run step doesn't exist", async () => {
+    vi.mocked(workflowRunRepo.getRunStepByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      service.recordBounceEvent(mockDb, {
+        runStepPublicId: "run_step_missing",
+        bounceType: "hard",
+        reason: "no such user",
+      }),
+    ).rejects.toThrow(NotFoundException);
+    expect(mockBounceEventsQueue.add).not.toHaveBeenCalled();
   });
 });
