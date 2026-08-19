@@ -54,7 +54,3 @@ i18n.cache
 
 # pgdata
 /apps/api/pgdata
-
-# wrangler (Cloudflare Workers)
-.wrangler/
-.dev.vars

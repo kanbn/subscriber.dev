@@ -4,7 +4,6 @@ export interface OutboundEmail {
   to: string;
   subject: string;
   html: string;
-  envelopeFrom?: string;
 }
 
 export interface SendResult {

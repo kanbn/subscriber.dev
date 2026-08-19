@@ -4609,7 +4609,7 @@ export function useGetBroadcast<TData = Awaited<ReturnType<typeof getBroadcast>>
 
 
 /**
- * Generic bounce-recording endpoint: identifies the send by the run step's publicId (embedded in the VERP return-path address, e.g. bounce+<publicId>@yourdomain) rather than any particular inbound-email provider. Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.
+ * Generic bounce-recording endpoint, identified by the run step's publicId - callers are expected to have that publicId available via whatever mechanism they use to learn about the bounce (e.g. a provider's native webhook echoing back metadata set at send time). Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.
  * @summary Record an inbound bounce event
  */
 export type recordInboundBounceResponse202 = {

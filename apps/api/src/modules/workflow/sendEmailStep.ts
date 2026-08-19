@@ -10,7 +10,6 @@ import { renderTemplate } from "./workflow.template.js";
 
 interface RunStepForSend {
   id: number;
-  publicId: string;
   configSnapshot: Record<string, unknown>;
 }
 
@@ -19,12 +18,6 @@ interface SubscriberForSend {
   environmentId: number;
   publicId: string;
   email: string | null;
-}
-
-function buildBounceEnvelopeFrom(runStepPublicId: string): string | undefined {
-  const bounceDomain = process.env.BOUNCE_DOMAIN;
-  if (!bounceDomain) return undefined;
-  return `bounce+${runStepPublicId}@${bounceDomain}`;
 }
 
 export async function sendEmailStep(
@@ -110,7 +103,6 @@ export async function sendEmailStep(
       to: subscriber.email,
       subject,
       html,
-      envelopeFrom: buildBounceEnvelopeFrom(runStep.publicId),
     });
     await workflowRunRepo.updateRunStepStatus(
       db,

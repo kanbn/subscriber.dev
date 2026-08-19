@@ -162,32 +162,6 @@ describe("process", () => {
     );
   });
 
-  it("sets a VERP envelope-from using BOUNCE_DOMAIN and the run step's publicId, when configured", async () => {
-    const previous = process.env.BOUNCE_DOMAIN;
-    process.env.BOUNCE_DOMAIN = "bounces.example.com";
-    try {
-      await processor.process(makeJob());
-
-      const [, , , , envelopeFrom] = vi.mocked(sendRawEmail).mock.calls[0]!;
-      expect(envelopeFrom).toBe("bounce+run_step_1@bounces.example.com");
-    } finally {
-      process.env.BOUNCE_DOMAIN = previous;
-    }
-  });
-
-  it("omits the envelope-from override when BOUNCE_DOMAIN isn't configured", async () => {
-    const previous = process.env.BOUNCE_DOMAIN;
-    delete process.env.BOUNCE_DOMAIN;
-    try {
-      await processor.process(makeJob());
-
-      const [, , , , envelopeFrom] = vi.mocked(sendRawEmail).mock.calls[0]!;
-      expect(envelopeFrom).toBeUndefined();
-    } finally {
-      process.env.BOUNCE_DOMAIN = previous;
-    }
-  });
-
   it("marks the run-step failed when the integration's provider type isn't registered", async () => {
     vi.mocked(
       environmentIntegrationsRepo.getByEnvironmentAndType,

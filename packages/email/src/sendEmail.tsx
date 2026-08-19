@@ -64,7 +64,6 @@ export const sendRawEmail = async (
   to: string,
   subject: string,
   html: string,
-  envelopeFrom?: string,
 ) => {
   try {
     const response = await buildTransporter(config).sendMail({
@@ -72,7 +71,6 @@ export const sendRawEmail = async (
       to,
       subject,
       html,
-      ...(envelopeFrom && { envelope: { from: envelopeFrom, to } }),
     });
 
     if (!response.accepted.length) {
