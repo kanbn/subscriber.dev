@@ -34,6 +34,7 @@ export const environmentIntegrations = pgTable(
       () => users.id,
       { onDelete: "set null" },
     ),
+    lastBounceCheckAt: timestamp("lastBounceCheckAt"),
   },
   (table) => [
     unique("environment_integrations_env_type").on(

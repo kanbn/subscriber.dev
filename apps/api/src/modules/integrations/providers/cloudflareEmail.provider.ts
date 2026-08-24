@@ -1,7 +1,7 @@
 import { convert } from "html-to-text";
 import { z } from "zod";
 
-import type { IntegrationProvider } from "./types.js";
+import type { BounceEvent, IntegrationProvider } from "./types.js";
 
 const configSchema = z.object({
   accountId: z.string().min(1),
@@ -26,6 +26,22 @@ interface CloudflareSendResponse {
   errors: CloudflareApiError[];
   result: { message_id: string } | null;
 }
+
+interface CloudflareSuppressionEntry {
+  email: string;
+  reason: string;
+  created_at: string;
+}
+
+interface CloudflareSuppressionListResponse {
+  page: number;
+  per_page: number;
+  total: number;
+  result: CloudflareSuppressionEntry[];
+}
+
+const SUPPRESSION_PAGE_SIZE = 1000;
+const MAX_SUPPRESSION_PAGES = 1000;
 
 // Cloudflare accepts HTML-only, but including a text part is a documented
 // deliverability recommendation, not a strict requirement.
@@ -89,5 +105,55 @@ export const cloudflareEmailProvider: IntegrationProvider<
     }
 
     return { providerMessageId: body.result.message_id };
+  },
+  // Cloudflare has no bounce webhook. Hard bounces are auto-added to the
+  // account's suppression list, so that's what we poll instead. Soft
+  // bounces never appear here - Cloudflare retries those internally.
+  //
+  // Results are fetched newest-first, so once an entry is at or before
+  // `since` everything after it is old too - stop paginating there instead
+  // of always re-walking the entire list.
+  checkBounces: async (config, secret, since) => {
+    const events: BounceEvent[] = [];
+    let page = 1;
+
+    outer: for (;;) {
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/email/sending/suppression?page=${page}&per_page=${SUPPRESSION_PAGE_SIZE}&order=created_at&direction=desc`,
+        { headers: { Authorization: `Bearer ${secret.apiToken}` } },
+      );
+      const body = (await response
+        .json()
+        .catch(() => null)) as CloudflareSuppressionListResponse | null;
+
+      if (!response.ok || !body) {
+        throw new Error(
+          `Cloudflare Email suppression list fetch failed: HTTP ${response.status}`,
+        );
+      }
+
+      for (const entry of body.result) {
+        const occurredAt = new Date(entry.created_at);
+        if (since && occurredAt <= since) break outer;
+
+        events.push({
+          email: entry.email,
+          bounceType: "hard",
+          reason: entry.reason,
+          occurredAt,
+        });
+      }
+
+      if (page * body.per_page >= body.total) break;
+
+      page += 1;
+      if (page > MAX_SUPPRESSION_PAGES) {
+        throw new Error(
+          `Cloudflare Email suppression list pagination exceeded ${MAX_SUPPRESSION_PAGES} pages - aborting`,
+        );
+      }
+    }
+
+    return events;
   },
 };

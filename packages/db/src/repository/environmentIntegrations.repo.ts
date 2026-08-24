@@ -25,6 +25,21 @@ export const listByEnvironment = async (
   });
 };
 
+export const listAll = async (db: dbClient) => {
+  return await db.query.environmentIntegrations.findMany();
+};
+
+export const updateLastBounceCheckAt = async (
+  db: dbClient,
+  id: number,
+  lastBounceCheckAt: Date,
+) => {
+  await db
+    .update(environmentIntegrations)
+    .set({ lastBounceCheckAt })
+    .where(eq(environmentIntegrations.id, id));
+};
+
 export const upsertIntegration = async (
   db: dbClient,
   environmentId: number,

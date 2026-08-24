@@ -1,0 +1,1 @@
+ALTER TABLE "environment_integrations" ADD COLUMN "lastBounceCheckAt" timestamp;

@@ -30,3 +30,7 @@ export interface BounceEventJobData {
   bounceType: "hard" | "soft";
   reason: string;
 }
+
+export const SUPPRESSION_POLL_QUEUE_NAME = "suppression-poll";
+export const SUPPRESSION_POLL_JOB_NAME = "poll";
+export const SUPPRESSION_POLL_INTERVAL_MS = 15 * 60 * 1000;
