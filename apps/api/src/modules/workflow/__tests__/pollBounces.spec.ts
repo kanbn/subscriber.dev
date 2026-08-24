@@ -1,19 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
-import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
+import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
-import { pollSuppressions } from "../pollSuppressions.js";
+import { pollBounces } from "../pollBounces.js";
+import { recordBounce } from "../recordBounce.js";
 
 vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
   listAll: vi.fn(),
   updateLastBounceCheckAt: vi.fn(),
 }));
 
-vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
-  getSubscriberByEmail: vi.fn(),
-  getLatestPreferences: vi.fn(),
-  createSubscriberPreferences: vi.fn(),
+vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
+  getRunStepByProviderMessageId: vi.fn(),
+}));
+
+vi.mock("../recordBounce.js", () => ({
+  recordBounce: vi.fn(),
 }));
 
 vi.mock("../../../common/encryption.js", () => ({
@@ -65,15 +68,15 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("pollSuppressions", () => {
+describe("pollBounces", () => {
   it("skips integrations whose provider has no checkBounces", async () => {
     vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
       smtpIntegration,
     ] as any);
 
-    await pollSuppressions(mockDb);
+    await pollBounces(mockDb);
 
-    expect(subscriberRepo.getSubscriberByEmail).not.toHaveBeenCalled();
+    expect(workflowRunRepo.getRunStepByProviderMessageId).not.toHaveBeenCalled();
   });
 
   it("skips integrations with no encrypted secret", async () => {
@@ -81,92 +84,63 @@ describe("pollSuppressions", () => {
       { ...fakeIntegration, encryptedSecret: null },
     ] as any);
 
-    await pollSuppressions(mockDb);
+    await pollBounces(mockDb);
 
     expect(checkBounces).not.toHaveBeenCalled();
   });
 
-  it("opts a matched subscriber out of email on a hard bounce", async () => {
+  it("records a bounce against the matched run step", async () => {
     vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
       fakeIntegration,
     ] as any);
     checkBounces.mockResolvedValue([
       {
-        email: "bounced@example.com",
+        providerMessageId: "<abc@mail.kan.bn>",
         bounceType: "hard",
-        reason: "hard_bounce",
+        reason: "no such user",
         occurredAt: new Date("2026-08-24T10:00:00Z"),
       },
     ]);
-    vi.mocked(subscriberRepo.getSubscriberByEmail).mockResolvedValue({
-      id: 42,
-    } as any);
-    vi.mocked(subscriberRepo.getLatestPreferences).mockResolvedValue({
-      email: true,
-    } as any);
-
-    await pollSuppressions(mockDb);
-
-    expect(subscriberRepo.getSubscriberByEmail).toHaveBeenCalledWith(
-      mockDb,
-      5,
-      "bounced@example.com",
+    vi.mocked(workflowRunRepo.getRunStepByProviderMessageId).mockResolvedValue(
+      { id: 4 } as any,
     );
-    expect(subscriberRepo.createSubscriberPreferences).toHaveBeenCalledWith(
+
+    await pollBounces(mockDb);
+
+    expect(workflowRunRepo.getRunStepByProviderMessageId).toHaveBeenCalledWith(
       mockDb,
-      { subscriberId: 42, email: false },
+      "<abc@mail.kan.bn>",
     );
+    expect(recordBounce).toHaveBeenCalledWith(mockDb, {
+      runStepId: 4,
+      bounceType: "hard",
+      reason: "no such user",
+    });
   });
 
-  it("does nothing when the email doesn't match a subscriber in that environment", async () => {
+  it("does nothing when the providerMessageId doesn't match a run step", async () => {
     vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
       fakeIntegration,
     ] as any);
     checkBounces.mockResolvedValue([
       {
-        email: "unknown@example.com",
+        providerMessageId: "<unknown@mail.kan.bn>",
         bounceType: "hard",
-        reason: "hard_bounce",
+        reason: "no such user",
         occurredAt: new Date("2026-08-24T10:00:00Z"),
       },
     ]);
-    vi.mocked(subscriberRepo.getSubscriberByEmail).mockResolvedValue(undefined);
+    vi.mocked(workflowRunRepo.getRunStepByProviderMessageId).mockResolvedValue(
+      undefined,
+    );
 
-    await pollSuppressions(mockDb);
+    await pollBounces(mockDb);
 
-    expect(subscriberRepo.createSubscriberPreferences).not.toHaveBeenCalled();
-  });
-
-  it("does not re-opt-out a subscriber already opted out", async () => {
-    vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
-      fakeIntegration,
-    ] as any);
-    checkBounces.mockResolvedValue([
-      {
-        email: "bounced@example.com",
-        bounceType: "hard",
-        reason: "hard_bounce",
-        occurredAt: new Date("2026-08-24T10:00:00Z"),
-      },
-    ]);
-    vi.mocked(subscriberRepo.getSubscriberByEmail).mockResolvedValue({
-      id: 42,
-    } as any);
-    vi.mocked(subscriberRepo.getLatestPreferences).mockResolvedValue({
-      email: false,
-    } as any);
-
-    await pollSuppressions(mockDb);
-
-    expect(subscriberRepo.createSubscriberPreferences).not.toHaveBeenCalled();
+    expect(recordBounce).not.toHaveBeenCalled();
   });
 
   it("continues processing other integrations when one throws", async () => {
-    const otherFakeIntegration = {
-      ...fakeIntegration,
-      id: 3,
-      environmentId: 6,
-    };
+    const otherFakeIntegration = { ...fakeIntegration, id: 3, environmentId: 6 };
     vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
       fakeIntegration,
       otherFakeIntegration,
@@ -175,27 +149,25 @@ describe("pollSuppressions", () => {
       .mockRejectedValueOnce(new Error("Cloudflare API down"))
       .mockResolvedValueOnce([
         {
-          email: "bounced@example.com",
+          providerMessageId: "<abc@mail.kan.bn>",
           bounceType: "hard",
-          reason: "hard_bounce",
+          reason: "no such user",
           occurredAt: new Date("2026-08-24T10:00:00Z"),
         },
       ]);
-    vi.mocked(subscriberRepo.getSubscriberByEmail).mockResolvedValue({
-      id: 42,
-    } as any);
-    vi.mocked(subscriberRepo.getLatestPreferences).mockResolvedValue({
-      email: true,
-    } as any);
+    vi.mocked(workflowRunRepo.getRunStepByProviderMessageId).mockResolvedValue(
+      { id: 4 } as any,
+    );
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    await pollSuppressions(mockDb);
+    await pollBounces(mockDb);
 
     expect(consoleSpy).toHaveBeenCalled();
-    expect(subscriberRepo.createSubscriberPreferences).toHaveBeenCalledWith(
-      mockDb,
-      { subscriberId: 42, email: false },
-    );
+    expect(recordBounce).toHaveBeenCalledWith(mockDb, {
+      runStepId: 4,
+      bounceType: "hard",
+      reason: "no such user",
+    });
     consoleSpy.mockRestore();
   });
 
@@ -206,7 +178,7 @@ describe("pollSuppressions", () => {
     ] as any);
     checkBounces.mockResolvedValue([]);
 
-    await pollSuppressions(mockDb);
+    await pollBounces(mockDb);
 
     expect(checkBounces).toHaveBeenCalledWith(
       {},
@@ -221,7 +193,7 @@ describe("pollSuppressions", () => {
     ] as any);
     checkBounces.mockResolvedValue([]);
 
-    await pollSuppressions(mockDb);
+    await pollBounces(mockDb);
 
     expect(checkBounces).toHaveBeenCalledWith(
       {},
@@ -230,45 +202,48 @@ describe("pollSuppressions", () => {
     );
   });
 
-  it("advances the cursor to the latest occurredAt seen", async () => {
-    vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
-      fakeIntegration,
-    ] as any);
-    checkBounces.mockResolvedValue([
-      {
-        email: "older@example.com",
-        bounceType: "hard",
-        reason: "hard_bounce",
-        occurredAt: new Date("2026-08-24T09:00:00Z"),
-      },
-      {
-        email: "newer@example.com",
-        bounceType: "hard",
-        reason: "hard_bounce",
-        occurredAt: new Date("2026-08-24T11:00:00Z"),
-      },
-    ]);
-    vi.mocked(subscriberRepo.getSubscriberByEmail).mockResolvedValue({
-      id: 42,
-    } as any);
-    vi.mocked(subscriberRepo.getLatestPreferences).mockResolvedValue({
-      email: true,
-    } as any);
-
-    await pollSuppressions(mockDb);
-
-    expect(
-      environmentIntegrationsRepo.updateLastBounceCheckAt,
-    ).toHaveBeenCalledWith(mockDb, 1, new Date("2026-08-24T11:00:00Z"));
-  });
-
-  it("does not move the cursor when no bounces were returned", async () => {
+  it("advances the cursor to the poll time, even when no bounces were found", async () => {
     vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
       fakeIntegration,
     ] as any);
     checkBounces.mockResolvedValue([]);
 
-    await pollSuppressions(mockDb);
+    const before = new Date();
+    await pollBounces(mockDb);
+    const after = new Date();
+
+    expect(
+      environmentIntegrationsRepo.updateLastBounceCheckAt,
+    ).toHaveBeenCalledWith(mockDb, 1, expect.any(Date));
+    const cursor = vi.mocked(
+      environmentIntegrationsRepo.updateLastBounceCheckAt,
+    ).mock.calls[0]![2] as Date;
+    expect(cursor.getTime()).toBeGreaterThanOrEqual(before.getTime());
+    expect(cursor.getTime()).toBeLessThanOrEqual(after.getTime());
+  });
+
+  it("does not move the cursor when the provider returns null (not configured for this check)", async () => {
+    vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
+      fakeIntegration,
+    ] as any);
+    checkBounces.mockResolvedValue(null);
+
+    await pollBounces(mockDb);
+
+    expect(
+      environmentIntegrationsRepo.updateLastBounceCheckAt,
+    ).not.toHaveBeenCalled();
+    expect(workflowRunRepo.getRunStepByProviderMessageId).not.toHaveBeenCalled();
+  });
+
+  it("does not move the cursor when the poll itself fails", async () => {
+    vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
+      fakeIntegration,
+    ] as any);
+    checkBounces.mockRejectedValue(new Error("Cloudflare API down"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await pollBounces(mockDb);
 
     expect(
       environmentIntegrationsRepo.updateLastBounceCheckAt,

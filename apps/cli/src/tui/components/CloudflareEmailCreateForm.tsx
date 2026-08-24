@@ -8,6 +8,7 @@ export interface CloudflareEmailCreateValues {
   fromEmail: string;
   fromName: string;
   apiToken: string;
+  zoneId: string;
 }
 
 const TEXT_FIELDS = [
@@ -15,6 +16,11 @@ const TEXT_FIELDS = [
   { key: "fromEmail", label: "From email", mask: false },
   { key: "fromName", label: "From name", mask: false },
   { key: "apiToken", label: "API token", mask: true },
+  {
+    key: "zoneId",
+    label: "Zone ID (optional, enables precise bounce detection)",
+    mask: false,
+  },
 ] as const;
 
 type TextFieldKey = (typeof TEXT_FIELDS)[number]["key"];
@@ -44,6 +50,7 @@ export function CloudflareEmailCreateForm({
     fromEmail: "",
     fromName: "",
     apiToken: "",
+    zoneId: "",
   });
   const [mode, setMode] = useState<Mode>("menu");
   const [editingField, setEditingField] = useState<TextFieldKey | null>(null);

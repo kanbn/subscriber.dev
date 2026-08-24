@@ -7,6 +7,7 @@ const configSchema = z.object({
   accountId: z.string().min(1),
   fromEmail: z.string().email(),
   fromName: z.string().max(255).optional(),
+  zoneId: z.string().min(1).optional(),
 });
 
 const secretSchema = z.object({
@@ -27,21 +28,55 @@ interface CloudflareSendResponse {
   result: { message_id: string } | null;
 }
 
-interface CloudflareSuppressionEntry {
-  email: string;
-  reason: string;
-  created_at: string;
+interface CloudflareEmailSendingEvent {
+  datetime: string;
+  status: string;
+  errorCause: string;
+  errorDetail: string;
+  messageId: string;
 }
 
-interface CloudflareSuppressionListResponse {
-  page: number;
-  per_page: number;
-  total: number;
-  result: CloudflareSuppressionEntry[];
+interface CloudflareGraphQLResponse {
+  data?: {
+    viewer?: {
+      zones?: Array<{ emailSendingAdaptive: CloudflareEmailSendingEvent[] }>;
+    };
+  };
+  errors?: Array<{ message: string }> | null;
 }
 
-const SUPPRESSION_PAGE_SIZE = 1000;
-const MAX_SUPPRESSION_PAGES = 1000;
+const ANALYTICS_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000;
+const ANALYTICS_EVENT_LIMIT = 1000;
+
+const EMAIL_SENDING_EVENTS_QUERY = `
+  query($zoneTag: string!, $start: Time!, $end: Time!) {
+    viewer {
+      zones(filter: { zoneTag: $zoneTag }) {
+        emailSendingAdaptive(
+          filter: { datetime_geq: $start, datetime_leq: $end }
+          limit: ${ANALYTICS_EVENT_LIMIT}
+          orderBy: [datetime_ASC]
+        ) {
+          datetime
+          status
+          errorCause
+          errorDetail
+          messageId
+        }
+      }
+    }
+  }
+`;
+
+// Cloudflare's errorDetail embeds the raw SMTP response, e.g.
+// "Permanent ... permanent error (550): 5.1.1 ..." vs
+// "Temporary ... transient error (450): 4.2.0 ...". A 5xx code is a hard
+// bounce; anything else (4xx, or unparseable) is treated as soft so we
+// don't unsubscribe someone over an ambiguous signal.
+function classifyBounce(errorDetail: string): "hard" | "soft" {
+  const match = /\((\d)\d{2}\)/.exec(errorDetail);
+  return match?.[1] === "5" ? "hard" : "soft";
+}
 
 // Cloudflare accepts HTML-only, but including a text part is a documented
 // deliverability recommendation, not a strict requirement.
@@ -106,52 +141,56 @@ export const cloudflareEmailProvider: IntegrationProvider<
 
     return { providerMessageId: body.result.message_id };
   },
-  // Cloudflare has no bounce webhook. Hard bounces are auto-added to the
-  // account's suppression list, so that's what we poll instead. Soft
-  // bounces never appear here - Cloudflare retries those internally.
-  //
-  // Results are fetched newest-first, so once an entry is at or before
-  // `since` everything after it is old too - stop paginating there instead
-  // of always re-walking the entire list.
+  // Cloudflare has no bounce webhook, so this polls GraphQL Analytics for
+  // delivery failures instead, correlated back to the run step that sent
+  // them via messageId. Needs config.zoneId, which requires a
+  // Zone > Analytics > Read grant on the API token - a no-op without it.
   checkBounces: async (config, secret, since) => {
+    if (!config.zoneId) return null;
+
+    const start = since ?? new Date(Date.now() - ANALYTICS_DEFAULT_LOOKBACK_MS);
+    const end = new Date();
+
+    const response = await fetch(
+      "https://api.cloudflare.com/client/v4/graphql",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${secret.apiToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: EMAIL_SENDING_EVENTS_QUERY,
+          variables: {
+            zoneTag: config.zoneId,
+            start: start.toISOString(),
+            end: end.toISOString(),
+          },
+        }),
+      },
+    );
+
+    const body = (await response
+      .json()
+      .catch(() => null)) as CloudflareGraphQLResponse | null;
+
+    if (!response.ok || !body?.data) {
+      const message = body?.errors?.[0]?.message ?? `HTTP ${response.status}`;
+      throw new Error(`Cloudflare Email analytics fetch failed: ${message}`);
+    }
+
+    const rawEvents = body.data.viewer?.zones?.[0]?.emailSendingAdaptive ?? [];
+
     const events: BounceEvent[] = [];
-    let page = 1;
+    for (const event of rawEvents) {
+      if (event.status !== "deliveryFailed" || !event.messageId) continue;
 
-    outer: for (;;) {
-      const response = await fetch(
-        `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/email/sending/suppression?page=${page}&per_page=${SUPPRESSION_PAGE_SIZE}&order=created_at&direction=desc`,
-        { headers: { Authorization: `Bearer ${secret.apiToken}` } },
-      );
-      const body = (await response
-        .json()
-        .catch(() => null)) as CloudflareSuppressionListResponse | null;
-
-      if (!response.ok || !body) {
-        throw new Error(
-          `Cloudflare Email suppression list fetch failed: HTTP ${response.status}`,
-        );
-      }
-
-      for (const entry of body.result) {
-        const occurredAt = new Date(entry.created_at);
-        if (since && occurredAt <= since) break outer;
-
-        events.push({
-          email: entry.email,
-          bounceType: "hard",
-          reason: entry.reason,
-          occurredAt,
-        });
-      }
-
-      if (page * body.per_page >= body.total) break;
-
-      page += 1;
-      if (page > MAX_SUPPRESSION_PAGES) {
-        throw new Error(
-          `Cloudflare Email suppression list pagination exceeded ${MAX_SUPPRESSION_PAGES} pages - aborting`,
-        );
-      }
+      events.push({
+        providerMessageId: event.messageId,
+        bounceType: classifyBounce(event.errorDetail),
+        reason: event.errorDetail || event.errorCause,
+        occurredAt: new Date(event.datetime),
+      });
     }
 
     return events;

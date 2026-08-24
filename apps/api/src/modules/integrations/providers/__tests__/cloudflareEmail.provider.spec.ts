@@ -136,191 +136,120 @@ describe("verify", () => {
 });
 
 describe("checkBounces", () => {
-  it("fetches the suppression list and maps entries to hard bounces", async () => {
+  const configWithZone = { ...config, zoneId: "zone_abc" };
+
+  it("returns null (not checked) without calling the API when no zoneId is configured", async () => {
+    const events = await cloudflareEmailProvider.checkBounces!(config, secret);
+
+    expect(events).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("maps deliveryFailed events to bounces, classifying hard vs soft from the embedded SMTP code", async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: () =>
         Promise.resolve({
-          page: 1,
-          per_page: 1000,
-          total: 2,
-          result: [
-            {
-              email: "bounced1@example.com",
-              reason: "hard_bounce",
-              created_at: "2026-08-24T10:00:00Z",
+          data: {
+            viewer: {
+              zones: [
+                {
+                  emailSendingAdaptive: [
+                    {
+                      datetime: "2026-08-24T14:11:15Z",
+                      status: "deliveryFailed",
+                      errorCause: "mailbox_gmail_unknown",
+                      errorDetail:
+                        "Permanent Unknown error: permanent error (550): 5.1.1 no such user",
+                      messageId: "<abc@mail.kan.bn>",
+                    },
+                    {
+                      datetime: "2026-08-24T13:47:16Z",
+                      status: "deliveryFailed",
+                      errorCause: "greylisted_postgrey",
+                      errorDetail:
+                        "Temporary Unknown error: transient error (450): 4.2.0 greylisted",
+                      messageId: "<def@mail.kan.bn>",
+                    },
+                    {
+                      datetime: "2026-08-24T15:24:10Z",
+                      status: "delivered",
+                      errorCause: "",
+                      errorDetail: "",
+                      messageId: "<ghi@mail.kan.bn>",
+                    },
+                    {
+                      datetime: "2026-08-24T15:22:08Z",
+                      status: "rejected",
+                      errorCause: "suppressed",
+                      errorDetail: "recipient suppressed",
+                      messageId: "",
+                    },
+                  ],
+                },
+              ],
             },
-            {
-              email: "bounced2@example.com",
-              reason: "hard_bounce",
-              created_at: "2026-08-24T09:00:00Z",
-            },
-          ],
+          },
+          errors: null,
         }),
     });
 
-    const events = await cloudflareEmailProvider.checkBounces!(config, secret);
+    const events = await cloudflareEmailProvider.checkBounces!(
+      configWithZone,
+      secret,
+    );
 
     expect(events).toEqual([
       {
-        email: "bounced1@example.com",
+        providerMessageId: "<abc@mail.kan.bn>",
         bounceType: "hard",
-        reason: "hard_bounce",
-        occurredAt: new Date("2026-08-24T10:00:00Z"),
+        reason:
+          "Permanent Unknown error: permanent error (550): 5.1.1 no such user",
+        occurredAt: new Date("2026-08-24T14:11:15Z"),
       },
       {
-        email: "bounced2@example.com",
-        bounceType: "hard",
-        reason: "hard_bounce",
-        occurredAt: new Date("2026-08-24T09:00:00Z"),
+        providerMessageId: "<def@mail.kan.bn>",
+        bounceType: "soft",
+        reason:
+          "Temporary Unknown error: transient error (450): 4.2.0 greylisted",
+        occurredAt: new Date("2026-08-24T13:47:16Z"),
       },
     ]);
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.cloudflare.com/client/v4/accounts/acct_123/email/sending/suppression?page=1&per_page=1000&order=created_at&direction=desc",
-      { headers: { Authorization: "Bearer test-token" } },
-    );
   });
 
-  it("paginates until every suppressed entry has been fetched", async () => {
-    fetchMock
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            page: 1,
-            per_page: 1,
-            total: 2,
-            result: [
-              {
-                email: "bounced1@example.com",
-                reason: "hard_bounce",
-                created_at: "2026-08-24T10:00:00Z",
-              },
-            ],
-          }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            page: 2,
-            per_page: 1,
-            total: 2,
-            result: [
-              {
-                email: "bounced2@example.com",
-                reason: "hard_bounce",
-                created_at: "2026-08-24T09:00:00Z",
-              },
-            ],
-          }),
-      });
-
-    const events = await cloudflareEmailProvider.checkBounces!(config, secret);
-
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(events.map((e) => e.email)).toEqual([
-      "bounced1@example.com",
-      "bounced2@example.com",
-    ]);
-  });
-
-  it("stops paginating once entries are at or before `since`, without fetching further pages", async () => {
-    fetchMock.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          page: 1,
-          per_page: 1,
-          total: 2,
-          result: [
-            {
-              email: "new@example.com",
-              reason: "hard_bounce",
-              created_at: "2026-08-24T10:00:00Z",
-            },
-          ],
-        }),
-    });
-
-    const events = await cloudflareEmailProvider.checkBounces!(
-      config,
-      secret,
-      new Date("2026-08-24T10:00:00Z"),
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(events).toEqual([]);
-  });
-
-  it("only returns entries newer than `since`", async () => {
-    fetchMock.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          page: 1,
-          per_page: 2,
-          total: 2,
-          result: [
-            {
-              email: "new@example.com",
-              reason: "hard_bounce",
-              created_at: "2026-08-24T11:00:00Z",
-            },
-            {
-              email: "old@example.com",
-              reason: "hard_bounce",
-              created_at: "2026-08-24T09:00:00Z",
-            },
-          ],
-        }),
-    });
-
-    const events = await cloudflareEmailProvider.checkBounces!(
-      config,
-      secret,
-      new Date("2026-08-24T10:00:00Z"),
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(events.map((e) => e.email)).toEqual(["new@example.com"]);
-  });
-
-  it("aborts if the API reports a total that pagination never reaches", async () => {
-    fetchMock.mockImplementation((url: string) => {
-      const page = Number(new URL(url).searchParams.get("page"));
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            page,
-            per_page: 1,
-            total: Number.MAX_SAFE_INTEGER,
-            result: [
-              {
-                email: `bounced${page}@example.com`,
-                reason: "hard_bounce",
-                created_at: "2026-08-24T10:00:00Z",
-              },
-            ],
-          }),
-      });
-    });
-
-    await expect(
-      cloudflareEmailProvider.checkBounces!(config, secret),
-    ).rejects.toThrow("exceeded");
-  });
-
-  it("throws when the suppression list request fails", async () => {
+  it("sends the zoneId, since cursor, and now as the GraphQL query variables", async () => {
     fetchMock.mockResolvedValue({
-      ok: false,
-      status: 500,
-      json: () => Promise.resolve(null),
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          data: { viewer: { zones: [{ emailSendingAdaptive: [] }] } },
+          errors: null,
+        }),
+    });
+    const since = new Date("2026-08-24T12:00:00Z");
+
+    await cloudflareEmailProvider.checkBounces!(configWithZone, secret, since);
+
+    const [url, options] = fetchMock.mock.calls[0]!;
+    expect(url).toBe("https://api.cloudflare.com/client/v4/graphql");
+    expect(options.headers.Authorization).toBe("Bearer test-token");
+    const body = JSON.parse(options.body);
+    expect(body.variables.zoneTag).toBe("zone_abc");
+    expect(body.variables.start).toBe("2026-08-24T12:00:00.000Z");
+  });
+
+  it("throws with the GraphQL error message when the request fails", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          data: null,
+          errors: [{ message: "Invalid zone tag" }],
+        }),
     });
 
     await expect(
-      cloudflareEmailProvider.checkBounces!(config, secret),
-    ).rejects.toThrow("Cloudflare Email suppression list fetch failed");
+      cloudflareEmailProvider.checkBounces!(configWithZone, secret),
+    ).rejects.toThrow("Invalid zone tag");
   });
 });

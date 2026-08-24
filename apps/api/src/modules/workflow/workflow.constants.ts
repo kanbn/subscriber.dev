@@ -31,6 +31,6 @@ export interface BounceEventJobData {
   reason: string;
 }
 
-export const SUPPRESSION_POLL_QUEUE_NAME = "suppression-poll";
-export const SUPPRESSION_POLL_JOB_NAME = "poll";
-export const SUPPRESSION_POLL_INTERVAL_MS = 15 * 60 * 1000;
+export const BOUNCE_POLL_QUEUE_NAME = "bounce-poll";
+export const BOUNCE_POLL_JOB_NAME = "poll";
+export const BOUNCE_POLL_INTERVAL_MS = 15 * 60 * 1000;

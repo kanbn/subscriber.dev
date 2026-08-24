@@ -82,6 +82,7 @@ export function IntegrationsScreen({
         fromEmail: values.fromEmail.trim(),
         fromName: values.fromName.trim() || undefined,
         apiToken: values.apiToken.trim(),
+        zoneId: values.zoneId.trim() || undefined,
       };
       const response = await upsertIntegration(
         environmentId,

@@ -5,6 +5,7 @@ import {
   cancelPendingForSubscriber,
   completeRunIfAllStepsTerminal,
   createRunWithSteps,
+  getRunStepByProviderMessageId,
   listRunsForEnvironment,
   listRunsForWorkflow,
   updateRunStepStatus,
@@ -221,6 +222,35 @@ describe("completeRunIfAllStepsTerminal", () => {
 
     await completeRunIfAllStepsTerminal(db, 5);
     expect(db.update).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getRunStepByProviderMessageId
+// ---------------------------------------------------------------------------
+
+describe("getRunStepByProviderMessageId", () => {
+  it("returns the matching run step", async () => {
+    const runStep = { id: 4, providerMessageId: "<abc@mail.kan.bn>" };
+    const findFirst = vi.fn().mockResolvedValue(runStep);
+    const db = {
+      query: { workflowRunSteps: { findFirst } },
+    } as unknown as dbClient;
+
+    const result = await getRunStepByProviderMessageId(db, "<abc@mail.kan.bn>");
+
+    expect(result).toEqual(runStep);
+  });
+
+  it("returns undefined when nothing matches", async () => {
+    const findFirst = vi.fn().mockResolvedValue(undefined);
+    const db = {
+      query: { workflowRunSteps: { findFirst } },
+    } as unknown as dbClient;
+
+    const result = await getRunStepByProviderMessageId(db, "<missing>");
+
+    expect(result).toBeUndefined();
   });
 });
 

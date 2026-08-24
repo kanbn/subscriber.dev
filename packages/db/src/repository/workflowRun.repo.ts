@@ -92,6 +92,15 @@ export const getRunStepByPublicId = async (db: dbClient, publicId: string) => {
   });
 };
 
+export const getRunStepByProviderMessageId = async (
+  db: dbClient,
+  providerMessageId: string,
+) => {
+  return await db.query.workflowRunSteps.findFirst({
+    where: eq(workflowRunSteps.providerMessageId, providerMessageId),
+  });
+};
+
 export const getRunById = async (db: dbClient, id: number) => {
   return await db.query.workflowRuns.findFirst({
     where: eq(workflowRuns.id, id),

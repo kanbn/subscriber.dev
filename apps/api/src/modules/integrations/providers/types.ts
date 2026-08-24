@@ -11,7 +11,7 @@ export interface SendResult {
 }
 
 export interface BounceEvent {
-  email: string;
+  providerMessageId: string;
   bounceType: "hard" | "soft";
   reason: string;
   occurredAt: Date;
@@ -27,12 +27,9 @@ export interface IntegrationProvider<TConfig = unknown, TSecret = unknown> {
     secret: TSecret,
     message: OutboundEmail,
   ) => Promise<SendResult>;
-  // For providers with no native bounce webhook: polled periodically to
-  // discover bounces that happened since the last check. `since` is omitted
-  // on the first ever poll for an integration.
   checkBounces?: (
     config: TConfig,
     secret: TSecret,
     since?: Date,
-  ) => Promise<BounceEvent[]>;
+  ) => Promise<BounceEvent[] | null>;
 }
