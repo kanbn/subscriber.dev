@@ -15,6 +15,33 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
 
 const testIntegration = { type: "smtp", updatedAt: "2026-01-01T00:00:00.000Z" };
 
+describe("IntegrationsScreen primary badge", () => {
+  it("labels the first integration as primary, matching the priority-ordered response", async () => {
+    vi.mocked(listIntegrations).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        integrations: [
+          { type: "cloudflare", updatedAt: "2026-01-01T00:00:00.000Z" },
+          { type: "smtp", updatedAt: "2026-01-01T00:00:00.000Z" },
+        ],
+      },
+    } as never);
+
+    const { lastFrame } = render(
+      <IntegrationsScreen
+        environmentId="test-environment-1"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("cloudflare (primary)");
+    });
+    expect(lastFrame()).not.toContain("smtp (primary)");
+  });
+});
+
 describe("IntegrationsScreen", () => {
   it("lists integrations by type", async () => {
     vi.mocked(listIntegrations).mockResolvedValue({

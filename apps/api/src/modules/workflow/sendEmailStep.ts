@@ -53,8 +53,8 @@ export async function sendEmailStep(
     db,
     subscriber.environmentId,
   );
-  const integration = integrations.find((i) => INTEGRATION_PROVIDERS[i.type]);
-  if (!integration) {
+  const candidates = integrations.filter((i) => INTEGRATION_PROVIDERS[i.type]);
+  if (candidates.length === 0) {
     await workflowRunRepo.updateRunStepStatus(
       db,
       runStep.id,
@@ -63,13 +63,6 @@ export async function sendEmailStep(
     );
     return;
   }
-
-  const provider = INTEGRATION_PROVIDERS[integration.type]!;
-
-  const providerConfig = provider.configSchema.parse(integration.config);
-  const providerSecret = provider.secretSchema.parse(
-    JSON.parse(decrypt(integration.encryptedSecret!)),
-  );
 
   const stepConfig = runStep.configSnapshot as {
     subject: string;
@@ -89,26 +82,38 @@ export async function sendEmailStep(
       ? `${interpolatedBody}<p style="font-size:12px;color:#666;">Don't want these emails? <a href="${unsubscribeUrl}">Unsubscribe</a></p>`
       : interpolatedBody;
 
-  try {
-    const result = await provider.send(providerConfig, providerSecret, {
-      to: subscriber.email,
-      subject,
-      html,
-    });
-    await workflowRunRepo.updateRunStepStatus(
-      db,
-      runStep.id,
-      "sent",
-      undefined,
-      result.providerMessageId,
-    );
-  } catch (error) {
-    await workflowRunRepo.updateRunStepStatus(
-      db,
-      runStep.id,
-      "failed",
-      error instanceof Error ? error.message : "Unknown error",
-    );
-    throw error;
+  let lastError: unknown;
+  for (const integration of candidates) {
+    const provider = INTEGRATION_PROVIDERS[integration.type]!;
+    try {
+      const providerConfig = provider.configSchema.parse(integration.config);
+      const providerSecret = provider.secretSchema.parse(
+        JSON.parse(decrypt(integration.encryptedSecret!)),
+      );
+      const result = await provider.send(providerConfig, providerSecret, {
+        to: subscriber.email,
+        subject,
+        html,
+      });
+      await workflowRunRepo.updateRunStepStatus(
+        db,
+        runStep.id,
+        "sent",
+        undefined,
+        result.providerMessageId,
+      );
+      return;
+    } catch (error) {
+      // Try the next integration in priority order before giving up.
+      lastError = error;
+    }
   }
+
+  await workflowRunRepo.updateRunStepStatus(
+    db,
+    runStep.id,
+    "failed",
+    lastError instanceof Error ? lastError.message : "Unknown error",
+  );
+  throw lastError;
 }

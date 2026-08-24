@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   deleteIntegration,
   getIntegration,
+  setPrimaryIntegration,
 } from "@subscriber.dev/api-client/cli";
 
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
@@ -12,6 +13,7 @@ import { Hints } from "../components/Hints.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
+type PrimaryStatus = "idle" | "setting" | "error";
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined) return "—";
@@ -32,6 +34,8 @@ export function IntegrationDetailScreen({
   type: string;
   onDeleted: () => void;
 }) {
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const state = useAsyncData(async () => {
     const response = await getIntegration(environmentId, type);
     if (response.status !== 200) {
@@ -40,16 +44,45 @@ export function IntegrationDetailScreen({
     // The response has provider-specific fields beyond what the generated
     // type declares (a known lossy conversion for open-dictionary DTOs).
     return response.data as unknown as Record<string, unknown>;
-  }, [environmentId, type]);
+  }, [environmentId, type, refreshKey]);
 
   const [deleteStatus, setDeleteStatus] = useState<DeleteStatus>("idle");
   const [deleteError, setDeleteError] = useState("");
+  const [primaryStatus, setPrimaryStatus] = useState<PrimaryStatus>("idle");
+  const [primaryError, setPrimaryError] = useState("");
+
+  const isPrimary = state.status === "ready" && state.data.priority === 1;
 
   useInput((input) => {
     if (deleteStatus === "idle" && (input === "d" || input === "D")) {
       setDeleteStatus("confirming");
     }
+    if (
+      deleteStatus === "idle" &&
+      primaryStatus === "idle" &&
+      !isPrimary &&
+      (input === "p" || input === "P")
+    ) {
+      void handleSetPrimary();
+    }
   });
+
+  const handleSetPrimary = async () => {
+    setPrimaryStatus("setting");
+    try {
+      const response = await setPrimaryIntegration(environmentId, type);
+      if (response.status !== 200) {
+        setPrimaryError("Integration not found.");
+        setPrimaryStatus("error");
+        return;
+      }
+      setPrimaryStatus("idle");
+      setRefreshKey((key) => key + 1);
+    } catch (err) {
+      setPrimaryError(err instanceof Error ? err.message : String(err));
+      setPrimaryStatus("error");
+    }
+  };
 
   const handleConfirmDelete = async () => {
     setDeleteStatus("deleting");
@@ -93,11 +126,17 @@ export function IntegrationDetailScreen({
       {deleteStatus === "error" && (
         <Text color="red">Error: {deleteError}</Text>
       )}
+      {primaryStatus === "setting" && (
+        <Text color="gray">Setting as primary…</Text>
+      )}
+      {primaryStatus === "error" && (
+        <Text color="red">Error: {primaryError}</Text>
+      )}
 
       <Hints
         text={
           deleteStatus === "idle"
-            ? "d remove · Esc back · q quit"
+            ? `d remove${isPrimary ? "" : " · p set primary"} · Esc back · q quit`
             : "↑↓ navigate · Enter select"
         }
       />

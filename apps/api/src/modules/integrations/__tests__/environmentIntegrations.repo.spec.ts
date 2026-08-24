@@ -5,6 +5,7 @@ import {
   deleteIntegration,
   getByEnvironmentAndType,
   listByEnvironment,
+  setPrimary,
   upsertIntegration,
 } from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 
@@ -29,10 +30,19 @@ function makeMockDb(
   const values = vi.fn().mockReturnValue({ onConflictDoUpdate });
   const where = vi.fn().mockReturnValue({ returning: deleteReturning });
 
+  const txSet = vi.fn().mockReturnValue({ where: vi.fn() });
+  const txUpdate = vi.fn().mockReturnValue({ set: txSet });
+  const transaction = vi
+    .fn()
+    .mockImplementation(async (cb: (tx: unknown) => Promise<void>) => {
+      await cb({ update: txUpdate });
+    });
+
   const db = {
     query: { environmentIntegrations: { findFirst, findMany } },
     insert: vi.fn().mockReturnValue({ values }),
     delete: vi.fn().mockReturnValue({ where }),
+    transaction,
   };
 
   return {
@@ -40,6 +50,9 @@ function makeMockDb(
     values,
     onConflictDoUpdate,
     where,
+    transaction,
+    txUpdate,
+    txSet,
   };
 }
 
@@ -86,6 +99,7 @@ describe("upsertIntegration", () => {
       { host: "smtp.example.com" },
       "encrypted-blob",
       1,
+      1,
     );
 
     expect(result).toEqual(row);
@@ -100,14 +114,81 @@ describe("upsertIntegration", () => {
     );
   });
 
+  it("sets priority in the insert values but not in the onConflictDoUpdate set, so reconfiguring an existing integration doesn't move it", async () => {
+    const row = { id: 1, environmentId: 10, type: "smtp" };
+    const { db, values, onConflictDoUpdate } = makeMockDb({
+      insertReturning: vi.fn().mockResolvedValue([row]),
+    });
+
+    await upsertIntegration(db, 10, "smtp", {}, null, 1, 3);
+
+    expect(values).toHaveBeenCalledWith(
+      expect.objectContaining({ priority: 3 }),
+    );
+    const setArg = onConflictDoUpdate.mock.calls[0]![0].set;
+    expect(setArg).not.toHaveProperty("priority");
+  });
+
   it("throws if the upsert returns nothing", async () => {
     const { db } = makeMockDb({
       insertReturning: vi.fn().mockResolvedValue([]),
     });
 
     await expect(
-      upsertIntegration(db, 10, "smtp", {}, null, 1),
+      upsertIntegration(db, 10, "smtp", {}, null, 1, 1),
     ).rejects.toThrow("Failed to upsert integration");
+  });
+});
+
+describe("setPrimary", () => {
+  it("moves the target to priority 1 and shifts the rest after it, preserving their relative order", async () => {
+    const rows = [
+      { id: 1, type: "smtp", priority: 1 },
+      { id: 2, type: "cloudflare", priority: 2 },
+      { id: 3, type: "ses", priority: 3 },
+    ];
+    const { db, txUpdate, txSet } = makeMockDb({
+      findMany: vi.fn().mockResolvedValue(rows),
+    });
+
+    const result = await setPrimary(db, 10, "ses");
+
+    expect(result).toEqual({ id: 3, type: "ses", priority: 1 });
+    // New order: ses(1), smtp(1->2), cloudflare(2->3)
+    expect(txUpdate).toHaveBeenCalledTimes(3);
+    expect(txSet.mock.calls).toEqual([
+      [{ priority: 1 }],
+      [{ priority: 2 }],
+      [{ priority: 3 }],
+    ]);
+  });
+
+  it("returns undefined when the type isn't configured", async () => {
+    const { db, transaction } = makeMockDb({
+      findMany: vi
+        .fn()
+        .mockResolvedValue([{ id: 1, type: "smtp", priority: 1 }]),
+    });
+
+    const result = await setPrimary(db, 10, "cloudflare");
+
+    expect(result).toBeUndefined();
+    expect(transaction).not.toHaveBeenCalled();
+  });
+
+  it("is a no-op reorder when the target is already primary", async () => {
+    const rows = [
+      { id: 1, type: "smtp", priority: 1 },
+      { id: 2, type: "cloudflare", priority: 2 },
+    ];
+    const { db, txSet } = makeMockDb({
+      findMany: vi.fn().mockResolvedValue(rows),
+    });
+
+    const result = await setPrimary(db, 10, "smtp");
+
+    expect(result).toEqual({ id: 1, type: "smtp", priority: 1 });
+    expect(txSet.mock.calls).toEqual([[{ priority: 1 }], [{ priority: 2 }]]);
   });
 });
 

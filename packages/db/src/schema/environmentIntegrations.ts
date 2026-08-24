@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   index,
+  integer,
   jsonb,
   pgTable,
   text,
@@ -35,6 +36,7 @@ export const environmentIntegrations = pgTable(
       { onDelete: "set null" },
     ),
     lastBounceCheckAt: timestamp("lastBounceCheckAt"),
+    priority: integer("priority").notNull(),
   },
   (table) => [
     unique("environment_integrations_env_type").on(

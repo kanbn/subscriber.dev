@@ -5,6 +5,7 @@ import {
   deleteIntegration,
   getIntegration,
   listIntegrations,
+  setPrimaryIntegration,
   upsertIntegration,
 } from "@subscriber.dev/api-client/cli";
 import { readCliConfig } from "@subscriber.dev/shared";
@@ -16,6 +17,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   getIntegration: vi.fn(),
   upsertIntegration: vi.fn(),
   deleteIntegration: vi.fn(),
+  setPrimaryIntegration: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
@@ -184,6 +186,52 @@ describe("integrations set", () => {
 
     expect(errorSpy).toHaveBeenCalledWith(
       "Invalid config or failed verification.",
+    );
+    expect(process.exitCode).toBe(1);
+
+    process.exitCode = undefined;
+  });
+});
+
+describe("integrations set-primary", () => {
+  it("moves the integration to the front of the failover order", async () => {
+    vi.mocked(setPrimaryIntegration).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { ...testIntegration, priority: 1 },
+    } as never);
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["integrations", "set-primary", "cloudflare"],
+      { from: "user" },
+    );
+
+    expect(setPrimaryIntegration).toHaveBeenCalledWith(
+      "test-environment-1",
+      "cloudflare",
+    );
+    expect(logSpy).toHaveBeenCalledWith({ ...testIntegration, priority: 1 });
+  });
+
+  it("prints an error and exits on a 404", async () => {
+    vi.mocked(setPrimaryIntegration).mockResolvedValue({
+      status: 404,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["integrations", "set-primary", "missing"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Environment or integration not found.",
     );
     expect(process.exitCode).toBe(1);
 

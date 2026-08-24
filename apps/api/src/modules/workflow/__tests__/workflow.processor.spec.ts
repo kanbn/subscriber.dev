@@ -105,6 +105,7 @@ beforeEach(() => {
         fromName: "Example",
       },
       encryptedSecret: "encrypted-blob",
+      priority: 1,
     },
   ] as any);
   vi.mocked(decrypt).mockReturnValue(
@@ -168,6 +169,7 @@ describe("process", () => {
         type: "unknown-provider",
         config: {},
         encryptedSecret: "encrypted-blob",
+        priority: 1,
       },
     ] as any);
 
@@ -182,12 +184,13 @@ describe("process", () => {
     );
   });
 
-  it("picks whichever configured integration matches a registered provider, e.g. cloudflare alongside an unrelated type", async () => {
+  it("skips unregistered integration types and sends through whichever configured integration matches a registered provider", async () => {
     vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
       {
         type: "unrelated-future-integration",
         config: {},
         encryptedSecret: null,
+        priority: 1,
       },
       {
         type: "smtp",
@@ -199,12 +202,107 @@ describe("process", () => {
           fromName: "Example",
         },
         encryptedSecret: "encrypted-blob",
+        priority: 2,
       },
     ] as any);
 
     await processor.process(makeJob());
 
     expect(sendRawEmail).toHaveBeenCalled();
+  });
+
+  it("falls through to the next integration in priority order when the primary one fails to send", async () => {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+      {
+        type: "smtp",
+        config: {
+          host: "primary.example.com",
+          port: 587,
+          secure: false,
+          fromEmail: "hello@example.com",
+          fromName: "Example",
+        },
+        encryptedSecret: "encrypted-blob",
+        priority: 1,
+      },
+      {
+        type: "smtp",
+        config: {
+          host: "fallback.example.com",
+          port: 587,
+          secure: false,
+          fromEmail: "hello@example.com",
+          fromName: "Example",
+        },
+        encryptedSecret: "encrypted-blob",
+        priority: 2,
+      },
+    ] as any);
+    vi.mocked(sendRawEmail)
+      .mockRejectedValueOnce(new Error("Primary provider down"))
+      .mockResolvedValueOnce({
+        accepted: ["alice@example.com"],
+        messageId: "msg-fallback",
+      } as any);
+
+    await processor.process(makeJob());
+
+    expect(sendRawEmail).toHaveBeenCalledTimes(2);
+    const [firstConfig] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    const [secondConfig] = vi.mocked(sendRawEmail).mock.calls[1]!;
+    expect((firstConfig as any).host).toBe("primary.example.com");
+    expect((secondConfig as any).host).toBe("fallback.example.com");
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      1,
+      "sent",
+      undefined,
+      "msg-fallback",
+    );
+  });
+
+  it("marks the run-step failed with the last provider's error when every configured integration fails", async () => {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+      {
+        type: "smtp",
+        config: {
+          host: "primary.example.com",
+          port: 587,
+          secure: false,
+          fromEmail: "hello@example.com",
+          fromName: "Example",
+        },
+        encryptedSecret: "encrypted-blob",
+        priority: 1,
+      },
+      {
+        type: "smtp",
+        config: {
+          host: "fallback.example.com",
+          port: 587,
+          secure: false,
+          fromEmail: "hello@example.com",
+          fromName: "Example",
+        },
+        encryptedSecret: "encrypted-blob",
+        priority: 2,
+      },
+    ] as any);
+    vi.mocked(sendRawEmail)
+      .mockRejectedValueOnce(new Error("Primary provider down"))
+      .mockRejectedValueOnce(new Error("Fallback provider down too"));
+
+    await expect(processor.process(makeJob())).rejects.toThrow(
+      "Fallback provider down too",
+    );
+
+    expect(sendRawEmail).toHaveBeenCalledTimes(2);
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      1,
+      "failed",
+      "Fallback provider down too",
+    );
   });
 
   it("always appends a working unsubscribe link, even when the template doesn't reference {{unsubscribeUrl}}", async () => {

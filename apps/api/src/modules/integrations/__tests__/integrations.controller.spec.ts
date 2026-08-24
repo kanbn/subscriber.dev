@@ -23,6 +23,7 @@ const mockService = {
   get: vi.fn(),
   list: vi.fn(),
   delete: vi.fn(),
+  setPrimary: vi.fn(),
 };
 
 let controller: IntegrationsController;
@@ -106,6 +107,35 @@ describe("list", () => {
 
     expect(result).toEqual({ integrations: [] });
     expect(mockService.list).toHaveBeenCalledWith(expect.anything(), 10);
+  });
+});
+
+describe("setPrimary", () => {
+  it("delegates to the service with the resolved environment id", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      mockEnvironment as any,
+    );
+    mockService.setPrimary.mockResolvedValue({ type: "ses", priority: 1 });
+
+    const result = await controller.setPrimary("env_abc", "ses");
+
+    expect(result).toEqual({ type: "ses", priority: 1 });
+    expect(mockService.setPrimary).toHaveBeenCalledWith(
+      expect.anything(),
+      10,
+      "ses",
+    );
+  });
+
+  it("throws NotFoundException when the environment doesn't exist", async () => {
+    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(controller.setPrimary("env_missing", "ses")).rejects.toThrow(
+      NotFoundException,
+    );
+    expect(mockService.setPrimary).not.toHaveBeenCalled();
   });
 });
 

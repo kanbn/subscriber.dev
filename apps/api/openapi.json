@@ -1748,6 +1748,54 @@
         ]
       }
     },
+    "/environments/{environmentId}/integrations/{type}/primary": {
+      "patch": {
+        "operationId": "setPrimaryIntegration",
+        "summary": "Set an integration as primary",
+        "description": "Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration promoted to primary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment or integration not found"
+          }
+        },
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/environments/{environmentId}/integrations": {
       "get": {
         "operationId": "listIntegrations",
@@ -3781,6 +3829,9 @@
           "type": {
             "type": "string"
           },
+          "priority": {
+            "type": "number"
+          },
           "updatedAt": {
             "type": "",
             "x-nestjs_zod-empty-type": true
@@ -3788,6 +3839,7 @@
         },
         "required": [
           "type",
+          "priority",
           "updatedAt"
         ]
       },
@@ -3802,10 +3854,14 @@
                 "type": {
                   "type": "string"
                 },
+                "priority": {
+                  "type": "number"
+                },
                 "updatedAt": {}
               },
               "required": [
                 "type",
+                "priority",
                 "updatedAt"
               ]
             }

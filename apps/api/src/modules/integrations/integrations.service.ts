@@ -14,8 +14,14 @@ function toResponse(row: {
   type: string;
   config: Record<string, unknown>;
   updatedAt: Date;
+  priority: number;
 }) {
-  return { type: row.type, ...row.config, updatedAt: row.updatedAt };
+  return {
+    type: row.type,
+    ...row.config,
+    priority: row.priority,
+    updatedAt: row.updatedAt,
+  };
 }
 
 @Injectable()
@@ -61,6 +67,19 @@ export class IntegrationsService {
     }
 
     const encryptedSecret = encrypt(JSON.stringify(secretResult.data));
+
+    // Only used if this is a brand new integration type for this
+    // environment - appended to the end of the failover order. Reconfiguring
+    // an existing integration never changes its position (see
+    // upsertIntegration's onConflictDoUpdate).
+    const existing = await environmentIntegrationsRepo.listByEnvironment(
+      db,
+      environmentId,
+    );
+    const priorities = existing.map((i) => i.priority);
+    const priorityIfNew =
+      priorities.length > 0 ? Math.max(...priorities) + 1 : 1;
+
     const row = await environmentIntegrationsRepo.upsertIntegration(
       db,
       environmentId,
@@ -68,7 +87,19 @@ export class IntegrationsService {
       configResult.data,
       encryptedSecret,
       updatedBy,
+      priorityIfNew,
     );
+
+    return toResponse(row);
+  }
+
+  async setPrimary(db: dbClient, environmentId: number, type: string) {
+    const row = await environmentIntegrationsRepo.setPrimary(
+      db,
+      environmentId,
+      type,
+    );
+    if (!row) throw new NotFoundException("Integration not configured");
 
     return toResponse(row);
   }

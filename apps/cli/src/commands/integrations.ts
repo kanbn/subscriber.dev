@@ -5,6 +5,7 @@ import {
   deleteIntegration,
   getIntegration,
   listIntegrations,
+  setPrimaryIntegration,
   upsertIntegration,
 } from "@subscriber.dev/api-client/cli";
 
@@ -16,7 +17,9 @@ import { run } from "../run.js";
 export function registerIntegrationsCommand(program: Command): void {
   const integrations = program
     .command("integrations")
-    .description("Manage environment integrations (e.g. smtp)");
+    .description(
+      "Manage environment integrations (e.g. smtp). Multiple email integrations failover in priority order on send.",
+    );
 
   integrations
     .command("list")
@@ -115,6 +118,35 @@ export function registerIntegrationsCommand(program: Command): void {
           }
           if (response.status === 404) {
             console.error("Environment or integration type not found.");
+            process.exitCode = 1;
+            return;
+          }
+          printResult(response.data, opts);
+        },
+      ),
+    );
+
+  integrations
+    .command("set-primary <type>")
+    .description(
+      "Move an integration to the front of the failover order (tried first on send)",
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          type: string,
+          opts: { environment?: string; json?: boolean },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await setPrimaryIntegration(environmentId, type);
+          if (response.status === 404) {
+            console.error("Environment or integration not found.");
             process.exitCode = 1;
             return;
           }

@@ -6,6 +6,7 @@ export const UpsertIntegrationSchema = z.object({}).catchall(z.unknown());
 export const IntegrationResponseSchema = z
   .object({
     type: z.string(),
+    priority: z.number(),
     updatedAt: z.date(),
   })
   .catchall(z.unknown());

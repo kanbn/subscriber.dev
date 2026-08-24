@@ -86,6 +86,42 @@ export class IntegrationsController {
     );
   }
 
+  @Patch(":type/primary")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "setPrimaryIntegration",
+    summary: "Set an integration as primary",
+    description:
+      "Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "type", type: "string" })
+  @ApiResponse({
+    status: 200,
+    description: "Integration promoted to primary",
+    type: IntegrationResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Environment or integration not found",
+  })
+  async setPrimary(
+    @Param("environmentId") environmentId: string,
+    @Param("type") type: string,
+  ): Promise<IntegrationResponseDto> {
+    const db = createDrizzleClient();
+
+    const environment = await subscriberRepo.getEnvironmentByPublicId(
+      db,
+      environmentId,
+    );
+    if (!environment) {
+      throw new NotFoundException("Environment not found");
+    }
+
+    return this.integrationsService.setPrimary(db, environment.id, type);
+  }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

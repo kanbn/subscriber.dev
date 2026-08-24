@@ -1,0 +1,1 @@
+ALTER TABLE "environment_integrations" ALTER COLUMN "priority" SET NOT NULL;

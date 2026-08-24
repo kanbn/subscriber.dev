@@ -157,8 +157,8 @@ export function IntegrationsScreen({
           ) : (
             <SelectInput
               limit={10}
-              items={integrations.map((integration) => ({
-                label: integration.type,
+              items={integrations.map((integration, index) => ({
+                label: `${integration.type}${index === 0 ? " (primary)" : ""}`,
                 value: integration.type,
               }))}
               onSelect={(item) => onSelect(item.value)}

@@ -78,6 +78,20 @@
       "when": 1787568565069,
       "tag": "20260824104925_AddLastBounceCheckAtToIntegrations",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1787574608644,
+      "tag": "20260824123008_AddPriorityToIntegrationsNullable",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1787574643284,
+      "tag": "20260824123043_MakeIntegrationPriorityNotNull",
+      "breakpoints": true
     }
   ]
 }

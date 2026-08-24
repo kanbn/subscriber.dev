@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import { environmentIntegrations } from "@subscriber.dev/db/schema";
@@ -22,6 +22,10 @@ export const listByEnvironment = async (
 ) => {
   return await db.query.environmentIntegrations.findMany({
     where: eq(environmentIntegrations.environmentId, environmentId),
+    orderBy: [
+      asc(environmentIntegrations.priority),
+      asc(environmentIntegrations.id),
+    ],
   });
 };
 
@@ -47,6 +51,9 @@ export const upsertIntegration = async (
   config: Record<string, unknown>,
   encryptedSecret: string | null,
   updatedBy: number,
+  // Only applied on insert - reconfiguring an existing integration must
+  // never change its place in the failover order.
+  priorityIfNew: number,
 ) => {
   const [result] = await db
     .insert(environmentIntegrations)
@@ -57,6 +64,7 @@ export const upsertIntegration = async (
       encryptedSecret,
       createdBy: updatedBy,
       updatedBy,
+      priority: priorityIfNew,
     })
     .onConflictDoUpdate({
       target: [
@@ -69,6 +77,31 @@ export const upsertIntegration = async (
 
   if (!result) throw new Error("Failed to upsert integration");
   return result;
+};
+
+// Moves `type` to the front of the failover order, preserving the relative
+// order of the rest. Returns undefined if the type isn't configured.
+export const setPrimary = async (
+  db: dbClient,
+  environmentId: number,
+  type: string,
+) => {
+  const rows = await listByEnvironment(db, environmentId);
+  const target = rows.find((row) => row.type === type);
+  if (!target) return undefined;
+
+  const reordered = [target, ...rows.filter((row) => row.type !== type)];
+
+  await db.transaction(async (tx) => {
+    for (let i = 0; i < reordered.length; i++) {
+      await tx
+        .update(environmentIntegrations)
+        .set({ priority: i + 1 })
+        .where(eq(environmentIntegrations.id, reordered[i]!.id));
+    }
+  });
+
+  return { ...target, priority: 1 };
 };
 
 export const deleteIntegration = async (

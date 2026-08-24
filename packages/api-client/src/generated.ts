@@ -1130,11 +1130,13 @@ export interface UpsertIntegrationDto {
 
 export interface IntegrationResponseDto {
   type: string;
+  priority: number;
   updatedAt: unknown;
 }
 
 export type ListIntegrationsResponseDtoIntegrationsItem = {
   type: string;
+  priority: number;
   updatedAt: unknown;
 };
 
@@ -5026,6 +5028,100 @@ export const useDeleteIntegration = <TError = void,
       > => {
 
       const mutationOptions = getDeleteIntegrationMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.
+ * @summary Set an integration as primary
+ */
+export type setPrimaryIntegrationResponse200 = {
+  data: IntegrationResponseDto
+  status: 200
+}
+
+export type setPrimaryIntegrationResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type setPrimaryIntegrationResponseSuccess = (setPrimaryIntegrationResponse200) & {
+  headers: Headers;
+};
+export type setPrimaryIntegrationResponseError = (setPrimaryIntegrationResponse404) & {
+  headers: Headers;
+};
+
+export type setPrimaryIntegrationResponse = (setPrimaryIntegrationResponseSuccess | setPrimaryIntegrationResponseError)
+
+export const getSetPrimaryIntegrationUrl = (environmentId: string,
+    type: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/integrations/${type}/primary`
+}
+
+export const setPrimaryIntegration = async (environmentId: string,
+    type: string, options?: RequestInit): Promise<setPrimaryIntegrationResponse> => {
+  
+  return customFetch<setPrimaryIntegrationResponse>(getSetPrimaryIntegrationUrl(environmentId,type),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH'
+    
+    
+  }
+);}
+
+
+
+
+export const getSetPrimaryIntegrationMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setPrimaryIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setPrimaryIntegration>>, TError,{environmentId: string;type: string}, TContext> => {
+
+const mutationKey = ['setPrimaryIntegration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setPrimaryIntegration>>, {environmentId: string;type: string}> = (props) => {
+          const {environmentId,type} = props ?? {};
+
+          return  setPrimaryIntegration(environmentId,type,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetPrimaryIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof setPrimaryIntegration>>>
+    
+    export type SetPrimaryIntegrationMutationError = void
+
+    /**
+ * @summary Set an integration as primary
+ */
+export const useSetPrimaryIntegration = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setPrimaryIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setPrimaryIntegration>>,
+        TError,
+        {environmentId: string;type: string},
+        TContext
+      > => {
+
+      const mutationOptions = getSetPrimaryIntegrationMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

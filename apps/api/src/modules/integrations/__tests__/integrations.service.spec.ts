@@ -13,6 +13,7 @@ vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
   listByEnvironment: vi.fn(),
   upsertIntegration: vi.fn(),
   deleteIntegration: vi.fn(),
+  setPrimary: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/email", () => ({
@@ -40,6 +41,9 @@ let service: IntegrationsService;
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(verifySmtpConnection).mockResolvedValue(undefined as any);
+  vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue(
+    [],
+  );
   service = new IntegrationsService();
 });
 
@@ -109,6 +113,7 @@ describe("upsert", () => {
         fromName: "Example",
       },
       encryptedSecret: "encrypted-blob",
+      priority: 1,
       updatedAt: new Date("2026-01-01"),
     } as any);
 
@@ -131,6 +136,7 @@ describe("upsert", () => {
       expect.objectContaining({ host: "smtp.example.com" }),
       "encrypted-blob",
       1,
+      1,
     );
     const [, , , savedConfig] = vi.mocked(
       environmentIntegrationsRepo.upsertIntegration,
@@ -141,6 +147,63 @@ describe("upsert", () => {
     expect(result).not.toHaveProperty("password");
     expect(result).toEqual(
       expect.objectContaining({ type: "smtp", host: "smtp.example.com" }),
+    );
+  });
+
+  it("appends new integrations to the end of the existing failover order", async () => {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+      { type: "cloudflare", priority: 1 },
+      { type: "ses", priority: 2 },
+    ] as any);
+    vi.mocked(environmentIntegrationsRepo.upsertIntegration).mockResolvedValue({
+      type: "smtp",
+      config: {},
+      priority: 3,
+      updatedAt: new Date("2026-01-01"),
+    } as any);
+
+    await service.upsert(mockDb, 10, "smtp", validSmtpBody, 1);
+
+    expect(environmentIntegrationsRepo.upsertIntegration).toHaveBeenCalledWith(
+      mockDb,
+      10,
+      "smtp",
+      expect.anything(),
+      expect.anything(),
+      1,
+      3,
+    );
+  });
+});
+
+describe("setPrimary", () => {
+  it("delegates to the repo and returns the sanitized result", async () => {
+    vi.mocked(environmentIntegrationsRepo.setPrimary).mockResolvedValue({
+      type: "ses",
+      config: { fromEmail: "hello@example.com" },
+      priority: 1,
+      updatedAt: new Date("2026-01-01"),
+    } as any);
+
+    const result = await service.setPrimary(mockDb, 10, "ses");
+
+    expect(environmentIntegrationsRepo.setPrimary).toHaveBeenCalledWith(
+      mockDb,
+      10,
+      "ses",
+    );
+    expect(result).toEqual(
+      expect.objectContaining({ type: "ses", priority: 1 }),
+    );
+  });
+
+  it("throws NotFoundException when the type isn't configured", async () => {
+    vi.mocked(environmentIntegrationsRepo.setPrimary).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(service.setPrimary(mockDb, 10, "ses")).rejects.toThrow(
+      NotFoundException,
     );
   });
 });

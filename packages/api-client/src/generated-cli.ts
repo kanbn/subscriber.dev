@@ -1111,11 +1111,13 @@ export interface UpsertIntegrationDto {
 
 export interface IntegrationResponseDto {
   type: string;
+  priority: number;
   updatedAt: unknown;
 }
 
 export type ListIntegrationsResponseDtoIntegrationsItem = {
   type: string;
+  priority: number;
   updatedAt: unknown;
 };
 
@@ -2828,6 +2830,52 @@ export const deleteIntegration = async (environmentId: string,
   {      
     ...options,
     method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+/**
+ * Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.
+ * @summary Set an integration as primary
+ */
+export type setPrimaryIntegrationResponse200 = {
+  data: IntegrationResponseDto
+  status: 200
+}
+
+export type setPrimaryIntegrationResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type setPrimaryIntegrationResponseSuccess = (setPrimaryIntegrationResponse200) & {
+  headers: Headers;
+};
+export type setPrimaryIntegrationResponseError = (setPrimaryIntegrationResponse404) & {
+  headers: Headers;
+};
+
+export type setPrimaryIntegrationResponse = (setPrimaryIntegrationResponseSuccess | setPrimaryIntegrationResponseError)
+
+export const getSetPrimaryIntegrationUrl = (environmentId: string,
+    type: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/integrations/${type}/primary`
+}
+
+export const setPrimaryIntegration = async (environmentId: string,
+    type: string, options?: RequestInit): Promise<setPrimaryIntegrationResponse> => {
+  
+  return cliFetch<setPrimaryIntegrationResponse>(getSetPrimaryIntegrationUrl(environmentId,type),
+  {      
+    ...options,
+    method: 'PATCH'
     
     
   }
