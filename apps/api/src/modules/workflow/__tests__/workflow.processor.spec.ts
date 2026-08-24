@@ -36,7 +36,7 @@ vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
 }));
 
 vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
-  getByEnvironmentAndType: vi.fn(),
+  listByEnvironment: vi.fn(),
 }));
 
 vi.mock("../../../common/encryption.js", () => ({
@@ -94,19 +94,19 @@ beforeEach(() => {
   vi.mocked(createEmailUnsubscribeLink).mockResolvedValue(
     "https://example.com/unsubscribe?token=abc",
   );
-  vi.mocked(
-    environmentIntegrationsRepo.getByEnvironmentAndType,
-  ).mockResolvedValue({
-    type: "smtp",
-    config: {
-      host: "smtp.example.com",
-      port: 587,
-      secure: false,
-      fromEmail: "hello@example.com",
-      fromName: "Example",
+  vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+    {
+      type: "smtp",
+      config: {
+        host: "smtp.example.com",
+        port: 587,
+        secure: false,
+        fromEmail: "hello@example.com",
+        fromName: "Example",
+      },
+      encryptedSecret: "encrypted-blob",
     },
-    encryptedSecret: "encrypted-blob",
-  } as any);
+  ] as any);
   vi.mocked(decrypt).mockReturnValue(
     JSON.stringify({ user: "smtp-user", password: "s3cret" }),
   );
@@ -162,14 +162,14 @@ describe("process", () => {
     );
   });
 
-  it("marks the run-step failed when the integration's provider type isn't registered", async () => {
-    vi.mocked(
-      environmentIntegrationsRepo.getByEnvironmentAndType,
-    ).mockResolvedValue({
-      type: "unknown-provider",
-      config: {},
-      encryptedSecret: "encrypted-blob",
-    } as any);
+  it("marks the run-step failed when no configured integration matches a registered provider", async () => {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+      {
+        type: "unknown-provider",
+        config: {},
+        encryptedSecret: "encrypted-blob",
+      },
+    ] as any);
 
     await processor.process(makeJob());
 
@@ -178,8 +178,33 @@ describe("process", () => {
       expect.anything(),
       1,
       "failed",
-      "Unknown integration provider: unknown-provider",
+      "No email integration configured for this environment",
     );
+  });
+
+  it("picks whichever configured integration matches a registered provider, e.g. cloudflare alongside an unrelated type", async () => {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+      {
+        type: "unrelated-future-integration",
+        config: {},
+        encryptedSecret: null,
+      },
+      {
+        type: "smtp",
+        config: {
+          host: "smtp.example.com",
+          port: 587,
+          secure: false,
+          fromEmail: "hello@example.com",
+          fromName: "Example",
+        },
+        encryptedSecret: "encrypted-blob",
+      },
+    ] as any);
+
+    await processor.process(makeJob());
+
+    expect(sendRawEmail).toHaveBeenCalled();
   });
 
   it("always appends a working unsubscribe link, even when the template doesn't reference {{unsubscribeUrl}}", async () => {
@@ -297,10 +322,10 @@ describe("process", () => {
     );
   });
 
-  it("marks the run-step failed when no SMTP integration is configured for the environment", async () => {
-    vi.mocked(
-      environmentIntegrationsRepo.getByEnvironmentAndType,
-    ).mockResolvedValue(undefined);
+  it("marks the run-step failed when no integration is configured for the environment", async () => {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue(
+      [],
+    );
 
     await processor.process(makeJob());
 
@@ -309,7 +334,7 @@ describe("process", () => {
       expect.anything(),
       1,
       "failed",
-      "No SMTP integration configured for this environment",
+      "No email integration configured for this environment",
     );
   });
 

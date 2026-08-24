@@ -49,31 +49,22 @@ export async function sendEmailStep(
     return;
   }
 
-  const integration = await environmentIntegrationsRepo.getByEnvironmentAndType(
+  const integrations = await environmentIntegrationsRepo.listByEnvironment(
     db,
     subscriber.environmentId,
-    "smtp",
   );
+  const integration = integrations.find((i) => INTEGRATION_PROVIDERS[i.type]);
   if (!integration) {
     await workflowRunRepo.updateRunStepStatus(
       db,
       runStep.id,
       "failed",
-      "No SMTP integration configured for this environment",
+      "No email integration configured for this environment",
     );
     return;
   }
 
-  const provider = INTEGRATION_PROVIDERS[integration.type];
-  if (!provider) {
-    await workflowRunRepo.updateRunStepStatus(
-      db,
-      runStep.id,
-      "failed",
-      `Unknown integration provider: ${integration.type}`,
-    );
-    return;
-  }
+  const provider = INTEGRATION_PROVIDERS[integration.type]!;
 
   const providerConfig = provider.configSchema.parse(integration.config);
   const providerSecret = provider.secretSchema.parse(

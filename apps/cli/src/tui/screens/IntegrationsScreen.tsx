@@ -8,13 +8,15 @@ import {
   upsertIntegration,
 } from "@subscriber.dev/api-client/cli";
 
+import type { CloudflareEmailCreateValues } from "../components/CloudflareEmailCreateForm.js";
 import type { IntegrationCreateValues } from "../components/IntegrationCreateForm.js";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
+import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateForm.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
 import { useAsyncData } from "../useAsyncData.js";
 
-type Mode = "list" | "creating";
+type Mode = "list" | "choosing-type" | "creating-smtp" | "creating-cloudflare";
 
 export function IntegrationsScreen({
   environmentId,
@@ -36,11 +38,11 @@ export function IntegrationsScreen({
   useInput((input) => {
     if (mode !== "list") return;
     if (input === "n" || input === "N") {
-      setMode("creating");
+      setMode("choosing-type");
     }
   });
 
-  const handleCreate = async (
+  const handleCreateSmtp = async (
     values: IntegrationCreateValues,
   ): Promise<string | undefined> => {
     try {
@@ -71,12 +73,73 @@ export function IntegrationsScreen({
     }
   };
 
-  if (mode === "creating") {
+  const handleCreateCloudflare = async (
+    values: CloudflareEmailCreateValues,
+  ): Promise<string | undefined> => {
+    try {
+      const body = {
+        accountId: values.accountId.trim(),
+        fromEmail: values.fromEmail.trim(),
+        fromName: values.fromName.trim() || undefined,
+        apiToken: values.apiToken.trim(),
+      };
+      const response = await upsertIntegration(
+        environmentId,
+        "cloudflare",
+        body as unknown as UpsertIntegrationDto,
+      );
+      if (response.status === 400) {
+        return "Invalid config or failed verification.";
+      }
+      if (response.status !== 200) {
+        return "Failed to create integration.";
+      }
+      onSelect("cloudflare");
+      return undefined;
+    } catch (err) {
+      return err instanceof Error ? err.message : String(err);
+    }
+  };
+
+  if (mode === "choosing-type") {
+    return (
+      <Box flexDirection="column">
+        <Text bold>New integration</Text>
+        <SelectInput
+          items={[
+            { label: "SMTP", value: "smtp" as const },
+            { label: "Cloudflare Email", value: "cloudflare" as const },
+          ]}
+          onSelect={(item) =>
+            setMode(
+              item.value === "smtp" ? "creating-smtp" : "creating-cloudflare",
+            )
+          }
+        />
+        <Hints text="↑↓ navigate · Enter select · Esc back · q quit" />
+      </Box>
+    );
+  }
+
+  if (mode === "creating-smtp") {
     return (
       <Box flexDirection="column">
         <Text bold>New SMTP integration</Text>
         <IntegrationCreateForm
-          onSubmit={handleCreate}
+          onSubmit={handleCreateSmtp}
+          onCancel={() => setMode("list")}
+        />
+        <Hints text="↑↓ navigate · Enter select/edit" />
+      </Box>
+    );
+  }
+
+  if (mode === "creating-cloudflare") {
+    return (
+      <Box flexDirection="column">
+        <Text bold>New Cloudflare Email integration</Text>
+        <CloudflareEmailCreateForm
+          onSubmit={handleCreateCloudflare}
           onCancel={() => setMode("list")}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />

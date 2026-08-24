@@ -103,7 +103,7 @@ describe("IntegrationsScreen create", () => {
     return new Promise<void>((resolve) => setTimeout(resolve, 50));
   }
 
-  it("shows the new-integration field menu when 'n' is pressed", async () => {
+  it("shows the type chooser when 'n' is pressed", async () => {
     vi.mocked(listIntegrations).mockResolvedValue({
       status: 200,
       headers: new Headers(),
@@ -123,6 +123,41 @@ describe("IntegrationsScreen create", () => {
 
     await tick();
     stdin.write("n");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New integration");
+    });
+    expect(lastFrame()).toContain("SMTP");
+    expect(lastFrame()).toContain("Cloudflare Email");
+  });
+
+  it("shows the SMTP field menu after choosing SMTP (the default option)", async () => {
+    vi.mocked(listIntegrations).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { integrations: [testIntegration] },
+    } as never);
+
+    const { lastFrame, stdin } = render(
+      <IntegrationsScreen
+        environmentId="test-environment-1"
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("smtp");
+    });
+
+    await tick();
+    stdin.write("n");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New integration");
+    });
+
+    // "SMTP" is the default-selected (first) option.
+    await tick();
+    stdin.write("\r");
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("New SMTP integration");
@@ -152,6 +187,12 @@ describe("IntegrationsScreen create", () => {
 
     await tick();
     stdin.write("n");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New integration");
+    });
+
+    await tick();
+    stdin.write("\r");
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("New SMTP integration");
     });
