@@ -1135,7 +1135,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowResponseDto"
+                  "$ref": "#/components/schemas/WorkflowDetailResponseDto"
                 }
               }
             }
@@ -1828,6 +1828,59 @@
         },
         "tags": [
           "Integrations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/analytics": {
+      "get": {
+        "operationId": "getAnalytics",
+        "summary": "Get environment-wide analytics",
+        "description": "Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 365,
+              "exclusiveMaximum": false,
+              "exclusiveMinimum": false,
+              "default": 30,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "tags": [
+          "Analytics"
         ],
         "security": [
           {
@@ -3297,6 +3350,125 @@
           "offset"
         ]
       },
+      "WorkflowDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "automation",
+              "broadcast"
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "stepOrder": {
+                  "type": "number"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "delayMs": {
+                  "type": "number"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "publicId",
+                "stepOrder",
+                "type",
+                "delayMs"
+              ]
+            }
+          },
+          "createdAt": {
+            "type": "",
+            "x-nestjs_zod-empty-type": true
+          },
+          "updatedAt": {
+            "type": "",
+            "x-nestjs_zod-empty-type": true
+          },
+          "sentCount": {
+            "type": "number"
+          },
+          "failedCount": {
+            "type": "number"
+          },
+          "skippedCount": {
+            "type": "number"
+          },
+          "pendingCount": {
+            "type": "number"
+          },
+          "bouncedCount": {
+            "type": "number"
+          },
+          "hardBounceCount": {
+            "type": "number"
+          },
+          "softBounceCount": {
+            "type": "number"
+          },
+          "successRate": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "publicId",
+          "key",
+          "name",
+          "description",
+          "status",
+          "type",
+          "steps",
+          "createdAt",
+          "updatedAt",
+          "sentCount",
+          "failedCount",
+          "skippedCount",
+          "pendingCount",
+          "bouncedCount",
+          "hardBounceCount",
+          "softBounceCount",
+          "successRate"
+        ]
+      },
       "UpdateWorkflowDto": {
         "type": "object",
         "properties": {
@@ -3769,6 +3941,16 @@
           },
           "bouncedCount": {
             "type": "number"
+          },
+          "hardBounceCount": {
+            "type": "number"
+          },
+          "softBounceCount": {
+            "type": "number"
+          },
+          "successRate": {
+            "type": "number",
+            "nullable": true
           }
         },
         "required": [
@@ -3780,7 +3962,10 @@
           "failedCount",
           "skippedCount",
           "pendingCount",
-          "bouncedCount"
+          "bouncedCount",
+          "hardBounceCount",
+          "softBounceCount",
+          "successRate"
         ]
       },
       "BounceWebhookBodyDto": {
@@ -3869,6 +4054,75 @@
         },
         "required": [
           "integrations"
+        ]
+      },
+      "AnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "number"
+          },
+          "subscribers": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "newInPeriod": {
+                "type": "number"
+              },
+              "optedOut": {
+                "type": "number"
+              },
+              "optedOutInPeriod": {
+                "type": "number"
+              }
+            },
+            "selfRequired": true
+          },
+          "sends": {
+            "type": "object",
+            "properties": {
+              "sent": {
+                "type": "number"
+              },
+              "failed": {
+                "type": "number"
+              },
+              "skipped": {
+                "type": "number"
+              },
+              "pending": {
+                "type": "number"
+              },
+              "bounced": {
+                "type": "number"
+              },
+              "successRate": {
+                "type": "number",
+                "nullable": true
+              }
+            },
+            "selfRequired": true
+          },
+          "bounces": {
+            "type": "object",
+            "properties": {
+              "hard": {
+                "type": "number"
+              },
+              "soft": {
+                "type": "number"
+              }
+            },
+            "selfRequired": true
+          }
+        },
+        "required": [
+          "days",
+          "subscribers",
+          "sends",
+          "bounces"
         ]
       }
     }

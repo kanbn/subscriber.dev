@@ -260,6 +260,24 @@ export function WorkflowDetailScreen({
                 {step.subject ? ` — ${step.subject}` : ""}
               </Text>
             ))}
+            <Text bold>Send outcomes:</Text>
+            <Text color="green"> sent: {loadedWorkflow.sentCount}</Text>
+            <Text color="red"> failed: {loadedWorkflow.failedCount}</Text>
+            <Text> skipped: {loadedWorkflow.skippedCount}</Text>
+            <Text dimColor> pending: {loadedWorkflow.pendingCount}</Text>
+            <Text>
+              {" "}
+              bounced: {loadedWorkflow.bouncedCount} (hard{" "}
+              {loadedWorkflow.hardBounceCount}, soft{" "}
+              {loadedWorkflow.softBounceCount})
+            </Text>
+            <Text>
+              {" "}
+              success rate:{" "}
+              {loadedWorkflow.successRate === null
+                ? "—"
+                : `${(loadedWorkflow.successRate * 100).toFixed(1)}%`}
+            </Text>
           </Box>
         )}
       </AsyncBoundary>

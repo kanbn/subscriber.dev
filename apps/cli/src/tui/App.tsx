@@ -2,6 +2,7 @@ import { Box, Text, useApp, useInput } from "ink";
 import { useState } from "react";
 
 import type { Screen } from "./navigation.js";
+import { AnalyticsScreen } from "./screens/AnalyticsScreen.js";
 import { BroadcastsScreen } from "./screens/BroadcastsScreen.js";
 import { EnvironmentsScreen } from "./screens/EnvironmentsScreen.js";
 import { IntegrationDetailScreen } from "./screens/IntegrationDetailScreen.js";
@@ -183,6 +184,10 @@ export function App() {
           type={screen.type}
           onDeleted={pop}
         />
+      )}
+
+      {screen.kind === "analytics" && (
+        <AnalyticsScreen environmentId={screen.environment.publicId} />
       )}
     </Box>
   );

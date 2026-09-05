@@ -30,6 +30,7 @@ vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
   listBroadcastsForWorkflow: vi.fn(),
   getBroadcastByPublicId: vi.fn(),
   getBroadcastStepCounts: vi.fn(),
+  getBroadcastBounceBreakdown: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
@@ -40,6 +41,8 @@ vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
   listRunsForWorkflow: vi.fn(),
   listRunsForEnvironment: vi.fn(),
   getRunStepByPublicId: vi.fn(),
+  getWorkflowStepCounts: vi.fn(),
+  getWorkflowBounceBreakdown: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
@@ -678,6 +681,112 @@ describe("listBroadcasts", () => {
 });
 
 // ---------------------------------------------------------------------------
+// getWorkflow
+// ---------------------------------------------------------------------------
+
+describe("getWorkflow", () => {
+  it("returns the workflow with derived step-outcome counts", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      id: 1,
+      publicId: "wf_abc",
+      key: "user-signup",
+      name: "Signup",
+      description: null,
+      status: "active",
+      type: "automation",
+      createdAt: new Date("2026-01-01T00:00:00Z"),
+      updatedAt: new Date("2026-01-01T00:00:00Z"),
+    } as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([
+      {
+        publicId: "step_1",
+        stepOrder: 0,
+        type: "email",
+        delayMs: 0,
+        config: { subject: "hi", body: "hi" },
+      },
+    ] as any);
+    vi.mocked(workflowRunRepo.getWorkflowStepCounts).mockResolvedValue({
+      pending: 2,
+      sent: 5,
+      skipped: 1,
+      failed: 1,
+      cancelled: 0,
+      bounced: 1,
+    });
+    vi.mocked(workflowRunRepo.getWorkflowBounceBreakdown).mockResolvedValue({
+      hard: 1,
+      soft: 0,
+    });
+
+    const result = await service.getWorkflow(mockDb, 10, "wf_abc");
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        publicId: "wf_abc",
+        sentCount: 5,
+        failedCount: 1,
+        skippedCount: 1,
+        pendingCount: 2,
+        bouncedCount: 1,
+        hardBounceCount: 1,
+        softBounceCount: 0,
+        successRate: 5 / 6,
+      }),
+    );
+    expect(workflowRunRepo.getWorkflowStepCounts).toHaveBeenCalledWith(
+      mockDb,
+      1,
+    );
+    expect(workflowRunRepo.getWorkflowBounceBreakdown).toHaveBeenCalledWith(
+      mockDb,
+      1,
+    );
+  });
+
+  it("reports a null successRate when there have been no sends or failures yet", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      id: 1,
+      publicId: "wf_abc",
+      key: "user-signup",
+      name: "Signup",
+      description: null,
+      status: "active",
+      type: "automation",
+      createdAt: new Date("2026-01-01T00:00:00Z"),
+      updatedAt: new Date("2026-01-01T00:00:00Z"),
+    } as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([] as any);
+    vi.mocked(workflowRunRepo.getWorkflowStepCounts).mockResolvedValue({
+      pending: 3,
+      sent: 0,
+      skipped: 0,
+      failed: 0,
+      cancelled: 0,
+      bounced: 0,
+    });
+    vi.mocked(workflowRunRepo.getWorkflowBounceBreakdown).mockResolvedValue({
+      hard: 0,
+      soft: 0,
+    });
+
+    const result = await service.getWorkflow(mockDb, 10, "wf_abc");
+
+    expect(result.successRate).toBeNull();
+  });
+
+  it("throws NotFoundException when the workflow does not exist", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(undefined);
+
+    await expect(service.getWorkflow(mockDb, 10, "wf_missing")).rejects.toThrow(
+      NotFoundException,
+    );
+    expect(workflowRunRepo.getWorkflowStepCounts).not.toHaveBeenCalled();
+    expect(workflowRunRepo.getWorkflowBounceBreakdown).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // getBroadcast
 // ---------------------------------------------------------------------------
 
@@ -701,6 +810,9 @@ describe("getBroadcast", () => {
       cancelled: 0,
       bounced: 0,
     });
+    vi.mocked(
+      workflowBroadcastRepo.getBroadcastBounceBreakdown,
+    ).mockResolvedValue({ hard: 0, soft: 0 });
 
     const result = await service.getBroadcast(mockDb, 10, "wf_abc", "bc_abc");
 
@@ -714,6 +826,9 @@ describe("getBroadcast", () => {
       skippedCount: 0,
       pendingCount: 1,
       bouncedCount: 0,
+      hardBounceCount: 0,
+      softBounceCount: 0,
+      successRate: 1,
     });
   });
 

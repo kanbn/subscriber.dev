@@ -95,6 +95,18 @@ export function BroadcastsScreen({
             <Text color="red"> failed: {detail.failedCount}</Text>
             <Text> skipped: {detail.skippedCount}</Text>
             <Text dimColor> pending: {detail.pendingCount}</Text>
+            <Text>
+              {" "}
+              bounced: {detail.bouncedCount} (hard {detail.hardBounceCount},
+              soft {detail.softBounceCount})
+            </Text>
+            <Text>
+              {" "}
+              success rate:{" "}
+              {detail.successRate === null
+                ? "—"
+                : `${(detail.successRate * 100).toFixed(1)}%`}
+            </Text>
           </Box>
         ) : (
           <Text color="red">Error: {detailError}</Text>

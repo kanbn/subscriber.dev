@@ -1,8 +1,10 @@
 import {
   and,
   asc,
+  count,
   desc,
   eq,
+  gte,
   ilike,
   inArray,
   isNull,
@@ -200,15 +202,15 @@ export const findSubscriberForUpsert = async (
   return undefined;
 };
 
-export const latestOptedInOrOutSubscriberIds = (
+export const latestPreferencePerSubscriber = (
   db: dbClient,
   environmentId: number,
-  emailOptedIn: boolean,
 ) => {
-  const latestPreferencePerSubscriber = db
+  return db
     .selectDistinctOn([subscriberPreferences.subscriberId], {
       subscriberId: subscriberPreferences.subscriberId,
       email: subscriberPreferences.email,
+      createdAt: subscriberPreferences.createdAt,
     })
     .from(subscriberPreferences)
     .innerJoin(
@@ -221,11 +223,68 @@ export const latestOptedInOrOutSubscriberIds = (
       desc(subscriberPreferences.version),
     )
     .as("latest_preference_per_subscriber");
+};
+
+export const latestOptedInOrOutSubscriberIds = (
+  db: dbClient,
+  environmentId: number,
+  emailOptedIn: boolean,
+) => {
+  const latest = latestPreferencePerSubscriber(db, environmentId);
 
   return db
-    .select({ subscriberId: latestPreferencePerSubscriber.subscriberId })
-    .from(latestPreferencePerSubscriber)
-    .where(eq(latestPreferencePerSubscriber.email, emailOptedIn));
+    .select({ subscriberId: latest.subscriberId })
+    .from(latest)
+    .where(eq(latest.email, emailOptedIn));
+};
+
+export const getSubscriberCounts = async (
+  db: dbClient,
+  environmentId: number,
+  sinceDate: Date,
+): Promise<{ total: number; newInPeriod: number }> => {
+  const [totalRow] = await db
+    .select({ count: count() })
+    .from(subscribers)
+    .where(
+      and(
+        eq(subscribers.environmentId, environmentId),
+        isNull(subscribers.deletedAt),
+      ),
+    );
+
+  const [recentRow] = await db
+    .select({ count: count() })
+    .from(subscribers)
+    .where(
+      and(
+        eq(subscribers.environmentId, environmentId),
+        isNull(subscribers.deletedAt),
+        gte(subscribers.createdAt, sinceDate),
+      ),
+    );
+
+  return { total: totalRow?.count ?? 0, newInPeriod: recentRow?.count ?? 0 };
+};
+
+export const getOptedOutCounts = async (
+  db: dbClient,
+  environmentId: number,
+  sinceDate: Date,
+): Promise<{ total: number; recent: number }> => {
+  const latest = latestPreferencePerSubscriber(db, environmentId);
+
+  const [totalRow] = await db
+    .select({ count: count() })
+    .from(latest)
+    .where(eq(latest.email, false));
+
+  const [recentRow] = await db
+    .select({ count: count() })
+    .from(latest)
+    .where(and(eq(latest.email, false), gte(latest.createdAt, sinceDate)));
+
+  return { total: totalRow?.count ?? 0, recent: recentRow?.count ?? 0 };
 };
 
 export const listSubscribers = async (

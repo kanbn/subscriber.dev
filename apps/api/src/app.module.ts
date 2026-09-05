@@ -1,6 +1,7 @@
 import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 
+import { AnalyticsModule } from "./modules/analytics/analytics.module.js";
 import { IntegrationsModule } from "./modules/integrations/integrations.module.js";
 import { SubscriberModule } from "./modules/subscriber/subscriber.module.js";
 import { TestModule } from "./modules/test/test.module.js";
@@ -18,6 +19,7 @@ import { getRedisConnection } from "./queue/bullmq.connection.js";
     SubscriberModule,
     WorkflowModule,
     IntegrationsModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}

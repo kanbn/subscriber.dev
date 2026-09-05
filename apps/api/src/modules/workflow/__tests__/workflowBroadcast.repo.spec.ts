@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
   createBroadcast,
+  getBroadcastBounceBreakdown,
   getBroadcastById,
   getBroadcastByPublicId,
   getBroadcastStepCounts,
@@ -195,5 +196,40 @@ describe("getBroadcastStepCounts", () => {
       cancelled: 0,
       bounced: 0,
     });
+  });
+});
+
+describe("getBroadcastBounceBreakdown", () => {
+  it("returns zero counts when there are no bounces", async () => {
+    const db = makeMockDb({ groupByResult: vi.fn().mockResolvedValue([]) });
+
+    const result = await getBroadcastBounceBreakdown(db, 1);
+
+    expect(result).toEqual({ hard: 0, soft: 0 });
+  });
+
+  it("maps grouped counts per bounce type", async () => {
+    const db = makeMockDb({
+      groupByResult: vi.fn().mockResolvedValue([
+        { bounceType: "hard", count: 2 },
+        { bounceType: "soft", count: 4 },
+      ]),
+    });
+
+    const result = await getBroadcastBounceBreakdown(db, 1);
+
+    expect(result).toEqual({ hard: 2, soft: 4 });
+  });
+
+  it("ignores rows with a null bounceType", async () => {
+    const db = makeMockDb({
+      groupByResult: vi
+        .fn()
+        .mockResolvedValue([{ bounceType: null, count: 1 }]),
+    });
+
+    const result = await getBroadcastBounceBreakdown(db, 1);
+
+    expect(result).toEqual({ hard: 0, soft: 0 });
   });
 });

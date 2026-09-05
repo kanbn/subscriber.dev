@@ -37,6 +37,7 @@ import {
 } from "./dto/broadcast.dto.js";
 import {
   CreateWorkflowDto,
+  WorkflowDetailResponseDto,
   WorkflowResponseDto,
 } from "./dto/create-workflow.dto.js";
 import {
@@ -215,12 +216,12 @@ export class WorkflowController {
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
-  @ApiResponse({ status: 200, type: WorkflowResponseDto })
+  @ApiResponse({ status: 200, type: WorkflowDetailResponseDto })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async getWorkflow(
     @Param("environmentId") environmentId: string,
     @Param("workflowId") workflowId: string,
-  ) {
+  ): Promise<WorkflowDetailResponseDto> {
     const db = createDrizzleClient();
 
     const environment = await subscriberRepo.getEnvironmentByPublicId(

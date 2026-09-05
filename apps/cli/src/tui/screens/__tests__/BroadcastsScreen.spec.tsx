@@ -26,6 +26,10 @@ const testDetail = {
   failedCount: 1,
   skippedCount: 2,
   pendingCount: 29,
+  bouncedCount: 1,
+  hardBounceCount: 0,
+  softBounceCount: 1,
+  successRate: 10 / 11,
 };
 
 function listBroadcastsMock(broadcasts: unknown[]) {
@@ -126,6 +130,8 @@ describe("BroadcastsScreen detail", () => {
     expect(lastFrame()).toContain("failed: 1");
     expect(lastFrame()).toContain("skipped: 2");
     expect(lastFrame()).toContain("pending: 29");
+    expect(lastFrame()).toContain("bounced: 1 (hard 0, soft 1)");
+    expect(lastFrame()).toContain("success rate: 90.9%");
   });
 
   it("returns to the list when 'b' is pressed", async () => {

@@ -43,6 +43,14 @@ const testWorkflow = {
       delayMs: 60000,
     },
   ],
+  sentCount: 12,
+  failedCount: 1,
+  skippedCount: 2,
+  pendingCount: 3,
+  bouncedCount: 1,
+  hardBounceCount: 1,
+  softBounceCount: 0,
+  successRate: 12 / 13,
 };
 
 function renderScreen(
@@ -84,6 +92,45 @@ describe("WorkflowDetailScreen", () => {
     expect(lastFrame()).toContain("description: Fires when a user signs up");
     expect(lastFrame()).toContain("0. email (delay 0ms) — Welcome!");
     expect(lastFrame()).toContain("1. webhook (delay 60000ms)");
+  });
+
+  it("renders send outcome counts", async () => {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testWorkflow,
+    } as never);
+
+    const { lastFrame } = renderScreen();
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Send outcomes:");
+    });
+    expect(lastFrame()).toContain("sent: 12");
+    expect(lastFrame()).toContain("failed: 1");
+    expect(lastFrame()).toContain("skipped: 2");
+    expect(lastFrame()).toContain("pending: 3");
+    expect(lastFrame()).toContain("bounced: 1 (hard 1, soft 0)");
+    expect(lastFrame()).toContain("success rate: 92.3%");
+  });
+
+  it("shows a dash for success rate when there have been no sends or failures yet", async () => {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        ...testWorkflow,
+        sentCount: 0,
+        failedCount: 0,
+        successRate: null,
+      },
+    } as never);
+
+    const { lastFrame } = renderScreen();
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("success rate: —");
+    });
   });
 
   it("shows an error when the workflow isn't found", async () => {

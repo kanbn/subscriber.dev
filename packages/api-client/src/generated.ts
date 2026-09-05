@@ -766,6 +766,56 @@ export interface ListEnvironmentRunsResponseDto {
   offset: number;
 }
 
+export type WorkflowDetailResponseDtoStatus = typeof WorkflowDetailResponseDtoStatus[keyof typeof WorkflowDetailResponseDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkflowDetailResponseDtoStatus = {
+  active: 'active',
+  paused: 'paused',
+} as const;
+
+export type WorkflowDetailResponseDtoType = typeof WorkflowDetailResponseDtoType[keyof typeof WorkflowDetailResponseDtoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkflowDetailResponseDtoType = {
+  automation: 'automation',
+  broadcast: 'broadcast',
+} as const;
+
+export type WorkflowDetailResponseDtoStepsItem = {
+  publicId: string;
+  stepOrder: number;
+  type: string;
+  delayMs: number;
+  subject?: string;
+  body?: string;
+  url?: string;
+};
+
+export interface WorkflowDetailResponseDto {
+  publicId: string;
+  key: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+  status: WorkflowDetailResponseDtoStatus;
+  type: WorkflowDetailResponseDtoType;
+  steps: WorkflowDetailResponseDtoStepsItem[];
+  createdAt: unknown;
+  updatedAt: unknown;
+  sentCount: number;
+  failedCount: number;
+  skippedCount: number;
+  pendingCount: number;
+  bouncedCount: number;
+  hardBounceCount: number;
+  softBounceCount: number;
+  /** @nullable */
+  successRate: number | null;
+}
+
 export type UpdateWorkflowDtoStatus = typeof UpdateWorkflowDtoStatus[keyof typeof UpdateWorkflowDtoStatus];
 
 
@@ -1100,6 +1150,10 @@ export interface BroadcastDetailResponseDto {
   skippedCount: number;
   pendingCount: number;
   bouncedCount: number;
+  hardBounceCount: number;
+  softBounceCount: number;
+  /** @nullable */
+  successRate: number | null;
 }
 
 export type BounceWebhookBodyDtoBounceType = typeof BounceWebhookBodyDtoBounceType[keyof typeof BounceWebhookBodyDtoBounceType];
@@ -1142,6 +1196,35 @@ export type ListIntegrationsResponseDtoIntegrationsItem = {
 
 export interface ListIntegrationsResponseDto {
   integrations: ListIntegrationsResponseDtoIntegrationsItem[];
+}
+
+export type AnalyticsResponseDtoSubscribers = {
+  total?: number;
+  newInPeriod?: number;
+  optedOut?: number;
+  optedOutInPeriod?: number;
+};
+
+export type AnalyticsResponseDtoSends = {
+  sent?: number;
+  failed?: number;
+  skipped?: number;
+  pending?: number;
+  bounced?: number;
+  /** @nullable */
+  successRate?: number | null;
+};
+
+export type AnalyticsResponseDtoBounces = {
+  hard?: number;
+  soft?: number;
+};
+
+export interface AnalyticsResponseDto {
+  days: number;
+  subscribers: AnalyticsResponseDtoSubscribers;
+  sends: AnalyticsResponseDtoSends;
+  bounces: AnalyticsResponseDtoBounces;
 }
 
 export type ListSubscribersParams = {
@@ -1229,6 +1312,14 @@ limit?: number;
  * @minimum 0
  */
 offset?: number;
+};
+
+export type GetAnalyticsParams = {
+/**
+ * @minimum 1
+ * @maximum 365
+ */
+days?: number;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -3665,7 +3756,7 @@ export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnv
  * @summary Get a workflow
  */
 export type getWorkflowResponse200 = {
-  data: WorkflowResponseDto
+  data: WorkflowDetailResponseDto
   status: 200
 }
 
@@ -5236,6 +5327,143 @@ export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegr
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
   const queryOptions = getListIntegrationsQueryOptions(environmentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.
+ * @summary Get environment-wide analytics
+ */
+export type getAnalyticsResponse200 = {
+  data: AnalyticsResponseDto
+  status: 200
+}
+
+export type getAnalyticsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type getAnalyticsResponseSuccess = (getAnalyticsResponse200) & {
+  headers: Headers;
+};
+export type getAnalyticsResponseError = (getAnalyticsResponse404) & {
+  headers: Headers;
+};
+
+export type getAnalyticsResponse = (getAnalyticsResponseSuccess | getAnalyticsResponseError)
+
+export const getGetAnalyticsUrl = (environmentId: string,
+    params?: GetAnalyticsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/analytics?${stringifiedParams}` : `/environments/${environmentId}/analytics`
+}
+
+export const getAnalytics = async (environmentId: string,
+    params?: GetAnalyticsParams, options?: RequestInit): Promise<getAnalyticsResponse> => {
+  
+  return customFetch<getAnalyticsResponse>(getGetAnalyticsUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetAnalyticsQueryKey = (environmentId?: string,
+    params?: GetAnalyticsParams,) => {
+    return [
+    `/environments/${environmentId}/analytics`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getGetAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(environmentId: string,
+    params?: GetAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAnalyticsQueryKey(environmentId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAnalytics>>> = ({ signal }) => getAnalytics(environmentId,params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getAnalytics>>>
+export type GetAnalyticsQueryError = void
+
+
+export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(
+ environmentId: string,
+    params: undefined |  GetAnalyticsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAnalytics>>,
+          TError,
+          Awaited<ReturnType<typeof getAnalytics>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(
+ environmentId: string,
+    params?: GetAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAnalytics>>,
+          TError,
+          Awaited<ReturnType<typeof getAnalytics>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(
+ environmentId: string,
+    params?: GetAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary Get environment-wide analytics
+ */
+
+export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(
+ environmentId: string,
+    params?: GetAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getGetAnalyticsQueryOptions(environmentId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 

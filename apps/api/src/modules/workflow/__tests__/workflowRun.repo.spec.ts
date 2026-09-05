@@ -6,6 +6,8 @@ import {
   completeRunIfAllStepsTerminal,
   createRunWithSteps,
   getRunStepByProviderMessageId,
+  getWorkflowBounceBreakdown,
+  getWorkflowStepCounts,
   listRunsForEnvironment,
   listRunsForWorkflow,
   updateRunStepStatus,
@@ -27,6 +29,7 @@ function makeMockDb(
     findMany: ReturnType<typeof vi.fn>;
     insertChain: { values: ReturnType<typeof vi.fn> };
     updateChain: ReturnType<typeof makeUpdateChain>;
+    groupByResult: ReturnType<typeof vi.fn>;
   }> = {},
 ) {
   const findMany = overrides.findMany ?? vi.fn();
@@ -36,6 +39,13 @@ function makeMockDb(
       .mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
   };
   const updateChain = overrides.updateChain ?? makeUpdateChain([]);
+  const groupByResult =
+    overrides.groupByResult ?? vi.fn().mockResolvedValue([]);
+
+  const groupBy = vi.fn().mockImplementation(() => groupByResult());
+  const selectWhere = vi.fn().mockReturnValue({ groupBy });
+  const innerJoin = vi.fn().mockReturnValue({ where: selectWhere });
+  const from = vi.fn().mockReturnValue({ innerJoin });
 
   const db = {
     query: {
@@ -44,6 +54,7 @@ function makeMockDb(
     },
     insert: vi.fn().mockReturnValue(insertChain),
     update: vi.fn().mockReturnValue(updateChain),
+    select: vi.fn().mockReturnValue({ from }),
     transaction: vi.fn(async (cb: (tx: dbClient) => unknown) =>
       cb(db as unknown as dbClient),
     ),
@@ -251,6 +262,87 @@ describe("getRunStepByProviderMessageId", () => {
     const result = await getRunStepByProviderMessageId(db, "<missing>");
 
     expect(result).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getWorkflowStepCounts
+// ---------------------------------------------------------------------------
+
+describe("getWorkflowStepCounts", () => {
+  it("returns zero counts when the workflow has no run-steps yet", async () => {
+    const db = makeMockDb({ groupByResult: vi.fn().mockResolvedValue([]) });
+
+    const result = await getWorkflowStepCounts(db, 1);
+
+    expect(result).toEqual({
+      pending: 0,
+      sent: 0,
+      skipped: 0,
+      failed: 0,
+      cancelled: 0,
+      bounced: 0,
+    });
+  });
+
+  it("maps grouped counts per status", async () => {
+    const db = makeMockDb({
+      groupByResult: vi.fn().mockResolvedValue([
+        { status: "sent", count: 12 },
+        { status: "failed", count: 2 },
+        { status: "bounced", count: 1 },
+      ]),
+    });
+
+    const result = await getWorkflowStepCounts(db, 1);
+
+    expect(result).toEqual({
+      pending: 0,
+      sent: 12,
+      skipped: 0,
+      failed: 2,
+      cancelled: 0,
+      bounced: 1,
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getWorkflowBounceBreakdown
+// ---------------------------------------------------------------------------
+
+describe("getWorkflowBounceBreakdown", () => {
+  it("returns zero counts when there are no bounces", async () => {
+    const db = makeMockDb({ groupByResult: vi.fn().mockResolvedValue([]) });
+
+    const result = await getWorkflowBounceBreakdown(db, 1);
+
+    expect(result).toEqual({ hard: 0, soft: 0 });
+  });
+
+  it("maps grouped counts per bounce type", async () => {
+    const db = makeMockDb({
+      groupByResult: vi.fn().mockResolvedValue([
+        { bounceType: "hard", count: 3 },
+        { bounceType: "soft", count: 1 },
+      ]),
+    });
+
+    const result = await getWorkflowBounceBreakdown(db, 1);
+
+    expect(result).toEqual({ hard: 3, soft: 1 });
+  });
+
+  it("ignores rows with a null bounceType", async () => {
+    const db = makeMockDb({
+      groupByResult: vi
+        .fn()
+        .mockResolvedValue([{ bounceType: null, count: 1 }]),
+    });
+
+    const result = await getWorkflowBounceBreakdown(db, 1);
+
+    expect(result).toEqual({ hard: 0, soft: 0 });
   });
 });
 

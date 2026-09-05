@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
   findSubscriberForUpsert,
+  getOptedOutCounts,
   getSubscriberByPublicId,
+  getSubscriberCounts,
   listSubscribers,
   softDeleteSubscriber,
   updateSubscriber,
@@ -20,16 +22,46 @@ function makeReturning(value: unknown) {
   return { set, where, returning };
 }
 
+function makeSelectChain(resolvedValueQueue: unknown[][] = []) {
+  let callIndex = 0;
+  const subqueryPlaceholder = {
+    subscriberId: "subscriberId",
+    email: "email",
+    createdAt: "createdAt",
+  };
+
+  const terminal = {
+    then: (
+      resolve: (v: unknown) => unknown,
+      reject?: (e: unknown) => unknown,
+    ) =>
+      Promise.resolve(resolvedValueQueue[callIndex++] ?? []).then(
+        resolve,
+        reject,
+      ),
+    orderBy: vi.fn().mockReturnValue({
+      as: vi.fn().mockReturnValue(subqueryPlaceholder),
+    }),
+  };
+  const where = vi.fn().mockReturnValue(terminal);
+  const innerJoin = vi.fn().mockReturnValue({ where });
+  const from = vi.fn().mockReturnValue({ where, innerJoin });
+  return vi.fn().mockReturnValue({ from });
+}
+
 function makeMockDb(
   overrides: Partial<{
     findFirst: ReturnType<typeof vi.fn>;
     findMany: ReturnType<typeof vi.fn>;
     updateChain: ReturnType<typeof makeReturning>;
+    select: ReturnType<typeof makeSelectChain>;
   }> = {},
 ) {
   const findFirst = overrides.findFirst ?? vi.fn();
   const findMany = overrides.findMany ?? vi.fn();
   const updateChain = overrides.updateChain ?? makeReturning([]);
+  const select = overrides.select ?? makeSelectChain();
+  const selectDistinctOn = makeSelectChain();
 
   return {
     query: {
@@ -38,6 +70,8 @@ function makeMockDb(
       environments: { findFirst: vi.fn() },
     },
     update: vi.fn().mockReturnValue(updateChain),
+    select,
+    selectDistinctOn,
   } as unknown as dbClient;
 }
 
@@ -292,5 +326,53 @@ describe("softDeleteSubscriber", () => {
     const db = makeMockDb({ updateChain: chain });
     const result = await softDeleteSubscriber(db, 1, 99);
     expect(result).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getSubscriberCounts
+// ---------------------------------------------------------------------------
+
+describe("getSubscriberCounts", () => {
+  it("returns the total and newInPeriod counts", async () => {
+    const select = makeSelectChain([[{ count: 42 }], [{ count: 5 }]]);
+    const db = makeMockDb({ select });
+
+    const result = await getSubscriberCounts(db, 10, new Date("2026-08-01"));
+
+    expect(result).toEqual({ total: 42, newInPeriod: 5 });
+  });
+
+  it("defaults to zero when there are no rows yet", async () => {
+    const select = makeSelectChain([[], []]);
+    const db = makeMockDb({ select });
+
+    const result = await getSubscriberCounts(db, 10, new Date());
+
+    expect(result).toEqual({ total: 0, newInPeriod: 0 });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getOptedOutCounts
+// ---------------------------------------------------------------------------
+
+describe("getOptedOutCounts", () => {
+  it("returns the total and recent opted-out counts", async () => {
+    const select = makeSelectChain([[{ count: 7 }], [{ count: 2 }]]);
+    const db = makeMockDb({ select });
+
+    const result = await getOptedOutCounts(db, 10, new Date("2026-08-01"));
+
+    expect(result).toEqual({ total: 7, recent: 2 });
+  });
+
+  it("defaults to zero when nobody has opted out", async () => {
+    const select = makeSelectChain([[], []]);
+    const db = makeMockDb({ select });
+
+    const result = await getOptedOutCounts(db, 10, new Date());
+
+    expect(result).toEqual({ total: 0, recent: 0 });
   });
 });

@@ -62,4 +62,9 @@ export type Screen =
       kind: "integrationDetail";
       environment: EnvironmentSummary;
       type: string;
+    }
+  | {
+      kind: "analytics";
+      workspace: WorkspaceSummary;
+      environment: EnvironmentSummary;
     };

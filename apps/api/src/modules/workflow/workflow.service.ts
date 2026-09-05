@@ -106,6 +106,11 @@ export class WorkflowService {
     };
   }
 
+  private successRate(sent: number, failed: number): number | null {
+    const totalAttempted = sent + failed;
+    return totalAttempted > 0 ? sent / totalAttempted : null;
+  }
+
   private toStepInputs(steps: WorkflowStepInput[]) {
     return steps.map((s) => {
       const { type, delayMs, ...config } = s;
@@ -164,7 +169,22 @@ export class WorkflowService {
     if (!workflow) throw new NotFoundException("Workflow not found");
 
     const steps = await workflowRepo.listStepsForWorkflow(db, workflow.id);
-    return this.toWorkflowDto(workflow, steps);
+    const [counts, bounceBreakdown] = await Promise.all([
+      workflowRunRepo.getWorkflowStepCounts(db, workflow.id),
+      workflowRunRepo.getWorkflowBounceBreakdown(db, workflow.id),
+    ]);
+
+    return {
+      ...this.toWorkflowDto(workflow, steps),
+      sentCount: counts.sent,
+      failedCount: counts.failed,
+      skippedCount: counts.skipped,
+      pendingCount: counts.pending,
+      bouncedCount: counts.bounced,
+      hardBounceCount: bounceBreakdown.hard,
+      softBounceCount: bounceBreakdown.soft,
+      successRate: this.successRate(counts.sent, counts.failed),
+    };
   }
 
   async updateWorkflow(
@@ -508,10 +528,10 @@ export class WorkflowService {
     );
     if (!broadcast) throw new NotFoundException("Broadcast not found");
 
-    const counts = await workflowBroadcastRepo.getBroadcastStepCounts(
-      db,
-      broadcast.id,
-    );
+    const [counts, bounceBreakdown] = await Promise.all([
+      workflowBroadcastRepo.getBroadcastStepCounts(db, broadcast.id),
+      workflowBroadcastRepo.getBroadcastBounceBreakdown(db, broadcast.id),
+    ]);
 
     return {
       publicId: broadcast.publicId,
@@ -523,6 +543,9 @@ export class WorkflowService {
       skippedCount: counts.skipped,
       pendingCount: counts.pending,
       bouncedCount: counts.bounced,
+      hardBounceCount: bounceBreakdown.hard,
+      softBounceCount: bounceBreakdown.soft,
+      successRate: this.successRate(counts.sent, counts.failed),
     };
   }
 

@@ -103,3 +103,26 @@ export const getBroadcastStepCounts = async (
   }
   return counts;
 };
+
+export const getBroadcastBounceBreakdown = async (
+  db: dbClient,
+  broadcastId: number,
+) => {
+  const rows = await db
+    .select({ bounceType: workflowRunSteps.bounceType, count: count() })
+    .from(workflowRunSteps)
+    .innerJoin(workflowRuns, eq(workflowRunSteps.runId, workflowRuns.id))
+    .where(
+      and(
+        eq(workflowRuns.broadcastId, broadcastId),
+        eq(workflowRunSteps.status, "bounced"),
+      ),
+    )
+    .groupBy(workflowRunSteps.bounceType);
+
+  const counts = { hard: 0, soft: 0 };
+  for (const row of rows) {
+    if (row.bounceType) counts[row.bounceType] = row.count;
+  }
+  return counts;
+};

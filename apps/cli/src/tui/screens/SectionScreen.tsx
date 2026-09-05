@@ -17,7 +17,8 @@ export function SectionScreen({
       | "workflows"
       | "broadcastWorkflows"
       | "runHistory"
-      | "integrations",
+      | "integrations"
+      | "analytics",
   ) => void;
 }) {
   return (
@@ -32,6 +33,7 @@ export function SectionScreen({
           { label: "Broadcasts", value: "broadcastWorkflows" as const },
           { label: "Run History", value: "runHistory" as const },
           { label: "Integrations", value: "integrations" as const },
+          { label: "Analytics", value: "analytics" as const },
         ]}
         onSelect={(item) => onSelect(item.value)}
       />

@@ -747,6 +747,56 @@ export interface ListEnvironmentRunsResponseDto {
   offset: number;
 }
 
+export type WorkflowDetailResponseDtoStatus = typeof WorkflowDetailResponseDtoStatus[keyof typeof WorkflowDetailResponseDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkflowDetailResponseDtoStatus = {
+  active: 'active',
+  paused: 'paused',
+} as const;
+
+export type WorkflowDetailResponseDtoType = typeof WorkflowDetailResponseDtoType[keyof typeof WorkflowDetailResponseDtoType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkflowDetailResponseDtoType = {
+  automation: 'automation',
+  broadcast: 'broadcast',
+} as const;
+
+export type WorkflowDetailResponseDtoStepsItem = {
+  publicId: string;
+  stepOrder: number;
+  type: string;
+  delayMs: number;
+  subject?: string;
+  body?: string;
+  url?: string;
+};
+
+export interface WorkflowDetailResponseDto {
+  publicId: string;
+  key: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+  status: WorkflowDetailResponseDtoStatus;
+  type: WorkflowDetailResponseDtoType;
+  steps: WorkflowDetailResponseDtoStepsItem[];
+  createdAt: unknown;
+  updatedAt: unknown;
+  sentCount: number;
+  failedCount: number;
+  skippedCount: number;
+  pendingCount: number;
+  bouncedCount: number;
+  hardBounceCount: number;
+  softBounceCount: number;
+  /** @nullable */
+  successRate: number | null;
+}
+
 export type UpdateWorkflowDtoStatus = typeof UpdateWorkflowDtoStatus[keyof typeof UpdateWorkflowDtoStatus];
 
 
@@ -1081,6 +1131,10 @@ export interface BroadcastDetailResponseDto {
   skippedCount: number;
   pendingCount: number;
   bouncedCount: number;
+  hardBounceCount: number;
+  softBounceCount: number;
+  /** @nullable */
+  successRate: number | null;
 }
 
 export type BounceWebhookBodyDtoBounceType = typeof BounceWebhookBodyDtoBounceType[keyof typeof BounceWebhookBodyDtoBounceType];
@@ -1123,6 +1177,35 @@ export type ListIntegrationsResponseDtoIntegrationsItem = {
 
 export interface ListIntegrationsResponseDto {
   integrations: ListIntegrationsResponseDtoIntegrationsItem[];
+}
+
+export type AnalyticsResponseDtoSubscribers = {
+  total?: number;
+  newInPeriod?: number;
+  optedOut?: number;
+  optedOutInPeriod?: number;
+};
+
+export type AnalyticsResponseDtoSends = {
+  sent?: number;
+  failed?: number;
+  skipped?: number;
+  pending?: number;
+  bounced?: number;
+  /** @nullable */
+  successRate?: number | null;
+};
+
+export type AnalyticsResponseDtoBounces = {
+  hard?: number;
+  soft?: number;
+};
+
+export interface AnalyticsResponseDto {
+  days: number;
+  subscribers: AnalyticsResponseDtoSubscribers;
+  sends: AnalyticsResponseDtoSends;
+  bounces: AnalyticsResponseDtoBounces;
 }
 
 export type ListSubscribersParams = {
@@ -1210,6 +1293,14 @@ limit?: number;
  * @minimum 0
  */
 offset?: number;
+};
+
+export type GetAnalyticsParams = {
+/**
+ * @minimum 1
+ * @maximum 365
+ */
+days?: number;
 };
 
 /**
@@ -2244,7 +2335,7 @@ export const listEnvironmentRuns = async (environmentId: string,
  * @summary Get a workflow
  */
 export type getWorkflowResponse200 = {
-  data: WorkflowResponseDto
+  data: WorkflowDetailResponseDto
   status: 200
 }
 
@@ -2917,6 +3008,59 @@ export const getListIntegrationsUrl = (environmentId: string,) => {
 export const listIntegrations = async (environmentId: string, options?: RequestInit): Promise<listIntegrationsResponse> => {
   
   return cliFetch<listIntegrationsResponse>(getListIntegrationsUrl(environmentId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+/**
+ * Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.
+ * @summary Get environment-wide analytics
+ */
+export type getAnalyticsResponse200 = {
+  data: AnalyticsResponseDto
+  status: 200
+}
+
+export type getAnalyticsResponse404 = {
+  data: void
+  status: 404
+}
+    
+export type getAnalyticsResponseSuccess = (getAnalyticsResponse200) & {
+  headers: Headers;
+};
+export type getAnalyticsResponseError = (getAnalyticsResponse404) & {
+  headers: Headers;
+};
+
+export type getAnalyticsResponse = (getAnalyticsResponseSuccess | getAnalyticsResponseError)
+
+export const getGetAnalyticsUrl = (environmentId: string,
+    params?: GetAnalyticsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/analytics?${stringifiedParams}` : `/environments/${environmentId}/analytics`
+}
+
+export const getAnalytics = async (environmentId: string,
+    params?: GetAnalyticsParams, options?: RequestInit): Promise<getAnalyticsResponse> => {
+  
+  return cliFetch<getAnalyticsResponse>(getGetAnalyticsUrl(environmentId,params),
   {      
     ...options,
     method: 'GET'

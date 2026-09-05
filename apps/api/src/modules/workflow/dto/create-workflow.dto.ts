@@ -84,5 +84,19 @@ export const WorkflowSchema = z.object({
   updatedAt: z.date(),
 });
 
+export const WorkflowDetailResponseSchema = WorkflowSchema.extend({
+  sentCount: z.number(),
+  failedCount: z.number(),
+  skippedCount: z.number(),
+  pendingCount: z.number(),
+  bouncedCount: z.number(),
+  hardBounceCount: z.number(),
+  softBounceCount: z.number(),
+  successRate: z.number().nullable(),
+});
+
 export class CreateWorkflowDto extends createZodDto(CreateWorkflowSchema) {}
 export class WorkflowResponseDto extends createZodDto(WorkflowSchema) {}
+export class WorkflowDetailResponseDto extends createZodDto(
+  WorkflowDetailResponseSchema,
+) {}
