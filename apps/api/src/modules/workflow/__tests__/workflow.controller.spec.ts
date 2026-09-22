@@ -1,18 +1,11 @@
-import { NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 
 import { WorkflowController } from "../workflow.controller.js";
 import { WorkflowService } from "../workflow.service.js";
 
 vi.mock("@subscriber.dev/db/client", () => ({
   createDrizzleClient: vi.fn().mockReturnValue({}),
-}));
-
-vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
-  getEnvironmentByPublicId: vi.fn(),
 }));
 
 const mockUser = { id: 1, email: "user@example.com" };
@@ -46,10 +39,7 @@ beforeEach(async () => {
 });
 
 describe("triggerWorkflow", () => {
-  it("delegates to the service when the environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
+  it("delegates to the service", async () => {
     mockService.triggerWorkflow.mockResolvedValue({
       triggered: true,
       runPublicId: "run_1",
@@ -57,7 +47,7 @@ describe("triggerWorkflow", () => {
 
     const result = await controller.triggerWorkflow(
       mockUser as any,
-      "env_abc",
+      mockEnvironment as any,
       {
         key: "user-signup",
         subscriber: { email: "a@example.com" },
@@ -71,59 +61,44 @@ describe("triggerWorkflow", () => {
       expect.objectContaining({ key: "user-signup", triggeredBy: 1 }),
     );
   });
-
-  it("throws NotFoundException when the environment doesn't exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.triggerWorkflow(mockUser as any, "env_missing", {
-        key: "user-signup",
-        subscriber: { email: "a@example.com" },
-      } as any),
-    ).rejects.toThrow(NotFoundException);
-    expect(mockService.triggerWorkflow).not.toHaveBeenCalled();
-  });
 });
 
 describe("createWorkflow", () => {
-  it("delegates to the service when the environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
+  it("delegates to the service", async () => {
     mockService.createWorkflow.mockResolvedValue({ publicId: "wf_1" });
 
-    const result = await controller.createWorkflow(mockUser as any, "env_abc", {
-      key: "user-signup",
-      name: "Signup",
-      steps: [{ subject: "hi", body: "hi" }],
-    } as any);
+    const result = await controller.createWorkflow(
+      mockUser as any,
+      mockEnvironment as any,
+      {
+        key: "user-signup",
+        name: "Signup",
+        steps: [{ subject: "hi", body: "hi" }],
+      } as any,
+    );
 
     expect(result).toEqual({ publicId: "wf_1" });
   });
 });
 
 describe("getWorkflow", () => {
-  it("throws NotFoundException when the environment doesn't exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
+  it("delegates to the service", async () => {
+    mockService.getWorkflow.mockResolvedValue({ publicId: "wf_1" });
 
-    await expect(controller.getWorkflow("env_missing", "wf_1")).rejects.toThrow(
-      NotFoundException,
-    );
-    expect(mockService.getWorkflow).not.toHaveBeenCalled();
+    const result = await controller.getWorkflow(mockEnvironment as any, "wf_1");
+
+    expect(result).toEqual({ publicId: "wf_1" });
+    expect(mockService.getWorkflow).toHaveBeenCalledWith({}, 10, "wf_1");
   });
 });
 
 describe("deleteWorkflow", () => {
-  it("delegates to the service when the environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
+  it("delegates to the service", async () => {
+    await controller.deleteWorkflow(
+      mockUser as any,
       mockEnvironment as any,
+      "wf_1",
     );
-
-    await controller.deleteWorkflow(mockUser as any, "env_abc", "wf_1");
 
     expect(mockService.deleteWorkflow).toHaveBeenCalledWith({}, 10, "wf_1", 1);
   });
@@ -131,15 +106,16 @@ describe("deleteWorkflow", () => {
 
 describe("listWorkflowRuns", () => {
   it("delegates to the service with pagination params", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.listRuns.mockResolvedValue({ runs: [], limit: 20, offset: 0 });
 
-    const result = await controller.listWorkflowRuns("env_abc", "wf_1", {
-      limit: 20,
-      offset: 0,
-    } as any);
+    const result = await controller.listWorkflowRuns(
+      mockEnvironment as any,
+      "wf_1",
+      {
+        limit: 20,
+        offset: 0,
+      } as any,
+    );
 
     expect(result).toEqual({ runs: [], limit: 20, offset: 0 });
     expect(mockService.listRuns).toHaveBeenCalledWith({}, 10, "wf_1", {
@@ -150,41 +126,26 @@ describe("listWorkflowRuns", () => {
 });
 
 describe("previewBroadcast", () => {
-  it("delegates to the service when the environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
+  it("delegates to the service", async () => {
     mockService.previewBroadcast.mockResolvedValue({ matchedCount: 42 });
 
-    const result = await controller.previewBroadcast("env_abc", "wf_1", {
-      audience: { type: "optedIn" },
-    } as any);
+    const result = await controller.previewBroadcast(
+      mockEnvironment as any,
+      "wf_1",
+      {
+        audience: { type: "optedIn" },
+      } as any,
+    );
 
     expect(result).toEqual({ matchedCount: 42 });
     expect(mockService.previewBroadcast).toHaveBeenCalledWith({}, 10, "wf_1", {
       type: "optedIn",
     });
   });
-
-  it("throws NotFoundException when the environment doesn't exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.previewBroadcast("env_missing", "wf_1", {
-        audience: { type: "optedIn" },
-      } as any),
-    ).rejects.toThrow(NotFoundException);
-    expect(mockService.previewBroadcast).not.toHaveBeenCalled();
-  });
 });
 
 describe("triggerBroadcast", () => {
-  it("delegates to the service when the environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
+  it("delegates to the service", async () => {
     mockService.triggerBroadcast.mockResolvedValue({
       broadcastId: "bc_1",
       status: "pending",
@@ -192,7 +153,7 @@ describe("triggerBroadcast", () => {
 
     const result = await controller.triggerBroadcast(
       mockUser as any,
-      "env_abc",
+      mockEnvironment as any,
       "wf_1",
       { audience: { type: "optedIn" } } as any,
     );
@@ -206,36 +167,24 @@ describe("triggerBroadcast", () => {
       1,
     );
   });
-
-  it("throws NotFoundException when the environment doesn't exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.triggerBroadcast(mockUser as any, "env_missing", "wf_1", {
-        audience: { type: "optedIn" },
-      } as any),
-    ).rejects.toThrow(NotFoundException);
-    expect(mockService.triggerBroadcast).not.toHaveBeenCalled();
-  });
 });
 
 describe("listBroadcasts", () => {
   it("delegates to the service with pagination params", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.listBroadcasts.mockResolvedValue({
       broadcasts: [],
       limit: 20,
       offset: 0,
     });
 
-    const result = await controller.listBroadcasts("env_abc", "wf_1", {
-      limit: 20,
-      offset: 0,
-    } as any);
+    const result = await controller.listBroadcasts(
+      mockEnvironment as any,
+      "wf_1",
+      {
+        limit: 20,
+        offset: 0,
+      } as any,
+    );
 
     expect(result).toEqual({ broadcasts: [], limit: 20, offset: 0 });
     expect(mockService.listBroadcasts).toHaveBeenCalledWith({}, 10, "wf_1", {
@@ -243,33 +192,20 @@ describe("listBroadcasts", () => {
       offset: 0,
     });
   });
-
-  it("throws NotFoundException when the environment doesn't exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.listBroadcasts("env_missing", "wf_1", {
-        limit: 20,
-        offset: 0,
-      } as any),
-    ).rejects.toThrow(NotFoundException);
-    expect(mockService.listBroadcasts).not.toHaveBeenCalled();
-  });
 });
 
 describe("getBroadcast", () => {
-  it("delegates to the service when the environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
+  it("delegates to the service", async () => {
     mockService.getBroadcast.mockResolvedValue({
       publicId: "bc_1",
       status: "queued",
     });
 
-    const result = await controller.getBroadcast("env_abc", "wf_1", "bc_1");
+    const result = await controller.getBroadcast(
+      mockEnvironment as any,
+      "wf_1",
+      "bc_1",
+    );
 
     expect(result).toEqual({ publicId: "bc_1", status: "queued" });
     expect(mockService.getBroadcast).toHaveBeenCalledWith(
@@ -278,16 +214,5 @@ describe("getBroadcast", () => {
       "wf_1",
       "bc_1",
     );
-  });
-
-  it("throws NotFoundException when the environment doesn't exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.getBroadcast("env_missing", "wf_1", "bc_1"),
-    ).rejects.toThrow(NotFoundException);
-    expect(mockService.getBroadcast).not.toHaveBeenCalled();
   });
 });

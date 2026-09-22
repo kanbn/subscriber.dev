@@ -17,6 +17,7 @@ import {
   environments,
   subscriberPreferences,
   subscribers,
+  workspaceMembers,
 } from "@subscriber.dev/db/schema";
 import { generateUID } from "@subscriber.dev/shared/utils";
 
@@ -42,6 +43,40 @@ export const getEnvironmentByPublicId = async (
       isNull(environments.deletedAt),
     ),
   });
+};
+
+export type EnvironmentForUser = NonNullable<
+  Awaited<ReturnType<typeof getEnvironmentForUser>>
+>;
+
+export const getEnvironmentForUser = async (
+  db: dbClient,
+  userId: number,
+  publicId: string,
+) => {
+  const [result] = await db
+    .select({
+      id: environments.id,
+      publicId: environments.publicId,
+      workspaceId: environments.workspaceId,
+      name: environments.name,
+      slug: environments.slug,
+    })
+    .from(environments)
+    .innerJoin(
+      workspaceMembers,
+      eq(environments.workspaceId, workspaceMembers.workspaceId),
+    )
+    .where(
+      and(
+        eq(environments.publicId, publicId),
+        eq(workspaceMembers.userId, userId),
+        isNull(environments.deletedAt),
+        isNull(workspaceMembers.deletedAt),
+      ),
+    );
+
+  return result;
 };
 
 export const getSubscriberByEmail = async (

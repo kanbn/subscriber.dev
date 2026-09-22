@@ -7,7 +7,7 @@ export const IntegrationResponseSchema = z
   .object({
     type: z.string(),
     priority: z.number(),
-    updatedAt: z.date(),
+    updatedAt: z.iso.datetime(),
   })
   .catchall(z.unknown());
 

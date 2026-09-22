@@ -101,8 +101,8 @@ export class WorkflowService {
         type: s.type,
         delayMs: s.delayMs,
       })),
-      createdAt: workflow.createdAt,
-      updatedAt: workflow.updatedAt,
+      createdAt: workflow.createdAt.toISOString(),
+      updatedAt: workflow.updatedAt.toISOString(),
     };
   }
 
@@ -308,8 +308,8 @@ export class WorkflowService {
       runs: runs.map((run) => ({
         publicId: run.publicId,
         status: run.status,
-        triggeredAt: run.triggeredAt,
-        completedAt: run.completedAt,
+        triggeredAt: run.triggeredAt.toISOString(),
+        completedAt: run.completedAt?.toISOString() ?? null,
         subscriber: {
           publicId: run.subscriber.publicId,
           email: run.subscriber.email,
@@ -320,8 +320,8 @@ export class WorkflowService {
           stepOrder: s.stepOrder,
           type: s.type,
           status: s.status,
-          scheduledAt: s.scheduledAt,
-          sentAt: s.sentAt,
+          scheduledAt: s.scheduledAt.toISOString(),
+          sentAt: s.sentAt?.toISOString() ?? null,
           errorMessage: s.errorMessage,
           bounceType: s.bounceType,
         })),
@@ -346,8 +346,8 @@ export class WorkflowService {
       runs: runs.map((run) => ({
         publicId: run.publicId,
         status: run.status,
-        triggeredAt: run.triggeredAt,
-        completedAt: run.completedAt,
+        triggeredAt: run.triggeredAt.toISOString(),
+        completedAt: run.completedAt?.toISOString() ?? null,
         workflow: {
           publicId: run.workflow.publicId,
           key: run.workflow.key,
@@ -363,8 +363,8 @@ export class WorkflowService {
           stepOrder: s.stepOrder,
           type: s.type,
           status: s.status,
-          scheduledAt: s.scheduledAt,
-          sentAt: s.sentAt,
+          scheduledAt: s.scheduledAt.toISOString(),
+          sentAt: s.sentAt?.toISOString() ?? null,
           errorMessage: s.errorMessage,
           bounceType: s.bounceType,
         })),
@@ -501,7 +501,7 @@ export class WorkflowService {
         publicId: b.publicId,
         status: b.status,
         matchedCount: b.matchedCount,
-        createdAt: b.createdAt,
+        createdAt: b.createdAt.toISOString(),
       })),
       limit: opts.limit,
       offset: opts.offset,
@@ -537,7 +537,7 @@ export class WorkflowService {
       publicId: broadcast.publicId,
       status: broadcast.status,
       matchedCount: broadcast.matchedCount,
-      createdAt: broadcast.createdAt,
+      createdAt: broadcast.createdAt.toISOString(),
       sentCount: counts.sent,
       failedCount: counts.failed,
       skippedCount: counts.skipped,

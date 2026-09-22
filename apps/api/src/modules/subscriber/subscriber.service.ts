@@ -86,8 +86,8 @@ export class SubscriberService {
       lastName: subscriber.lastName,
       name: subscriber.name,
       attributes: subscriber.attributes,
-      createdAt: subscriber.createdAt,
-      updatedAt: subscriber.updatedAt,
+      createdAt: subscriber.createdAt.toISOString(),
+      updatedAt: subscriber.updatedAt.toISOString(),
       unsubscribeUrl: await createEmailUnsubscribeLink(
         subscriber.environmentId,
         subscriber.publicId,
@@ -193,7 +193,7 @@ export class SubscriberService {
         publicId: preferences.publicId,
         email: preferences.email,
         version: preferences.version,
-        createdAt: preferences.createdAt,
+        createdAt: preferences.createdAt.toISOString(),
       },
     };
   }
@@ -212,7 +212,7 @@ export class SubscriberService {
         publicId: string;
         email: boolean;
         version: number;
-        createdAt: Date;
+        createdAt: string;
       };
       error?: string;
     }[] = [];
@@ -301,7 +301,7 @@ export class SubscriberService {
                   publicId: preferences.publicId,
                   email: preferences.email,
                   version: preferences.version,
-                  createdAt: preferences.createdAt,
+                  createdAt: preferences.createdAt.toISOString(),
                 }
               : undefined,
           });
@@ -347,7 +347,7 @@ export class SubscriberService {
               publicId: preferences.publicId,
               email: preferences.email,
               version: preferences.version,
-              createdAt: preferences.createdAt,
+              createdAt: preferences.createdAt.toISOString(),
             },
           });
         }
@@ -428,7 +428,7 @@ export class SubscriberService {
       subscriberPublicId: string;
       email: boolean;
       version: number;
-      createdAt: Date;
+      createdAt: string;
     };
   }> {
     // Verify subscriber exists
@@ -474,7 +474,7 @@ export class SubscriberService {
         subscriberPublicId: subscriber.publicId,
         email: preferences.email,
         version: preferences.version,
-        createdAt: preferences.createdAt,
+        createdAt: preferences.createdAt.toISOString(),
       },
     };
   }
@@ -513,7 +513,7 @@ export class SubscriberService {
             publicId: preferences.publicId,
             email: preferences.email,
             version: preferences.version,
-            createdAt: preferences.createdAt,
+            createdAt: preferences.createdAt.toISOString(),
           }
         : null,
     };

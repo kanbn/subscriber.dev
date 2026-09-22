@@ -1,5 +1,5 @@
-import { User } from '@subscriber.dev/auth/server';
-import type { dbClient } from '@subscriber.dev/db/client';
+import type { dbClient } from "@subscriber.dev/db/client";
+import { User } from "@subscriber.dev/auth/server";
 
 declare global {
   namespace Express {
@@ -7,10 +7,6 @@ declare global {
       user?: User;
       db?: dbClient;
       auth?: any;
-      headers?: Headers;
     }
   }
 }
-
-
-

@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -21,12 +20,14 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscriber.repo";
 import { createDrizzleClient } from "@subscriber.dev/db/client";
-import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 
 import type { User } from "../../common/interfaces/user.interface.js";
+import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
+import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
   BroadcastDetailResponseDto,
   ListBroadcastsQueryDto,
@@ -59,7 +60,7 @@ import { WorkflowService } from "./workflow.service.js";
 @ApiTags("Workflows")
 @ApiBearerAuth("bearer")
 @Controller("environments/:environmentId/workflows")
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class WorkflowController {
   constructor(private readonly workflowService: WorkflowService) {}
 
@@ -79,18 +80,10 @@ export class WorkflowController {
   })
   async triggerWorkflow(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: TriggerWorkflowDto,
   ): Promise<TriggerWorkflowResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.triggerWorkflow(db, environment.id, {
       key: input.key,
@@ -113,18 +106,10 @@ export class WorkflowController {
   @ApiResponse({ status: 404, description: "Environment not found" })
   async createWorkflow(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: CreateWorkflowDto,
   ) {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.createWorkflow(db, environment.id, {
       key: input.key,
@@ -154,18 +139,10 @@ export class WorkflowController {
   @ApiResponse({ status: 200, type: ListWorkflowsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async listWorkflows(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Query() query: ListWorkflowsQueryDto,
   ): Promise<ListWorkflowsResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.listWorkflows(db, environment.id, {
       limit: query.limit,
@@ -188,18 +165,10 @@ export class WorkflowController {
   @ApiResponse({ status: 200, type: ListEnvironmentRunsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async listEnvironmentRuns(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Query() query: ListRunsQueryDto,
   ): Promise<ListEnvironmentRunsResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.listRunsForEnvironment(db, environment.id, {
       limit: query.limit,
@@ -219,18 +188,10 @@ export class WorkflowController {
   @ApiResponse({ status: 200, type: WorkflowDetailResponseDto })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async getWorkflow(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
   ): Promise<WorkflowDetailResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.getWorkflow(db, environment.id, workflowId);
   }
@@ -249,19 +210,11 @@ export class WorkflowController {
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async updateWorkflow(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
     @Body() input: UpdateWorkflowDto,
   ) {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.updateWorkflow(db, environment.id, workflowId, {
       key: input.key,
@@ -287,18 +240,10 @@ export class WorkflowController {
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async deleteWorkflow(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
   ): Promise<void> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     await this.workflowService.deleteWorkflow(
       db,
@@ -323,19 +268,11 @@ export class WorkflowController {
   @ApiResponse({ status: 200, type: ListRunsResponseDto })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async listWorkflowRuns(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
     @Query() query: ListRunsQueryDto,
   ): Promise<ListRunsResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.listRuns(db, environment.id, workflowId, {
       limit: query.limit,
@@ -360,19 +297,11 @@ export class WorkflowController {
   })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async previewBroadcast(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
     @Body() input: TriggerBroadcastDto,
   ): Promise<PreviewBroadcastResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.previewBroadcast(
       db,
@@ -400,19 +329,11 @@ export class WorkflowController {
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async triggerBroadcast(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
     @Body() input: TriggerBroadcastDto,
   ): Promise<TriggerBroadcastResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.triggerBroadcast(
       db,
@@ -438,19 +359,11 @@ export class WorkflowController {
   @ApiResponse({ status: 200, type: ListBroadcastsResponseDto })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async listBroadcasts(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
     @Query() query: ListBroadcastsQueryDto,
   ): Promise<ListBroadcastsResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.listBroadcasts(db, environment.id, workflowId, {
       limit: query.limit,
@@ -472,19 +385,11 @@ export class WorkflowController {
   @ApiResponse({ status: 200, type: BroadcastDetailResponseDto })
   @ApiResponse({ status: 404, description: "Workflow or broadcast not found" })
   async getBroadcast(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
     @Param("broadcastId") broadcastId: string,
   ): Promise<BroadcastDetailResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.workflowService.getBroadcast(
       db,

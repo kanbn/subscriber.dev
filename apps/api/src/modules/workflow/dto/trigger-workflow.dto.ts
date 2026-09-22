@@ -10,7 +10,7 @@ export const TriggerWorkflowSchema = z
       email: z.string().email().optional(),
     }),
     payload: z
-      .record(z.unknown())
+      .record(z.string(), z.unknown())
       .optional()
       .describe(
         "Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.",

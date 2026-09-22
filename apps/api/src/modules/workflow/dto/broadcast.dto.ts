@@ -27,7 +27,7 @@ export const BroadcastSummarySchema = z.object({
   publicId: z.string(),
   status: z.enum(workflowBroadcastStatuses),
   matchedCount: z.number().nullable(),
-  createdAt: z.date(),
+  createdAt: z.iso.datetime(),
 });
 
 export const ListBroadcastsResponseSchema = z.object({

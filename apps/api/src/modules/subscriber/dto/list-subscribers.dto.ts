@@ -17,8 +17,8 @@ export const ListSubscribersQuerySchema = z.object({
     ),
   emailOptedIn: z
     .enum(["true", "false"])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
+    .transform((v) => v === "true")
+    .optional(),
 });
 
 export const ListSubscribersResponseSchema = z.object({

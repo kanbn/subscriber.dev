@@ -20,7 +20,7 @@ function toResponse(row: {
     type: row.type,
     ...row.config,
     priority: row.priority,
-    updatedAt: row.updatedAt,
+    updatedAt: row.updatedAt.toISOString(),
   };
 }
 

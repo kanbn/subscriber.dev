@@ -11,7 +11,7 @@ export const UpdatePreferencesResponseSchema = z.object({
     subscriberPublicId: z.string(),
     email: z.boolean(),
     version: z.number(),
-    createdAt: z.date(),
+    createdAt: z.iso.datetime(),
   }),
 });
 
