@@ -1,45 +1,18 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 
-import { initAuth } from "@subscriber.dev/auth/server";
-import { createDrizzleClient } from "@subscriber.dev/db/client";
+import { headersFromRaw, resolveSessionFromHeaders } from "./session.util.js";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    // Convert Express headers to Web API Headers
-    const headers = new Headers();
-    for (const [key, value] of Object.entries(
-      request.headers as Record<string, string | string[] | undefined>,
-    )) {
-      if (value) {
-        if (Array.isArray(value)) {
-          value.forEach((v: string) => headers.append(key, v));
-        } else {
-          headers.set(key, value);
-        }
-      }
-    }
+    const headers = headersFromRaw(request.headers);
+    const { user, db, auth } = await resolveSessionFromHeaders(headers);
 
-    const db = createDrizzleClient();
-    const auth = initAuth(db);
-
-    const session = await auth.api.getSession({ headers });
-
-    if (!session?.user) {
-      throw new UnauthorizedException("User not authenticated");
-    }
-
-    request.user = session.user;
+    request.user = user;
     request.db = db;
     request.auth = auth;
-    request.headers = headers;
 
     return true;
   }

@@ -17,8 +17,8 @@ export const WorkflowRunStepSummarySchema = z.object({
     "cancelled",
     "bounced",
   ]),
-  scheduledAt: z.date(),
-  sentAt: z.date().nullable(),
+  scheduledAt: z.iso.datetime(),
+  sentAt: z.iso.datetime().nullable(),
   errorMessage: z.string().nullable(),
   bounceType: z.enum(["hard", "soft"]).nullable(),
 });
@@ -33,8 +33,8 @@ export const WorkflowRunSubscriberSummarySchema = z.object({
 export const WorkflowRunSummarySchema = z.object({
   publicId: z.string(),
   status: z.enum(["active", "completed", "cancelled"]),
-  triggeredAt: z.date(),
-  completedAt: z.date().nullable(),
+  triggeredAt: z.iso.datetime(),
+  completedAt: z.iso.datetime().nullable(),
   subscriber: WorkflowRunSubscriberSummarySchema,
   steps: z.array(WorkflowRunStepSummarySchema),
 });

@@ -19,8 +19,8 @@ export interface BounceEvent {
 
 export interface IntegrationProvider<TConfig = unknown, TSecret = unknown> {
   type: string;
-  configSchema: z.ZodType<TConfig, z.ZodTypeDef, any>;
-  secretSchema: z.ZodType<TSecret, z.ZodTypeDef, any>;
+  configSchema: z.ZodType<TConfig>;
+  secretSchema: z.ZodType<TSecret>;
   verify?: (config: TConfig, secret: TSecret) => Promise<void>;
   send: (
     config: TConfig,

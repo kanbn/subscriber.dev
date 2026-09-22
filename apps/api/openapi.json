@@ -299,8 +299,6 @@
             "schema": {
               "minimum": 1,
               "maximum": 100,
-              "exclusiveMaximum": false,
-              "exclusiveMinimum": false,
               "default": 20,
               "type": "number"
             }
@@ -311,7 +309,7 @@
             "in": "query",
             "schema": {
               "minimum": 0,
-              "exclusiveMinimum": false,
+              "maximum": 9007199254740991,
               "default": 0,
               "type": "number"
             }
@@ -323,6 +321,7 @@
             "description": "Filter to the subscriber with this exact email address",
             "schema": {
               "format": "email",
+              "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
               "type": "string"
             }
           },
@@ -987,8 +986,6 @@
             "schema": {
               "minimum": 1,
               "maximum": 100,
-              "exclusiveMaximum": false,
-              "exclusiveMinimum": false,
               "default": 20,
               "type": "number"
             }
@@ -999,7 +996,7 @@
             "in": "query",
             "schema": {
               "minimum": 0,
-              "exclusiveMinimum": false,
+              "maximum": 9007199254740991,
               "default": 0,
               "type": "number"
             }
@@ -1063,8 +1060,6 @@
             "schema": {
               "minimum": 1,
               "maximum": 100,
-              "exclusiveMaximum": false,
-              "exclusiveMinimum": false,
               "default": 20,
               "type": "number"
             }
@@ -1075,7 +1070,7 @@
             "in": "query",
             "schema": {
               "minimum": 0,
-              "exclusiveMinimum": false,
+              "maximum": 9007199254740991,
               "default": 0,
               "type": "number"
             }
@@ -1278,8 +1273,6 @@
             "schema": {
               "minimum": 1,
               "maximum": 100,
-              "exclusiveMaximum": false,
-              "exclusiveMinimum": false,
               "default": 20,
               "type": "number"
             }
@@ -1290,7 +1283,7 @@
             "in": "query",
             "schema": {
               "minimum": 0,
-              "exclusiveMinimum": false,
+              "maximum": 9007199254740991,
               "default": 0,
               "type": "number"
             }
@@ -1472,8 +1465,6 @@
             "schema": {
               "minimum": 1,
               "maximum": 100,
-              "exclusiveMaximum": false,
-              "exclusiveMinimum": false,
               "default": 20,
               "type": "number"
             }
@@ -1484,7 +1475,7 @@
             "in": "query",
             "schema": {
               "minimum": 0,
-              "exclusiveMinimum": false,
+              "maximum": 9007199254740991,
               "default": 0,
               "type": "number"
             }
@@ -1857,8 +1848,6 @@
             "schema": {
               "minimum": 1,
               "maximum": 365,
-              "exclusiveMaximum": false,
-              "exclusiveMinimum": false,
               "default": 30,
               "type": "number"
             }
@@ -1887,6 +1876,35 @@
             "bearer": []
           }
         ]
+      }
+    },
+    "/mcp": {
+      "post": {
+        "operationId": "StreamableHttpController_handlePostRequest",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      },
+      "get": {
+        "operationId": "StreamableHttpController_handleGetRequest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "operationId": "StreamableHttpController_handleDeleteRequest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
       }
     }
   },
@@ -1926,19 +1944,28 @@
             "type": "string"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "email": {
             "type": "string"
           },
           "image": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "stripeCustomerId": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "apiKeys": {
             "type": "array",
@@ -1949,8 +1976,10 @@
                   "type": "number"
                 },
                 "prefix": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "key": {
                   "type": "string"
@@ -1991,16 +2020,25 @@
             "type": "string"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "image": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "stripeCustomerId": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -2026,8 +2064,8 @@
             "type": "object",
             "properties": {
               "name": {
-                "description": "Test name",
-                "type": "string"
+                "type": "string",
+                "description": "Test name"
               },
               "message": {
                 "description": "Optional message",
@@ -2048,8 +2086,8 @@
         "type": "object",
         "properties": {
           "name": {
-            "description": "Test name",
-            "type": "string"
+            "type": "string",
+            "description": "Test name"
           },
           "message": {
             "description": "Optional message",
@@ -2223,39 +2261,70 @@
                   "type": "string"
                 },
                 "email": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "phone": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "externalId": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "firstName": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "lastName": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "name": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "attributes": {
-                  "type": "object",
-                  "additionalProperties": {},
-                  "nullable": true
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
-                "createdAt": {},
-                "updatedAt": {},
-                "unsubscribeUrl": {
+                "createdAt": {
                   "type": "string",
-                  "nullable": true
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "unsubscribeUrl": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
               "required": [
@@ -2271,13 +2340,16 @@
                 "updatedAt",
                 "unsubscribeUrl"
               ]
-            }
+            },
+            "x-nestjs_zod-has-null": true
           },
           "limit": {
-            "type": "number"
+            "type": "number",
+            "x-nestjs_zod-has-null": true
           },
           "offset": {
-            "type": "number"
+            "type": "number",
+            "x-nestjs_zod-has-null": true
           }
         },
         "required": [
@@ -2310,39 +2382,70 @@
                 "type": "string"
               },
               "email": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "phone": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "externalId": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "firstName": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "lastName": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "name": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "attributes": {
-                "type": "object",
-                "additionalProperties": {},
-                "nullable": true
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
-              "createdAt": {},
-              "updatedAt": {},
-              "unsubscribeUrl": {
+              "createdAt": {
                 "type": "string",
-                "nullable": true
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "unsubscribeUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "tags": {
                 "type": "array",
@@ -2351,24 +2454,42 @@
                 }
               }
             },
+            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           },
           "preferences": {
-            "type": "object",
-            "properties": {
-              "publicId": {
-                "type": "string"
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "publicId": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "boolean"
+                  },
+                  "version": {
+                    "type": "number"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  }
+                },
+                "required": [
+                  "publicId",
+                  "email",
+                  "version",
+                  "createdAt"
+                ]
               },
-              "email": {
-                "type": "boolean"
-              },
-              "version": {
-                "type": "number"
-              },
-              "createdAt": {}
-            },
-            "nullable": true,
-            "selfRequired": true
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
           }
         },
         "required": [
@@ -2387,7 +2508,8 @@
           },
           "email": {
             "type": "string",
-            "format": "email"
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
           },
           "phone": {
             "type": "string"
@@ -2406,19 +2528,22 @@
           },
           "attributes": {
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {},
             "selfRequired": false
           },
           "preferences": {
+            "default": {
+              "email": true
+            },
             "type": "object",
             "properties": {
               "email": {
-                "type": "boolean",
-                "default": true
+                "default": true,
+                "type": "boolean"
               }
-            },
-            "default": {
-              "email": true
             },
             "selfRequired": false
           }
@@ -2438,41 +2563,73 @@
                 "type": "string"
               },
               "email": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "phone": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "externalId": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "firstName": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "lastName": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "name": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "attributes": {
-                "type": "object",
-                "additionalProperties": {},
-                "nullable": true
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
-              "createdAt": {},
-              "updatedAt": {},
-              "unsubscribeUrl": {
+              "createdAt": {
                 "type": "string",
-                "nullable": true
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "unsubscribeUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
+            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           },
           "preferences": {
@@ -2487,8 +2644,13 @@
               "version": {
                 "type": "number"
               },
-              "createdAt": {}
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              }
             },
+            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           }
         },
@@ -2501,9 +2663,9 @@
         "type": "object",
         "properties": {
           "subscribers": {
-            "type": "array",
             "minItems": 1,
             "maxItems": 500,
+            "type": "array",
             "items": {
               "type": "object",
               "properties": {
@@ -2515,7 +2677,8 @@
                 },
                 "email": {
                   "type": "string",
-                  "format": "email"
+                  "format": "email",
+                  "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                 },
                 "phone": {
                   "type": "string"
@@ -2534,6 +2697,9 @@
                 },
                 "attributes": {
                   "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
                   "additionalProperties": {}
                 },
                 "preferences": {
@@ -2579,39 +2745,70 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "phone": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "externalId": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "firstName": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "lastName": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "name": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "attributes": {
-                      "type": "object",
-                      "additionalProperties": {},
-                      "nullable": true
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {}
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
-                    "createdAt": {},
-                    "updatedAt": {},
-                    "unsubscribeUrl": {
+                    "createdAt": {
                       "type": "string",
-                      "nullable": true
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "unsubscribeUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "required": [
@@ -2640,7 +2837,11 @@
                     "version": {
                       "type": "number"
                     },
-                    "createdAt": {}
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    }
                   },
                   "required": [
                     "publicId",
@@ -2657,7 +2858,8 @@
                 "index",
                 "status"
               ]
-            }
+            },
+            "x-nestjs_zod-has-null": true
           },
           "summary": {
             "type": "object",
@@ -2672,6 +2874,7 @@
                 "type": "number"
               }
             },
+            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           }
         },
@@ -2684,46 +2887,76 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "format": "email",
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
           },
           "phone": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "externalId": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "firstName": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "lastName": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "attributes": {
-            "type": "object",
-            "additionalProperties": {},
-            "nullable": true,
-            "selfRequired": true
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
           }
-        },
-        "required": [
-          "email",
-          "phone",
-          "externalId",
-          "firstName",
-          "lastName",
-          "name",
-          "attributes"
-        ]
+        }
       },
       "UpdateSubscriberResponseDto": {
         "type": "object",
@@ -2735,41 +2968,73 @@
                 "type": "string"
               },
               "email": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "phone": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "externalId": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "firstName": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "lastName": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "name": {
-                "type": "string",
-                "nullable": true
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "attributes": {
-                "type": "object",
-                "additionalProperties": {},
-                "nullable": true
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
-              "createdAt": {},
-              "updatedAt": {},
-              "unsubscribeUrl": {
+              "createdAt": {
                 "type": "string",
-                "nullable": true
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "unsubscribeUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
+            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           }
         },
@@ -2803,7 +3068,11 @@
               "version": {
                 "type": "number"
               },
-              "createdAt": {}
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              }
             },
             "selfRequired": true
           }
@@ -2863,9 +3132,9 @@
         "type": "object",
         "properties": {
           "key": {
-            "description": "The workflow key, e.g. \"user-signup\".",
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "The workflow key, e.g. \"user-signup\"."
           },
           "subscriber": {
             "type": "object",
@@ -2878,7 +3147,8 @@
               },
               "email": {
                 "type": "string",
-                "format": "email"
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
               }
             },
             "selfRequired": true
@@ -2886,6 +3156,9 @@
           "payload": {
             "description": "Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.",
             "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
             "additionalProperties": {},
             "selfRequired": false
           }
@@ -2917,10 +3190,10 @@
         "type": "object",
         "properties": {
           "key": {
-            "description": "Stable identifier used to trigger this workflow, e.g. \"user-signup\". Unique within the environment.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 255
+            "maxLength": 255,
+            "description": "Stable identifier used to trigger this workflow, e.g. \"user-signup\". Unique within the environment."
           },
           "name": {
             "type": "string",
@@ -2932,18 +3205,18 @@
             "maxLength": 2000
           },
           "type": {
+            "default": "automation",
             "description": "Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.",
             "type": "string",
             "enum": [
               "automation",
               "broadcast"
-            ],
-            "default": "automation"
+            ]
           },
           "steps": {
-            "type": "array",
             "minItems": 1,
             "maxItems": 50,
+            "type": "array",
             "items": {
               "oneOf": [
                 {
@@ -2951,16 +3224,14 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "email"
-                      ]
+                      "const": "email"
                     },
                     "delayMs": {
+                      "default": 0,
                       "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
                       "type": "integer",
                       "minimum": 0,
-                      "exclusiveMinimum": false,
-                      "default": 0
+                      "maximum": 9007199254740991
                     },
                     "subject": {
                       "type": "string",
@@ -2968,9 +3239,9 @@
                       "maxLength": 500
                     },
                     "body": {
-                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.",
                       "type": "string",
-                      "minLength": 1
+                      "minLength": 1,
+                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}."
                     }
                   },
                   "required": [
@@ -2984,26 +3255,24 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "webhook"
-                      ]
+                      "const": "webhook"
                     },
                     "delayMs": {
+                      "default": 0,
                       "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
                       "type": "integer",
                       "minimum": 0,
-                      "exclusiveMinimum": false,
-                      "default": 0
+                      "maximum": 9007199254740991
                     },
                     "url": {
-                      "description": "Destination URL the JSON payload is POSTed to.",
                       "type": "string",
-                      "format": "uri"
+                      "format": "uri",
+                      "description": "Destination URL the JSON payload is POSTed to."
                     },
                     "body": {
-                      "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON.",
                       "type": "string",
-                      "minLength": 1
+                      "minLength": 1,
+                      "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON."
                     }
                   },
                   "required": [
@@ -3035,8 +3304,11 @@
             "type": "string"
           },
           "description": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "status": {
             "type": "string",
@@ -3088,12 +3360,14 @@
             }
           },
           "createdAt": {
-            "type": "",
-            "x-nestjs_zod-empty-type": true
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
           "updatedAt": {
-            "type": "",
-            "x-nestjs_zod-empty-type": true
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           }
         },
         "required": [
@@ -3126,8 +3400,10 @@
                   "type": "string"
                 },
                 "description": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "status": {
                   "type": "string",
@@ -3178,8 +3454,16 @@
                     ]
                   }
                 },
-                "createdAt": {},
-                "updatedAt": {}
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
               },
               "required": [
                 "publicId",
@@ -3226,9 +3510,22 @@
                     "cancelled"
                   ]
                 },
-                "triggeredAt": {},
+                "triggeredAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
                 "completedAt": {
-                  "nullable": true
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "subscriber": {
                   "type": "object",
@@ -3237,16 +3534,22 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "name": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "externalId": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "required": [
@@ -3278,21 +3581,42 @@
                           "bounced"
                         ]
                       },
-                      "scheduledAt": {},
+                      "scheduledAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
                       "sentAt": {
-                        "nullable": true
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "errorMessage": {
-                        "type": "string",
-                        "nullable": true
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "bounceType": {
-                        "type": "string",
-                        "enum": [
-                          "hard",
-                          "soft"
-                        ],
-                        "nullable": true
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "hard",
+                              "soft"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "required": [
@@ -3335,13 +3659,16 @@
                 "steps",
                 "workflow"
               ]
-            }
+            },
+            "x-nestjs_zod-has-null": true
           },
           "limit": {
-            "type": "number"
+            "type": "number",
+            "x-nestjs_zod-has-null": true
           },
           "offset": {
-            "type": "number"
+            "type": "number",
+            "x-nestjs_zod-has-null": true
           }
         },
         "required": [
@@ -3363,8 +3690,11 @@
             "type": "string"
           },
           "description": {
-            "type": "string",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "status": {
             "type": "string",
@@ -3416,12 +3746,14 @@
             }
           },
           "createdAt": {
-            "type": "",
-            "x-nestjs_zod-empty-type": true
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
           "updatedAt": {
-            "type": "",
-            "x-nestjs_zod-empty-type": true
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
           "sentCount": {
             "type": "number"
@@ -3445,8 +3777,11 @@
             "type": "number"
           },
           "successRate": {
-            "type": "number",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           }
         },
         "required": [
@@ -3475,30 +3810,41 @@
           "key": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 255
+            "maxLength": 255,
+            "x-nestjs_zod-has-null": true
           },
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 255
+            "maxLength": 255,
+            "x-nestjs_zod-has-null": true
           },
           "description": {
-            "type": "string",
-            "maxLength": 2000,
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
           },
           "status": {
             "type": "string",
             "enum": [
               "active",
               "paused"
-            ]
+            ],
+            "x-nestjs_zod-has-null": true
           },
           "steps": {
             "description": "If provided, replaces ALL existing steps for this workflow.",
-            "type": "array",
             "minItems": 1,
             "maxItems": 50,
+            "type": "array",
             "items": {
               "oneOf": [
                 {
@@ -3506,16 +3852,14 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "email"
-                      ]
+                      "const": "email"
                     },
                     "delayMs": {
+                      "default": 0,
                       "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
                       "type": "integer",
                       "minimum": 0,
-                      "exclusiveMinimum": false,
-                      "default": 0
+                      "maximum": 9007199254740991
                     },
                     "subject": {
                       "type": "string",
@@ -3523,9 +3867,9 @@
                       "maxLength": 500
                     },
                     "body": {
-                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.",
                       "type": "string",
-                      "minLength": 1
+                      "minLength": 1,
+                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}."
                     }
                   },
                   "required": [
@@ -3539,26 +3883,24 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "webhook"
-                      ]
+                      "const": "webhook"
                     },
                     "delayMs": {
+                      "default": 0,
                       "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
                       "type": "integer",
                       "minimum": 0,
-                      "exclusiveMinimum": false,
-                      "default": 0
+                      "maximum": 9007199254740991
                     },
                     "url": {
-                      "description": "Destination URL the JSON payload is POSTed to.",
                       "type": "string",
-                      "format": "uri"
+                      "format": "uri",
+                      "description": "Destination URL the JSON payload is POSTed to."
                     },
                     "body": {
-                      "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON.",
                       "type": "string",
-                      "minLength": 1
+                      "minLength": 1,
+                      "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON."
                     }
                   },
                   "required": [
@@ -3568,7 +3910,8 @@
                   ]
                 }
               ]
-            }
+            },
+            "x-nestjs_zod-has-null": true
           }
         }
       },
@@ -3591,9 +3934,22 @@
                     "cancelled"
                   ]
                 },
-                "triggeredAt": {},
+                "triggeredAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
                 "completedAt": {
-                  "nullable": true
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "subscriber": {
                   "type": "object",
@@ -3602,16 +3958,22 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "name": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "externalId": {
-                      "type": "string",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "required": [
@@ -3643,21 +4005,42 @@
                           "bounced"
                         ]
                       },
-                      "scheduledAt": {},
+                      "scheduledAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
                       "sentAt": {
-                        "nullable": true
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "errorMessage": {
-                        "type": "string",
-                        "nullable": true
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "bounceType": {
-                        "type": "string",
-                        "enum": [
-                          "hard",
-                          "soft"
-                        ],
-                        "nullable": true
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "hard",
+                              "soft"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "required": [
@@ -3680,13 +4063,16 @@
                 "subscriber",
                 "steps"
               ]
-            }
+            },
+            "x-nestjs_zod-has-null": true
           },
           "limit": {
-            "type": "number"
+            "type": "number",
+            "x-nestjs_zod-has-null": true
           },
           "offset": {
-            "type": "number"
+            "type": "number",
+            "x-nestjs_zod-has-null": true
           }
         },
         "required": [
@@ -3699,129 +4085,130 @@
         "type": "object",
         "properties": {
           "audience": {
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "optedIn"
+            "$ref": "#/$defs/__schema0",
+            "type": "",
+            "x-nestjs_zod-parent-has-refs": true,
+            "x-nestjs_zod-empty-type": true,
+            "x-nestjs_zod-$defs": {
+              "__schema0": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "optedIn"
+                      }
+                    },
+                    "required": [
+                      "type"
                     ]
-                  }
-                },
-                "required": [
-                  "type"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "tag"
+                      },
+                      "tag": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
                       "tag"
                     ]
                   },
-                  "tag": {
-                    "type": "string",
-                    "minLength": 1
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "attribute"
+                      },
+                      "field": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "op": {
+                        "type": "string",
+                        "enum": [
+                          "equals",
+                          "contains",
+                          "exists"
+                        ]
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "field",
+                      "op"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "and"
+                      },
+                      "clauses": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/__schema0"
+                        }
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "clauses"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "or"
+                      },
+                      "clauses": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/__schema0"
+                        }
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "clauses"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "not"
+                      },
+                      "clause": {
+                        "$ref": "#/$defs/__schema0"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "clause"
+                    ]
                   }
-                },
-                "required": [
-                  "type",
-                  "tag"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "attribute"
-                    ]
-                  },
-                  "field": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "op": {
-                    "type": "string",
-                    "enum": [
-                      "equals",
-                      "contains",
-                      "exists"
-                    ]
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "type",
-                  "field",
-                  "op"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "and"
-                    ]
-                  },
-                  "clauses": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "clauses"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "or"
-                    ]
-                  },
-                  "clauses": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {}
-                  }
-                },
-                "required": [
-                  "type",
-                  "clauses"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "not"
-                    ]
-                  },
-                  "clause": {}
-                },
-                "required": [
-                  "type",
-                  "clause"
                 ]
               }
-            ],
-            "x-nestjs_zod-empty-type": true
+            }
           }
         },
         "required": [
@@ -3879,10 +4266,16 @@
                   ]
                 },
                 "matchedCount": {
-                  "type": "number",
-                  "nullable": true
+                  "type": [
+                    "number",
+                    "null"
+                  ]
                 },
-                "createdAt": {}
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
               },
               "required": [
                 "publicId",
@@ -3920,12 +4313,16 @@
             ]
           },
           "matchedCount": {
-            "type": "number",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           },
           "createdAt": {
-            "type": "",
-            "x-nestjs_zod-empty-type": true
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
           "sentCount": {
             "type": "number"
@@ -3949,8 +4346,11 @@
             "type": "number"
           },
           "successRate": {
-            "type": "number",
-            "nullable": true
+            "x-nestjs_zod-empty-type": true,
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           }
         },
         "required": [
@@ -4000,6 +4400,7 @@
           "root": {
             "type": "object",
             "properties": {},
+            "additionalProperties": {},
             "x-nestjs_zod-unwrap-root": true,
             "selfRequired": false
           }
@@ -4018,8 +4419,9 @@
             "type": "number"
           },
           "updatedAt": {
-            "type": "",
-            "x-nestjs_zod-empty-type": true
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           }
         },
         "required": [
@@ -4042,13 +4444,18 @@
                 "priority": {
                   "type": "number"
                 },
-                "updatedAt": {}
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
               },
               "required": [
                 "type",
                 "priority",
                 "updatedAt"
-              ]
+              ],
+              "additionalProperties": {}
             }
           }
         },
@@ -4099,8 +4506,10 @@
                 "type": "number"
               },
               "successRate": {
-                "type": "number",
-                "nullable": true
+                "type": [
+                  "number",
+                  "null"
+                ]
               }
             },
             "selfRequired": true

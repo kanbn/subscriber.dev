@@ -80,8 +80,8 @@ export const WorkflowSchema = z.object({
   status: z.enum(["active", "paused"]),
   type: z.enum(["automation", "broadcast"]),
   steps: z.array(WorkflowStepResponseSchema),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export const WorkflowDetailResponseSchema = WorkflowSchema.extend({

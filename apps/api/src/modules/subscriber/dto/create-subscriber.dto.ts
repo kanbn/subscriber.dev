@@ -16,7 +16,7 @@ export const CreateSubscriberSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   name: z.string().optional(),
-  attributes: z.record(z.unknown()).optional(),
+  attributes: z.record(z.string(), z.unknown()).optional(),
   preferences: z
     .object({
       email: z.boolean().optional().default(true),
@@ -33,9 +33,9 @@ export const SubscriberSchema = z.object({
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),
   name: z.string().nullable(),
-  attributes: z.record(z.unknown()).nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  attributes: z.record(z.string(), z.unknown()).nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
   unsubscribeUrl: z.string().nullable(),
 });
 
@@ -43,7 +43,7 @@ export const SubscriberPreferencesSchema = z.object({
   publicId: z.string(),
   email: z.boolean(),
   version: z.number(),
-  createdAt: z.date(),
+  createdAt: z.iso.datetime(),
 });
 
 export const CreateSubscriberResponseSchema = z.object({

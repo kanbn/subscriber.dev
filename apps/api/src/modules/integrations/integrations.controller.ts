@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Patch,
   UseGuards,
@@ -18,12 +17,14 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscriber.repo";
 import { createDrizzleClient } from "@subscriber.dev/db/client";
-import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 
 import type { User } from "../../common/interfaces/user.interface.js";
+import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
+import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
   IntegrationResponseDto,
   ListIntegrationsResponseDto,
@@ -34,7 +35,7 @@ import { IntegrationsService } from "./integrations.service.js";
 @ApiTags("Integrations")
 @ApiBearerAuth("bearer")
 @Controller("environments/:environmentId/integrations")
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
 
@@ -63,19 +64,11 @@ export class IntegrationsController {
   })
   async upsert(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("type") type: string,
     @Body() body: UpsertIntegrationDto,
   ): Promise<IntegrationResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.integrationsService.upsert(
       db,
@@ -106,18 +99,10 @@ export class IntegrationsController {
     description: "Environment or integration not found",
   })
   async setPrimary(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("type") type: string,
   ): Promise<IntegrationResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.integrationsService.setPrimary(db, environment.id, type);
   }
@@ -134,17 +119,9 @@ export class IntegrationsController {
   @ApiResponse({ status: 200, type: ListIntegrationsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async list(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
   ): Promise<ListIntegrationsResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.integrationsService.list(db, environment.id);
   }
@@ -165,18 +142,10 @@ export class IntegrationsController {
     description: "Environment or integration not found",
   })
   async get(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("type") type: string,
   ): Promise<IntegrationResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.integrationsService.get(db, environment.id, type);
   }
@@ -195,18 +164,10 @@ export class IntegrationsController {
     description: "Environment or integration not found",
   })
   async delete(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("type") type: string,
   ): Promise<void> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     await this.integrationsService.delete(db, environment.id, type);
   }

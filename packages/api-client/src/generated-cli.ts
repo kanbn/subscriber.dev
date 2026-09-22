@@ -6,22 +6,20 @@
  * OpenAPI spec version: 1.0
  */
 import { cliFetch } from './mutator/cli-fetch.js';
+export type UserResponseDtoApiKeysItemPrefix = string | null;
+
 export type UserResponseDtoApiKeysItem = {
   id: number;
-  /** @nullable */
-  prefix: string | null;
+  prefix: UserResponseDtoApiKeysItemPrefix;
   key: string;
 };
 
 export interface UserResponseDto {
   publicId: string;
-  /** @nullable */
-  name: string | null;
+  name: string[];
   email: string;
-  /** @nullable */
-  image: string | null;
-  /** @nullable */
-  stripeCustomerId: string | null;
+  image: string[];
+  stripeCustomerId: string[];
   apiKeys: UserResponseDtoApiKeysItem[];
 }
 
@@ -32,12 +30,9 @@ export interface UpdateUserDto {
 
 export interface UpdateUserResponseDto {
   publicId: string;
-  /** @nullable */
-  name: string | null;
-  /** @nullable */
-  image: string | null;
-  /** @nullable */
-  stripeCustomerId: string | null;
+  name: string[];
+  image: string[];
+  stripeCustomerId: string[];
 }
 
 export type TestResponseDtoEcho = {
@@ -121,31 +116,38 @@ export interface EnvironmentDto {
   slug: string;
 }
 
-/**
- * @nullable
- */
-export type ListSubscribersResponseDtoSubscribersItemAttributes = {[key: string]: unknown} | null;
+export type ListSubscribersResponseDtoSubscribersItemEmail = string | null;
+
+export type ListSubscribersResponseDtoSubscribersItemPhone = string | null;
+
+export type ListSubscribersResponseDtoSubscribersItemExternalId = string | null;
+
+export type ListSubscribersResponseDtoSubscribersItemFirstName = string | null;
+
+export type ListSubscribersResponseDtoSubscribersItemLastName = string | null;
+
+export type ListSubscribersResponseDtoSubscribersItemName = string | null;
+
+export type ListSubscribersResponseDtoSubscribersItemAttributesAnyOf = {[key: string]: unknown};
+
+export type ListSubscribersResponseDtoSubscribersItemAttributes = ListSubscribersResponseDtoSubscribersItemAttributesAnyOf | null;
+
+export type ListSubscribersResponseDtoSubscribersItemUnsubscribeUrl = string | null;
 
 export type ListSubscribersResponseDtoSubscribersItem = {
   publicId: string;
-  /** @nullable */
-  email: string | null;
-  /** @nullable */
-  phone: string | null;
-  /** @nullable */
-  externalId: string | null;
-  /** @nullable */
-  firstName: string | null;
-  /** @nullable */
-  lastName: string | null;
-  /** @nullable */
-  name: string | null;
-  /** @nullable */
+  email: ListSubscribersResponseDtoSubscribersItemEmail;
+  phone: ListSubscribersResponseDtoSubscribersItemPhone;
+  externalId: ListSubscribersResponseDtoSubscribersItemExternalId;
+  firstName: ListSubscribersResponseDtoSubscribersItemFirstName;
+  lastName: ListSubscribersResponseDtoSubscribersItemLastName;
+  name: ListSubscribersResponseDtoSubscribersItemName;
   attributes: ListSubscribersResponseDtoSubscribersItemAttributes;
-  createdAt: unknown;
-  updatedAt: unknown;
-  /** @nullable */
-  unsubscribeUrl: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+  unsubscribeUrl: ListSubscribersResponseDtoSubscribersItemUnsubscribeUrl;
 };
 
 export interface ListSubscribersResponseDto {
@@ -158,47 +160,53 @@ export interface ListTagsResponseDto {
   tags: string[];
 }
 
-/**
- * @nullable
- */
-export type GetSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+export type GetSubscriberResponseDtoSubscriberEmail = string | null;
+
+export type GetSubscriberResponseDtoSubscriberPhone = string | null;
+
+export type GetSubscriberResponseDtoSubscriberExternalId = string | null;
+
+export type GetSubscriberResponseDtoSubscriberFirstName = string | null;
+
+export type GetSubscriberResponseDtoSubscriberLastName = string | null;
+
+export type GetSubscriberResponseDtoSubscriberName = string | null;
+
+export type GetSubscriberResponseDtoSubscriberAttributesAnyOf = {[key: string]: unknown};
+
+export type GetSubscriberResponseDtoSubscriberAttributes = GetSubscriberResponseDtoSubscriberAttributesAnyOf | null;
+
+export type GetSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
 export type GetSubscriberResponseDtoSubscriber = {
   publicId?: string;
-  /** @nullable */
-  email?: string | null;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  externalId?: string | null;
-  /** @nullable */
-  firstName?: string | null;
-  /** @nullable */
-  lastName?: string | null;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
+  email?: GetSubscriberResponseDtoSubscriberEmail;
+  phone?: GetSubscriberResponseDtoSubscriberPhone;
+  externalId?: GetSubscriberResponseDtoSubscriberExternalId;
+  firstName?: GetSubscriberResponseDtoSubscriberFirstName;
+  lastName?: GetSubscriberResponseDtoSubscriberLastName;
+  name?: GetSubscriberResponseDtoSubscriberName;
   attributes?: GetSubscriberResponseDtoSubscriberAttributes;
-  createdAt?: unknown;
-  updatedAt?: unknown;
-  /** @nullable */
-  unsubscribeUrl?: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt?: string;
+  unsubscribeUrl?: GetSubscriberResponseDtoSubscriberUnsubscribeUrl;
   tags?: string[];
 };
 
-/**
- * @nullable
- */
-export type GetSubscriberResponseDtoPreferences = {
-  publicId?: string;
-  email?: boolean;
-  version?: number;
-  createdAt?: unknown;
-} | null;
+export type GetSubscriberResponseDtoPreferencesAnyOf = {
+  publicId: string;
+  email: boolean;
+  version: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+};
+
+export type GetSubscriberResponseDtoPreferences = GetSubscriberResponseDtoPreferencesAnyOf | null;
 
 export interface GetSubscriberResponseDto {
   subscriber: GetSubscriberResponseDtoSubscriber;
-  /** @nullable */
   preferences: GetSubscriberResponseDtoPreferences;
 }
 
@@ -215,6 +223,7 @@ export interface CreateSubscriberDto {
    * @maxLength 255
    */
   publicId?: string;
+  /** @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$ */
   email?: string;
   phone?: string;
   externalId?: string;
@@ -225,38 +234,46 @@ export interface CreateSubscriberDto {
   preferences: CreateSubscriberDtoPreferences;
 }
 
-/**
- * @nullable
- */
-export type CreateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+export type CreateSubscriberResponseDtoSubscriberEmail = string | null;
+
+export type CreateSubscriberResponseDtoSubscriberPhone = string | null;
+
+export type CreateSubscriberResponseDtoSubscriberExternalId = string | null;
+
+export type CreateSubscriberResponseDtoSubscriberFirstName = string | null;
+
+export type CreateSubscriberResponseDtoSubscriberLastName = string | null;
+
+export type CreateSubscriberResponseDtoSubscriberName = string | null;
+
+export type CreateSubscriberResponseDtoSubscriberAttributesAnyOf = {[key: string]: unknown};
+
+export type CreateSubscriberResponseDtoSubscriberAttributes = CreateSubscriberResponseDtoSubscriberAttributesAnyOf | null;
+
+export type CreateSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
 export type CreateSubscriberResponseDtoSubscriber = {
   publicId?: string;
-  /** @nullable */
-  email?: string | null;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  externalId?: string | null;
-  /** @nullable */
-  firstName?: string | null;
-  /** @nullable */
-  lastName?: string | null;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
+  email?: CreateSubscriberResponseDtoSubscriberEmail;
+  phone?: CreateSubscriberResponseDtoSubscriberPhone;
+  externalId?: CreateSubscriberResponseDtoSubscriberExternalId;
+  firstName?: CreateSubscriberResponseDtoSubscriberFirstName;
+  lastName?: CreateSubscriberResponseDtoSubscriberLastName;
+  name?: CreateSubscriberResponseDtoSubscriberName;
   attributes?: CreateSubscriberResponseDtoSubscriberAttributes;
-  createdAt?: unknown;
-  updatedAt?: unknown;
-  /** @nullable */
-  unsubscribeUrl?: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt?: string;
+  unsubscribeUrl?: CreateSubscriberResponseDtoSubscriberUnsubscribeUrl;
 };
 
 export type CreateSubscriberResponseDtoPreferences = {
   publicId?: string;
   email?: boolean;
   version?: number;
-  createdAt?: unknown;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt?: string;
 };
 
 export interface CreateSubscriberResponseDto {
@@ -280,6 +297,7 @@ export type BulkUpsertSubscribersDtoSubscribersItem = {
    * @maxLength 255
    */
   publicId?: string;
+  /** @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$ */
   email?: string;
   phone?: string;
   externalId?: string;
@@ -309,38 +327,46 @@ export const BulkUpsertSubscribersResponseDtoResultsItemStatus = {
   error: 'error',
 } as const;
 
-/**
- * @nullable
- */
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes = {[key: string]: unknown} | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberEmail = string | null;
+
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberPhone = string | null;
+
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberExternalId = string | null;
+
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberFirstName = string | null;
+
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberLastName = string | null;
+
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberName = string | null;
+
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributesAnyOf = {[key: string]: unknown};
+
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes = BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributesAnyOf | null;
+
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberUnsubscribeUrl = string | null;
 
 export type BulkUpsertSubscribersResponseDtoResultsItemSubscriber = {
   publicId: string;
-  /** @nullable */
-  email: string | null;
-  /** @nullable */
-  phone: string | null;
-  /** @nullable */
-  externalId: string | null;
-  /** @nullable */
-  firstName: string | null;
-  /** @nullable */
-  lastName: string | null;
-  /** @nullable */
-  name: string | null;
-  /** @nullable */
+  email: BulkUpsertSubscribersResponseDtoResultsItemSubscriberEmail;
+  phone: BulkUpsertSubscribersResponseDtoResultsItemSubscriberPhone;
+  externalId: BulkUpsertSubscribersResponseDtoResultsItemSubscriberExternalId;
+  firstName: BulkUpsertSubscribersResponseDtoResultsItemSubscriberFirstName;
+  lastName: BulkUpsertSubscribersResponseDtoResultsItemSubscriberLastName;
+  name: BulkUpsertSubscribersResponseDtoResultsItemSubscriberName;
   attributes: BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes;
-  createdAt: unknown;
-  updatedAt: unknown;
-  /** @nullable */
-  unsubscribeUrl: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+  unsubscribeUrl: BulkUpsertSubscribersResponseDtoResultsItemSubscriberUnsubscribeUrl;
 };
 
 export type BulkUpsertSubscribersResponseDtoResultsItemPreferences = {
   publicId: string;
   email: boolean;
   version: number;
-  createdAt: unknown;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
 };
 
 export type BulkUpsertSubscribersResponseDtoResultsItem = {
@@ -362,53 +388,54 @@ export interface BulkUpsertSubscribersResponseDto {
   summary: BulkUpsertSubscribersResponseDtoSummary;
 }
 
-/**
- * @nullable
- */
-export type UpdateSubscriberDtoAttributes = {[key: string]: unknown} | null;
+export type UpdateSubscriberDtoEmail = string | null;
+
+export type UpdateSubscriberDtoAttributesAnyOf = {[key: string]: unknown};
+
+export type UpdateSubscriberDtoAttributes = UpdateSubscriberDtoAttributesAnyOf | null;
 
 export interface UpdateSubscriberDto {
-  /** @nullable */
-  email: string | null;
-  /** @nullable */
-  phone: string | null;
-  /** @nullable */
-  externalId: string | null;
-  /** @nullable */
-  firstName: string | null;
-  /** @nullable */
-  lastName: string | null;
-  /** @nullable */
-  name: string | null;
-  /** @nullable */
-  attributes: UpdateSubscriberDtoAttributes;
+  email?: UpdateSubscriberDtoEmail;
+  phone?: string[];
+  externalId?: string[];
+  firstName?: string[];
+  lastName?: string[];
+  name?: string[];
+  attributes?: UpdateSubscriberDtoAttributes;
 }
 
-/**
- * @nullable
- */
-export type UpdateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+export type UpdateSubscriberResponseDtoSubscriberEmail = string | null;
+
+export type UpdateSubscriberResponseDtoSubscriberPhone = string | null;
+
+export type UpdateSubscriberResponseDtoSubscriberExternalId = string | null;
+
+export type UpdateSubscriberResponseDtoSubscriberFirstName = string | null;
+
+export type UpdateSubscriberResponseDtoSubscriberLastName = string | null;
+
+export type UpdateSubscriberResponseDtoSubscriberName = string | null;
+
+export type UpdateSubscriberResponseDtoSubscriberAttributesAnyOf = {[key: string]: unknown};
+
+export type UpdateSubscriberResponseDtoSubscriberAttributes = UpdateSubscriberResponseDtoSubscriberAttributesAnyOf | null;
+
+export type UpdateSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
 export type UpdateSubscriberResponseDtoSubscriber = {
   publicId?: string;
-  /** @nullable */
-  email?: string | null;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  externalId?: string | null;
-  /** @nullable */
-  firstName?: string | null;
-  /** @nullable */
-  lastName?: string | null;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
+  email?: UpdateSubscriberResponseDtoSubscriberEmail;
+  phone?: UpdateSubscriberResponseDtoSubscriberPhone;
+  externalId?: UpdateSubscriberResponseDtoSubscriberExternalId;
+  firstName?: UpdateSubscriberResponseDtoSubscriberFirstName;
+  lastName?: UpdateSubscriberResponseDtoSubscriberLastName;
+  name?: UpdateSubscriberResponseDtoSubscriberName;
   attributes?: UpdateSubscriberResponseDtoSubscriberAttributes;
-  createdAt?: unknown;
-  updatedAt?: unknown;
-  /** @nullable */
-  unsubscribeUrl?: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt?: string;
+  unsubscribeUrl?: UpdateSubscriberResponseDtoSubscriberUnsubscribeUrl;
 };
 
 export interface UpdateSubscriberResponseDto {
@@ -424,7 +451,8 @@ export type UpdatePreferencesResponseDtoPreferences = {
   subscriberPublicId?: string;
   email?: boolean;
   version?: number;
-  createdAt?: unknown;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt?: string;
 };
 
 export interface UpdatePreferencesResponseDto {
@@ -455,6 +483,7 @@ export interface UnsubscribeResponseDto {
 export type TriggerWorkflowDtoSubscriber = {
   publicId?: string;
   externalId?: string;
+  /** @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$ */
   email?: string;
 };
 
@@ -492,19 +521,12 @@ export const CreateWorkflowDtoType = {
   broadcast: 'broadcast',
 } as const;
 
-export type CreateWorkflowDtoStepsItemOneOfType = typeof CreateWorkflowDtoStepsItemOneOfType[keyof typeof CreateWorkflowDtoStepsItemOneOfType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const CreateWorkflowDtoStepsItemOneOfType = {
-  email: 'email',
-} as const;
-
 export type CreateWorkflowDtoStepsItemOneOf = {
-  type: CreateWorkflowDtoStepsItemOneOfType;
+  type: 'email';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
+   * @maximum 9007199254740991
    */
   delayMs?: number;
   /**
@@ -519,19 +541,12 @@ export type CreateWorkflowDtoStepsItemOneOf = {
   body: string;
 };
 
-export type CreateWorkflowDtoStepsItemOneOfThreeType = typeof CreateWorkflowDtoStepsItemOneOfThreeType[keyof typeof CreateWorkflowDtoStepsItemOneOfThreeType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const CreateWorkflowDtoStepsItemOneOfThreeType = {
-  webhook: 'webhook',
-} as const;
-
-export type CreateWorkflowDtoStepsItemOneOfThree = {
-  type: CreateWorkflowDtoStepsItemOneOfThreeType;
+export type CreateWorkflowDtoStepsItemOneOfTwo = {
+  type: 'webhook';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
+   * @maximum 9007199254740991
    */
   delayMs?: number;
   /** Destination URL the JSON payload is POSTed to. */
@@ -543,7 +558,7 @@ export type CreateWorkflowDtoStepsItemOneOfThree = {
   body: string;
 };
 
-export type CreateWorkflowDtoStepsItem = CreateWorkflowDtoStepsItemOneOf | CreateWorkflowDtoStepsItemOneOfThree;
+export type CreateWorkflowDtoStepsItem = CreateWorkflowDtoStepsItemOneOf | CreateWorkflowDtoStepsItemOneOfTwo;
 
 export interface CreateWorkflowDto {
   /**
@@ -600,14 +615,17 @@ export interface WorkflowResponseDto {
   publicId: string;
   key: string;
   name: string;
-  /** @nullable */
-  description: string | null;
+  description: string[];
   status: WorkflowResponseDtoStatus;
   type: WorkflowResponseDtoType;
   steps: WorkflowResponseDtoStepsItem[];
-  createdAt: unknown;
-  updatedAt: unknown;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
 }
+
+export type ListWorkflowsResponseDtoWorkflowsItemDescription = string | null;
 
 export type ListWorkflowsResponseDtoWorkflowsItemStatus = typeof ListWorkflowsResponseDtoWorkflowsItemStatus[keyof typeof ListWorkflowsResponseDtoWorkflowsItemStatus];
 
@@ -641,13 +659,14 @@ export type ListWorkflowsResponseDtoWorkflowsItem = {
   publicId: string;
   key: string;
   name: string;
-  /** @nullable */
-  description: string | null;
+  description: ListWorkflowsResponseDtoWorkflowsItemDescription;
   status: ListWorkflowsResponseDtoWorkflowsItemStatus;
   type: ListWorkflowsResponseDtoWorkflowsItemType;
   steps: ListWorkflowsResponseDtoWorkflowsItemStepsItem[];
-  createdAt: unknown;
-  updatedAt: unknown;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
 };
 
 export interface ListWorkflowsResponseDto {
@@ -666,19 +685,19 @@ export const ListEnvironmentRunsResponseDtoRunsItemStatus = {
   cancelled: 'cancelled',
 } as const;
 
-/**
- * @nullable
- */
-export type ListEnvironmentRunsResponseDtoRunsItemCompletedAt = unknown | null;
+export type ListEnvironmentRunsResponseDtoRunsItemCompletedAt = string | null;
+
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberEmail = string | null;
+
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberName = string | null;
+
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberExternalId = string | null;
 
 export type ListEnvironmentRunsResponseDtoRunsItemSubscriber = {
   publicId: string;
-  /** @nullable */
-  email: string | null;
-  /** @nullable */
-  name: string | null;
-  /** @nullable */
-  externalId: string | null;
+  email: ListEnvironmentRunsResponseDtoRunsItemSubscriberEmail;
+  name: ListEnvironmentRunsResponseDtoRunsItemSubscriberName;
+  externalId: ListEnvironmentRunsResponseDtoRunsItemSubscriberExternalId;
 };
 
 export type ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus];
@@ -694,33 +713,20 @@ export const ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = {
   bounced: 'bounced',
 } as const;
 
-/**
- * @nullable
- */
-export type ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt = unknown | null;
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt = string | null;
 
-/**
- * @nullable
- */
-export type ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType] | null;
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemErrorMessage = string | null;
 
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = {
-  hard: 'hard',
-  soft: 'soft',
-} as const;
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = 'hard' | 'soft' | null;
 
 export type ListEnvironmentRunsResponseDtoRunsItemStepsItem = {
   stepOrder: number;
   type: string;
   status: ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus;
-  scheduledAt: unknown;
-  /** @nullable */
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  scheduledAt: string;
   sentAt: ListEnvironmentRunsResponseDtoRunsItemStepsItemSentAt;
-  /** @nullable */
-  errorMessage: string | null;
-  /** @nullable */
+  errorMessage: ListEnvironmentRunsResponseDtoRunsItemStepsItemErrorMessage;
   bounceType: ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType;
 };
 
@@ -733,8 +739,8 @@ export type ListEnvironmentRunsResponseDtoRunsItemWorkflow = {
 export type ListEnvironmentRunsResponseDtoRunsItem = {
   publicId: string;
   status: ListEnvironmentRunsResponseDtoRunsItemStatus;
-  triggeredAt: unknown;
-  /** @nullable */
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  triggeredAt: string;
   completedAt: ListEnvironmentRunsResponseDtoRunsItemCompletedAt;
   subscriber: ListEnvironmentRunsResponseDtoRunsItemSubscriber;
   steps: ListEnvironmentRunsResponseDtoRunsItemStepsItem[];
@@ -779,13 +785,14 @@ export interface WorkflowDetailResponseDto {
   publicId: string;
   key: string;
   name: string;
-  /** @nullable */
-  description: string | null;
+  description: string[];
   status: WorkflowDetailResponseDtoStatus;
   type: WorkflowDetailResponseDtoType;
   steps: WorkflowDetailResponseDtoStepsItem[];
-  createdAt: unknown;
-  updatedAt: unknown;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
   sentCount: number;
   failedCount: number;
   skippedCount: number;
@@ -793,9 +800,10 @@ export interface WorkflowDetailResponseDto {
   bouncedCount: number;
   hardBounceCount: number;
   softBounceCount: number;
-  /** @nullable */
-  successRate: number | null;
+  successRate: number[];
 }
+
+export type UpdateWorkflowDtoDescription = string | null;
 
 export type UpdateWorkflowDtoStatus = typeof UpdateWorkflowDtoStatus[keyof typeof UpdateWorkflowDtoStatus];
 
@@ -806,19 +814,12 @@ export const UpdateWorkflowDtoStatus = {
   paused: 'paused',
 } as const;
 
-export type UpdateWorkflowDtoStepsItemOneOfType = typeof UpdateWorkflowDtoStepsItemOneOfType[keyof typeof UpdateWorkflowDtoStepsItemOneOfType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UpdateWorkflowDtoStepsItemOneOfType = {
-  email: 'email',
-} as const;
-
 export type UpdateWorkflowDtoStepsItemOneOf = {
-  type: UpdateWorkflowDtoStepsItemOneOfType;
+  type: 'email';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
+   * @maximum 9007199254740991
    */
   delayMs?: number;
   /**
@@ -833,19 +834,12 @@ export type UpdateWorkflowDtoStepsItemOneOf = {
   body: string;
 };
 
-export type UpdateWorkflowDtoStepsItemOneOfThreeType = typeof UpdateWorkflowDtoStepsItemOneOfThreeType[keyof typeof UpdateWorkflowDtoStepsItemOneOfThreeType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UpdateWorkflowDtoStepsItemOneOfThreeType = {
-  webhook: 'webhook',
-} as const;
-
-export type UpdateWorkflowDtoStepsItemOneOfThree = {
-  type: UpdateWorkflowDtoStepsItemOneOfThreeType;
+export type UpdateWorkflowDtoStepsItemOneOfTwo = {
+  type: 'webhook';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
+   * @maximum 9007199254740991
    */
   delayMs?: number;
   /** Destination URL the JSON payload is POSTed to. */
@@ -857,7 +851,7 @@ export type UpdateWorkflowDtoStepsItemOneOfThree = {
   body: string;
 };
 
-export type UpdateWorkflowDtoStepsItem = UpdateWorkflowDtoStepsItemOneOf | UpdateWorkflowDtoStepsItemOneOfThree;
+export type UpdateWorkflowDtoStepsItem = UpdateWorkflowDtoStepsItemOneOf | UpdateWorkflowDtoStepsItemOneOfTwo;
 
 export interface UpdateWorkflowDto {
   /**
@@ -870,11 +864,7 @@ export interface UpdateWorkflowDto {
    * @maxLength 255
    */
   name?: string;
-  /**
-   * @maxLength 2000
-   * @nullable
-   */
-  description?: string | null;
+  description?: UpdateWorkflowDtoDescription;
   status?: UpdateWorkflowDtoStatus;
   /**
    * If provided, replaces ALL existing steps for this workflow.
@@ -894,19 +884,19 @@ export const ListRunsResponseDtoRunsItemStatus = {
   cancelled: 'cancelled',
 } as const;
 
-/**
- * @nullable
- */
-export type ListRunsResponseDtoRunsItemCompletedAt = unknown | null;
+export type ListRunsResponseDtoRunsItemCompletedAt = string | null;
+
+export type ListRunsResponseDtoRunsItemSubscriberEmail = string | null;
+
+export type ListRunsResponseDtoRunsItemSubscriberName = string | null;
+
+export type ListRunsResponseDtoRunsItemSubscriberExternalId = string | null;
 
 export type ListRunsResponseDtoRunsItemSubscriber = {
   publicId: string;
-  /** @nullable */
-  email: string | null;
-  /** @nullable */
-  name: string | null;
-  /** @nullable */
-  externalId: string | null;
+  email: ListRunsResponseDtoRunsItemSubscriberEmail;
+  name: ListRunsResponseDtoRunsItemSubscriberName;
+  externalId: ListRunsResponseDtoRunsItemSubscriberExternalId;
 };
 
 export type ListRunsResponseDtoRunsItemStepsItemStatus = typeof ListRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStepsItemStatus];
@@ -922,41 +912,28 @@ export const ListRunsResponseDtoRunsItemStepsItemStatus = {
   bounced: 'bounced',
 } as const;
 
-/**
- * @nullable
- */
-export type ListRunsResponseDtoRunsItemStepsItemSentAt = unknown | null;
+export type ListRunsResponseDtoRunsItemStepsItemSentAt = string | null;
 
-/**
- * @nullable
- */
-export type ListRunsResponseDtoRunsItemStepsItemBounceType = typeof ListRunsResponseDtoRunsItemStepsItemBounceType[keyof typeof ListRunsResponseDtoRunsItemStepsItemBounceType] | null;
+export type ListRunsResponseDtoRunsItemStepsItemErrorMessage = string | null;
 
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ListRunsResponseDtoRunsItemStepsItemBounceType = {
-  hard: 'hard',
-  soft: 'soft',
-} as const;
+export type ListRunsResponseDtoRunsItemStepsItemBounceType = 'hard' | 'soft' | null;
 
 export type ListRunsResponseDtoRunsItemStepsItem = {
   stepOrder: number;
   type: string;
   status: ListRunsResponseDtoRunsItemStepsItemStatus;
-  scheduledAt: unknown;
-  /** @nullable */
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  scheduledAt: string;
   sentAt: ListRunsResponseDtoRunsItemStepsItemSentAt;
-  /** @nullable */
-  errorMessage: string | null;
-  /** @nullable */
+  errorMessage: ListRunsResponseDtoRunsItemStepsItemErrorMessage;
   bounceType: ListRunsResponseDtoRunsItemStepsItemBounceType;
 };
 
 export type ListRunsResponseDtoRunsItem = {
   publicId: string;
   status: ListRunsResponseDtoRunsItemStatus;
-  triggeredAt: unknown;
-  /** @nullable */
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  triggeredAt: string;
   completedAt: ListRunsResponseDtoRunsItemCompletedAt;
   subscriber: ListRunsResponseDtoRunsItemSubscriber;
   steps: ListRunsResponseDtoRunsItemStepsItem[];
@@ -968,103 +945,8 @@ export interface ListRunsResponseDto {
   offset: number;
 }
 
-export type TriggerBroadcastDtoAudienceOneOfType = typeof TriggerBroadcastDtoAudienceOneOfType[keyof typeof TriggerBroadcastDtoAudienceOneOfType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TriggerBroadcastDtoAudienceOneOfType = {
-  optedIn: 'optedIn',
-} as const;
-
-export type TriggerBroadcastDtoAudienceOneOf = {
-  type: TriggerBroadcastDtoAudienceOneOfType;
-};
-
-export type TriggerBroadcastDtoAudienceOneOfThreeType = typeof TriggerBroadcastDtoAudienceOneOfThreeType[keyof typeof TriggerBroadcastDtoAudienceOneOfThreeType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TriggerBroadcastDtoAudienceOneOfThreeType = {
-  tag: 'tag',
-} as const;
-
-export type TriggerBroadcastDtoAudienceOneOfThree = {
-  type: TriggerBroadcastDtoAudienceOneOfThreeType;
-  /** @minLength 1 */
-  tag: string;
-};
-
-export type TriggerBroadcastDtoAudienceOneOfFiveType = typeof TriggerBroadcastDtoAudienceOneOfFiveType[keyof typeof TriggerBroadcastDtoAudienceOneOfFiveType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TriggerBroadcastDtoAudienceOneOfFiveType = {
-  attribute: 'attribute',
-} as const;
-
-export type TriggerBroadcastDtoAudienceOneOfFiveOp = typeof TriggerBroadcastDtoAudienceOneOfFiveOp[keyof typeof TriggerBroadcastDtoAudienceOneOfFiveOp];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TriggerBroadcastDtoAudienceOneOfFiveOp = {
-  equals: 'equals',
-  contains: 'contains',
-  exists: 'exists',
-} as const;
-
-export type TriggerBroadcastDtoAudienceOneOfFive = {
-  type: TriggerBroadcastDtoAudienceOneOfFiveType;
-  /** @minLength 1 */
-  field: string;
-  op: TriggerBroadcastDtoAudienceOneOfFiveOp;
-  value?: string;
-};
-
-export type TriggerBroadcastDtoAudienceOneOfEightType = typeof TriggerBroadcastDtoAudienceOneOfEightType[keyof typeof TriggerBroadcastDtoAudienceOneOfEightType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TriggerBroadcastDtoAudienceOneOfEightType = {
-  and: 'and',
-} as const;
-
-export type TriggerBroadcastDtoAudienceOneOfEight = {
-  type: TriggerBroadcastDtoAudienceOneOfEightType;
-  /** @minItems 1 */
-  clauses: unknown[];
-};
-
-export type TriggerBroadcastDtoAudienceOneOfOnezeroType = typeof TriggerBroadcastDtoAudienceOneOfOnezeroType[keyof typeof TriggerBroadcastDtoAudienceOneOfOnezeroType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TriggerBroadcastDtoAudienceOneOfOnezeroType = {
-  or: 'or',
-} as const;
-
-export type TriggerBroadcastDtoAudienceOneOfOnezero = {
-  type: TriggerBroadcastDtoAudienceOneOfOnezeroType;
-  /** @minItems 1 */
-  clauses: unknown[];
-};
-
-export type TriggerBroadcastDtoAudienceOneOfOnetwoType = typeof TriggerBroadcastDtoAudienceOneOfOnetwoType[keyof typeof TriggerBroadcastDtoAudienceOneOfOnetwoType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TriggerBroadcastDtoAudienceOneOfOnetwoType = {
-  not: 'not',
-} as const;
-
-export type TriggerBroadcastDtoAudienceOneOfOnetwo = {
-  type: TriggerBroadcastDtoAudienceOneOfOnetwoType;
-  clause: unknown;
-};
-
-export type TriggerBroadcastDtoAudience = TriggerBroadcastDtoAudienceOneOf | TriggerBroadcastDtoAudienceOneOfThree | TriggerBroadcastDtoAudienceOneOfFive | TriggerBroadcastDtoAudienceOneOfEight | TriggerBroadcastDtoAudienceOneOfOnezero | TriggerBroadcastDtoAudienceOneOfOnetwo;
-
 export interface TriggerBroadcastDto {
-  audience: TriggerBroadcastDtoAudience;
+  audience: _Schema0;
 }
 
 export interface PreviewBroadcastResponseDto {
@@ -1096,12 +978,14 @@ export const ListBroadcastsResponseDtoBroadcastsItemStatus = {
   failed: 'failed',
 } as const;
 
+export type ListBroadcastsResponseDtoBroadcastsItemMatchedCount = number | null;
+
 export type ListBroadcastsResponseDtoBroadcastsItem = {
   publicId: string;
   status: ListBroadcastsResponseDtoBroadcastsItemStatus;
-  /** @nullable */
-  matchedCount: number | null;
-  createdAt: unknown;
+  matchedCount: ListBroadcastsResponseDtoBroadcastsItemMatchedCount;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
 };
 
 export interface ListBroadcastsResponseDto {
@@ -1123,9 +1007,9 @@ export const BroadcastDetailResponseDtoStatus = {
 export interface BroadcastDetailResponseDto {
   publicId: string;
   status: BroadcastDetailResponseDtoStatus;
-  /** @nullable */
-  matchedCount: number | null;
-  createdAt: unknown;
+  matchedCount: number[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
   sentCount: number;
   failedCount: number;
   skippedCount: number;
@@ -1133,8 +1017,7 @@ export interface BroadcastDetailResponseDto {
   bouncedCount: number;
   hardBounceCount: number;
   softBounceCount: number;
-  /** @nullable */
-  successRate: number | null;
+  successRate: number[];
 }
 
 export type BounceWebhookBodyDtoBounceType = typeof BounceWebhookBodyDtoBounceType[keyof typeof BounceWebhookBodyDtoBounceType];
@@ -1157,7 +1040,7 @@ export interface BounceWebhookBodyDto {
   reason: string;
 }
 
-export type UpsertIntegrationDtoRoot = { [key: string]: unknown };
+export type UpsertIntegrationDtoRoot = {[key: string]: unknown};
 
 export interface UpsertIntegrationDto {
   root: UpsertIntegrationDtoRoot;
@@ -1166,13 +1049,16 @@ export interface UpsertIntegrationDto {
 export interface IntegrationResponseDto {
   type: string;
   priority: number;
-  updatedAt: unknown;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
 }
 
 export type ListIntegrationsResponseDtoIntegrationsItem = {
   type: string;
   priority: number;
-  updatedAt: unknown;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+  [key: string]: unknown;
 };
 
 export interface ListIntegrationsResponseDto {
@@ -1186,14 +1072,15 @@ export type AnalyticsResponseDtoSubscribers = {
   optedOutInPeriod?: number;
 };
 
+export type AnalyticsResponseDtoSendsSuccessRate = number | null;
+
 export type AnalyticsResponseDtoSends = {
   sent?: number;
   failed?: number;
   skipped?: number;
   pending?: number;
   bounced?: number;
-  /** @nullable */
-  successRate?: number | null;
+  successRate?: AnalyticsResponseDtoSendsSuccessRate;
 };
 
 export type AnalyticsResponseDtoBounces = {
@@ -1216,10 +1103,12 @@ export type ListSubscribersParams = {
 limit?: number;
 /**
  * @minimum 0
+ * @maximum 9007199254740991
  */
 offset?: number;
 /**
  * Filter to the subscriber with this exact email address
+ * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
  */
 email?: string;
 /**
@@ -1245,6 +1134,7 @@ export type ListWorkflowsParams = {
 limit?: number;
 /**
  * @minimum 0
+ * @maximum 9007199254740991
  */
 offset?: number;
 type?: ListWorkflowsType;
@@ -1267,6 +1157,7 @@ export type ListEnvironmentRunsParams = {
 limit?: number;
 /**
  * @minimum 0
+ * @maximum 9007199254740991
  */
 offset?: number;
 };
@@ -1279,6 +1170,7 @@ export type ListWorkflowRunsParams = {
 limit?: number;
 /**
  * @minimum 0
+ * @maximum 9007199254740991
  */
 offset?: number;
 };
@@ -1291,6 +1183,7 @@ export type ListBroadcastsParams = {
 limit?: number;
 /**
  * @minimum 0
+ * @maximum 9007199254740991
  */
 offset?: number;
 };
@@ -3064,6 +2957,105 @@ export const getAnalytics = async (environmentId: string,
   {      
     ...options,
     method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type streamableHttpControllerHandlePostRequestResponse201 = {
+  data: void
+  status: 201
+}
+    
+export type streamableHttpControllerHandlePostRequestResponseSuccess = (streamableHttpControllerHandlePostRequestResponse201) & {
+  headers: Headers;
+};
+;
+
+export type streamableHttpControllerHandlePostRequestResponse = (streamableHttpControllerHandlePostRequestResponseSuccess)
+
+export const getStreamableHttpControllerHandlePostRequestUrl = () => {
+
+
+  
+
+  return `/mcp`
+}
+
+export const streamableHttpControllerHandlePostRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandlePostRequestResponse> => {
+  
+  return cliFetch<streamableHttpControllerHandlePostRequestResponse>(getStreamableHttpControllerHandlePostRequestUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+export type streamableHttpControllerHandleGetRequestResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type streamableHttpControllerHandleGetRequestResponseSuccess = (streamableHttpControllerHandleGetRequestResponse200) & {
+  headers: Headers;
+};
+;
+
+export type streamableHttpControllerHandleGetRequestResponse = (streamableHttpControllerHandleGetRequestResponseSuccess)
+
+export const getStreamableHttpControllerHandleGetRequestUrl = () => {
+
+
+  
+
+  return `/mcp`
+}
+
+export const streamableHttpControllerHandleGetRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandleGetRequestResponse> => {
+  
+  return cliFetch<streamableHttpControllerHandleGetRequestResponse>(getStreamableHttpControllerHandleGetRequestUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export type streamableHttpControllerHandleDeleteRequestResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type streamableHttpControllerHandleDeleteRequestResponseSuccess = (streamableHttpControllerHandleDeleteRequestResponse200) & {
+  headers: Headers;
+};
+;
+
+export type streamableHttpControllerHandleDeleteRequestResponse = (streamableHttpControllerHandleDeleteRequestResponseSuccess)
+
+export const getStreamableHttpControllerHandleDeleteRequestUrl = () => {
+
+
+  
+
+  return `/mcp`
+}
+
+export const streamableHttpControllerHandleDeleteRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandleDeleteRequestResponse> => {
+  
+  return cliFetch<streamableHttpControllerHandleDeleteRequestResponse>(getStreamableHttpControllerHandleDeleteRequestUrl(),
+  {      
+    ...options,
+    method: 'DELETE'
     
     
   }

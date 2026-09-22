@@ -8,7 +8,7 @@ export const UpdateSubscriberSchema = z.object({
   firstName: z.string().optional().nullable(),
   lastName: z.string().optional().nullable(),
   name: z.string().optional().nullable(),
-  attributes: z.record(z.unknown()).optional().nullable(),
+  attributes: z.record(z.string(), z.unknown()).optional().nullable(),
 });
 
 import {

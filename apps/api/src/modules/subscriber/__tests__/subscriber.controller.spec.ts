@@ -13,7 +13,6 @@ vi.mock("@subscriber.dev/db/client", () => ({
 }));
 
 vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
-  getEnvironmentByPublicId: vi.fn(),
   getSubscriberByPublicId: vi.fn(),
 }));
 
@@ -88,16 +87,13 @@ beforeEach(async () => {
 
 describe("listSubscribers", () => {
   it("returns list when environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.listSubscribers.mockResolvedValue({
       subscribers: [],
       limit: 20,
       offset: 0,
     });
 
-    const result = await controller.listSubscribers("env_abc", {
+    const result = await controller.listSubscribers(mockEnvironment as any, {
       limit: 20,
       offset: 0,
     });
@@ -109,31 +105,21 @@ describe("listSubscribers", () => {
     });
   });
 
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.listSubscribers("env_missing", { limit: 20, offset: 0 }),
-    ).rejects.toThrow(NotFoundException);
-  });
-
   it("passes the search query through to the service", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.listSubscribers.mockResolvedValue({
       subscribers: [],
       limit: 20,
       offset: 0,
     });
 
-    await controller.listSubscribers("env_abc", {
-      limit: 20,
-      offset: 0,
-      q: "ali",
-    } as any);
+    await controller.listSubscribers(
+      mockEnvironment as any,
+      {
+        limit: 20,
+        offset: 0,
+        q: "ali",
+      } as any,
+    );
 
     expect(mockService.listSubscribers).toHaveBeenCalledWith({}, 10, {
       limit: 20,
@@ -149,37 +135,24 @@ describe("listSubscribers", () => {
 
 describe("getSubscriber", () => {
   it("returns subscriber when found", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.getSubscriber.mockResolvedValue(mockSubscriberResponse);
 
-    const result = await controller.getSubscriber("env_abc", "sub_abc");
+    const result = await controller.getSubscriber(
+      mockEnvironment as any,
+      "sub_abc",
+    );
 
     expect(result.subscriber.publicId).toBe("sub_abc");
     expect(mockService.getSubscriber).toHaveBeenCalledWith({}, 10, "sub_abc");
   });
 
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.getSubscriber("env_missing", "sub_abc"),
-    ).rejects.toThrow(NotFoundException);
-  });
-
   it("propagates NotFoundException from service when subscriber missing", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.getSubscriber.mockRejectedValue(
       new NotFoundException("Subscriber not found"),
     );
 
     await expect(
-      controller.getSubscriber("env_abc", "sub_missing"),
+      controller.getSubscriber(mockEnvironment as any, "sub_missing"),
     ).rejects.toThrow(NotFoundException);
   });
 });
@@ -190,15 +163,12 @@ describe("getSubscriber", () => {
 
 describe("createSubscriber", () => {
   it("delegates creation to the service", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.createSubscriber.mockResolvedValue(mockSubscriberResponse);
 
     const input = { email: "alice@example.com", preferences: { email: true } };
     const result = await controller.createSubscriber(
       mockUser as any,
-      "env_abc",
+      mockEnvironment as any,
       input as any,
     );
 
@@ -212,16 +182,6 @@ describe("createSubscriber", () => {
       }),
     );
   });
-
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.createSubscriber(mockUser as any, "env_missing", {} as any),
-    ).rejects.toThrow(NotFoundException);
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -230,9 +190,6 @@ describe("createSubscriber", () => {
 
 describe("bulkUpsertSubscribers", () => {
   it("delegates to the service", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     const serviceResult = {
       results: [{ index: 0, status: "created" }],
       summary: { created: 1, updated: 0, errored: 0 },
@@ -242,7 +199,7 @@ describe("bulkUpsertSubscribers", () => {
     const input = { subscribers: [{ email: "alice@example.com" }] };
     const result = await controller.bulkUpsertSubscribers(
       mockUser as any,
-      "env_abc",
+      mockEnvironment as any,
       input as any,
     );
 
@@ -254,18 +211,6 @@ describe("bulkUpsertSubscribers", () => {
       1,
     );
   });
-
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.bulkUpsertSubscribers(mockUser as any, "env_missing", {
-        subscribers: [],
-      } as any),
-    ).rejects.toThrow(NotFoundException);
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -274,9 +219,6 @@ describe("bulkUpsertSubscribers", () => {
 
 describe("updateSubscriber", () => {
   it("delegates update to the service", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     vi.mocked(subscriberRepo.getSubscriberByPublicId).mockResolvedValue(
       mockSubscriber as any,
     );
@@ -286,7 +228,7 @@ describe("updateSubscriber", () => {
 
     const result = await controller.updateSubscriber(
       mockUser as any,
-      "env_abc",
+      mockEnvironment as any,
       "sub_abc",
       { firstName: "Bob" } as any,
     );
@@ -302,25 +244,7 @@ describe("updateSubscriber", () => {
     expect(result.subscriber).toBeDefined();
   });
 
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.updateSubscriber(
-        mockUser as any,
-        "env_missing",
-        "sub_abc",
-        {} as any,
-      ),
-    ).rejects.toThrow(NotFoundException);
-  });
-
   it("throws NotFoundException when subscriber does not exist in environment", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     vi.mocked(subscriberRepo.getSubscriberByPublicId).mockResolvedValue(
       undefined,
     );
@@ -328,28 +252,8 @@ describe("updateSubscriber", () => {
     await expect(
       controller.updateSubscriber(
         mockUser as any,
-        "env_abc",
+        mockEnvironment as any,
         "sub_missing",
-        {} as any,
-      ),
-    ).rejects.toThrow(NotFoundException);
-  });
-
-  it("throws NotFoundException when subscriber belongs to a different environment", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
-    // A per-environment-scoped query returns nothing for a publicId that
-    // exists only in a different environment.
-    vi.mocked(subscriberRepo.getSubscriberByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.updateSubscriber(
-        mockUser as any,
-        "env_abc",
-        "sub_abc",
         {} as any,
       ),
     ).rejects.toThrow(NotFoundException);
@@ -362,14 +266,11 @@ describe("updateSubscriber", () => {
 
 describe("deleteSubscriber", () => {
   it("deletes successfully and returns void", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.deleteSubscriber.mockResolvedValue(undefined);
 
     const result = await controller.deleteSubscriber(
       mockUser as any,
-      "env_abc",
+      mockEnvironment as any,
       "sub_abc",
     );
 
@@ -382,26 +283,17 @@ describe("deleteSubscriber", () => {
     );
   });
 
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.deleteSubscriber(mockUser as any, "env_missing", "sub_abc"),
-    ).rejects.toThrow(NotFoundException);
-  });
-
   it("propagates NotFoundException from service", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.deleteSubscriber.mockRejectedValue(
       new NotFoundException("Subscriber not found"),
     );
 
     await expect(
-      controller.deleteSubscriber(mockUser as any, "env_abc", "sub_missing"),
+      controller.deleteSubscriber(
+        mockUser as any,
+        mockEnvironment as any,
+        "sub_missing",
+      ),
     ).rejects.toThrow(NotFoundException);
   });
 });
@@ -412,14 +304,11 @@ describe("deleteSubscriber", () => {
 
 describe("addTag", () => {
   it("adds the tag when environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.addTag.mockResolvedValue({ tag: "vip" });
 
     const result = await controller.addTag(
       mockUser as any,
-      "env_abc",
+      mockEnvironment as any,
       "sub_abc",
       {
         tag: "vip",
@@ -436,30 +325,20 @@ describe("addTag", () => {
     );
   });
 
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.addTag(mockUser as any, "env_missing", "sub_abc", {
-        tag: "vip",
-      } as any),
-    ).rejects.toThrow(NotFoundException);
-  });
-
   it("propagates NotFoundException from service", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.addTag.mockRejectedValue(
       new NotFoundException("Subscriber not found"),
     );
 
     await expect(
-      controller.addTag(mockUser as any, "env_abc", "sub_missing", {
-        tag: "vip",
-      } as any),
+      controller.addTag(
+        mockUser as any,
+        mockEnvironment as any,
+        "sub_missing",
+        {
+          tag: "vip",
+        } as any,
+      ),
     ).rejects.toThrow(NotFoundException);
   });
 });
@@ -470,12 +349,13 @@ describe("addTag", () => {
 
 describe("removeTag", () => {
   it("removes the tag and returns void", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.removeTag.mockResolvedValue(undefined);
 
-    const result = await controller.removeTag("env_abc", "sub_abc", "vip");
+    const result = await controller.removeTag(
+      mockEnvironment as any,
+      "sub_abc",
+      "vip",
+    );
 
     expect(result).toBeUndefined();
     expect(mockService.removeTag).toHaveBeenCalledWith(
@@ -485,16 +365,6 @@ describe("removeTag", () => {
       "vip",
     );
   });
-
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(
-      controller.removeTag("env_missing", "sub_abc", "vip"),
-    ).rejects.toThrow(NotFoundException);
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -503,24 +373,11 @@ describe("removeTag", () => {
 
 describe("listTags", () => {
   it("returns the distinct tags when environment exists", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      mockEnvironment as any,
-    );
     mockService.listTags.mockResolvedValue({ tags: ["beta", "vip"] });
 
-    const result = await controller.listTags("env_abc");
+    const result = await controller.listTags(mockEnvironment as any);
 
     expect(result).toEqual({ tags: ["beta", "vip"] });
     expect(mockService.listTags).toHaveBeenCalledWith({}, 10);
-  });
-
-  it("throws NotFoundException when environment does not exist", async () => {
-    vi.mocked(subscriberRepo.getEnvironmentByPublicId).mockResolvedValue(
-      undefined,
-    );
-
-    await expect(controller.listTags("env_missing")).rejects.toThrow(
-      NotFoundException,
-    );
   });
 });

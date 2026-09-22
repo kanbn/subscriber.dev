@@ -662,7 +662,7 @@ describe("listBroadcasts", () => {
         publicId: "bc_abc",
         status: "queued",
         matchedCount: 42,
-        createdAt: new Date("2026-01-01T00:00:00Z"),
+        createdAt: "2026-01-01T00:00:00.000Z",
       },
     ]);
     expect(result.limit).toBe(20);
@@ -820,7 +820,7 @@ describe("getBroadcast", () => {
       publicId: "bc_abc",
       status: "queued",
       matchedCount: 3,
-      createdAt: new Date("2026-01-01T00:00:00Z"),
+      createdAt: "2026-01-01T00:00:00.000Z",
       sentCount: 2,
       failedCount: 0,
       skippedCount: 0,

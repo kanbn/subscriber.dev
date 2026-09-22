@@ -3,8 +3,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
-  Param,
   Query,
   UseGuards,
 } from "@nestjs/common";
@@ -17,10 +15,12 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscriber.repo";
 import { createDrizzleClient } from "@subscriber.dev/db/client";
-import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 
+import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
+import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import { AnalyticsService } from "./analytics.service.js";
 import {
   AnalyticsResponseDto,
@@ -30,7 +30,7 @@ import {
 @ApiTags("Analytics")
 @ApiBearerAuth("bearer")
 @Controller("environments/:environmentId/analytics")
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
@@ -47,18 +47,10 @@ export class AnalyticsController {
   @ApiResponse({ status: 200, type: AnalyticsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async getAnalytics(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Query() query: GetAnalyticsQueryDto,
   ): Promise<AnalyticsResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.analyticsService.getAnalytics(db, environment.id, query.days);
   }

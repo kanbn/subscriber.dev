@@ -21,7 +21,7 @@ const BulkSubscriberItemSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   name: z.string().optional(),
-  attributes: z.record(z.unknown()).optional(),
+  attributes: z.record(z.string(), z.unknown()).optional(),
   preferences: z
     .object({
       email: z.boolean().optional(),

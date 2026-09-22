@@ -21,12 +21,15 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscriber.repo";
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 
 import type { User } from "../../common/interfaces/user.interface.js";
+import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
+import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
   BulkUpsertSubscribersDto,
   BulkUpsertSubscribersResponseDto,
@@ -58,7 +61,7 @@ import { SubscriberService } from "./subscriber.service.js";
 @ApiTags("Subscribers")
 @ApiBearerAuth("bearer")
 @Controller("environments/:environmentId/subscribers")
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class SubscriberController {
   constructor(private readonly subscriberService: SubscriberService) {}
 
@@ -102,18 +105,10 @@ export class SubscriberController {
   @ApiResponse({ status: 200, type: ListSubscribersResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async listSubscribers(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Query() query: ListSubscribersQueryDto,
   ): Promise<ListSubscribersResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.subscriberService.listSubscribers(db, environment.id, {
       limit: query.limit,
@@ -137,17 +132,9 @@ export class SubscriberController {
   @ApiResponse({ status: 200, type: ListTagsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async listTags(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
   ): Promise<ListTagsResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.subscriberService.listTags(db, environment.id);
   }
@@ -164,18 +151,10 @@ export class SubscriberController {
   @ApiResponse({ status: 200, type: GetSubscriberResponseDto })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
   async getSubscriber(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
   ): Promise<GetSubscriberResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.subscriberService.getSubscriber(
       db,
@@ -205,18 +184,10 @@ export class SubscriberController {
   @ApiResponse({ status: 404, description: "Environment not found" })
   async createSubscriber(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: CreateSubscriberDto,
   ): Promise<CreateSubscriberResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.subscriberService.createSubscriber(db, {
       environmentId: environment.id,
@@ -246,18 +217,10 @@ export class SubscriberController {
   @ApiResponse({ status: 404, description: "Environment not found" })
   async bulkUpsertSubscribers(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: BulkUpsertSubscribersDto,
   ): Promise<BulkUpsertSubscribersResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.subscriberService.bulkUpsertSubscribers(
       db,
@@ -280,19 +243,11 @@ export class SubscriberController {
   @ApiResponse({ status: 404, description: "Subscriber not found" })
   async updateSubscriber(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
     @Body() input: UpdateSubscriberDto,
   ): Promise<UpdateSubscriberResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,
@@ -330,18 +285,10 @@ export class SubscriberController {
   @ApiResponse({ status: 404, description: "Subscriber not found" })
   async deleteSubscriber(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
   ): Promise<void> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     await this.subscriberService.deleteSubscriber(
       db,
@@ -371,20 +318,11 @@ export class SubscriberController {
     description: "Subscriber or preferences not found",
   })
   async updatePreferences(
-    @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
     @Body() input: UpdatePreferencesDto,
   ): Promise<UpdatePreferencesResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,
@@ -415,19 +353,11 @@ export class SubscriberController {
   @ApiResponse({ status: 404, description: "Subscriber not found" })
   async addTag(
     @CurrentUser() user: User,
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
     @Body() input: AddTagDto,
   ): Promise<TagResponseDto> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     return this.subscriberService.addTag(
       db,
@@ -450,19 +380,11 @@ export class SubscriberController {
   @ApiResponse({ status: 204, description: "Tag removed" })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
   async removeTag(
-    @Param("environmentId") environmentId: string,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
     @Param("tag") tag: string,
   ): Promise<void> {
     const db = createDrizzleClient();
-
-    const environment = await subscriberRepo.getEnvironmentByPublicId(
-      db,
-      environmentId,
-    );
-    if (!environment) {
-      throw new NotFoundException("Environment not found");
-    }
 
     await this.subscriberService.removeTag(
       db,
