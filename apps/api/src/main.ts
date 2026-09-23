@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { writeFileSync } from "fs";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { ZodValidationPipe } from "nestjs-zod";
+import { cleanupOpenApiDoc, ZodValidationPipe } from "nestjs-zod";
 
 import { AppModule } from "./app.module.js";
 
@@ -45,7 +45,11 @@ async function bootstrap() {
     )
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  // Required by nestjs-zod: hoists recursive/nested schemas (e.g. the
+  // audience condition tree) out of inline $defs into proper
+  // components.schemas entries with resolvable $refs. Without this, tools
+  // like orval can't resolve the raw document's local $defs refs.
+  const document = cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
 
   writeFileSync("./openapi.json", JSON.stringify(document, null, 2));
   console.log("📄 OpenAPI spec written to openapi.json");

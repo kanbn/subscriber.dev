@@ -18,9 +18,7 @@
             }
           }
         },
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
             "bearer": []
@@ -55,9 +53,7 @@
             }
           }
         },
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
             "bearer": []
@@ -82,9 +78,7 @@
             }
           }
         },
-        "tags": [
-          "Test"
-        ],
+        "tags": ["Test"],
         "security": [
           {
             "bearer": []
@@ -117,9 +111,7 @@
             }
           }
         },
-        "tags": [
-          "Test"
-        ],
+        "tags": ["Test"],
         "security": [
           {
             "bearer": []
@@ -147,9 +139,7 @@
             }
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -182,9 +172,7 @@
             }
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -221,9 +209,7 @@
             "description": "Workspace not found"
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -268,9 +254,7 @@
             "description": "Workspace not found"
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "bearer": []
@@ -284,14 +268,6 @@
         "summary": "List subscribers",
         "description": "Returns a paginated list of active subscribers in the environment",
         "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "limit",
             "required": false,
@@ -350,11 +326,16 @@
             "in": "query",
             "description": "Filter by the subscriber's latest email preference (true = opted in, false = opted out)",
             "schema": {
-              "enum": [
-                "true",
-                "false"
-              ],
+              "enum": ["true", "false"],
               "type": "boolean"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -373,9 +354,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -424,9 +403,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -464,9 +441,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -481,7 +456,7 @@
         "description": "Returns a single subscriber with their latest preferences",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "subscriberId",
             "required": true,
             "in": "path",
             "schema": {
@@ -489,7 +464,7 @@
             }
           },
           {
-            "name": "subscriberId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -512,9 +487,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -527,7 +500,7 @@
         "description": "Updates subscriber fields. All fields are optional.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "subscriberId",
             "required": true,
             "in": "path",
             "schema": {
@@ -535,7 +508,7 @@
             }
           },
           {
-            "name": "subscriberId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -568,9 +541,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -583,7 +554,7 @@
         "description": "Soft-deletes a subscriber. The record is retained but excluded from all queries.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "subscriberId",
             "required": true,
             "in": "path",
             "schema": {
@@ -591,7 +562,7 @@
             }
           },
           {
-            "name": "subscriberId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -607,9 +578,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -657,9 +626,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -674,7 +641,7 @@
         "description": "Creates a new preference record with updated values (immutable pattern)",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "subscriberId",
             "required": true,
             "in": "path",
             "schema": {
@@ -682,7 +649,7 @@
             }
           },
           {
-            "name": "subscriberId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -715,9 +682,7 @@
             "description": "Subscriber or preferences not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -732,7 +697,7 @@
         "description": "Adds a tag to the subscriber. Adding a tag that's already present is a no-op.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "subscriberId",
             "required": true,
             "in": "path",
             "schema": {
@@ -740,7 +705,7 @@
             }
           },
           {
-            "name": "subscriberId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -773,9 +738,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -788,14 +751,6 @@
         "operationId": "removeSubscriberTag",
         "summary": "Remove a tag from a subscriber",
         "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "subscriberId",
             "required": true,
@@ -811,6 +766,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -821,9 +784,7 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
+        "tags": ["Subscribers"],
         "security": [
           {
             "bearer": []
@@ -862,9 +823,7 @@
             "description": "Invalid or expired unsubscribe link"
           }
         },
-        "tags": [
-          "Unsubscribe"
-        ]
+        "tags": ["Unsubscribe"]
       }
     },
     "/environments/{environmentId}/workflows/trigger": {
@@ -907,9 +866,7 @@
             "description": "Environment, workflow, or subscriber not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -957,9 +914,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -971,14 +926,6 @@
         "summary": "List workflows",
         "description": "Returns a paginated list of workflows in the environment",
         "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "limit",
             "required": false,
@@ -1006,10 +953,15 @@
             "required": false,
             "in": "query",
             "schema": {
-              "enum": [
-                "automation",
-                "broadcast"
-              ],
+              "enum": ["automation", "broadcast"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
               "type": "string"
             }
           }
@@ -1029,9 +981,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1045,14 +995,6 @@
         "summary": "List all workflow runs",
         "description": "Returns a paginated list of trigger runs across every workflow in the environment, most recent first",
         "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "limit",
             "required": false,
@@ -1074,6 +1016,14 @@
               "default": 0,
               "type": "number"
             }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1091,9 +1041,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1108,7 +1056,7 @@
         "description": "Returns a single workflow with its steps",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "workflowId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1116,7 +1064,7 @@
             }
           },
           {
-            "name": "workflowId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1139,9 +1087,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1154,7 +1100,7 @@
         "description": "Updates workflow fields. If `steps` is provided, it replaces ALL existing steps.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "workflowId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1162,7 +1108,7 @@
             }
           },
           {
-            "name": "workflowId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1195,9 +1141,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1210,7 +1154,7 @@
         "description": "Soft-deletes a workflow. Existing in-flight runs are unaffected.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "workflowId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1218,7 +1162,7 @@
             }
           },
           {
-            "name": "workflowId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1234,9 +1178,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1250,14 +1192,6 @@
         "summary": "List runs for a workflow",
         "description": "Returns a paginated list of trigger runs for this workflow, most recent first",
         "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "workflowId",
             "required": true,
@@ -1287,6 +1221,14 @@
               "default": 0,
               "type": "number"
             }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1304,9 +1246,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1321,7 +1261,7 @@
         "description": "Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "workflowId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1329,7 +1269,7 @@
             }
           },
           {
-            "name": "workflowId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1365,9 +1305,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1382,7 +1320,7 @@
         "description": "Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "workflowId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1390,7 +1328,7 @@
             }
           },
           {
-            "name": "workflowId",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1426,9 +1364,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1442,14 +1378,6 @@
         "summary": "List broadcasts for a workflow",
         "description": "Returns a paginated list of broadcasts triggered for this workflow, most recent first",
         "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "workflowId",
             "required": true,
@@ -1479,6 +1407,14 @@
               "default": 0,
               "type": "number"
             }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1496,9 +1432,7 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1513,14 +1447,6 @@
         "description": "Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)",
         "parameters": [
           {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "workflowId",
             "required": true,
             "in": "path",
@@ -1530,6 +1456,14 @@
           },
           {
             "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1552,9 +1486,7 @@
             "description": "Workflow or broadcast not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
+        "tags": ["Workflows"],
         "security": [
           {
             "bearer": []
@@ -1589,9 +1521,7 @@
             "description": "Run step not found"
           }
         },
-        "tags": [
-          "Bounces"
-        ]
+        "tags": ["Bounces"]
       }
     },
     "/environments/{environmentId}/integrations/{type}": {
@@ -1601,7 +1531,7 @@
         "description": "Creates or updates the integration of the given type for this environment (e.g. \"smtp\"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "type",
             "required": true,
             "in": "path",
             "schema": {
@@ -1609,7 +1539,7 @@
             }
           },
           {
-            "name": "type",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1645,9 +1575,7 @@
             "description": "Environment or integration type not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1660,7 +1588,7 @@
         "description": "Returns the sanitized config for a single integration type (no secrets).",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "type",
             "required": true,
             "in": "path",
             "schema": {
@@ -1668,7 +1596,7 @@
             }
           },
           {
-            "name": "type",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1691,9 +1619,7 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1705,7 +1631,7 @@
         "summary": "Remove an integration",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "type",
             "required": true,
             "in": "path",
             "schema": {
@@ -1713,7 +1639,7 @@
             }
           },
           {
-            "name": "type",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1729,9 +1655,7 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1746,7 +1670,7 @@
         "description": "Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.",
         "parameters": [
           {
-            "name": "environmentId",
+            "name": "type",
             "required": true,
             "in": "path",
             "schema": {
@@ -1754,7 +1678,7 @@
             }
           },
           {
-            "name": "type",
+            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1777,9 +1701,7 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1817,9 +1739,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
+        "tags": ["Integrations"],
         "security": [
           {
             "bearer": []
@@ -1834,14 +1754,6 @@
         "description": "Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.",
         "parameters": [
           {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "days",
             "required": false,
             "in": "query",
@@ -1850,6 +1762,14 @@
               "maximum": 365,
               "default": 30,
               "type": "number"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1868,9 +1788,7 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Analytics"
-        ],
+        "tags": ["Analytics"],
         "security": [
           {
             "bearer": []
@@ -1944,7 +1862,6 @@
             "type": "string"
           },
           "name": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
@@ -1954,14 +1871,12 @@
             "type": "string"
           },
           "image": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "stripeCustomerId": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
@@ -1976,20 +1891,13 @@
                   "type": "number"
                 },
                 "prefix": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 },
                 "key": {
                   "type": "string"
                 }
               },
-              "required": [
-                "id",
-                "prefix",
-                "key"
-              ]
+              "required": ["id", "prefix", "key"]
             }
           }
         },
@@ -2020,33 +1928,25 @@
             "type": "string"
           },
           "name": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "image": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "stripeCustomerId": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           }
         },
-        "required": [
-          "publicId",
-          "name",
-          "image",
-          "stripeCustomerId"
-        ]
+        "required": ["publicId", "name", "image", "stripeCustomerId"]
       },
       "TestResponseDto": {
         "type": "object",
@@ -2075,12 +1975,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "message",
-          "timestamp",
-          "success",
-          "echo"
-        ]
+        "required": ["message", "timestamp", "success", "echo"]
       },
       "TestRequestDto": {
         "type": "object",
@@ -2094,9 +1989,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "WorkspaceDto": {
         "type": "object",
@@ -2114,12 +2007,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "publicId",
-          "name",
-          "slug"
-        ]
+        "required": ["id", "publicId", "name", "slug"]
       },
       "CreateWorkspaceDto": {
         "type": "object",
@@ -2130,9 +2018,7 @@
             "maxLength": 255
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "CreateWorkspaceResponseDto": {
         "type": "object",
@@ -2174,10 +2060,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "workspace",
-          "environment"
-        ]
+        "required": ["workspace", "environment"]
       },
       "ListEnvironmentsResponseDto": {
         "type": "object",
@@ -2200,18 +2083,11 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id",
-                "publicId",
-                "name",
-                "slug"
-              ]
+              "required": ["id", "publicId", "name", "slug"]
             }
           }
         },
-        "required": [
-          "environments"
-        ]
+        "required": ["environments"]
       },
       "CreateEnvironmentDto": {
         "type": "object",
@@ -2222,9 +2098,7 @@
             "maxLength": 255
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "EnvironmentDto": {
         "type": "object",
@@ -2242,12 +2116,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "publicId",
-          "name",
-          "slug"
-        ]
+        "required": ["id", "publicId", "name", "slug"]
       },
       "ListSubscribersResponseDto": {
         "type": "object",
@@ -2261,54 +2130,30 @@
                   "type": "string"
                 },
                 "email": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 },
                 "phone": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 },
                 "externalId": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 },
                 "firstName": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 },
                 "lastName": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 },
                 "name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 },
                 "attributes": {
-                  "anyOf": [
-                    {
-                      "type": "object",
-                      "propertyNames": {
-                        "type": "string"
-                      },
-                      "additionalProperties": {}
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {},
+                  "nullable": true
                 },
                 "createdAt": {
                   "type": "string",
@@ -2321,10 +2166,7 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 },
                 "unsubscribeUrl": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 }
               },
               "required": [
@@ -2340,23 +2182,16 @@
                 "updatedAt",
                 "unsubscribeUrl"
               ]
-            },
-            "x-nestjs_zod-has-null": true
+            }
           },
           "limit": {
-            "type": "number",
-            "x-nestjs_zod-has-null": true
+            "type": "number"
           },
           "offset": {
-            "type": "number",
-            "x-nestjs_zod-has-null": true
+            "type": "number"
           }
         },
-        "required": [
-          "subscribers",
-          "limit",
-          "offset"
-        ]
+        "required": ["subscribers", "limit", "offset"]
       },
       "ListTagsResponseDto": {
         "type": "object",
@@ -2368,9 +2203,7 @@
             }
           }
         },
-        "required": [
-          "tags"
-        ]
+        "required": ["tags"]
       },
       "GetSubscriberResponseDto": {
         "type": "object",
@@ -2382,54 +2215,30 @@
                 "type": "string"
               },
               "email": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "phone": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "externalId": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "firstName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "lastName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "name": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "attributes": {
-                "anyOf": [
-                  {
-                    "type": "object",
-                    "propertyNames": {
-                      "type": "string"
-                    },
-                    "additionalProperties": {}
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {},
+                "nullable": true
               },
               "createdAt": {
                 "type": "string",
@@ -2442,10 +2251,7 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               },
               "unsubscribeUrl": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "tags": {
                 "type": "array",
@@ -2454,48 +2260,31 @@
                 }
               }
             },
-            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           },
           "preferences": {
-            "anyOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "publicId": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "boolean"
-                  },
-                  "version": {
-                    "type": "number"
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                  }
-                },
-                "required": [
-                  "publicId",
-                  "email",
-                  "version",
-                  "createdAt"
-                ]
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
               },
-              {
-                "type": "null"
+              "email": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "number"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               }
-            ],
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true
+            },
+            "required": ["publicId", "email", "version", "createdAt"],
+            "nullable": true
           }
         },
-        "required": [
-          "subscriber",
-          "preferences"
-        ]
+        "required": ["subscriber", "preferences"]
       },
       "CreateSubscriberDto": {
         "type": "object",
@@ -2548,10 +2337,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "attributes",
-          "preferences"
-        ]
+        "required": ["attributes", "preferences"]
       },
       "CreateSubscriberResponseDto": {
         "type": "object",
@@ -2563,54 +2349,30 @@
                 "type": "string"
               },
               "email": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "phone": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "externalId": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "firstName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "lastName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "name": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "attributes": {
-                "anyOf": [
-                  {
-                    "type": "object",
-                    "propertyNames": {
-                      "type": "string"
-                    },
-                    "additionalProperties": {}
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {},
+                "nullable": true
               },
               "createdAt": {
                 "type": "string",
@@ -2623,13 +2385,9 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               },
               "unsubscribeUrl": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               }
             },
-            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           },
           "preferences": {
@@ -2650,14 +2408,10 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               }
             },
-            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           }
         },
-        "required": [
-          "subscriber",
-          "preferences"
-        ]
+        "required": ["subscriber", "preferences"]
       },
       "BulkUpsertSubscribersDto": {
         "type": "object",
@@ -2715,9 +2469,7 @@
             }
           }
         },
-        "required": [
-          "subscribers"
-        ]
+        "required": ["subscribers"]
       },
       "BulkUpsertSubscribersResponseDto": {
         "type": "object",
@@ -2732,11 +2484,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "created",
-                    "updated",
-                    "error"
-                  ]
+                  "enum": ["created", "updated", "error"]
                 },
                 "subscriber": {
                   "type": "object",
@@ -2745,54 +2493,30 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "phone": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "externalId": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "firstName": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "lastName": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "name": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "attributes": {
-                      "anyOf": [
-                        {
-                          "type": "object",
-                          "propertyNames": {
-                            "type": "string"
-                          },
-                          "additionalProperties": {}
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {},
+                      "nullable": true
                     },
                     "createdAt": {
                       "type": "string",
@@ -2805,10 +2529,7 @@
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     },
                     "unsubscribeUrl": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     }
                   },
                   "required": [
@@ -2843,23 +2564,14 @@
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
-                  "required": [
-                    "publicId",
-                    "email",
-                    "version",
-                    "createdAt"
-                  ]
+                  "required": ["publicId", "email", "version", "createdAt"]
                 },
                 "error": {
                   "type": "string"
                 }
               },
-              "required": [
-                "index",
-                "status"
-              ]
-            },
-            "x-nestjs_zod-has-null": true
+              "required": ["index", "status"]
+            }
           },
           "summary": {
             "type": "object",
@@ -2874,87 +2586,57 @@
                 "type": "number"
               }
             },
-            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           }
         },
-        "required": [
-          "results",
-          "summary"
-        ]
+        "required": ["results", "summary"]
       },
       "UpdateSubscriberDto": {
         "type": "object",
         "properties": {
           "email": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "email",
-                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "nullable": true
           },
           "phone": {
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "externalId": {
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "firstName": {
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "lastName": {
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "name": {
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "attributes": {
-            "anyOf": [
-              {
-                "type": "object",
-                "propertyNames": {
-                  "type": "string"
-                },
-                "additionalProperties": {}
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {},
+            "nullable": true
           }
         }
       },
@@ -2968,54 +2650,30 @@
                 "type": "string"
               },
               "email": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "phone": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "externalId": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "firstName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "lastName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "name": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               },
               "attributes": {
-                "anyOf": [
-                  {
-                    "type": "object",
-                    "propertyNames": {
-                      "type": "string"
-                    },
-                    "additionalProperties": {}
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {},
+                "nullable": true
               },
               "createdAt": {
                 "type": "string",
@@ -3028,19 +2686,13 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               },
               "unsubscribeUrl": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               }
             },
-            "x-nestjs_zod-has-null": true,
             "selfRequired": true
           }
         },
-        "required": [
-          "subscriber"
-        ]
+        "required": ["subscriber"]
       },
       "UpdatePreferencesDto": {
         "type": "object",
@@ -3077,9 +2729,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "preferences"
-        ]
+        "required": ["preferences"]
       },
       "AddTagDto": {
         "type": "object",
@@ -3090,9 +2740,7 @@
             "maxLength": 100
           }
         },
-        "required": [
-          "tag"
-        ]
+        "required": ["tag"]
       },
       "TagResponseDto": {
         "type": "object",
@@ -3101,9 +2749,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "tag"
-        ]
+        "required": ["tag"]
       },
       "UnsubscribeBodyDto": {
         "type": "object",
@@ -3113,9 +2759,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "token"
-        ]
+        "required": ["token"]
       },
       "UnsubscribeResponseDto": {
         "type": "object",
@@ -3124,9 +2768,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "unsubscribed"
-        ]
+        "required": ["unsubscribed"]
       },
       "TriggerWorkflowDto": {
         "type": "object",
@@ -3163,11 +2805,7 @@
             "selfRequired": false
           }
         },
-        "required": [
-          "key",
-          "subscriber",
-          "payload"
-        ]
+        "required": ["key", "subscriber", "payload"]
       },
       "TriggerWorkflowResponseDto": {
         "type": "object",
@@ -3182,9 +2820,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "triggered"
-        ]
+        "required": ["triggered"]
       },
       "CreateWorkflowDto": {
         "type": "object",
@@ -3208,10 +2844,7 @@
             "default": "automation",
             "description": "Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.",
             "type": "string",
-            "enum": [
-              "automation",
-              "broadcast"
-            ]
+            "enum": ["automation", "broadcast"]
           },
           "steps": {
             "minItems": 1,
@@ -3244,11 +2877,7 @@
                       "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}."
                     }
                   },
-                  "required": [
-                    "type",
-                    "subject",
-                    "body"
-                  ]
+                  "required": ["type", "subject", "body"]
                 },
                 {
                   "type": "object",
@@ -3275,21 +2904,13 @@
                       "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON."
                     }
                   },
-                  "required": [
-                    "type",
-                    "url",
-                    "body"
-                  ]
+                  "required": ["type", "url", "body"]
                 }
               ]
             }
           }
         },
-        "required": [
-          "key",
-          "name",
-          "steps"
-        ]
+        "required": ["key", "name", "steps"]
       },
       "WorkflowResponseDto": {
         "type": "object",
@@ -3304,7 +2925,6 @@
             "type": "string"
           },
           "description": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
@@ -3312,17 +2932,11 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "paused"
-            ]
+            "enum": ["active", "paused"]
           },
           "type": {
             "type": "string",
-            "enum": [
-              "automation",
-              "broadcast"
-            ]
+            "enum": ["automation", "broadcast"]
           },
           "steps": {
             "type": "array",
@@ -3351,12 +2965,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "publicId",
-                "stepOrder",
-                "type",
-                "delayMs"
-              ]
+              "required": ["publicId", "stepOrder", "type", "delayMs"]
             }
           },
           "createdAt": {
@@ -3400,24 +3009,15 @@
                   "type": "string"
                 },
                 "description": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "type": ["string", "null"]
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "active",
-                    "paused"
-                  ]
+                  "enum": ["active", "paused"]
                 },
                 "type": {
                   "type": "string",
-                  "enum": [
-                    "automation",
-                    "broadcast"
-                  ]
+                  "enum": ["automation", "broadcast"]
                 },
                 "steps": {
                   "type": "array",
@@ -3446,12 +3046,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "publicId",
-                      "stepOrder",
-                      "type",
-                      "delayMs"
-                    ]
+                    "required": ["publicId", "stepOrder", "type", "delayMs"]
                   }
                 },
                 "createdAt": {
@@ -3485,11 +3080,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "workflows",
-          "limit",
-          "offset"
-        ]
+        "required": ["workflows", "limit", "offset"]
       },
       "ListEnvironmentRunsResponseDto": {
         "type": "object",
@@ -3504,11 +3095,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "active",
-                    "completed",
-                    "cancelled"
-                  ]
+                  "enum": ["active", "completed", "cancelled"]
                 },
                 "triggeredAt": {
                   "type": "string",
@@ -3516,16 +3103,10 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 },
                 "completedAt": {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "nullable": true
                 },
                 "subscriber": {
                   "type": "object",
@@ -3534,30 +3115,16 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "name": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "externalId": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     }
                   },
-                  "required": [
-                    "publicId",
-                    "email",
-                    "name",
-                    "externalId"
-                  ]
+                  "required": ["publicId", "email", "name", "externalId"]
                 },
                 "steps": {
                   "type": "array",
@@ -3587,36 +3154,18 @@
                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                       },
                       "sentAt": {
-                        "anyOf": [
-                          {
-                            "type": "string",
-                            "format": "date-time",
-                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ]
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "nullable": true
                       },
                       "errorMessage": {
-                        "type": [
-                          "string",
-                          "null"
-                        ]
+                        "type": ["string", "null"]
                       },
                       "bounceType": {
-                        "anyOf": [
-                          {
-                            "type": "string",
-                            "enum": [
-                              "hard",
-                              "soft"
-                            ]
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ]
+                        "type": "string",
+                        "enum": ["hard", "soft"],
+                        "nullable": true
                       }
                     },
                     "required": [
@@ -3643,11 +3192,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "publicId",
-                    "key",
-                    "name"
-                  ]
+                  "required": ["publicId", "key", "name"]
                 }
               },
               "required": [
@@ -3659,23 +3204,16 @@
                 "steps",
                 "workflow"
               ]
-            },
-            "x-nestjs_zod-has-null": true
+            }
           },
           "limit": {
-            "type": "number",
-            "x-nestjs_zod-has-null": true
+            "type": "number"
           },
           "offset": {
-            "type": "number",
-            "x-nestjs_zod-has-null": true
+            "type": "number"
           }
         },
-        "required": [
-          "runs",
-          "limit",
-          "offset"
-        ]
+        "required": ["runs", "limit", "offset"]
       },
       "WorkflowDetailResponseDto": {
         "type": "object",
@@ -3690,7 +3228,6 @@
             "type": "string"
           },
           "description": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "string"
@@ -3698,17 +3235,11 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "paused"
-            ]
+            "enum": ["active", "paused"]
           },
           "type": {
             "type": "string",
-            "enum": [
-              "automation",
-              "broadcast"
-            ]
+            "enum": ["automation", "broadcast"]
           },
           "steps": {
             "type": "array",
@@ -3737,12 +3268,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "publicId",
-                "stepOrder",
-                "type",
-                "delayMs"
-              ]
+              "required": ["publicId", "stepOrder", "type", "delayMs"]
             }
           },
           "createdAt": {
@@ -3777,7 +3303,6 @@
             "type": "number"
           },
           "successRate": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "number"
@@ -3810,35 +3335,21 @@
           "key": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 255,
-            "x-nestjs_zod-has-null": true
+            "maxLength": 255
           },
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 255,
-            "x-nestjs_zod-has-null": true
+            "maxLength": 255
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 2000
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true
+            "type": "string",
+            "maxLength": 2000,
+            "nullable": true
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "paused"
-            ],
-            "x-nestjs_zod-has-null": true
+            "enum": ["active", "paused"]
           },
           "steps": {
             "description": "If provided, replaces ALL existing steps for this workflow.",
@@ -3872,11 +3383,7 @@
                       "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}."
                     }
                   },
-                  "required": [
-                    "type",
-                    "subject",
-                    "body"
-                  ]
+                  "required": ["type", "subject", "body"]
                 },
                 {
                   "type": "object",
@@ -3903,15 +3410,10 @@
                       "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON."
                     }
                   },
-                  "required": [
-                    "type",
-                    "url",
-                    "body"
-                  ]
+                  "required": ["type", "url", "body"]
                 }
               ]
-            },
-            "x-nestjs_zod-has-null": true
+            }
           }
         }
       },
@@ -3928,11 +3430,7 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "active",
-                    "completed",
-                    "cancelled"
-                  ]
+                  "enum": ["active", "completed", "cancelled"]
                 },
                 "triggeredAt": {
                   "type": "string",
@@ -3940,16 +3438,10 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 },
                 "completedAt": {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "nullable": true
                 },
                 "subscriber": {
                   "type": "object",
@@ -3958,30 +3450,16 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "name": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     },
                     "externalId": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     }
                   },
-                  "required": [
-                    "publicId",
-                    "email",
-                    "name",
-                    "externalId"
-                  ]
+                  "required": ["publicId", "email", "name", "externalId"]
                 },
                 "steps": {
                   "type": "array",
@@ -4011,36 +3489,18 @@
                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                       },
                       "sentAt": {
-                        "anyOf": [
-                          {
-                            "type": "string",
-                            "format": "date-time",
-                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ]
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "nullable": true
                       },
                       "errorMessage": {
-                        "type": [
-                          "string",
-                          "null"
-                        ]
+                        "type": ["string", "null"]
                       },
                       "bounceType": {
-                        "anyOf": [
-                          {
-                            "type": "string",
-                            "enum": [
-                              "hard",
-                              "soft"
-                            ]
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ]
+                        "type": "string",
+                        "enum": ["hard", "soft"],
+                        "nullable": true
                       }
                     },
                     "required": [
@@ -4063,157 +3523,121 @@
                 "subscriber",
                 "steps"
               ]
-            },
-            "x-nestjs_zod-has-null": true
+            }
           },
           "limit": {
-            "type": "number",
-            "x-nestjs_zod-has-null": true
+            "type": "number"
           },
           "offset": {
-            "type": "number",
-            "x-nestjs_zod-has-null": true
+            "type": "number"
           }
         },
-        "required": [
-          "runs",
-          "limit",
-          "offset"
+        "required": ["runs", "limit", "offset"]
+      },
+      "TriggerBroadcastDto__schema0": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "optedIn"
+              }
+            },
+            "required": ["type"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "tag"
+              },
+              "tag": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": ["type", "tag"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "attribute"
+              },
+              "field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "op": {
+                "type": "string",
+                "enum": ["equals", "contains", "exists"]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": ["type", "field", "op"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "and"
+              },
+              "clauses": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+                }
+              }
+            },
+            "required": ["type", "clauses"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "or"
+              },
+              "clauses": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+                }
+              }
+            },
+            "required": ["type", "clauses"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "not"
+              },
+              "clause": {
+                "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+              }
+            },
+            "required": ["type", "clause"]
+          }
         ]
       },
       "TriggerBroadcastDto": {
         "type": "object",
         "properties": {
           "audience": {
-            "$ref": "#/$defs/__schema0",
-            "type": "",
-            "x-nestjs_zod-parent-has-refs": true,
-            "x-nestjs_zod-empty-type": true,
-            "x-nestjs_zod-$defs": {
-              "__schema0": {
-                "anyOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "const": "optedIn"
-                      }
-                    },
-                    "required": [
-                      "type"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "const": "tag"
-                      },
-                      "tag": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "tag"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "const": "attribute"
-                      },
-                      "field": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "op": {
-                        "type": "string",
-                        "enum": [
-                          "equals",
-                          "contains",
-                          "exists"
-                        ]
-                      },
-                      "value": {
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "field",
-                      "op"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "const": "and"
-                      },
-                      "clauses": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "$ref": "#/$defs/__schema0"
-                        }
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "clauses"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "const": "or"
-                      },
-                      "clauses": {
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {
-                          "$ref": "#/$defs/__schema0"
-                        }
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "clauses"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "const": "not"
-                      },
-                      "clause": {
-                        "$ref": "#/$defs/__schema0"
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "clause"
-                    ]
-                  }
-                ]
-              }
-            }
+            "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
           }
         },
-        "required": [
-          "audience"
-        ]
+        "required": ["audience"]
       },
       "PreviewBroadcastResponseDto": {
         "type": "object",
@@ -4222,9 +3646,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "matchedCount"
-        ]
+        "required": ["matchedCount"]
       },
       "TriggerBroadcastResponseDto": {
         "type": "object",
@@ -4234,17 +3656,10 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "queued",
-              "failed"
-            ]
+            "enum": ["pending", "queued", "failed"]
           }
         },
-        "required": [
-          "broadcastId",
-          "status"
-        ]
+        "required": ["broadcastId", "status"]
       },
       "ListBroadcastsResponseDto": {
         "type": "object",
@@ -4259,17 +3674,10 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "queued",
-                    "failed"
-                  ]
+                  "enum": ["pending", "queued", "failed"]
                 },
                 "matchedCount": {
-                  "type": [
-                    "number",
-                    "null"
-                  ]
+                  "type": ["number", "null"]
                 },
                 "createdAt": {
                   "type": "string",
@@ -4277,12 +3685,7 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 }
               },
-              "required": [
-                "publicId",
-                "status",
-                "matchedCount",
-                "createdAt"
-              ]
+              "required": ["publicId", "status", "matchedCount", "createdAt"]
             }
           },
           "limit": {
@@ -4292,11 +3695,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "broadcasts",
-          "limit",
-          "offset"
-        ]
+        "required": ["broadcasts", "limit", "offset"]
       },
       "BroadcastDetailResponseDto": {
         "type": "object",
@@ -4306,14 +3705,9 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "queued",
-              "failed"
-            ]
+            "enum": ["pending", "queued", "failed"]
           },
           "matchedCount": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "number"
@@ -4346,7 +3740,6 @@
             "type": "number"
           },
           "successRate": {
-            "x-nestjs_zod-empty-type": true,
             "type": "array",
             "items": {
               "type": "number"
@@ -4377,10 +3770,7 @@
           },
           "bounceType": {
             "type": "string",
-            "enum": [
-              "hard",
-              "soft"
-            ]
+            "enum": ["hard", "soft"]
           },
           "reason": {
             "type": "string",
@@ -4388,26 +3778,13 @@
             "maxLength": 2000
           }
         },
-        "required": [
-          "runStepPublicId",
-          "bounceType",
-          "reason"
-        ]
+        "required": ["runStepPublicId", "bounceType", "reason"]
       },
       "UpsertIntegrationDto": {
         "type": "object",
-        "properties": {
-          "root": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": {},
-            "x-nestjs_zod-unwrap-root": true,
-            "selfRequired": false
-          }
-        },
-        "required": [
-          "root"
-        ]
+        "properties": {},
+        "additionalProperties": {},
+        "selfRequired": false
       },
       "IntegrationResponseDto": {
         "type": "object",
@@ -4424,11 +3801,7 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           }
         },
-        "required": [
-          "type",
-          "priority",
-          "updatedAt"
-        ]
+        "required": ["type", "priority", "updatedAt"]
       },
       "ListIntegrationsResponseDto": {
         "type": "object",
@@ -4450,18 +3823,12 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 }
               },
-              "required": [
-                "type",
-                "priority",
-                "updatedAt"
-              ],
+              "required": ["type", "priority", "updatedAt"],
               "additionalProperties": {}
             }
           }
         },
-        "required": [
-          "integrations"
-        ]
+        "required": ["integrations"]
       },
       "AnalyticsResponseDto": {
         "type": "object",
@@ -4506,10 +3873,7 @@
                 "type": "number"
               },
               "successRate": {
-                "type": [
-                  "number",
-                  "null"
-                ]
+                "type": ["number", "null"]
               }
             },
             "selfRequired": true
@@ -4527,12 +3891,7 @@
             "selfRequired": true
           }
         },
-        "required": [
-          "days",
-          "subscribers",
-          "sends",
-          "bounces"
-        ]
+        "required": ["days", "subscribers", "sends", "bounces"]
       }
     }
   }
