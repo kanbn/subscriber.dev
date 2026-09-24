@@ -12,8 +12,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "pnpm with-env node --import @swc-node/register/esm-register src/main.ts",
-    "dev:watch": "pnpm with-env node --watch --import @swc-node/register/esm-register src/main.ts",
+    "dev": "pnpm with-env node --watch --import @swc-node/register/esm-register src/main.ts",
     "start": "pnpm with-env node dist/main.js",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",

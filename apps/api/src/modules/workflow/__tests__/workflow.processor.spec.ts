@@ -4,7 +4,10 @@ import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/envi
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 import { sendRawEmail } from "@subscriber.dev/email";
-import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
+import {
+  createEmailUnsubscribeLink,
+  createOneClickUnsubscribeUrl,
+} from "@subscriber.dev/shared/utils";
 
 import { decrypt } from "../../../common/encryption.js";
 import { WorkflowProcessor } from "../workflow.processor.js";
@@ -19,6 +22,7 @@ vi.mock("@subscriber.dev/shared/utils", async (importOriginal) => {
   return {
     ...actual,
     createEmailUnsubscribeLink: vi.fn(),
+    createOneClickUnsubscribeUrl: vi.fn(),
   };
 });
 
@@ -94,6 +98,9 @@ beforeEach(() => {
   vi.mocked(createEmailUnsubscribeLink).mockResolvedValue(
     "https://example.com/unsubscribe?token=abc",
   );
+  vi.mocked(createOneClickUnsubscribeUrl).mockResolvedValue(
+    "https://api.example.com/unsubscribe/one-click?token=abc",
+  );
   vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
     {
       type: "smtp",
@@ -161,6 +168,31 @@ describe("process", () => {
       expect.anything(),
       5,
     );
+  });
+
+  it("sends a plain-text alternative and one-click List-Unsubscribe headers", async () => {
+    await processor.process(makeJob());
+
+    const [, , , , options] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(options?.text).toContain("Welcome Alice!");
+    expect(options?.text).not.toContain("<");
+    expect(options?.headers).toEqual({
+      "List-Unsubscribe":
+        "<https://api.example.com/unsubscribe/one-click?token=abc>",
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    });
+  });
+
+  it("omits List-Unsubscribe headers when the one-click URL isn't HTTPS", async () => {
+    vi.mocked(createOneClickUnsubscribeUrl).mockResolvedValue(
+      "http://localhost:4000/unsubscribe/one-click?token=abc",
+    );
+
+    await processor.process(makeJob());
+
+    const [, , , , options] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(options?.headers).toBeUndefined();
+    expect(options?.text).toContain("Welcome Alice!");
   });
 
   it("marks the run-step failed when no configured integration matches a registered provider", async () => {

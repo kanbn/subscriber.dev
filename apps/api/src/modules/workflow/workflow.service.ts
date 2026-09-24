@@ -64,6 +64,14 @@ interface WorkflowStepRow {
   config: Record<string, unknown>;
 }
 
+export const redactWebhookUrl = (url: string) => {
+  try {
+    return `${new URL(url).origin}/***${url.slice(-4)}`;
+  } catch {
+    return "***";
+  }
+};
+
 @Injectable()
 export class WorkflowService {
   constructor(
@@ -96,6 +104,9 @@ export class WorkflowService {
       type: workflow.type,
       steps: steps.map((s) => ({
         ...s.config,
+        ...(typeof s.config.url === "string"
+          ? { url: redactWebhookUrl(s.config.url) }
+          : {}),
         publicId: s.publicId,
         stepOrder: s.stepOrder,
         type: s.type,
@@ -115,6 +126,29 @@ export class WorkflowService {
     return steps.map((s) => {
       const { type, delayMs, ...config } = s;
       return { type, delayMs, config };
+    });
+  }
+
+  // Replaces any webhook URL that is the redacted form of an existing step's URL
+  // with the real one, so read-modify-write updates don't clobber secrets.
+  private restoreRedactedWebhookUrls(
+    steps: WorkflowStepInput[],
+    existingSteps: WorkflowStepRow[],
+  ): WorkflowStepInput[] {
+    const realUrlByRedacted = new Map<string, string>();
+    for (const step of existingSteps) {
+      if (typeof step.config.url === "string") {
+        realUrlByRedacted.set(
+          redactWebhookUrl(step.config.url),
+          step.config.url,
+        );
+      }
+    }
+
+    return steps.map((step) => {
+      if (step.type !== "webhook") return step;
+      const realUrl = realUrlByRedacted.get(step.url);
+      return realUrl ? { ...step, url: realUrl } : step;
     });
   }
 
@@ -213,7 +247,12 @@ export class WorkflowService {
       ? await workflowRepo.replaceWorkflowSteps(
           db,
           existing.id,
-          this.toStepInputs(data.steps),
+          this.toStepInputs(
+            this.restoreRedactedWebhookUrls(
+              data.steps,
+              await workflowRepo.listStepsForWorkflow(db, existing.id),
+            ),
+          ),
         )
       : await workflowRepo.listStepsForWorkflow(db, existing.id);
 

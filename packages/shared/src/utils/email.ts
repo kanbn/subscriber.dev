@@ -8,6 +8,20 @@ export interface UnsubscribeTokenPayload {
   subscriberPublicId: string;
 }
 
+async function signUnsubscribeToken(
+  environmentId: number,
+  subscriberPublicId: string,
+  secret: string,
+): Promise<string> {
+  return new SignJWT({
+    environmentId,
+    subscriberPublicId,
+    purpose: UNSUBSCRIBE_TOKEN_PURPOSE,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .sign(encoder.encode(secret));
+}
+
 /**
  * Creates a long‑lived unsubscribe link for a given subscriber.
  *
@@ -31,16 +45,31 @@ export async function createEmailUnsubscribeLink(
     return null;
   }
 
-  const token = await new SignJWT({
+  const token = await signUnsubscribeToken(
     environmentId,
     subscriberPublicId,
-    purpose: UNSUBSCRIBE_TOKEN_PURPOSE,
-  })
-    .setProtectedHeader({ alg: "HS256" })
-    // No expiration on purpose; unsubscribe links are long‑lived.
-    .sign(encoder.encode(secret));
-
+    secret,
+  );
   return `${baseUrl}/unsubscribe?token=${encodeURIComponent(token)}`;
+}
+
+export async function createOneClickUnsubscribeUrl(
+  environmentId: number,
+  subscriberPublicId: string,
+): Promise<string | null> {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const secret = process.env.EMAIL_UNSUBSCRIBE_SECRET;
+
+  if (!apiBaseUrl || !secret) {
+    return null;
+  }
+
+  const token = await signUnsubscribeToken(
+    environmentId,
+    subscriberPublicId,
+    secret,
+  );
+  return `${apiBaseUrl}/unsubscribe/one-click?token=${encodeURIComponent(token)}`;
 }
 
 /**

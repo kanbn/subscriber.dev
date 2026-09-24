@@ -5,6 +5,10 @@
  * REST API for Subscriber - Customer.io alternative
  * OpenAPI spec version: 1.0
  */
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -17,18 +21,15 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
-import { useMutation, useQuery } from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
-import { customFetch } from "./mutator/custom-fetch";
-
+import { customFetch } from './mutator/custom-fetch';
 export type UserResponseDtoApiKeysItemPrefix = string | null;
 
 export type UserResponseDtoApiKeysItem = {
   id: number;
   prefix: UserResponseDtoApiKeysItemPrefix;
-  key: string;
 };
 
 export interface UserResponseDto {
@@ -148,13 +149,7 @@ export type ListSubscribersResponseDtoSubscribersItemName = string | null;
 /**
  * @nullable
  */
-export type ListSubscribersResponseDtoSubscribersItemAttributes = {
-  [key: string]: unknown;
-} | null;
-
-export type ListSubscribersResponseDtoSubscribersItemUnsubscribeUrl =
-  | string
-  | null;
+export type ListSubscribersResponseDtoSubscribersItemAttributes = {[key: string]: unknown} | null;
 
 export type ListSubscribersResponseDtoSubscribersItem = {
   publicId: string;
@@ -170,7 +165,6 @@ export type ListSubscribersResponseDtoSubscribersItem = {
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
-  unsubscribeUrl: ListSubscribersResponseDtoSubscribersItemUnsubscribeUrl;
 };
 
 export interface ListSubscribersResponseDto {
@@ -198,9 +192,7 @@ export type GetSubscriberResponseDtoSubscriberName = string | null;
 /**
  * @nullable
  */
-export type GetSubscriberResponseDtoSubscriberAttributes = {
-  [key: string]: unknown;
-} | null;
+export type GetSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
 
 export type GetSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
@@ -239,7 +231,7 @@ export interface GetSubscriberResponseDto {
   preferences: GetSubscriberResponseDtoPreferences;
 }
 
-export type CreateSubscriberDtoAttributes = { [key: string]: unknown };
+export type CreateSubscriberDtoAttributes = {[key: string]: unknown};
 
 export type CreateSubscriberDtoPreferences = {
   email?: boolean;
@@ -278,9 +270,7 @@ export type CreateSubscriberResponseDtoSubscriberName = string | null;
 /**
  * @nullable
  */
-export type CreateSubscriberResponseDtoSubscriberAttributes = {
-  [key: string]: unknown;
-} | null;
+export type CreateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
 
 export type CreateSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
@@ -314,9 +304,7 @@ export interface CreateSubscriberResponseDto {
   preferences: CreateSubscriberResponseDtoPreferences;
 }
 
-export type BulkUpsertSubscribersDtoSubscribersItemAttributes = {
-  [key: string]: unknown;
-};
+export type BulkUpsertSubscribersDtoSubscribersItemAttributes = {[key: string]: unknown};
 
 /**
  * Omit entirely to leave existing preferences untouched on update.
@@ -352,49 +340,34 @@ export interface BulkUpsertSubscribersDto {
   subscribers: BulkUpsertSubscribersDtoSubscribersItem[];
 }
 
-export type BulkUpsertSubscribersResponseDtoResultsItemStatus =
-  (typeof BulkUpsertSubscribersResponseDtoResultsItemStatus)[keyof typeof BulkUpsertSubscribersResponseDtoResultsItemStatus];
+export type BulkUpsertSubscribersResponseDtoResultsItemStatus = typeof BulkUpsertSubscribersResponseDtoResultsItemStatus[keyof typeof BulkUpsertSubscribersResponseDtoResultsItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const BulkUpsertSubscribersResponseDtoResultsItemStatus = {
-  created: "created",
-  updated: "updated",
-  error: "error",
+  created: 'created',
+  updated: 'updated',
+  error: 'error',
 } as const;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberEmail =
-  | string
-  | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberEmail = string | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberPhone =
-  | string
-  | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberPhone = string | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberExternalId =
-  | string
-  | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberExternalId = string | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberFirstName =
-  | string
-  | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberFirstName = string | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberLastName =
-  | string
-  | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberLastName = string | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberName =
-  | string
-  | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberName = string | null;
 
 /**
  * @nullable
  */
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes = {
-  [key: string]: unknown;
-} | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes = {[key: string]: unknown} | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberUnsubscribeUrl =
-  string | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberUnsubscribeUrl = string | null;
 
 export type BulkUpsertSubscribersResponseDtoResultsItemSubscriber = {
   publicId: string;
@@ -443,7 +416,7 @@ export interface BulkUpsertSubscribersResponseDto {
 /**
  * @nullable
  */
-export type UpdateSubscriberDtoAttributes = { [key: string]: unknown } | null;
+export type UpdateSubscriberDtoAttributes = {[key: string]: unknown} | null;
 
 export interface UpdateSubscriberDto {
   /**
@@ -475,9 +448,7 @@ export type UpdateSubscriberResponseDtoSubscriberName = string | null;
 /**
  * @nullable
  */
-export type UpdateSubscriberResponseDtoSubscriberAttributes = {
-  [key: string]: unknown;
-} | null;
+export type UpdateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
 
 export type UpdateSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
@@ -550,7 +521,7 @@ export type TriggerWorkflowDtoSubscriber = {
 /**
  * Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.
  */
-export type TriggerWorkflowDtoPayload = { [key: string]: unknown };
+export type TriggerWorkflowDtoPayload = {[key: string]: unknown};
 
 export interface TriggerWorkflowDto {
   /**
@@ -572,17 +543,17 @@ export interface TriggerWorkflowResponseDto {
 /**
  * Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.
  */
-export type CreateWorkflowDtoType =
-  (typeof CreateWorkflowDtoType)[keyof typeof CreateWorkflowDtoType];
+export type CreateWorkflowDtoType = typeof CreateWorkflowDtoType[keyof typeof CreateWorkflowDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateWorkflowDtoType = {
-  automation: "automation",
-  broadcast: "broadcast",
+  automation: 'automation',
+  broadcast: 'broadcast',
 } as const;
 
 export type CreateWorkflowDtoStepsItemOneOf = {
-  type: "email";
+  type: 'email';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -602,7 +573,7 @@ export type CreateWorkflowDtoStepsItemOneOf = {
 };
 
 export type CreateWorkflowDtoStepsItemOneOfTwo = {
-  type: "webhook";
+  type: 'webhook';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -618,9 +589,7 @@ export type CreateWorkflowDtoStepsItemOneOfTwo = {
   body: string;
 };
 
-export type CreateWorkflowDtoStepsItem =
-  | CreateWorkflowDtoStepsItemOneOf
-  | CreateWorkflowDtoStepsItemOneOfTwo;
+export type CreateWorkflowDtoStepsItem = CreateWorkflowDtoStepsItemOneOf | CreateWorkflowDtoStepsItemOneOfTwo;
 
 export interface CreateWorkflowDto {
   /**
@@ -645,22 +614,22 @@ export interface CreateWorkflowDto {
   steps: CreateWorkflowDtoStepsItem[];
 }
 
-export type WorkflowResponseDtoStatus =
-  (typeof WorkflowResponseDtoStatus)[keyof typeof WorkflowResponseDtoStatus];
+export type WorkflowResponseDtoStatus = typeof WorkflowResponseDtoStatus[keyof typeof WorkflowResponseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkflowResponseDtoStatus = {
-  active: "active",
-  paused: "paused",
+  active: 'active',
+  paused: 'paused',
 } as const;
 
-export type WorkflowResponseDtoType =
-  (typeof WorkflowResponseDtoType)[keyof typeof WorkflowResponseDtoType];
+export type WorkflowResponseDtoType = typeof WorkflowResponseDtoType[keyof typeof WorkflowResponseDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkflowResponseDtoType = {
-  automation: "automation",
-  broadcast: "broadcast",
+  automation: 'automation',
+  broadcast: 'broadcast',
 } as const;
 
 export type WorkflowResponseDtoStepsItem = {
@@ -670,6 +639,7 @@ export type WorkflowResponseDtoStepsItem = {
   delayMs: number;
   subject?: string;
   body?: string;
+  /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
 
@@ -689,22 +659,22 @@ export interface WorkflowResponseDto {
 
 export type ListWorkflowsResponseDtoWorkflowsItemDescription = string | null;
 
-export type ListWorkflowsResponseDtoWorkflowsItemStatus =
-  (typeof ListWorkflowsResponseDtoWorkflowsItemStatus)[keyof typeof ListWorkflowsResponseDtoWorkflowsItemStatus];
+export type ListWorkflowsResponseDtoWorkflowsItemStatus = typeof ListWorkflowsResponseDtoWorkflowsItemStatus[keyof typeof ListWorkflowsResponseDtoWorkflowsItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListWorkflowsResponseDtoWorkflowsItemStatus = {
-  active: "active",
-  paused: "paused",
+  active: 'active',
+  paused: 'paused',
 } as const;
 
-export type ListWorkflowsResponseDtoWorkflowsItemType =
-  (typeof ListWorkflowsResponseDtoWorkflowsItemType)[keyof typeof ListWorkflowsResponseDtoWorkflowsItemType];
+export type ListWorkflowsResponseDtoWorkflowsItemType = typeof ListWorkflowsResponseDtoWorkflowsItemType[keyof typeof ListWorkflowsResponseDtoWorkflowsItemType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListWorkflowsResponseDtoWorkflowsItemType = {
-  automation: "automation",
-  broadcast: "broadcast",
+  automation: 'automation',
+  broadcast: 'broadcast',
 } as const;
 
 export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
@@ -714,6 +684,7 @@ export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
   delayMs: number;
   subject?: string;
   body?: string;
+  /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
 
@@ -737,27 +708,21 @@ export interface ListWorkflowsResponseDto {
   offset: number;
 }
 
-export type ListEnvironmentRunsResponseDtoRunsItemStatus =
-  (typeof ListEnvironmentRunsResponseDtoRunsItemStatus)[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStatus];
+export type ListEnvironmentRunsResponseDtoRunsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEnvironmentRunsResponseDtoRunsItemStatus = {
-  active: "active",
-  completed: "completed",
-  cancelled: "cancelled",
+  active: 'active',
+  completed: 'completed',
+  cancelled: 'cancelled',
 } as const;
 
-export type ListEnvironmentRunsResponseDtoRunsItemSubscriberEmail =
-  | string
-  | null;
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberEmail = string | null;
 
-export type ListEnvironmentRunsResponseDtoRunsItemSubscriberName =
-  | string
-  | null;
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberName = string | null;
 
-export type ListEnvironmentRunsResponseDtoRunsItemSubscriberExternalId =
-  | string
-  | null;
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberExternalId = string | null;
 
 export type ListEnvironmentRunsResponseDtoRunsItemSubscriber = {
   publicId: string;
@@ -766,34 +731,31 @@ export type ListEnvironmentRunsResponseDtoRunsItemSubscriber = {
   externalId: ListEnvironmentRunsResponseDtoRunsItemSubscriberExternalId;
 };
 
-export type ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus =
-  (typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus)[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus];
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = {
-  pending: "pending",
-  sent: "sent",
-  skipped: "skipped",
-  failed: "failed",
-  cancelled: "cancelled",
-  bounced: "bounced",
+  pending: 'pending',
+  sent: 'sent',
+  skipped: 'skipped',
+  failed: 'failed',
+  cancelled: 'cancelled',
+  bounced: 'bounced',
 } as const;
 
-export type ListEnvironmentRunsResponseDtoRunsItemStepsItemErrorMessage =
-  | string
-  | null;
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemErrorMessage = string | null;
 
 /**
  * @nullable
  */
-export type ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType =
-  | (typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType)[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType]
-  | null;
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType] | null;
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = {
-  hard: "hard",
-  soft: "soft",
+  hard: 'hard',
+  soft: 'soft',
 } as const;
 
 export type ListEnvironmentRunsResponseDtoRunsItemStepsItem = {
@@ -839,22 +801,22 @@ export interface ListEnvironmentRunsResponseDto {
   offset: number;
 }
 
-export type WorkflowDetailResponseDtoStatus =
-  (typeof WorkflowDetailResponseDtoStatus)[keyof typeof WorkflowDetailResponseDtoStatus];
+export type WorkflowDetailResponseDtoStatus = typeof WorkflowDetailResponseDtoStatus[keyof typeof WorkflowDetailResponseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkflowDetailResponseDtoStatus = {
-  active: "active",
-  paused: "paused",
+  active: 'active',
+  paused: 'paused',
 } as const;
 
-export type WorkflowDetailResponseDtoType =
-  (typeof WorkflowDetailResponseDtoType)[keyof typeof WorkflowDetailResponseDtoType];
+export type WorkflowDetailResponseDtoType = typeof WorkflowDetailResponseDtoType[keyof typeof WorkflowDetailResponseDtoType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkflowDetailResponseDtoType = {
-  automation: "automation",
-  broadcast: "broadcast",
+  automation: 'automation',
+  broadcast: 'broadcast',
 } as const;
 
 export type WorkflowDetailResponseDtoStepsItem = {
@@ -864,6 +826,7 @@ export type WorkflowDetailResponseDtoStepsItem = {
   delayMs: number;
   subject?: string;
   body?: string;
+  /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
 
@@ -889,17 +852,17 @@ export interface WorkflowDetailResponseDto {
   successRate: number[];
 }
 
-export type UpdateWorkflowDtoStatus =
-  (typeof UpdateWorkflowDtoStatus)[keyof typeof UpdateWorkflowDtoStatus];
+export type UpdateWorkflowDtoStatus = typeof UpdateWorkflowDtoStatus[keyof typeof UpdateWorkflowDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateWorkflowDtoStatus = {
-  active: "active",
-  paused: "paused",
+  active: 'active',
+  paused: 'paused',
 } as const;
 
 export type UpdateWorkflowDtoStepsItemOneOf = {
-  type: "email";
+  type: 'email';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -919,7 +882,7 @@ export type UpdateWorkflowDtoStepsItemOneOf = {
 };
 
 export type UpdateWorkflowDtoStepsItemOneOfTwo = {
-  type: "webhook";
+  type: 'webhook';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -935,9 +898,7 @@ export type UpdateWorkflowDtoStepsItemOneOfTwo = {
   body: string;
 };
 
-export type UpdateWorkflowDtoStepsItem =
-  | UpdateWorkflowDtoStepsItemOneOf
-  | UpdateWorkflowDtoStepsItemOneOfTwo;
+export type UpdateWorkflowDtoStepsItem = UpdateWorkflowDtoStepsItemOneOf | UpdateWorkflowDtoStepsItemOneOfTwo;
 
 export interface UpdateWorkflowDto {
   /**
@@ -964,14 +925,14 @@ export interface UpdateWorkflowDto {
   steps?: UpdateWorkflowDtoStepsItem[];
 }
 
-export type ListRunsResponseDtoRunsItemStatus =
-  (typeof ListRunsResponseDtoRunsItemStatus)[keyof typeof ListRunsResponseDtoRunsItemStatus];
+export type ListRunsResponseDtoRunsItemStatus = typeof ListRunsResponseDtoRunsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListRunsResponseDtoRunsItemStatus = {
-  active: "active",
-  completed: "completed",
-  cancelled: "cancelled",
+  active: 'active',
+  completed: 'completed',
+  cancelled: 'cancelled',
 } as const;
 
 export type ListRunsResponseDtoRunsItemSubscriberEmail = string | null;
@@ -987,17 +948,17 @@ export type ListRunsResponseDtoRunsItemSubscriber = {
   externalId: ListRunsResponseDtoRunsItemSubscriberExternalId;
 };
 
-export type ListRunsResponseDtoRunsItemStepsItemStatus =
-  (typeof ListRunsResponseDtoRunsItemStepsItemStatus)[keyof typeof ListRunsResponseDtoRunsItemStepsItemStatus];
+export type ListRunsResponseDtoRunsItemStepsItemStatus = typeof ListRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStepsItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListRunsResponseDtoRunsItemStepsItemStatus = {
-  pending: "pending",
-  sent: "sent",
-  skipped: "skipped",
-  failed: "failed",
-  cancelled: "cancelled",
-  bounced: "bounced",
+  pending: 'pending',
+  sent: 'sent',
+  skipped: 'skipped',
+  failed: 'failed',
+  cancelled: 'cancelled',
+  bounced: 'bounced',
 } as const;
 
 export type ListRunsResponseDtoRunsItemStepsItemErrorMessage = string | null;
@@ -1005,14 +966,13 @@ export type ListRunsResponseDtoRunsItemStepsItemErrorMessage = string | null;
 /**
  * @nullable
  */
-export type ListRunsResponseDtoRunsItemStepsItemBounceType =
-  | (typeof ListRunsResponseDtoRunsItemStepsItemBounceType)[keyof typeof ListRunsResponseDtoRunsItemStepsItemBounceType]
-  | null;
+export type ListRunsResponseDtoRunsItemStepsItemBounceType = typeof ListRunsResponseDtoRunsItemStepsItemBounceType[keyof typeof ListRunsResponseDtoRunsItemStepsItemBounceType] | null;
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListRunsResponseDtoRunsItemStepsItemBounceType = {
-  hard: "hard",
-  soft: "soft",
+  hard: 'hard',
+  soft: 'soft',
 } as const;
 
 export type ListRunsResponseDtoRunsItemStepsItem = {
@@ -1052,27 +1012,27 @@ export interface ListRunsResponseDto {
 }
 
 export type TriggerBroadcastDtoSchema0AnyOf = {
-  type: "optedIn";
+  type: 'optedIn';
 };
 
 export type TriggerBroadcastDtoSchema0AnyOfTwo = {
-  type: "tag";
+  type: 'tag';
   /** @minLength 1 */
   tag: string;
 };
 
-export type TriggerBroadcastDtoSchema0AnyOfThreeOp =
-  (typeof TriggerBroadcastDtoSchema0AnyOfThreeOp)[keyof typeof TriggerBroadcastDtoSchema0AnyOfThreeOp];
+export type TriggerBroadcastDtoSchema0AnyOfThreeOp = typeof TriggerBroadcastDtoSchema0AnyOfThreeOp[keyof typeof TriggerBroadcastDtoSchema0AnyOfThreeOp];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TriggerBroadcastDtoSchema0AnyOfThreeOp = {
-  equals: "equals",
-  contains: "contains",
-  exists: "exists",
+  equals: 'equals',
+  contains: 'contains',
+  exists: 'exists',
 } as const;
 
 export type TriggerBroadcastDtoSchema0AnyOfThree = {
-  type: "attribute";
+  type: 'attribute';
   /** @minLength 1 */
   field: string;
   op: TriggerBroadcastDtoSchema0AnyOfThreeOp;
@@ -1080,29 +1040,23 @@ export type TriggerBroadcastDtoSchema0AnyOfThree = {
 };
 
 export type TriggerBroadcastDtoSchema0AnyOfFive = {
-  type: "and";
+  type: 'and';
   /** @minItems 1 */
   clauses: TriggerBroadcastDtoSchema0[];
 };
 
 export type TriggerBroadcastDtoSchema0AnyOfSix = {
-  type: "or";
+  type: 'or';
   /** @minItems 1 */
   clauses: TriggerBroadcastDtoSchema0[];
 };
 
 export type TriggerBroadcastDtoSchema0AnyOfSeven = {
-  type: "not";
+  type: 'not';
   clause: TriggerBroadcastDtoSchema0;
 };
 
-export type TriggerBroadcastDtoSchema0 =
-  | TriggerBroadcastDtoSchema0AnyOf
-  | TriggerBroadcastDtoSchema0AnyOfTwo
-  | TriggerBroadcastDtoSchema0AnyOfThree
-  | TriggerBroadcastDtoSchema0AnyOfFive
-  | TriggerBroadcastDtoSchema0AnyOfSix
-  | TriggerBroadcastDtoSchema0AnyOfSeven;
+export type TriggerBroadcastDtoSchema0 = TriggerBroadcastDtoSchema0AnyOf | TriggerBroadcastDtoSchema0AnyOfTwo | TriggerBroadcastDtoSchema0AnyOfThree | TriggerBroadcastDtoSchema0AnyOfFive | TriggerBroadcastDtoSchema0AnyOfSix | TriggerBroadcastDtoSchema0AnyOfSeven;
 
 export interface TriggerBroadcastDto {
   audience: TriggerBroadcastDtoSchema0;
@@ -1112,14 +1066,14 @@ export interface PreviewBroadcastResponseDto {
   matchedCount: number;
 }
 
-export type TriggerBroadcastResponseDtoStatus =
-  (typeof TriggerBroadcastResponseDtoStatus)[keyof typeof TriggerBroadcastResponseDtoStatus];
+export type TriggerBroadcastResponseDtoStatus = typeof TriggerBroadcastResponseDtoStatus[keyof typeof TriggerBroadcastResponseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TriggerBroadcastResponseDtoStatus = {
-  pending: "pending",
-  queued: "queued",
-  failed: "failed",
+  pending: 'pending',
+  queued: 'queued',
+  failed: 'failed',
 } as const;
 
 export interface TriggerBroadcastResponseDto {
@@ -1127,14 +1081,14 @@ export interface TriggerBroadcastResponseDto {
   status: TriggerBroadcastResponseDtoStatus;
 }
 
-export type ListBroadcastsResponseDtoBroadcastsItemStatus =
-  (typeof ListBroadcastsResponseDtoBroadcastsItemStatus)[keyof typeof ListBroadcastsResponseDtoBroadcastsItemStatus];
+export type ListBroadcastsResponseDtoBroadcastsItemStatus = typeof ListBroadcastsResponseDtoBroadcastsItemStatus[keyof typeof ListBroadcastsResponseDtoBroadcastsItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListBroadcastsResponseDtoBroadcastsItemStatus = {
-  pending: "pending",
-  queued: "queued",
-  failed: "failed",
+  pending: 'pending',
+  queued: 'queued',
+  failed: 'failed',
 } as const;
 
 export type ListBroadcastsResponseDtoBroadcastsItemMatchedCount = number | null;
@@ -1153,14 +1107,14 @@ export interface ListBroadcastsResponseDto {
   offset: number;
 }
 
-export type BroadcastDetailResponseDtoStatus =
-  (typeof BroadcastDetailResponseDtoStatus)[keyof typeof BroadcastDetailResponseDtoStatus];
+export type BroadcastDetailResponseDtoStatus = typeof BroadcastDetailResponseDtoStatus[keyof typeof BroadcastDetailResponseDtoStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const BroadcastDetailResponseDtoStatus = {
-  pending: "pending",
-  queued: "queued",
-  failed: "failed",
+  pending: 'pending',
+  queued: 'queued',
+  failed: 'failed',
 } as const;
 
 export interface BroadcastDetailResponseDto {
@@ -1179,13 +1133,13 @@ export interface BroadcastDetailResponseDto {
   successRate: number[];
 }
 
-export type BounceWebhookBodyDtoBounceType =
-  (typeof BounceWebhookBodyDtoBounceType)[keyof typeof BounceWebhookBodyDtoBounceType];
+export type BounceWebhookBodyDtoBounceType = typeof BounceWebhookBodyDtoBounceType[keyof typeof BounceWebhookBodyDtoBounceType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const BounceWebhookBodyDtoBounceType = {
-  hard: "hard",
-  soft: "soft",
+  hard: 'hard',
+  soft: 'soft',
 } as const;
 
 export interface BounceWebhookBodyDto {
@@ -1199,9 +1153,7 @@ export interface BounceWebhookBodyDto {
   reason: string;
 }
 
-export interface UpsertIntegrationDto {
-  [key: string]: unknown;
-}
+export interface UpsertIntegrationDto {[key: string]: unknown}
 
 export interface IntegrationResponseDto {
   type: string;
@@ -1253,6083 +1205,4520 @@ export interface AnalyticsResponseDto {
 }
 
 export type ListSubscribersParams = {
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
-  /**
-   * @minimum 0
-   * @maximum 9007199254740991
-   */
-  offset?: number;
-  /**
-   * Filter to the subscriber with this exact email address
-   * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
-   */
-  email?: string;
-  /**
-   * Filter to the subscriber with this exact external ID
-   */
-  externalId?: string;
-  /**
-   * Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name
-   * @minLength 1
-   */
-  q?: string;
-  /**
-   * Filter by the subscriber's latest email preference (true = opted in, false = opted out)
-   */
-  emailOptedIn?: boolean;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ * @maximum 9007199254740991
+ */
+offset?: number;
+/**
+ * Filter to the subscriber with this exact email address
+ * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+ */
+email?: string;
+/**
+ * Filter to the subscriber with this exact external ID
+ */
+externalId?: string;
+/**
+ * Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name
+ * @minLength 1
+ */
+q?: string;
+/**
+ * Filter by the subscriber's latest email preference (true = opted in, false = opted out)
+ */
+emailOptedIn?: boolean;
 };
 
 export type ListWorkflowsParams = {
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
-  /**
-   * @minimum 0
-   * @maximum 9007199254740991
-   */
-  offset?: number;
-  type?: ListWorkflowsType;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ * @maximum 9007199254740991
+ */
+offset?: number;
+type?: ListWorkflowsType;
 };
 
-export type ListWorkflowsType =
-  (typeof ListWorkflowsType)[keyof typeof ListWorkflowsType];
+export type ListWorkflowsType = typeof ListWorkflowsType[keyof typeof ListWorkflowsType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListWorkflowsType = {
-  automation: "automation",
-  broadcast: "broadcast",
+  automation: 'automation',
+  broadcast: 'broadcast',
 } as const;
 
 export type ListEnvironmentRunsParams = {
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
-  /**
-   * @minimum 0
-   * @maximum 9007199254740991
-   */
-  offset?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ * @maximum 9007199254740991
+ */
+offset?: number;
 };
 
 export type ListWorkflowRunsParams = {
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
-  /**
-   * @minimum 0
-   * @maximum 9007199254740991
-   */
-  offset?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ * @maximum 9007199254740991
+ */
+offset?: number;
 };
 
 export type ListBroadcastsParams = {
-  /**
-   * @minimum 1
-   * @maximum 100
-   */
-  limit?: number;
-  /**
-   * @minimum 0
-   * @maximum 9007199254740991
-   */
-  offset?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ * @maximum 9007199254740991
+ */
+offset?: number;
 };
 
 export type GetAnalyticsParams = {
-  /**
-   * @minimum 1
-   * @maximum 365
-   */
-  days?: number;
+/**
+ * @minimum 1
+ * @maximum 365
+ */
+days?: number;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * @summary Get current user
  */
 export type getCurrentUserResponse200 = {
-  data: UserResponseDto;
-  status: 200;
-};
-
-export type getCurrentUserResponseSuccess = getCurrentUserResponse200 & {
+  data: UserResponseDto
+  status: 200
+}
+    
+export type getCurrentUserResponseSuccess = (getCurrentUserResponse200) & {
   headers: Headers;
 };
-export type getCurrentUserResponse = getCurrentUserResponseSuccess;
+;
+
+export type getCurrentUserResponse = (getCurrentUserResponseSuccess)
 
 export const getGetCurrentUserUrl = () => {
-  return `/users/me`;
-};
 
-export const getCurrentUser = async (
-  options?: RequestInit,
-): Promise<getCurrentUserResponse> => {
-  return customFetch<getCurrentUserResponse>(getGetCurrentUserUrl(), {
-    credentials: "include",
+
+  
+
+  return `/users/me`
+}
+
+export const getCurrentUser = async ( options?: RequestInit): Promise<getCurrentUserResponse> => {
+  
+  return customFetch<getCurrentUserResponse>(getGetCurrentUserUrl(),
+  {
+      credentials: 'include',
     ...options,
-    method: "GET",
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
 
 export const getGetCurrentUserQueryKey = () => {
-  return [`/users/me`] as const;
-};
+    return [
+    `/users/me`
+    ] as const;
+    }
 
-export const getGetCurrentUserQueryOptions = <
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+    
+export const getGetCurrentUserQueryOptions = <TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
 
-  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserQueryKey();
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({
-    signal,
-  }) => getCurrentUser({ signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetCurrentUserQueryKey();
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getCurrentUser>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+  
 
-export type GetCurrentUserQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getCurrentUser>>
->;
-export type GetCurrentUserQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) => getCurrentUser({ signal, ...requestOptions });
 
-export function useGetCurrentUser<
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = unknown,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetCurrentUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>
+export type GetCurrentUserQueryError = unknown
+
+
+export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getCurrentUser>>,
           TError,
           Awaited<ReturnType<typeof getCurrentUser>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useGetCurrentUser<
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getCurrentUser>>,
           TError,
           Awaited<ReturnType<typeof getCurrentUser>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetCurrentUser<
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary Get current user
  */
 
-export function useGetCurrentUser<
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetCurrentUserQueryOptions(options);
+export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getGetCurrentUserQueryOptions(options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * @summary Update current user
  */
 export type updateCurrentUserResponse200 = {
-  data: UpdateUserResponseDto;
-  status: 200;
-};
-
-export type updateCurrentUserResponseSuccess = updateCurrentUserResponse200 & {
+  data: UpdateUserResponseDto
+  status: 200
+}
+    
+export type updateCurrentUserResponseSuccess = (updateCurrentUserResponse200) & {
   headers: Headers;
 };
-export type updateCurrentUserResponse = updateCurrentUserResponseSuccess;
+;
+
+export type updateCurrentUserResponse = (updateCurrentUserResponseSuccess)
 
 export const getUpdateCurrentUserUrl = () => {
-  return `/users`;
-};
 
-export const updateCurrentUser = async (
-  updateUserDto: UpdateUserDto,
-  options?: RequestInit,
-): Promise<updateCurrentUserResponse> => {
-  return customFetch<updateCurrentUserResponse>(getUpdateCurrentUserUrl(), {
-    credentials: "include",
+
+  
+
+  return `/users`
+}
+
+export const updateCurrentUser = async (updateUserDto: UpdateUserDto, options?: RequestInit): Promise<updateCurrentUserResponse> => {
+  
+  return customFetch<updateCurrentUserResponse>(getUpdateCurrentUserUrl(),
+  {
+      credentials: 'include',
     ...options,
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(updateUserDto),
-  });
-};
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateUserDto,)
+  }
+);}
 
-export const getUpdateCurrentUserMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateCurrentUser>>,
-    TError,
-    { data: UpdateUserDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateCurrentUser>>,
-  TError,
-  { data: UpdateUserDto },
-  TContext
-> => {
-  const mutationKey = ["updateCurrentUser"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateCurrentUser>>,
-    { data: UpdateUserDto }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return updateCurrentUser(data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getUpdateCurrentUserMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateUserDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateUserDto}, TContext> => {
 
-export type UpdateCurrentUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateCurrentUser>>
->;
-export type UpdateCurrentUserMutationBody = UpdateUserDto;
-export type UpdateCurrentUserMutationError = unknown;
+const mutationKey = ['updateCurrentUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCurrentUser>>, {data: UpdateUserDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateCurrentUser(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCurrentUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateCurrentUser>>>
+    export type UpdateCurrentUserMutationBody = UpdateUserDto
+    export type UpdateCurrentUserMutationError = unknown
+
+    /**
  * @summary Update current user
  */
-export const useUpdateCurrentUser = <TError = unknown, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateCurrentUser>>,
-      TError,
-      { data: UpdateUserDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateCurrentUser>>,
-  TError,
-  { data: UpdateUserDto },
-  TContext
-> => {
-  const mutationOptions = getUpdateCurrentUserMutationOptions(options);
+export const useUpdateCurrentUser = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateUserDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateCurrentUser>>,
+        TError,
+        {data: UpdateUserDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getUpdateCurrentUserMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * @summary Get test message
  */
 export type getTestResponse200 = {
-  data: TestResponseDto;
-  status: 200;
-};
-
-export type getTestResponseSuccess = getTestResponse200 & {
+  data: TestResponseDto
+  status: 200
+}
+    
+export type getTestResponseSuccess = (getTestResponse200) & {
   headers: Headers;
 };
-export type getTestResponse = getTestResponseSuccess;
+;
+
+export type getTestResponse = (getTestResponseSuccess)
 
 export const getGetTestUrl = () => {
-  return `/test`;
-};
 
-export const getTest = async (
-  options?: RequestInit,
-): Promise<getTestResponse> => {
-  return customFetch<getTestResponse>(getGetTestUrl(), {
-    credentials: "include",
+
+  
+
+  return `/test`
+}
+
+export const getTest = async ( options?: RequestInit): Promise<getTestResponse> => {
+  
+  return customFetch<getTestResponse>(getGetTestUrl(),
+  {
+      credentials: 'include',
     ...options,
-    method: "GET",
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
 
 export const getGetTestQueryKey = () => {
-  return [`/test`] as const;
-};
+    return [
+    `/test`
+    ] as const;
+    }
 
-export const getGetTestQueryOptions = <
-  TData = Awaited<ReturnType<typeof getTest>>,
-  TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+    
+export const getGetTestQueryOptions = <TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
 
-  const queryKey = queryOptions?.queryKey ?? getGetTestQueryKey();
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTest>>> = ({
-    signal,
-  }) => getTest({ signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetTestQueryKey();
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getTest>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+  
 
-export type GetTestQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getTest>>
->;
-export type GetTestQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTest>>> = ({ signal }) => getTest({ signal, ...requestOptions });
 
-export function useGetTest<
-  TData = Awaited<ReturnType<typeof getTest>>,
-  TError = unknown,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetTestQueryResult = NonNullable<Awaited<ReturnType<typeof getTest>>>
+export type GetTestQueryError = unknown
+
+
+export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getTest>>,
           TError,
           Awaited<ReturnType<typeof getTest>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useGetTest<
-  TData = Awaited<ReturnType<typeof getTest>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getTest>>,
           TError,
           Awaited<ReturnType<typeof getTest>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetTest<
-  TData = Awaited<ReturnType<typeof getTest>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary Get test message
  */
 
-export function useGetTest<
-  TData = Awaited<ReturnType<typeof getTest>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetTestQueryOptions(options);
+export function useGetTest<TData = Awaited<ReturnType<typeof getTest>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getGetTestQueryOptions(options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * @summary Post test data
  */
 export type createTestResponse200 = {
-  data: TestResponseDto;
-  status: 200;
-};
-
-export type createTestResponseSuccess = createTestResponse200 & {
+  data: TestResponseDto
+  status: 200
+}
+    
+export type createTestResponseSuccess = (createTestResponse200) & {
   headers: Headers;
 };
-export type createTestResponse = createTestResponseSuccess;
+;
+
+export type createTestResponse = (createTestResponseSuccess)
 
 export const getCreateTestUrl = () => {
-  return `/test`;
-};
 
-export const createTest = async (
-  testRequestDto: TestRequestDto,
-  options?: RequestInit,
-): Promise<createTestResponse> => {
-  return customFetch<createTestResponse>(getCreateTestUrl(), {
-    credentials: "include",
+
+  
+
+  return `/test`
+}
+
+export const createTest = async (testRequestDto: TestRequestDto, options?: RequestInit): Promise<createTestResponse> => {
+  
+  return customFetch<createTestResponse>(getCreateTestUrl(),
+  {
+      credentials: 'include',
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(testRequestDto),
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      testRequestDto,)
+  }
+);}
 
-export const getCreateTestMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createTest>>,
-    TError,
-    { data: TestRequestDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createTest>>,
-  TError,
-  { data: TestRequestDto },
-  TContext
-> => {
-  const mutationKey = ["createTest"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createTest>>,
-    { data: TestRequestDto }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return createTest(data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getCreateTestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTest>>, TError,{data: TestRequestDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTest>>, TError,{data: TestRequestDto}, TContext> => {
 
-export type CreateTestMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createTest>>
->;
-export type CreateTestMutationBody = TestRequestDto;
-export type CreateTestMutationError = unknown;
+const mutationKey = ['createTest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTest>>, {data: TestRequestDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTest(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTestMutationResult = NonNullable<Awaited<ReturnType<typeof createTest>>>
+    export type CreateTestMutationBody = TestRequestDto
+    export type CreateTestMutationError = unknown
+
+    /**
  * @summary Post test data
  */
-export const useCreateTest = <TError = unknown, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createTest>>,
-      TError,
-      { data: TestRequestDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createTest>>,
-  TError,
-  { data: TestRequestDto },
-  TContext
-> => {
-  const mutationOptions = getCreateTestMutationOptions(options);
+export const useCreateTest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTest>>, TError,{data: TestRequestDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createTest>>,
+        TError,
+        {data: TestRequestDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getCreateTestMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * @summary Get user's workspaces
  */
 export type getWorkspacesResponse200 = {
-  data: WorkspaceDto[];
-  status: 200;
-};
-
-export type getWorkspacesResponseSuccess = getWorkspacesResponse200 & {
+  data: WorkspaceDto[]
+  status: 200
+}
+    
+export type getWorkspacesResponseSuccess = (getWorkspacesResponse200) & {
   headers: Headers;
 };
-export type getWorkspacesResponse = getWorkspacesResponseSuccess;
+;
+
+export type getWorkspacesResponse = (getWorkspacesResponseSuccess)
 
 export const getGetWorkspacesUrl = () => {
-  return `/workspaces`;
-};
 
-export const getWorkspaces = async (
-  options?: RequestInit,
-): Promise<getWorkspacesResponse> => {
-  return customFetch<getWorkspacesResponse>(getGetWorkspacesUrl(), {
-    credentials: "include",
+
+  
+
+  return `/workspaces`
+}
+
+export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspacesResponse> => {
+  
+  return customFetch<getWorkspacesResponse>(getGetWorkspacesUrl(),
+  {
+      credentials: 'include',
     ...options,
-    method: "GET",
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
 
 export const getGetWorkspacesQueryKey = () => {
-  return [`/workspaces`] as const;
-};
+    return [
+    `/workspaces`
+    ] as const;
+    }
 
-export const getGetWorkspacesQueryOptions = <
-  TData = Awaited<ReturnType<typeof getWorkspaces>>,
-  TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+    
+export const getGetWorkspacesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
 
-  const queryKey = queryOptions?.queryKey ?? getGetWorkspacesQueryKey();
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaces>>> = ({
-    signal,
-  }) => getWorkspaces({ signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesQueryKey();
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getWorkspaces>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+  
 
-export type GetWorkspacesQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getWorkspaces>>
->;
-export type GetWorkspacesQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaces>>> = ({ signal }) => getWorkspaces({ signal, ...requestOptions });
 
-export function useGetWorkspaces<
-  TData = Awaited<ReturnType<typeof getWorkspaces>>,
-  TError = unknown,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetWorkspacesQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspaces>>>
+export type GetWorkspacesQueryError = unknown
+
+
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspaces>>,
           TError,
           Awaited<ReturnType<typeof getWorkspaces>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useGetWorkspaces<
-  TData = Awaited<ReturnType<typeof getWorkspaces>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspaces>>,
           TError,
           Awaited<ReturnType<typeof getWorkspaces>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetWorkspaces<
-  TData = Awaited<ReturnType<typeof getWorkspaces>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary Get user's workspaces
  */
 
-export function useGetWorkspaces<
-  TData = Awaited<ReturnType<typeof getWorkspaces>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetWorkspacesQueryOptions(options);
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getGetWorkspacesQueryOptions(options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * @summary Create a new workspace
  */
 export type createWorkspaceResponse201 = {
-  data: CreateWorkspaceResponseDto;
-  status: 201;
-};
-
-export type createWorkspaceResponseSuccess = createWorkspaceResponse201 & {
+  data: CreateWorkspaceResponseDto
+  status: 201
+}
+    
+export type createWorkspaceResponseSuccess = (createWorkspaceResponse201) & {
   headers: Headers;
 };
-export type createWorkspaceResponse = createWorkspaceResponseSuccess;
+;
+
+export type createWorkspaceResponse = (createWorkspaceResponseSuccess)
 
 export const getCreateWorkspaceUrl = () => {
-  return `/workspaces`;
-};
 
-export const createWorkspace = async (
-  createWorkspaceDto: CreateWorkspaceDto,
-  options?: RequestInit,
-): Promise<createWorkspaceResponse> => {
-  return customFetch<createWorkspaceResponse>(getCreateWorkspaceUrl(), {
-    credentials: "include",
+
+  
+
+  return `/workspaces`
+}
+
+export const createWorkspace = async (createWorkspaceDto: CreateWorkspaceDto, options?: RequestInit): Promise<createWorkspaceResponse> => {
+  
+  return customFetch<createWorkspaceResponse>(getCreateWorkspaceUrl(),
+  {
+      credentials: 'include',
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createWorkspaceDto),
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createWorkspaceDto,)
+  }
+);}
 
-export const getCreateWorkspaceMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createWorkspace>>,
-    TError,
-    { data: CreateWorkspaceDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createWorkspace>>,
-  TError,
-  { data: CreateWorkspaceDto },
-  TContext
-> => {
-  const mutationKey = ["createWorkspace"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createWorkspace>>,
-    { data: CreateWorkspaceDto }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return createWorkspace(data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getCreateWorkspaceMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext> => {
 
-export type CreateWorkspaceMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createWorkspace>>
->;
-export type CreateWorkspaceMutationBody = CreateWorkspaceDto;
-export type CreateWorkspaceMutationError = unknown;
+const mutationKey = ['createWorkspace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkspace>>, {data: CreateWorkspaceDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createWorkspace(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateWorkspaceMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkspace>>>
+    export type CreateWorkspaceMutationBody = CreateWorkspaceDto
+    export type CreateWorkspaceMutationError = unknown
+
+    /**
  * @summary Create a new workspace
  */
-export const useCreateWorkspace = <TError = unknown, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createWorkspace>>,
-      TError,
-      { data: CreateWorkspaceDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createWorkspace>>,
-  TError,
-  { data: CreateWorkspaceDto },
-  TContext
-> => {
-  const mutationOptions = getCreateWorkspaceMutationOptions(options);
+export const useCreateWorkspace = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspace>>, TError,{data: CreateWorkspaceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createWorkspace>>,
+        TError,
+        {data: CreateWorkspaceDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getCreateWorkspaceMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * @summary List a workspace's environments
  */
 export type listEnvironmentsResponse200 = {
-  data: ListEnvironmentsResponseDto;
-  status: 200;
-};
+  data: ListEnvironmentsResponseDto
+  status: 200
+}
 
 export type listEnvironmentsResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type listEnvironmentsResponseSuccess = listEnvironmentsResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type listEnvironmentsResponseSuccess = (listEnvironmentsResponse200) & {
   headers: Headers;
 };
-export type listEnvironmentsResponseError = listEnvironmentsResponse404 & {
+export type listEnvironmentsResponseError = (listEnvironmentsResponse404) & {
   headers: Headers;
 };
 
-export type listEnvironmentsResponse =
-  | listEnvironmentsResponseSuccess
-  | listEnvironmentsResponseError;
+export type listEnvironmentsResponse = (listEnvironmentsResponseSuccess | listEnvironmentsResponseError)
 
-export const getListEnvironmentsUrl = (workspaceId: string) => {
-  return `/workspaces/${workspaceId}/environments`;
-};
+export const getListEnvironmentsUrl = (workspaceId: string,) => {
 
-export const listEnvironments = async (
-  workspaceId: string,
-  options?: RequestInit,
-): Promise<listEnvironmentsResponse> => {
-  return customFetch<listEnvironmentsResponse>(
-    getListEnvironmentsUrl(workspaceId),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
 
-export const getListEnvironmentsQueryKey = (workspaceId?: string) => {
-  return [`/workspaces/${workspaceId}/environments`] as const;
-};
+  
 
-export const getListEnvironmentsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listEnvironments>>,
-  TError = void,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironments>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
+  return `/workspaces/${workspaceId}/environments`
+}
+
+export const listEnvironments = async (workspaceId: string, options?: RequestInit): Promise<listEnvironmentsResponse> => {
+  
+  return customFetch<listEnvironmentsResponse>(getListEnvironmentsUrl(workspaceId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListEnvironmentsQueryKey = (workspaceId?: string,) => {
+    return [
+    `/workspaces/${workspaceId}/environments`
+    ] as const;
+    }
+
+    
+export const getListEnvironmentsQueryOptions = <TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getListEnvironmentsQueryKey(workspaceId);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listEnvironments>>
-  > = ({ signal }) =>
-    listEnvironments(workspaceId, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getListEnvironmentsQueryKey(workspaceId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!workspaceId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof listEnvironments>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+  
 
-export type ListEnvironmentsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listEnvironments>>
->;
-export type ListEnvironmentsQueryError = void;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listEnvironments>>> = ({ signal }) => listEnvironments(workspaceId, { signal, ...requestOptions });
 
-export function useListEnvironments<
-  TData = Awaited<ReturnType<typeof listEnvironments>>,
-  TError = void,
->(
-  workspaceId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironments>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListEnvironmentsQueryResult = NonNullable<Awaited<ReturnType<typeof listEnvironments>>>
+export type ListEnvironmentsQueryError = void
+
+
+export function useListEnvironments<TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listEnvironments>>,
           TError,
           Awaited<ReturnType<typeof listEnvironments>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useListEnvironments<
-  TData = Awaited<ReturnType<typeof listEnvironments>>,
-  TError = void,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironments>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListEnvironments<TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listEnvironments>>,
           TError,
           Awaited<ReturnType<typeof listEnvironments>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useListEnvironments<
-  TData = Awaited<ReturnType<typeof listEnvironments>>,
-  TError = void,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironments>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListEnvironments<TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary List a workspace's environments
  */
 
-export function useListEnvironments<
-  TData = Awaited<ReturnType<typeof listEnvironments>>,
-  TError = void,
->(
-  workspaceId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironments>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getListEnvironmentsQueryOptions(workspaceId, options);
+export function useListEnvironments<TData = Awaited<ReturnType<typeof listEnvironments>>, TError = void>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getListEnvironmentsQueryOptions(workspaceId,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * @summary Create a new environment in a workspace
  */
 export type createEnvironmentResponse201 = {
-  data: EnvironmentDto;
-  status: 201;
-};
+  data: EnvironmentDto
+  status: 201
+}
 
 export type createEnvironmentResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type createEnvironmentResponseSuccess = createEnvironmentResponse201 & {
+  data: void
+  status: 404
+}
+    
+export type createEnvironmentResponseSuccess = (createEnvironmentResponse201) & {
   headers: Headers;
 };
-export type createEnvironmentResponseError = createEnvironmentResponse404 & {
+export type createEnvironmentResponseError = (createEnvironmentResponse404) & {
   headers: Headers;
 };
 
-export type createEnvironmentResponse =
-  | createEnvironmentResponseSuccess
-  | createEnvironmentResponseError;
+export type createEnvironmentResponse = (createEnvironmentResponseSuccess | createEnvironmentResponseError)
 
-export const getCreateEnvironmentUrl = (workspaceId: string) => {
-  return `/workspaces/${workspaceId}/environments`;
-};
+export const getCreateEnvironmentUrl = (workspaceId: string,) => {
 
-export const createEnvironment = async (
-  workspaceId: string,
-  createEnvironmentDto: CreateEnvironmentDto,
-  options?: RequestInit,
-): Promise<createEnvironmentResponse> => {
-  return customFetch<createEnvironmentResponse>(
-    getCreateEnvironmentUrl(workspaceId),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createEnvironmentDto),
-    },
-  );
-};
 
-export const getCreateEnvironmentMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createEnvironment>>,
-    TError,
-    { workspaceId: string; data: CreateEnvironmentDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createEnvironment>>,
-  TError,
-  { workspaceId: string; data: CreateEnvironmentDto },
-  TContext
-> => {
-  const mutationKey = ["createEnvironment"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createEnvironment>>,
-    { workspaceId: string; data: CreateEnvironmentDto }
-  > = (props) => {
-    const { workspaceId, data } = props ?? {};
+  return `/workspaces/${workspaceId}/environments`
+}
 
-    return createEnvironment(workspaceId, data, requestOptions);
-  };
+export const createEnvironment = async (workspaceId: string,
+    createEnvironmentDto: CreateEnvironmentDto, options?: RequestInit): Promise<createEnvironmentResponse> => {
+  
+  return customFetch<createEnvironmentResponse>(getCreateEnvironmentUrl(workspaceId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createEnvironmentDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type CreateEnvironmentMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createEnvironment>>
->;
-export type CreateEnvironmentMutationBody = CreateEnvironmentDto;
-export type CreateEnvironmentMutationError = void;
 
-/**
+
+export const getCreateEnvironmentMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createEnvironment>>, TError,{workspaceId: string;data: CreateEnvironmentDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createEnvironment>>, TError,{workspaceId: string;data: CreateEnvironmentDto}, TContext> => {
+
+const mutationKey = ['createEnvironment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEnvironment>>, {workspaceId: string;data: CreateEnvironmentDto}> = (props) => {
+          const {workspaceId,data} = props ?? {};
+
+          return  createEnvironment(workspaceId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateEnvironmentMutationResult = NonNullable<Awaited<ReturnType<typeof createEnvironment>>>
+    export type CreateEnvironmentMutationBody = CreateEnvironmentDto
+    export type CreateEnvironmentMutationError = void
+
+    /**
  * @summary Create a new environment in a workspace
  */
-export const useCreateEnvironment = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createEnvironment>>,
-      TError,
-      { workspaceId: string; data: CreateEnvironmentDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createEnvironment>>,
-  TError,
-  { workspaceId: string; data: CreateEnvironmentDto },
-  TContext
-> => {
-  const mutationOptions = getCreateEnvironmentMutationOptions(options);
+export const useCreateEnvironment = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createEnvironment>>, TError,{workspaceId: string;data: CreateEnvironmentDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createEnvironment>>,
+        TError,
+        {workspaceId: string;data: CreateEnvironmentDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getCreateEnvironmentMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Returns a paginated list of active subscribers in the environment
  * @summary List subscribers
  */
 export type listSubscribersResponse200 = {
-  data: ListSubscribersResponseDto;
-  status: 200;
-};
+  data: ListSubscribersResponseDto
+  status: 200
+}
 
 export type listSubscribersResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type listSubscribersResponseSuccess = listSubscribersResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type listSubscribersResponseSuccess = (listSubscribersResponse200) & {
   headers: Headers;
 };
-export type listSubscribersResponseError = listSubscribersResponse404 & {
+export type listSubscribersResponseError = (listSubscribersResponse404) & {
   headers: Headers;
 };
 
-export type listSubscribersResponse =
-  | listSubscribersResponseSuccess
-  | listSubscribersResponseError;
+export type listSubscribersResponse = (listSubscribersResponseSuccess | listSubscribersResponseError)
 
-export const getListSubscribersUrl = (
-  environmentId: string,
-  params?: ListSubscribersParams,
-) => {
+export const getListSubscribersUrl = (environmentId: string,
+    params?: ListSubscribersParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/environments/${environmentId}/subscribers?${stringifiedParams}`
-    : `/environments/${environmentId}/subscribers`;
-};
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/subscribers?${stringifiedParams}` : `/environments/${environmentId}/subscribers`
+}
 
-export const listSubscribers = async (
-  environmentId: string,
-  params?: ListSubscribersParams,
-  options?: RequestInit,
-): Promise<listSubscribersResponse> => {
-  return customFetch<listSubscribersResponse>(
-    getListSubscribersUrl(environmentId, params),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export const listSubscribers = async (environmentId: string,
+    params?: ListSubscribersParams, options?: RequestInit): Promise<listSubscribersResponse> => {
+  
+  return customFetch<listSubscribersResponse>(getListSubscribersUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getListSubscribersQueryKey = (
-  environmentId?: string,
-  params?: ListSubscribersParams,
+
+
+
+
+export const getListSubscribersQueryKey = (environmentId?: string,
+    params?: ListSubscribersParams,) => {
+    return [
+    `/environments/${environmentId}/subscribers`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListSubscribersQueryOptions = <TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(environmentId: string,
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [
-    `/environments/${environmentId}/subscribers`,
-    ...(params ? [params] : []),
-  ] as const;
-};
 
-export const getListSubscribersQueryOptions = <
-  TData = Awaited<ReturnType<typeof listSubscribers>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListSubscribersParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSubscribers>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getListSubscribersQueryKey(environmentId, params);
+  const queryKey =  queryOptions?.queryKey ?? getListSubscribersQueryKey(environmentId,params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof listSubscribers>>> = ({
-    signal,
-  }) => listSubscribers(environmentId, params, { signal, ...requestOptions });
+  
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!environmentId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof listSubscribers>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSubscribers>>> = ({ signal }) => listSubscribers(environmentId,params, { signal, ...requestOptions });
 
-export type ListSubscribersQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listSubscribers>>
->;
-export type ListSubscribersQueryError = void;
+      
 
-export function useListSubscribers<
-  TData = Awaited<ReturnType<typeof listSubscribers>>,
-  TError = void,
->(
-  environmentId: string,
-  params: undefined | ListSubscribersParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSubscribers>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListSubscribersQueryResult = NonNullable<Awaited<ReturnType<typeof listSubscribers>>>
+export type ListSubscribersQueryError = void
+
+
+export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
+ environmentId: string,
+    params: undefined |  ListSubscribersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listSubscribers>>,
           TError,
           Awaited<ReturnType<typeof listSubscribers>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useListSubscribers<
-  TData = Awaited<ReturnType<typeof listSubscribers>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListSubscribersParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSubscribers>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
+ environmentId: string,
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listSubscribers>>,
           TError,
           Awaited<ReturnType<typeof listSubscribers>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useListSubscribers<
-  TData = Awaited<ReturnType<typeof listSubscribers>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListSubscribersParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSubscribers>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
+ environmentId: string,
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary List subscribers
  */
 
-export function useListSubscribers<
-  TData = Awaited<ReturnType<typeof listSubscribers>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListSubscribersParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listSubscribers>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getListSubscribersQueryOptions(
-    environmentId,
-    params,
-    options,
-  );
+export function useListSubscribers<TData = Awaited<ReturnType<typeof listSubscribers>>, TError = void>(
+ environmentId: string,
+    params?: ListSubscribersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSubscribers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getListSubscribersQueryOptions(environmentId,params,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Creates a new subscriber in the specified environment and initialises their preferences
  * @summary Create a new subscriber
  */
 export type createSubscriberResponse201 = {
-  data: CreateSubscriberResponseDto;
-  status: 201;
-};
+  data: CreateSubscriberResponseDto
+  status: 201
+}
 
 export type createSubscriberResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type createSubscriberResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type createSubscriberResponseSuccess = createSubscriberResponse201 & {
+  data: void
+  status: 404
+}
+    
+export type createSubscriberResponseSuccess = (createSubscriberResponse201) & {
   headers: Headers;
 };
-export type createSubscriberResponseError = (
-  | createSubscriberResponse400
-  | createSubscriberResponse404
-) & {
+export type createSubscriberResponseError = (createSubscriberResponse400 | createSubscriberResponse404) & {
   headers: Headers;
 };
 
-export type createSubscriberResponse =
-  | createSubscriberResponseSuccess
-  | createSubscriberResponseError;
+export type createSubscriberResponse = (createSubscriberResponseSuccess | createSubscriberResponseError)
 
-export const getCreateSubscriberUrl = (environmentId: string) => {
-  return `/environments/${environmentId}/subscribers`;
-};
+export const getCreateSubscriberUrl = (environmentId: string,) => {
 
-export const createSubscriber = async (
-  environmentId: string,
-  createSubscriberDto: CreateSubscriberDto,
-  options?: RequestInit,
-): Promise<createSubscriberResponse> => {
-  return customFetch<createSubscriberResponse>(
-    getCreateSubscriberUrl(environmentId),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createSubscriberDto),
-    },
-  );
-};
 
-export const getCreateSubscriberMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createSubscriber>>,
-    TError,
-    { environmentId: string; data: CreateSubscriberDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createSubscriber>>,
-  TError,
-  { environmentId: string; data: CreateSubscriberDto },
-  TContext
-> => {
-  const mutationKey = ["createSubscriber"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createSubscriber>>,
-    { environmentId: string; data: CreateSubscriberDto }
-  > = (props) => {
-    const { environmentId, data } = props ?? {};
+  return `/environments/${environmentId}/subscribers`
+}
 
-    return createSubscriber(environmentId, data, requestOptions);
-  };
+export const createSubscriber = async (environmentId: string,
+    createSubscriberDto: CreateSubscriberDto, options?: RequestInit): Promise<createSubscriberResponse> => {
+  
+  return customFetch<createSubscriberResponse>(getCreateSubscriberUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createSubscriberDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type CreateSubscriberMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createSubscriber>>
->;
-export type CreateSubscriberMutationBody = CreateSubscriberDto;
-export type CreateSubscriberMutationError = void;
 
-/**
+
+export const getCreateSubscriberMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext> => {
+
+const mutationKey = ['createSubscriber'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSubscriber>>, {environmentId: string;data: CreateSubscriberDto}> = (props) => {
+          const {environmentId,data} = props ?? {};
+
+          return  createSubscriber(environmentId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSubscriberMutationResult = NonNullable<Awaited<ReturnType<typeof createSubscriber>>>
+    export type CreateSubscriberMutationBody = CreateSubscriberDto
+    export type CreateSubscriberMutationError = void
+
+    /**
  * @summary Create a new subscriber
  */
-export const useCreateSubscriber = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createSubscriber>>,
-      TError,
-      { environmentId: string; data: CreateSubscriberDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createSubscriber>>,
-  TError,
-  { environmentId: string; data: CreateSubscriberDto },
-  TContext
-> => {
-  const mutationOptions = getCreateSubscriberMutationOptions(options);
+export const useCreateSubscriber = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriber>>, TError,{environmentId: string;data: CreateSubscriberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createSubscriber>>,
+        TError,
+        {environmentId: string;data: CreateSubscriberDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getCreateSubscriberMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Returns every distinct tag currently in use across subscribers in the environment
  * @summary List distinct tags
  */
 export type listTagsResponse200 = {
-  data: ListTagsResponseDto;
-  status: 200;
-};
+  data: ListTagsResponseDto
+  status: 200
+}
 
 export type listTagsResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type listTagsResponseSuccess = listTagsResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type listTagsResponseSuccess = (listTagsResponse200) & {
   headers: Headers;
 };
-export type listTagsResponseError = listTagsResponse404 & {
+export type listTagsResponseError = (listTagsResponse404) & {
   headers: Headers;
 };
 
-export type listTagsResponse = listTagsResponseSuccess | listTagsResponseError;
+export type listTagsResponse = (listTagsResponseSuccess | listTagsResponseError)
 
-export const getListTagsUrl = (environmentId: string) => {
-  return `/environments/${environmentId}/subscribers/tags`;
-};
+export const getListTagsUrl = (environmentId: string,) => {
 
-export const listTags = async (
-  environmentId: string,
-  options?: RequestInit,
-): Promise<listTagsResponse> => {
-  return customFetch<listTagsResponse>(getListTagsUrl(environmentId), {
-    credentials: "include",
+
+  
+
+  return `/environments/${environmentId}/subscribers/tags`
+}
+
+export const listTags = async (environmentId: string, options?: RequestInit): Promise<listTagsResponse> => {
+  
+  return customFetch<listTagsResponse>(getListTagsUrl(environmentId),
+  {
+      credentials: 'include',
     ...options,
-    method: "GET",
-  });
-};
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getListTagsQueryKey = (environmentId?: string) => {
-  return [`/environments/${environmentId}/subscribers/tags`] as const;
-};
 
-export const getListTagsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listTags>>,
-  TError = void,
->(
-  environmentId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
+
+
+
+export const getListTagsQueryKey = (environmentId?: string,) => {
+    return [
+    `/environments/${environmentId}/subscribers/tags`
+    ] as const;
+    }
+
+    
+export const getListTagsQueryOptions = <TData = Awaited<ReturnType<typeof listTags>>, TError = void>(environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getListTagsQueryKey(environmentId);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof listTags>>> = ({
-    signal,
-  }) => listTags(environmentId, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getListTagsQueryKey(environmentId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!environmentId,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData> & {
-    queryKey: DataTag<QueryKey, TData>;
-  };
-};
+  
 
-export type ListTagsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listTags>>
->;
-export type ListTagsQueryError = void;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTags>>> = ({ signal }) => listTags(environmentId, { signal, ...requestOptions });
 
-export function useListTags<
-  TData = Awaited<ReturnType<typeof listTags>>,
-  TError = void,
->(
-  environmentId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListTagsQueryResult = NonNullable<Awaited<ReturnType<typeof listTags>>>
+export type ListTagsQueryError = void
+
+
+export function useListTags<TData = Awaited<ReturnType<typeof listTags>>, TError = void>(
+ environmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listTags>>,
           TError,
           Awaited<ReturnType<typeof listTags>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useListTags<
-  TData = Awaited<ReturnType<typeof listTags>>,
-  TError = void,
->(
-  environmentId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListTags<TData = Awaited<ReturnType<typeof listTags>>, TError = void>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listTags>>,
           TError,
           Awaited<ReturnType<typeof listTags>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useListTags<
-  TData = Awaited<ReturnType<typeof listTags>>,
-  TError = void,
->(
-  environmentId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListTags<TData = Awaited<ReturnType<typeof listTags>>, TError = void>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary List distinct tags
  */
 
-export function useListTags<
-  TData = Awaited<ReturnType<typeof listTags>>,
-  TError = void,
->(
-  environmentId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getListTagsQueryOptions(environmentId, options);
+export function useListTags<TData = Awaited<ReturnType<typeof listTags>>, TError = void>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTags>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getListTagsQueryOptions(environmentId,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Returns a single subscriber with their latest preferences
  * @summary Get a subscriber
  */
 export type getSubscriberResponse200 = {
-  data: GetSubscriberResponseDto;
-  status: 200;
-};
+  data: GetSubscriberResponseDto
+  status: 200
+}
 
 export type getSubscriberResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type getSubscriberResponseSuccess = getSubscriberResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type getSubscriberResponseSuccess = (getSubscriberResponse200) & {
   headers: Headers;
 };
-export type getSubscriberResponseError = getSubscriberResponse404 & {
+export type getSubscriberResponseError = (getSubscriberResponse404) & {
   headers: Headers;
 };
 
-export type getSubscriberResponse =
-  | getSubscriberResponseSuccess
-  | getSubscriberResponseError;
+export type getSubscriberResponse = (getSubscriberResponseSuccess | getSubscriberResponseError)
 
-export const getGetSubscriberUrl = (
-  environmentId: string,
-  subscriberId: string,
+export const getGetSubscriberUrl = (environmentId: string,
+    subscriberId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/subscribers/${subscriberId}`
+}
+
+export const getSubscriber = async (environmentId: string,
+    subscriberId: string, options?: RequestInit): Promise<getSubscriberResponse> => {
+  
+  return customFetch<getSubscriberResponse>(getGetSubscriberUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetSubscriberQueryKey = (environmentId?: string,
+    subscriberId?: string,) => {
+    return [
+    `/environments/${environmentId}/subscribers/${subscriberId}`
+    ] as const;
+    }
+
+    
+export const getGetSubscriberQueryOptions = <TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(environmentId: string,
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return `/environments/${environmentId}/subscribers/${subscriberId}`;
-};
 
-export const getSubscriber = async (
-  environmentId: string,
-  subscriberId: string,
-  options?: RequestInit,
-): Promise<getSubscriberResponse> => {
-  return customFetch<getSubscriberResponse>(
-    getGetSubscriberUrl(environmentId, subscriberId),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getGetSubscriberQueryKey = (
-  environmentId?: string,
-  subscriberId?: string,
-) => {
-  return [
-    `/environments/${environmentId}/subscribers/${subscriberId}`,
-  ] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getGetSubscriberQueryKey(environmentId,subscriberId);
 
-export const getGetSubscriberQueryOptions = <
-  TData = Awaited<ReturnType<typeof getSubscriber>>,
-  TError = void,
->(
-  environmentId: string,
-  subscriberId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getGetSubscriberQueryKey(environmentId, subscriberId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubscriber>>> = ({ signal }) => getSubscriber(environmentId,subscriberId, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubscriber>>> = ({
-    signal,
-  }) =>
-    getSubscriber(environmentId, subscriberId, { signal, ...requestOptions });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(environmentId && subscriberId),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getSubscriber>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+      
 
-export type GetSubscriberQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getSubscriber>>
->;
-export type GetSubscriberQueryError = void;
+   return  { queryKey, queryFn, enabled: !!(environmentId && subscriberId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
 
-export function useGetSubscriber<
-  TData = Awaited<ReturnType<typeof getSubscriber>>,
-  TError = void,
->(
-  environmentId: string,
-  subscriberId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>
-    > &
-      Pick<
+export type GetSubscriberQueryResult = NonNullable<Awaited<ReturnType<typeof getSubscriber>>>
+export type GetSubscriberQueryError = void
+
+
+export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
+ environmentId: string,
+    subscriberId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSubscriber>>,
           TError,
           Awaited<ReturnType<typeof getSubscriber>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useGetSubscriber<
-  TData = Awaited<ReturnType<typeof getSubscriber>>,
-  TError = void,
->(
-  environmentId: string,
-  subscriberId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
+ environmentId: string,
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSubscriber>>,
           TError,
           Awaited<ReturnType<typeof getSubscriber>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetSubscriber<
-  TData = Awaited<ReturnType<typeof getSubscriber>>,
-  TError = void,
->(
-  environmentId: string,
-  subscriberId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
+ environmentId: string,
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary Get a subscriber
  */
 
-export function useGetSubscriber<
-  TData = Awaited<ReturnType<typeof getSubscriber>>,
-  TError = void,
->(
-  environmentId: string,
-  subscriberId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetSubscriberQueryOptions(
-    environmentId,
-    subscriberId,
-    options,
-  );
+export function useGetSubscriber<TData = Awaited<ReturnType<typeof getSubscriber>>, TError = void>(
+ environmentId: string,
+    subscriberId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubscriber>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getGetSubscriberQueryOptions(environmentId,subscriberId,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Updates subscriber fields. All fields are optional.
  * @summary Update a subscriber
  */
 export type updateSubscriberResponse200 = {
-  data: UpdateSubscriberResponseDto;
-  status: 200;
-};
+  data: UpdateSubscriberResponseDto
+  status: 200
+}
 
 export type updateSubscriberResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type updateSubscriberResponseSuccess = updateSubscriberResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type updateSubscriberResponseSuccess = (updateSubscriberResponse200) & {
   headers: Headers;
 };
-export type updateSubscriberResponseError = updateSubscriberResponse404 & {
+export type updateSubscriberResponseError = (updateSubscriberResponse404) & {
   headers: Headers;
 };
 
-export type updateSubscriberResponse =
-  | updateSubscriberResponseSuccess
-  | updateSubscriberResponseError;
+export type updateSubscriberResponse = (updateSubscriberResponseSuccess | updateSubscriberResponseError)
 
-export const getUpdateSubscriberUrl = (
-  environmentId: string,
-  subscriberId: string,
-) => {
-  return `/environments/${environmentId}/subscribers/${subscriberId}`;
-};
+export const getUpdateSubscriberUrl = (environmentId: string,
+    subscriberId: string,) => {
 
-export const updateSubscriber = async (
-  environmentId: string,
-  subscriberId: string,
-  updateSubscriberDto: UpdateSubscriberDto,
-  options?: RequestInit,
-): Promise<updateSubscriberResponse> => {
-  return customFetch<updateSubscriberResponse>(
-    getUpdateSubscriberUrl(environmentId, subscriberId),
-    {
-      credentials: "include",
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateSubscriberDto),
-    },
-  );
-};
 
-export const getUpdateSubscriberMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateSubscriber>>,
-    TError,
-    { environmentId: string; subscriberId: string; data: UpdateSubscriberDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateSubscriber>>,
-  TError,
-  { environmentId: string; subscriberId: string; data: UpdateSubscriberDto },
-  TContext
-> => {
-  const mutationKey = ["updateSubscriber"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateSubscriber>>,
-    { environmentId: string; subscriberId: string; data: UpdateSubscriberDto }
-  > = (props) => {
-    const { environmentId, subscriberId, data } = props ?? {};
+  return `/environments/${environmentId}/subscribers/${subscriberId}`
+}
 
-    return updateSubscriber(environmentId, subscriberId, data, requestOptions);
-  };
+export const updateSubscriber = async (environmentId: string,
+    subscriberId: string,
+    updateSubscriberDto: UpdateSubscriberDto, options?: RequestInit): Promise<updateSubscriberResponse> => {
+  
+  return customFetch<updateSubscriberResponse>(getUpdateSubscriberUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateSubscriberDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type UpdateSubscriberMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateSubscriber>>
->;
-export type UpdateSubscriberMutationBody = UpdateSubscriberDto;
-export type UpdateSubscriberMutationError = void;
 
-/**
+
+export const getUpdateSubscriberMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext> => {
+
+const mutationKey = ['updateSubscriber'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubscriber>>, {environmentId: string;subscriberId: string;data: UpdateSubscriberDto}> = (props) => {
+          const {environmentId,subscriberId,data} = props ?? {};
+
+          return  updateSubscriber(environmentId,subscriberId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSubscriberMutationResult = NonNullable<Awaited<ReturnType<typeof updateSubscriber>>>
+    export type UpdateSubscriberMutationBody = UpdateSubscriberDto
+    export type UpdateSubscriberMutationError = void
+
+    /**
  * @summary Update a subscriber
  */
-export const useUpdateSubscriber = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateSubscriber>>,
-      TError,
-      {
-        environmentId: string;
-        subscriberId: string;
-        data: UpdateSubscriberDto;
-      },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateSubscriber>>,
-  TError,
-  { environmentId: string; subscriberId: string; data: UpdateSubscriberDto },
-  TContext
-> => {
-  const mutationOptions = getUpdateSubscriberMutationOptions(options);
+export const useUpdateSubscriber = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriber>>, TError,{environmentId: string;subscriberId: string;data: UpdateSubscriberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSubscriber>>,
+        TError,
+        {environmentId: string;subscriberId: string;data: UpdateSubscriberDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getUpdateSubscriberMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Soft-deletes a subscriber. The record is retained but excluded from all queries.
  * @summary Delete a subscriber
  */
 export type deleteSubscriberResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type deleteSubscriberResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type deleteSubscriberResponseSuccess = deleteSubscriberResponse204 & {
+  data: void
+  status: 404
+}
+    
+export type deleteSubscriberResponseSuccess = (deleteSubscriberResponse204) & {
   headers: Headers;
 };
-export type deleteSubscriberResponseError = deleteSubscriberResponse404 & {
+export type deleteSubscriberResponseError = (deleteSubscriberResponse404) & {
   headers: Headers;
 };
 
-export type deleteSubscriberResponse =
-  | deleteSubscriberResponseSuccess
-  | deleteSubscriberResponseError;
+export type deleteSubscriberResponse = (deleteSubscriberResponseSuccess | deleteSubscriberResponseError)
 
-export const getDeleteSubscriberUrl = (
-  environmentId: string,
-  subscriberId: string,
-) => {
-  return `/environments/${environmentId}/subscribers/${subscriberId}`;
-};
+export const getDeleteSubscriberUrl = (environmentId: string,
+    subscriberId: string,) => {
 
-export const deleteSubscriber = async (
-  environmentId: string,
-  subscriberId: string,
-  options?: RequestInit,
-): Promise<deleteSubscriberResponse> => {
-  return customFetch<deleteSubscriberResponse>(
-    getDeleteSubscriberUrl(environmentId, subscriberId),
-    {
-      credentials: "include",
-      ...options,
-      method: "DELETE",
-    },
-  );
-};
 
-export const getDeleteSubscriberMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteSubscriber>>,
-    TError,
-    { environmentId: string; subscriberId: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteSubscriber>>,
-  TError,
-  { environmentId: string; subscriberId: string },
-  TContext
-> => {
-  const mutationKey = ["deleteSubscriber"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteSubscriber>>,
-    { environmentId: string; subscriberId: string }
-  > = (props) => {
-    const { environmentId, subscriberId } = props ?? {};
+  return `/environments/${environmentId}/subscribers/${subscriberId}`
+}
 
-    return deleteSubscriber(environmentId, subscriberId, requestOptions);
-  };
+export const deleteSubscriber = async (environmentId: string,
+    subscriberId: string, options?: RequestInit): Promise<deleteSubscriberResponse> => {
+  
+  return customFetch<deleteSubscriberResponse>(getDeleteSubscriberUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type DeleteSubscriberMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteSubscriber>>
->;
 
-export type DeleteSubscriberMutationError = void;
 
-/**
+export const getDeleteSubscriberMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext> => {
+
+const mutationKey = ['deleteSubscriber'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSubscriber>>, {environmentId: string;subscriberId: string}> = (props) => {
+          const {environmentId,subscriberId} = props ?? {};
+
+          return  deleteSubscriber(environmentId,subscriberId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteSubscriberMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSubscriber>>>
+    
+    export type DeleteSubscriberMutationError = void
+
+    /**
  * @summary Delete a subscriber
  */
-export const useDeleteSubscriber = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteSubscriber>>,
-      TError,
-      { environmentId: string; subscriberId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteSubscriber>>,
-  TError,
-  { environmentId: string; subscriberId: string },
-  TContext
-> => {
-  const mutationOptions = getDeleteSubscriberMutationOptions(options);
+export const useDeleteSubscriber = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubscriber>>, TError,{environmentId: string;subscriberId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteSubscriber>>,
+        TError,
+        {environmentId: string;subscriberId: string},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getDeleteSubscriberMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Upserts up to 500 subscribers per request. Each row is matched to an existing subscriber by publicId, then externalId, then email (in that order); if none match, a new subscriber is created. Rows are processed independently, so one failing row does not fail the batch.
  * @summary Bulk create or update subscribers
  */
 export type bulkUpsertSubscribersResponse200 = {
-  data: BulkUpsertSubscribersResponseDto;
-  status: 200;
-};
+  data: BulkUpsertSubscribersResponseDto
+  status: 200
+}
 
 export type bulkUpsertSubscribersResponse404 = {
-  data: void;
-  status: 404;
+  data: void
+  status: 404
+}
+    
+export type bulkUpsertSubscribersResponseSuccess = (bulkUpsertSubscribersResponse200) & {
+  headers: Headers;
+};
+export type bulkUpsertSubscribersResponseError = (bulkUpsertSubscribersResponse404) & {
+  headers: Headers;
 };
 
-export type bulkUpsertSubscribersResponseSuccess =
-  bulkUpsertSubscribersResponse200 & {
-    headers: Headers;
-  };
-export type bulkUpsertSubscribersResponseError =
-  bulkUpsertSubscribersResponse404 & {
-    headers: Headers;
-  };
+export type bulkUpsertSubscribersResponse = (bulkUpsertSubscribersResponseSuccess | bulkUpsertSubscribersResponseError)
 
-export type bulkUpsertSubscribersResponse =
-  | bulkUpsertSubscribersResponseSuccess
-  | bulkUpsertSubscribersResponseError;
+export const getBulkUpsertSubscribersUrl = (environmentId: string,) => {
 
-export const getBulkUpsertSubscribersUrl = (environmentId: string) => {
-  return `/environments/${environmentId}/subscribers/bulk`;
-};
 
-export const bulkUpsertSubscribers = async (
-  environmentId: string,
-  bulkUpsertSubscribersDto: BulkUpsertSubscribersDto,
-  options?: RequestInit,
-): Promise<bulkUpsertSubscribersResponse> => {
-  return customFetch<bulkUpsertSubscribersResponse>(
-    getBulkUpsertSubscribersUrl(environmentId),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(bulkUpsertSubscribersDto),
-    },
-  );
-};
+  
 
-export const getBulkUpsertSubscribersMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof bulkUpsertSubscribers>>,
-    TError,
-    { environmentId: string; data: BulkUpsertSubscribersDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof bulkUpsertSubscribers>>,
-  TError,
-  { environmentId: string; data: BulkUpsertSubscribersDto },
-  TContext
-> => {
-  const mutationKey = ["bulkUpsertSubscribers"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/environments/${environmentId}/subscribers/bulk`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof bulkUpsertSubscribers>>,
-    { environmentId: string; data: BulkUpsertSubscribersDto }
-  > = (props) => {
-    const { environmentId, data } = props ?? {};
+export const bulkUpsertSubscribers = async (environmentId: string,
+    bulkUpsertSubscribersDto: BulkUpsertSubscribersDto, options?: RequestInit): Promise<bulkUpsertSubscribersResponse> => {
+  
+  return customFetch<bulkUpsertSubscribersResponse>(getBulkUpsertSubscribersUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bulkUpsertSubscribersDto,)
+  }
+);}
 
-    return bulkUpsertSubscribers(environmentId, data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type BulkUpsertSubscribersMutationResult = NonNullable<
-  Awaited<ReturnType<typeof bulkUpsertSubscribers>>
->;
-export type BulkUpsertSubscribersMutationBody = BulkUpsertSubscribersDto;
-export type BulkUpsertSubscribersMutationError = void;
 
-/**
+export const getBulkUpsertSubscribersMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, TError,{environmentId: string;data: BulkUpsertSubscribersDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, TError,{environmentId: string;data: BulkUpsertSubscribersDto}, TContext> => {
+
+const mutationKey = ['bulkUpsertSubscribers'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, {environmentId: string;data: BulkUpsertSubscribersDto}> = (props) => {
+          const {environmentId,data} = props ?? {};
+
+          return  bulkUpsertSubscribers(environmentId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BulkUpsertSubscribersMutationResult = NonNullable<Awaited<ReturnType<typeof bulkUpsertSubscribers>>>
+    export type BulkUpsertSubscribersMutationBody = BulkUpsertSubscribersDto
+    export type BulkUpsertSubscribersMutationError = void
+
+    /**
  * @summary Bulk create or update subscribers
  */
-export const useBulkUpsertSubscribers = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof bulkUpsertSubscribers>>,
-      TError,
-      { environmentId: string; data: BulkUpsertSubscribersDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof bulkUpsertSubscribers>>,
-  TError,
-  { environmentId: string; data: BulkUpsertSubscribersDto },
-  TContext
-> => {
-  const mutationOptions = getBulkUpsertSubscribersMutationOptions(options);
+export const useBulkUpsertSubscribers = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bulkUpsertSubscribers>>, TError,{environmentId: string;data: BulkUpsertSubscribersDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof bulkUpsertSubscribers>>,
+        TError,
+        {environmentId: string;data: BulkUpsertSubscribersDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getBulkUpsertSubscribersMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Creates a new preference record with updated values (immutable pattern)
  * @summary Update subscriber preferences
  */
 export type updateSubscriberPreferencesResponse200 = {
-  data: UpdatePreferencesResponseDto;
-  status: 200;
-};
+  data: UpdatePreferencesResponseDto
+  status: 200
+}
 
 export type updateSubscriberPreferencesResponse404 = {
-  data: void;
-  status: 404;
+  data: void
+  status: 404
+}
+    
+export type updateSubscriberPreferencesResponseSuccess = (updateSubscriberPreferencesResponse200) & {
+  headers: Headers;
+};
+export type updateSubscriberPreferencesResponseError = (updateSubscriberPreferencesResponse404) & {
+  headers: Headers;
 };
 
-export type updateSubscriberPreferencesResponseSuccess =
-  updateSubscriberPreferencesResponse200 & {
-    headers: Headers;
-  };
-export type updateSubscriberPreferencesResponseError =
-  updateSubscriberPreferencesResponse404 & {
-    headers: Headers;
-  };
+export type updateSubscriberPreferencesResponse = (updateSubscriberPreferencesResponseSuccess | updateSubscriberPreferencesResponseError)
 
-export type updateSubscriberPreferencesResponse =
-  | updateSubscriberPreferencesResponseSuccess
-  | updateSubscriberPreferencesResponseError;
+export const getUpdateSubscriberPreferencesUrl = (environmentId: string,
+    subscriberId: string,) => {
 
-export const getUpdateSubscriberPreferencesUrl = (
-  environmentId: string,
-  subscriberId: string,
-) => {
-  return `/environments/${environmentId}/subscribers/${subscriberId}/preferences`;
-};
 
-export const updateSubscriberPreferences = async (
-  environmentId: string,
-  subscriberId: string,
-  updatePreferencesDto: UpdatePreferencesDto,
-  options?: RequestInit,
-): Promise<updateSubscriberPreferencesResponse> => {
-  return customFetch<updateSubscriberPreferencesResponse>(
-    getUpdateSubscriberPreferencesUrl(environmentId, subscriberId),
-    {
-      credentials: "include",
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updatePreferencesDto),
-    },
-  );
-};
+  
 
-export const getUpdateSubscriberPreferencesMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateSubscriberPreferences>>,
-    TError,
-    { environmentId: string; subscriberId: string; data: UpdatePreferencesDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateSubscriberPreferences>>,
-  TError,
-  { environmentId: string; subscriberId: string; data: UpdatePreferencesDto },
-  TContext
-> => {
-  const mutationKey = ["updateSubscriberPreferences"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/environments/${environmentId}/subscribers/${subscriberId}/preferences`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateSubscriberPreferences>>,
-    { environmentId: string; subscriberId: string; data: UpdatePreferencesDto }
-  > = (props) => {
-    const { environmentId, subscriberId, data } = props ?? {};
+export const updateSubscriberPreferences = async (environmentId: string,
+    subscriberId: string,
+    updatePreferencesDto: UpdatePreferencesDto, options?: RequestInit): Promise<updateSubscriberPreferencesResponse> => {
+  
+  return customFetch<updateSubscriberPreferencesResponse>(getUpdateSubscriberPreferencesUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updatePreferencesDto,)
+  }
+);}
 
-    return updateSubscriberPreferences(
-      environmentId,
-      subscriberId,
-      data,
-      requestOptions,
-    );
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type UpdateSubscriberPreferencesMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateSubscriberPreferences>>
->;
-export type UpdateSubscriberPreferencesMutationBody = UpdatePreferencesDto;
-export type UpdateSubscriberPreferencesMutationError = void;
 
-/**
+export const getUpdateSubscriberPreferencesMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext> => {
+
+const mutationKey = ['updateSubscriberPreferences'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubscriberPreferences>>, {environmentId: string;subscriberId: string;data: UpdatePreferencesDto}> = (props) => {
+          const {environmentId,subscriberId,data} = props ?? {};
+
+          return  updateSubscriberPreferences(environmentId,subscriberId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSubscriberPreferencesMutationResult = NonNullable<Awaited<ReturnType<typeof updateSubscriberPreferences>>>
+    export type UpdateSubscriberPreferencesMutationBody = UpdatePreferencesDto
+    export type UpdateSubscriberPreferencesMutationError = void
+
+    /**
  * @summary Update subscriber preferences
  */
-export const useUpdateSubscriberPreferences = <
-  TError = void,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateSubscriberPreferences>>,
-      TError,
-      {
-        environmentId: string;
-        subscriberId: string;
-        data: UpdatePreferencesDto;
-      },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateSubscriberPreferences>>,
-  TError,
-  { environmentId: string; subscriberId: string; data: UpdatePreferencesDto },
-  TContext
-> => {
-  const mutationOptions =
-    getUpdateSubscriberPreferencesMutationOptions(options);
+export const useUpdateSubscriberPreferences = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriberPreferences>>, TError,{environmentId: string;subscriberId: string;data: UpdatePreferencesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSubscriberPreferences>>,
+        TError,
+        {environmentId: string;subscriberId: string;data: UpdatePreferencesDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getUpdateSubscriberPreferencesMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Adds a tag to the subscriber. Adding a tag that's already present is a no-op.
  * @summary Add a tag to a subscriber
  */
 export type addSubscriberTagResponse200 = {
-  data: TagResponseDto;
-  status: 200;
-};
+  data: TagResponseDto
+  status: 200
+}
 
 export type addSubscriberTagResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type addSubscriberTagResponseSuccess = addSubscriberTagResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type addSubscriberTagResponseSuccess = (addSubscriberTagResponse200) & {
   headers: Headers;
 };
-export type addSubscriberTagResponseError = addSubscriberTagResponse404 & {
+export type addSubscriberTagResponseError = (addSubscriberTagResponse404) & {
   headers: Headers;
 };
 
-export type addSubscriberTagResponse =
-  | addSubscriberTagResponseSuccess
-  | addSubscriberTagResponseError;
+export type addSubscriberTagResponse = (addSubscriberTagResponseSuccess | addSubscriberTagResponseError)
 
-export const getAddSubscriberTagUrl = (
-  environmentId: string,
-  subscriberId: string,
-) => {
-  return `/environments/${environmentId}/subscribers/${subscriberId}/tags`;
-};
+export const getAddSubscriberTagUrl = (environmentId: string,
+    subscriberId: string,) => {
 
-export const addSubscriberTag = async (
-  environmentId: string,
-  subscriberId: string,
-  addTagDto: AddTagDto,
-  options?: RequestInit,
-): Promise<addSubscriberTagResponse> => {
-  return customFetch<addSubscriberTagResponse>(
-    getAddSubscriberTagUrl(environmentId, subscriberId),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(addTagDto),
-    },
-  );
-};
 
-export const getAddSubscriberTagMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof addSubscriberTag>>,
-    TError,
-    { environmentId: string; subscriberId: string; data: AddTagDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof addSubscriberTag>>,
-  TError,
-  { environmentId: string; subscriberId: string; data: AddTagDto },
-  TContext
-> => {
-  const mutationKey = ["addSubscriberTag"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof addSubscriberTag>>,
-    { environmentId: string; subscriberId: string; data: AddTagDto }
-  > = (props) => {
-    const { environmentId, subscriberId, data } = props ?? {};
+  return `/environments/${environmentId}/subscribers/${subscriberId}/tags`
+}
 
-    return addSubscriberTag(environmentId, subscriberId, data, requestOptions);
-  };
+export const addSubscriberTag = async (environmentId: string,
+    subscriberId: string,
+    addTagDto: AddTagDto, options?: RequestInit): Promise<addSubscriberTagResponse> => {
+  
+  return customFetch<addSubscriberTagResponse>(getAddSubscriberTagUrl(environmentId,subscriberId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      addTagDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type AddSubscriberTagMutationResult = NonNullable<
-  Awaited<ReturnType<typeof addSubscriberTag>>
->;
-export type AddSubscriberTagMutationBody = AddTagDto;
-export type AddSubscriberTagMutationError = void;
 
-/**
+
+export const getAddSubscriberTagMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addSubscriberTag>>, TError,{environmentId: string;subscriberId: string;data: AddTagDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addSubscriberTag>>, TError,{environmentId: string;subscriberId: string;data: AddTagDto}, TContext> => {
+
+const mutationKey = ['addSubscriberTag'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addSubscriberTag>>, {environmentId: string;subscriberId: string;data: AddTagDto}> = (props) => {
+          const {environmentId,subscriberId,data} = props ?? {};
+
+          return  addSubscriberTag(environmentId,subscriberId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddSubscriberTagMutationResult = NonNullable<Awaited<ReturnType<typeof addSubscriberTag>>>
+    export type AddSubscriberTagMutationBody = AddTagDto
+    export type AddSubscriberTagMutationError = void
+
+    /**
  * @summary Add a tag to a subscriber
  */
-export const useAddSubscriberTag = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof addSubscriberTag>>,
-      TError,
-      { environmentId: string; subscriberId: string; data: AddTagDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof addSubscriberTag>>,
-  TError,
-  { environmentId: string; subscriberId: string; data: AddTagDto },
-  TContext
-> => {
-  const mutationOptions = getAddSubscriberTagMutationOptions(options);
+export const useAddSubscriberTag = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addSubscriberTag>>, TError,{environmentId: string;subscriberId: string;data: AddTagDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addSubscriberTag>>,
+        TError,
+        {environmentId: string;subscriberId: string;data: AddTagDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getAddSubscriberTagMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * @summary Remove a tag from a subscriber
  */
 export type removeSubscriberTagResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type removeSubscriberTagResponse404 = {
-  data: void;
-  status: 404;
+  data: void
+  status: 404
+}
+    
+export type removeSubscriberTagResponseSuccess = (removeSubscriberTagResponse204) & {
+  headers: Headers;
+};
+export type removeSubscriberTagResponseError = (removeSubscriberTagResponse404) & {
+  headers: Headers;
 };
 
-export type removeSubscriberTagResponseSuccess =
-  removeSubscriberTagResponse204 & {
-    headers: Headers;
-  };
-export type removeSubscriberTagResponseError =
-  removeSubscriberTagResponse404 & {
-    headers: Headers;
-  };
+export type removeSubscriberTagResponse = (removeSubscriberTagResponseSuccess | removeSubscriberTagResponseError)
 
-export type removeSubscriberTagResponse =
-  | removeSubscriberTagResponseSuccess
-  | removeSubscriberTagResponseError;
+export const getRemoveSubscriberTagUrl = (environmentId: string,
+    subscriberId: string,
+    tag: string,) => {
 
-export const getRemoveSubscriberTagUrl = (
-  environmentId: string,
-  subscriberId: string,
-  tag: string,
-) => {
-  return `/environments/${environmentId}/subscribers/${subscriberId}/tags/${tag}`;
-};
 
-export const removeSubscriberTag = async (
-  environmentId: string,
-  subscriberId: string,
-  tag: string,
-  options?: RequestInit,
-): Promise<removeSubscriberTagResponse> => {
-  return customFetch<removeSubscriberTagResponse>(
-    getRemoveSubscriberTagUrl(environmentId, subscriberId, tag),
-    {
-      credentials: "include",
-      ...options,
-      method: "DELETE",
-    },
-  );
-};
+  
 
-export const getRemoveSubscriberTagMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof removeSubscriberTag>>,
-    TError,
-    { environmentId: string; subscriberId: string; tag: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof removeSubscriberTag>>,
-  TError,
-  { environmentId: string; subscriberId: string; tag: string },
-  TContext
-> => {
-  const mutationKey = ["removeSubscriberTag"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/environments/${environmentId}/subscribers/${subscriberId}/tags/${tag}`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof removeSubscriberTag>>,
-    { environmentId: string; subscriberId: string; tag: string }
-  > = (props) => {
-    const { environmentId, subscriberId, tag } = props ?? {};
+export const removeSubscriberTag = async (environmentId: string,
+    subscriberId: string,
+    tag: string, options?: RequestInit): Promise<removeSubscriberTagResponse> => {
+  
+  return customFetch<removeSubscriberTagResponse>(getRemoveSubscriberTagUrl(environmentId,subscriberId,tag),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-    return removeSubscriberTag(
-      environmentId,
-      subscriberId,
-      tag,
-      requestOptions,
-    );
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type RemoveSubscriberTagMutationResult = NonNullable<
-  Awaited<ReturnType<typeof removeSubscriberTag>>
->;
 
-export type RemoveSubscriberTagMutationError = void;
+export const getRemoveSubscriberTagMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeSubscriberTag>>, TError,{environmentId: string;subscriberId: string;tag: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeSubscriberTag>>, TError,{environmentId: string;subscriberId: string;tag: string}, TContext> => {
 
-/**
+const mutationKey = ['removeSubscriberTag'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeSubscriberTag>>, {environmentId: string;subscriberId: string;tag: string}> = (props) => {
+          const {environmentId,subscriberId,tag} = props ?? {};
+
+          return  removeSubscriberTag(environmentId,subscriberId,tag,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveSubscriberTagMutationResult = NonNullable<Awaited<ReturnType<typeof removeSubscriberTag>>>
+    
+    export type RemoveSubscriberTagMutationError = void
+
+    /**
  * @summary Remove a tag from a subscriber
  */
-export const useRemoveSubscriberTag = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof removeSubscriberTag>>,
-      TError,
-      { environmentId: string; subscriberId: string; tag: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof removeSubscriberTag>>,
-  TError,
-  { environmentId: string; subscriberId: string; tag: string },
-  TContext
-> => {
-  const mutationOptions = getRemoveSubscriberTagMutationOptions(options);
+export const useRemoveSubscriberTag = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeSubscriberTag>>, TError,{environmentId: string;subscriberId: string;tag: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removeSubscriberTag>>,
+        TError,
+        {environmentId: string;subscriberId: string;tag: string},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getRemoveSubscriberTagMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Called from the unsubscribe confirmation page linked from emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.
  * @summary Unsubscribe
  */
 export type unsubscribeResponse200 = {
-  data: UnsubscribeResponseDto;
-  status: 200;
-};
+  data: UnsubscribeResponseDto
+  status: 200
+}
 
 export type unsubscribeResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type unsubscribeResponseSuccess = unsubscribeResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type unsubscribeResponseSuccess = (unsubscribeResponse200) & {
   headers: Headers;
 };
-export type unsubscribeResponseError = unsubscribeResponse404 & {
+export type unsubscribeResponseError = (unsubscribeResponse404) & {
   headers: Headers;
 };
 
-export type unsubscribeResponse =
-  | unsubscribeResponseSuccess
-  | unsubscribeResponseError;
+export type unsubscribeResponse = (unsubscribeResponseSuccess | unsubscribeResponseError)
 
 export const getUnsubscribeUrl = () => {
-  return `/unsubscribe`;
-};
 
-export const unsubscribe = async (
-  unsubscribeBodyDto: UnsubscribeBodyDto,
-  options?: RequestInit,
-): Promise<unsubscribeResponse> => {
-  return customFetch<unsubscribeResponse>(getUnsubscribeUrl(), {
-    credentials: "include",
+
+  
+
+  return `/unsubscribe`
+}
+
+export const unsubscribe = async (unsubscribeBodyDto: UnsubscribeBodyDto, options?: RequestInit): Promise<unsubscribeResponse> => {
+  
+  return customFetch<unsubscribeResponse>(getUnsubscribeUrl(),
+  {
+      credentials: 'include',
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(unsubscribeBodyDto),
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      unsubscribeBodyDto,)
+  }
+);}
 
-export const getUnsubscribeMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof unsubscribe>>,
-    TError,
-    { data: UnsubscribeBodyDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof unsubscribe>>,
-  TError,
-  { data: UnsubscribeBodyDto },
-  TContext
-> => {
-  const mutationKey = ["unsubscribe"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof unsubscribe>>,
-    { data: UnsubscribeBodyDto }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return unsubscribe(data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getUnsubscribeMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsubscribe>>, TError,{data: UnsubscribeBodyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unsubscribe>>, TError,{data: UnsubscribeBodyDto}, TContext> => {
 
-export type UnsubscribeMutationResult = NonNullable<
-  Awaited<ReturnType<typeof unsubscribe>>
->;
-export type UnsubscribeMutationBody = UnsubscribeBodyDto;
-export type UnsubscribeMutationError = void;
+const mutationKey = ['unsubscribe'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unsubscribe>>, {data: UnsubscribeBodyDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  unsubscribe(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnsubscribeMutationResult = NonNullable<Awaited<ReturnType<typeof unsubscribe>>>
+    export type UnsubscribeMutationBody = UnsubscribeBodyDto
+    export type UnsubscribeMutationError = void
+
+    /**
  * @summary Unsubscribe
  */
-export const useUnsubscribe = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof unsubscribe>>,
-      TError,
-      { data: UnsubscribeBodyDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof unsubscribe>>,
-  TError,
-  { data: UnsubscribeBodyDto },
-  TContext
-> => {
-  const mutationOptions = getUnsubscribeMutationOptions(options);
+export const useUnsubscribe = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsubscribe>>, TError,{data: UnsubscribeBodyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unsubscribe>>,
+        TError,
+        {data: UnsubscribeBodyDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getUnsubscribeMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.
  * @summary Trigger a workflow
  */
 export type triggerWorkflowResponse200 = {
-  data: TriggerWorkflowResponseDto;
-  status: 200;
-};
+  data: TriggerWorkflowResponseDto
+  status: 200
+}
 
 export type triggerWorkflowResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type triggerWorkflowResponseSuccess = triggerWorkflowResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type triggerWorkflowResponseSuccess = (triggerWorkflowResponse200) & {
   headers: Headers;
 };
-export type triggerWorkflowResponseError = triggerWorkflowResponse404 & {
+export type triggerWorkflowResponseError = (triggerWorkflowResponse404) & {
   headers: Headers;
 };
 
-export type triggerWorkflowResponse =
-  | triggerWorkflowResponseSuccess
-  | triggerWorkflowResponseError;
+export type triggerWorkflowResponse = (triggerWorkflowResponseSuccess | triggerWorkflowResponseError)
 
-export const getTriggerWorkflowUrl = (environmentId: string) => {
-  return `/environments/${environmentId}/workflows/trigger`;
-};
+export const getTriggerWorkflowUrl = (environmentId: string,) => {
 
-export const triggerWorkflow = async (
-  environmentId: string,
-  triggerWorkflowDto: TriggerWorkflowDto,
-  options?: RequestInit,
-): Promise<triggerWorkflowResponse> => {
-  return customFetch<triggerWorkflowResponse>(
-    getTriggerWorkflowUrl(environmentId),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(triggerWorkflowDto),
-    },
-  );
-};
 
-export const getTriggerWorkflowMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof triggerWorkflow>>,
-    TError,
-    { environmentId: string; data: TriggerWorkflowDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof triggerWorkflow>>,
-  TError,
-  { environmentId: string; data: TriggerWorkflowDto },
-  TContext
-> => {
-  const mutationKey = ["triggerWorkflow"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof triggerWorkflow>>,
-    { environmentId: string; data: TriggerWorkflowDto }
-  > = (props) => {
-    const { environmentId, data } = props ?? {};
+  return `/environments/${environmentId}/workflows/trigger`
+}
 
-    return triggerWorkflow(environmentId, data, requestOptions);
-  };
+export const triggerWorkflow = async (environmentId: string,
+    triggerWorkflowDto: TriggerWorkflowDto, options?: RequestInit): Promise<triggerWorkflowResponse> => {
+  
+  return customFetch<triggerWorkflowResponse>(getTriggerWorkflowUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      triggerWorkflowDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type TriggerWorkflowMutationResult = NonNullable<
-  Awaited<ReturnType<typeof triggerWorkflow>>
->;
-export type TriggerWorkflowMutationBody = TriggerWorkflowDto;
-export type TriggerWorkflowMutationError = void;
 
-/**
+
+export const getTriggerWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext> => {
+
+const mutationKey = ['triggerWorkflow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof triggerWorkflow>>, {environmentId: string;data: TriggerWorkflowDto}> = (props) => {
+          const {environmentId,data} = props ?? {};
+
+          return  triggerWorkflow(environmentId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TriggerWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof triggerWorkflow>>>
+    export type TriggerWorkflowMutationBody = TriggerWorkflowDto
+    export type TriggerWorkflowMutationError = void
+
+    /**
  * @summary Trigger a workflow
  */
-export const useTriggerWorkflow = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof triggerWorkflow>>,
-      TError,
-      { environmentId: string; data: TriggerWorkflowDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof triggerWorkflow>>,
-  TError,
-  { environmentId: string; data: TriggerWorkflowDto },
-  TContext
-> => {
-  const mutationOptions = getTriggerWorkflowMutationOptions(options);
+export const useTriggerWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerWorkflow>>, TError,{environmentId: string;data: TriggerWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof triggerWorkflow>>,
+        TError,
+        {environmentId: string;data: TriggerWorkflowDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getTriggerWorkflowMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step.
  * @summary Create a new workflow
  */
 export type createWorkflowResponse201 = {
-  data: WorkflowResponseDto;
-  status: 201;
-};
+  data: WorkflowResponseDto
+  status: 201
+}
 
 export type createWorkflowResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type createWorkflowResponseSuccess = createWorkflowResponse201 & {
+  data: void
+  status: 404
+}
+    
+export type createWorkflowResponseSuccess = (createWorkflowResponse201) & {
   headers: Headers;
 };
-export type createWorkflowResponseError = createWorkflowResponse404 & {
+export type createWorkflowResponseError = (createWorkflowResponse404) & {
   headers: Headers;
 };
 
-export type createWorkflowResponse =
-  | createWorkflowResponseSuccess
-  | createWorkflowResponseError;
+export type createWorkflowResponse = (createWorkflowResponseSuccess | createWorkflowResponseError)
 
-export const getCreateWorkflowUrl = (environmentId: string) => {
-  return `/environments/${environmentId}/workflows`;
-};
+export const getCreateWorkflowUrl = (environmentId: string,) => {
 
-export const createWorkflow = async (
-  environmentId: string,
-  createWorkflowDto: CreateWorkflowDto,
-  options?: RequestInit,
-): Promise<createWorkflowResponse> => {
-  return customFetch<createWorkflowResponse>(
-    getCreateWorkflowUrl(environmentId),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createWorkflowDto),
-    },
-  );
-};
 
-export const getCreateWorkflowMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createWorkflow>>,
-    TError,
-    { environmentId: string; data: CreateWorkflowDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createWorkflow>>,
-  TError,
-  { environmentId: string; data: CreateWorkflowDto },
-  TContext
-> => {
-  const mutationKey = ["createWorkflow"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createWorkflow>>,
-    { environmentId: string; data: CreateWorkflowDto }
-  > = (props) => {
-    const { environmentId, data } = props ?? {};
+  return `/environments/${environmentId}/workflows`
+}
 
-    return createWorkflow(environmentId, data, requestOptions);
-  };
+export const createWorkflow = async (environmentId: string,
+    createWorkflowDto: CreateWorkflowDto, options?: RequestInit): Promise<createWorkflowResponse> => {
+  
+  return customFetch<createWorkflowResponse>(getCreateWorkflowUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createWorkflowDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type CreateWorkflowMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createWorkflow>>
->;
-export type CreateWorkflowMutationBody = CreateWorkflowDto;
-export type CreateWorkflowMutationError = void;
 
-/**
+
+export const getCreateWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext> => {
+
+const mutationKey = ['createWorkflow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkflow>>, {environmentId: string;data: CreateWorkflowDto}> = (props) => {
+          const {environmentId,data} = props ?? {};
+
+          return  createWorkflow(environmentId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkflow>>>
+    export type CreateWorkflowMutationBody = CreateWorkflowDto
+    export type CreateWorkflowMutationError = void
+
+    /**
  * @summary Create a new workflow
  */
-export const useCreateWorkflow = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createWorkflow>>,
-      TError,
-      { environmentId: string; data: CreateWorkflowDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createWorkflow>>,
-  TError,
-  { environmentId: string; data: CreateWorkflowDto },
-  TContext
-> => {
-  const mutationOptions = getCreateWorkflowMutationOptions(options);
+export const useCreateWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{environmentId: string;data: CreateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createWorkflow>>,
+        TError,
+        {environmentId: string;data: CreateWorkflowDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getCreateWorkflowMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Returns a paginated list of workflows in the environment
  * @summary List workflows
  */
 export type listWorkflowsResponse200 = {
-  data: ListWorkflowsResponseDto;
-  status: 200;
-};
+  data: ListWorkflowsResponseDto
+  status: 200
+}
 
 export type listWorkflowsResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type listWorkflowsResponseSuccess = listWorkflowsResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type listWorkflowsResponseSuccess = (listWorkflowsResponse200) & {
   headers: Headers;
 };
-export type listWorkflowsResponseError = listWorkflowsResponse404 & {
+export type listWorkflowsResponseError = (listWorkflowsResponse404) & {
   headers: Headers;
 };
 
-export type listWorkflowsResponse =
-  | listWorkflowsResponseSuccess
-  | listWorkflowsResponseError;
+export type listWorkflowsResponse = (listWorkflowsResponseSuccess | listWorkflowsResponseError)
 
-export const getListWorkflowsUrl = (
-  environmentId: string,
-  params?: ListWorkflowsParams,
-) => {
+export const getListWorkflowsUrl = (environmentId: string,
+    params?: ListWorkflowsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/environments/${environmentId}/workflows?${stringifiedParams}`
-    : `/environments/${environmentId}/workflows`;
-};
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows?${stringifiedParams}` : `/environments/${environmentId}/workflows`
+}
 
-export const listWorkflows = async (
-  environmentId: string,
-  params?: ListWorkflowsParams,
-  options?: RequestInit,
-): Promise<listWorkflowsResponse> => {
-  return customFetch<listWorkflowsResponse>(
-    getListWorkflowsUrl(environmentId, params),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export const listWorkflows = async (environmentId: string,
+    params?: ListWorkflowsParams, options?: RequestInit): Promise<listWorkflowsResponse> => {
+  
+  return customFetch<listWorkflowsResponse>(getListWorkflowsUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getListWorkflowsQueryKey = (
-  environmentId?: string,
-  params?: ListWorkflowsParams,
+
+
+
+
+export const getListWorkflowsQueryKey = (environmentId?: string,
+    params?: ListWorkflowsParams,) => {
+    return [
+    `/environments/${environmentId}/workflows`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListWorkflowsQueryOptions = <TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(environmentId: string,
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [
-    `/environments/${environmentId}/workflows`,
-    ...(params ? [params] : []),
-  ] as const;
-};
 
-export const getListWorkflowsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listWorkflows>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListWorkflowsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getListWorkflowsQueryKey(environmentId, params);
+  const queryKey =  queryOptions?.queryKey ?? getListWorkflowsQueryKey(environmentId,params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflows>>> = ({
-    signal,
-  }) => listWorkflows(environmentId, params, { signal, ...requestOptions });
+  
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!environmentId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof listWorkflows>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflows>>> = ({ signal }) => listWorkflows(environmentId,params, { signal, ...requestOptions });
 
-export type ListWorkflowsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listWorkflows>>
->;
-export type ListWorkflowsQueryError = void;
+      
 
-export function useListWorkflows<
-  TData = Awaited<ReturnType<typeof listWorkflows>>,
-  TError = void,
->(
-  environmentId: string,
-  params: undefined | ListWorkflowsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListWorkflowsQueryResult = NonNullable<Awaited<ReturnType<typeof listWorkflows>>>
+export type ListWorkflowsQueryError = void
+
+
+export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
+ environmentId: string,
+    params: undefined |  ListWorkflowsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listWorkflows>>,
           TError,
           Awaited<ReturnType<typeof listWorkflows>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useListWorkflows<
-  TData = Awaited<ReturnType<typeof listWorkflows>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListWorkflowsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
+ environmentId: string,
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listWorkflows>>,
           TError,
           Awaited<ReturnType<typeof listWorkflows>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useListWorkflows<
-  TData = Awaited<ReturnType<typeof listWorkflows>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListWorkflowsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
+ environmentId: string,
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary List workflows
  */
 
-export function useListWorkflows<
-  TData = Awaited<ReturnType<typeof listWorkflows>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListWorkflowsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getListWorkflowsQueryOptions(
-    environmentId,
-    params,
-    options,
-  );
+export function useListWorkflows<TData = Awaited<ReturnType<typeof listWorkflows>>, TError = void>(
+ environmentId: string,
+    params?: ListWorkflowsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getListWorkflowsQueryOptions(environmentId,params,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Returns a paginated list of trigger runs across every workflow in the environment, most recent first
  * @summary List all workflow runs
  */
 export type listEnvironmentRunsResponse200 = {
-  data: ListEnvironmentRunsResponseDto;
-  status: 200;
-};
+  data: ListEnvironmentRunsResponseDto
+  status: 200
+}
 
 export type listEnvironmentRunsResponse404 = {
-  data: void;
-  status: 404;
+  data: void
+  status: 404
+}
+    
+export type listEnvironmentRunsResponseSuccess = (listEnvironmentRunsResponse200) & {
+  headers: Headers;
+};
+export type listEnvironmentRunsResponseError = (listEnvironmentRunsResponse404) & {
+  headers: Headers;
 };
 
-export type listEnvironmentRunsResponseSuccess =
-  listEnvironmentRunsResponse200 & {
-    headers: Headers;
-  };
-export type listEnvironmentRunsResponseError =
-  listEnvironmentRunsResponse404 & {
-    headers: Headers;
-  };
+export type listEnvironmentRunsResponse = (listEnvironmentRunsResponseSuccess | listEnvironmentRunsResponseError)
 
-export type listEnvironmentRunsResponse =
-  | listEnvironmentRunsResponseSuccess
-  | listEnvironmentRunsResponseError;
-
-export const getListEnvironmentRunsUrl = (
-  environmentId: string,
-  params?: ListEnvironmentRunsParams,
-) => {
+export const getListEnvironmentRunsUrl = (environmentId: string,
+    params?: ListEnvironmentRunsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/environments/${environmentId}/workflows/runs?${stringifiedParams}`
-    : `/environments/${environmentId}/workflows/runs`;
-};
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/runs?${stringifiedParams}` : `/environments/${environmentId}/workflows/runs`
+}
 
-export const listEnvironmentRuns = async (
-  environmentId: string,
-  params?: ListEnvironmentRunsParams,
-  options?: RequestInit,
-): Promise<listEnvironmentRunsResponse> => {
-  return customFetch<listEnvironmentRunsResponse>(
-    getListEnvironmentRunsUrl(environmentId, params),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export const listEnvironmentRuns = async (environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: RequestInit): Promise<listEnvironmentRunsResponse> => {
+  
+  return customFetch<listEnvironmentRunsResponse>(getListEnvironmentRunsUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getListEnvironmentRunsQueryKey = (
-  environmentId?: string,
-  params?: ListEnvironmentRunsParams,
+
+
+
+
+export const getListEnvironmentRunsQueryKey = (environmentId?: string,
+    params?: ListEnvironmentRunsParams,) => {
+    return [
+    `/environments/${environmentId}/workflows/runs`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListEnvironmentRunsQueryOptions = <TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [
-    `/environments/${environmentId}/workflows/runs`,
-    ...(params ? [params] : []),
-  ] as const;
-};
 
-export const getListEnvironmentRunsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listEnvironmentRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListEnvironmentRunsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironmentRuns>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getListEnvironmentRunsQueryKey(environmentId, params);
+  const queryKey =  queryOptions?.queryKey ?? getListEnvironmentRunsQueryKey(environmentId,params);
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listEnvironmentRuns>>
-  > = ({ signal }) =>
-    listEnvironmentRuns(environmentId, params, { signal, ...requestOptions });
+  
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!environmentId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof listEnvironmentRuns>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listEnvironmentRuns>>> = ({ signal }) => listEnvironmentRuns(environmentId,params, { signal, ...requestOptions });
 
-export type ListEnvironmentRunsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listEnvironmentRuns>>
->;
-export type ListEnvironmentRunsQueryError = void;
+      
 
-export function useListEnvironmentRuns<
-  TData = Awaited<ReturnType<typeof listEnvironmentRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  params: undefined | ListEnvironmentRunsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironmentRuns>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListEnvironmentRunsQueryResult = NonNullable<Awaited<ReturnType<typeof listEnvironmentRuns>>>
+export type ListEnvironmentRunsQueryError = void
+
+
+export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(
+ environmentId: string,
+    params: undefined |  ListEnvironmentRunsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listEnvironmentRuns>>,
           TError,
           Awaited<ReturnType<typeof listEnvironmentRuns>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useListEnvironmentRuns<
-  TData = Awaited<ReturnType<typeof listEnvironmentRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListEnvironmentRunsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironmentRuns>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(
+ environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listEnvironmentRuns>>,
           TError,
           Awaited<ReturnType<typeof listEnvironmentRuns>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useListEnvironmentRuns<
-  TData = Awaited<ReturnType<typeof listEnvironmentRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListEnvironmentRunsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironmentRuns>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(
+ environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary List all workflow runs
  */
 
-export function useListEnvironmentRuns<
-  TData = Awaited<ReturnType<typeof listEnvironmentRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: ListEnvironmentRunsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listEnvironmentRuns>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getListEnvironmentRunsQueryOptions(
-    environmentId,
-    params,
-    options,
-  );
+export function useListEnvironmentRuns<TData = Awaited<ReturnType<typeof listEnvironmentRuns>>, TError = void>(
+ environmentId: string,
+    params?: ListEnvironmentRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listEnvironmentRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getListEnvironmentRunsQueryOptions(environmentId,params,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Returns a single workflow with its steps
  * @summary Get a workflow
  */
 export type getWorkflowResponse200 = {
-  data: WorkflowDetailResponseDto;
-  status: 200;
-};
+  data: WorkflowDetailResponseDto
+  status: 200
+}
 
 export type getWorkflowResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type getWorkflowResponseSuccess = getWorkflowResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type getWorkflowResponseSuccess = (getWorkflowResponse200) & {
   headers: Headers;
 };
-export type getWorkflowResponseError = getWorkflowResponse404 & {
+export type getWorkflowResponseError = (getWorkflowResponse404) & {
   headers: Headers;
 };
 
-export type getWorkflowResponse =
-  | getWorkflowResponseSuccess
-  | getWorkflowResponseError;
+export type getWorkflowResponse = (getWorkflowResponseSuccess | getWorkflowResponseError)
 
-export const getGetWorkflowUrl = (
-  environmentId: string,
-  workflowId: string,
+export const getGetWorkflowUrl = (environmentId: string,
+    workflowId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}`
+}
+
+export const getWorkflow = async (environmentId: string,
+    workflowId: string, options?: RequestInit): Promise<getWorkflowResponse> => {
+  
+  return customFetch<getWorkflowResponse>(getGetWorkflowUrl(environmentId,workflowId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetWorkflowQueryKey = (environmentId?: string,
+    workflowId?: string,) => {
+    return [
+    `/environments/${environmentId}/workflows/${workflowId}`
+    ] as const;
+    }
+
+    
+export const getGetWorkflowQueryOptions = <TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(environmentId: string,
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return `/environments/${environmentId}/workflows/${workflowId}`;
-};
 
-export const getWorkflow = async (
-  environmentId: string,
-  workflowId: string,
-  options?: RequestInit,
-): Promise<getWorkflowResponse> => {
-  return customFetch<getWorkflowResponse>(
-    getGetWorkflowUrl(environmentId, workflowId),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getGetWorkflowQueryKey = (
-  environmentId?: string,
-  workflowId?: string,
-) => {
-  return [`/environments/${environmentId}/workflows/${workflowId}`] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkflowQueryKey(environmentId,workflowId);
 
-export const getGetWorkflowQueryOptions = <
-  TData = Awaited<ReturnType<typeof getWorkflow>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetWorkflowQueryKey(environmentId, workflowId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkflow>>> = ({ signal }) => getWorkflow(environmentId,workflowId, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkflow>>> = ({
-    signal,
-  }) => getWorkflow(environmentId, workflowId, { signal, ...requestOptions });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(environmentId && workflowId),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getWorkflow>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+      
 
-export type GetWorkflowQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getWorkflow>>
->;
-export type GetWorkflowQueryError = void;
+   return  { queryKey, queryFn, enabled: !!(environmentId && workflowId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
 
-export function useGetWorkflow<
-  TData = Awaited<ReturnType<typeof getWorkflow>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>
-    > &
-      Pick<
+export type GetWorkflowQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkflow>>>
+export type GetWorkflowQueryError = void
+
+
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ environmentId: string,
+    workflowId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkflow>>,
           TError,
           Awaited<ReturnType<typeof getWorkflow>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useGetWorkflow<
-  TData = Awaited<ReturnType<typeof getWorkflow>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ environmentId: string,
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkflow>>,
           TError,
           Awaited<ReturnType<typeof getWorkflow>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetWorkflow<
-  TData = Awaited<ReturnType<typeof getWorkflow>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ environmentId: string,
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary Get a workflow
  */
 
-export function useGetWorkflow<
-  TData = Awaited<ReturnType<typeof getWorkflow>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetWorkflowQueryOptions(
-    environmentId,
-    workflowId,
-    options,
-  );
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ environmentId: string,
+    workflowId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getGetWorkflowQueryOptions(environmentId,workflowId,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Updates workflow fields. If `steps` is provided, it replaces ALL existing steps.
  * @summary Update a workflow
  */
 export type updateWorkflowResponse200 = {
-  data: WorkflowResponseDto;
-  status: 200;
-};
+  data: WorkflowResponseDto
+  status: 200
+}
 
 export type updateWorkflowResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type updateWorkflowResponseSuccess = updateWorkflowResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type updateWorkflowResponseSuccess = (updateWorkflowResponse200) & {
   headers: Headers;
 };
-export type updateWorkflowResponseError = updateWorkflowResponse404 & {
+export type updateWorkflowResponseError = (updateWorkflowResponse404) & {
   headers: Headers;
 };
 
-export type updateWorkflowResponse =
-  | updateWorkflowResponseSuccess
-  | updateWorkflowResponseError;
+export type updateWorkflowResponse = (updateWorkflowResponseSuccess | updateWorkflowResponseError)
 
-export const getUpdateWorkflowUrl = (
-  environmentId: string,
-  workflowId: string,
-) => {
-  return `/environments/${environmentId}/workflows/${workflowId}`;
-};
+export const getUpdateWorkflowUrl = (environmentId: string,
+    workflowId: string,) => {
 
-export const updateWorkflow = async (
-  environmentId: string,
-  workflowId: string,
-  updateWorkflowDto: UpdateWorkflowDto,
-  options?: RequestInit,
-): Promise<updateWorkflowResponse> => {
-  return customFetch<updateWorkflowResponse>(
-    getUpdateWorkflowUrl(environmentId, workflowId),
-    {
-      credentials: "include",
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(updateWorkflowDto),
-    },
-  );
-};
 
-export const getUpdateWorkflowMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateWorkflow>>,
-    TError,
-    { environmentId: string; workflowId: string; data: UpdateWorkflowDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateWorkflow>>,
-  TError,
-  { environmentId: string; workflowId: string; data: UpdateWorkflowDto },
-  TContext
-> => {
-  const mutationKey = ["updateWorkflow"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateWorkflow>>,
-    { environmentId: string; workflowId: string; data: UpdateWorkflowDto }
-  > = (props) => {
-    const { environmentId, workflowId, data } = props ?? {};
+  return `/environments/${environmentId}/workflows/${workflowId}`
+}
 
-    return updateWorkflow(environmentId, workflowId, data, requestOptions);
-  };
+export const updateWorkflow = async (environmentId: string,
+    workflowId: string,
+    updateWorkflowDto: UpdateWorkflowDto, options?: RequestInit): Promise<updateWorkflowResponse> => {
+  
+  return customFetch<updateWorkflowResponse>(getUpdateWorkflowUrl(environmentId,workflowId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateWorkflowDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type UpdateWorkflowMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateWorkflow>>
->;
-export type UpdateWorkflowMutationBody = UpdateWorkflowDto;
-export type UpdateWorkflowMutationError = void;
 
-/**
+
+export const getUpdateWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext> => {
+
+const mutationKey = ['updateWorkflow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorkflow>>, {environmentId: string;workflowId: string;data: UpdateWorkflowDto}> = (props) => {
+          const {environmentId,workflowId,data} = props ?? {};
+
+          return  updateWorkflow(environmentId,workflowId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorkflow>>>
+    export type UpdateWorkflowMutationBody = UpdateWorkflowDto
+    export type UpdateWorkflowMutationError = void
+
+    /**
  * @summary Update a workflow
  */
-export const useUpdateWorkflow = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateWorkflow>>,
-      TError,
-      { environmentId: string; workflowId: string; data: UpdateWorkflowDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateWorkflow>>,
-  TError,
-  { environmentId: string; workflowId: string; data: UpdateWorkflowDto },
-  TContext
-> => {
-  const mutationOptions = getUpdateWorkflowMutationOptions(options);
+export const useUpdateWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflow>>, TError,{environmentId: string;workflowId: string;data: UpdateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateWorkflow>>,
+        TError,
+        {environmentId: string;workflowId: string;data: UpdateWorkflowDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getUpdateWorkflowMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Soft-deletes a workflow. Existing in-flight runs are unaffected.
  * @summary Delete a workflow
  */
 export type deleteWorkflowResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type deleteWorkflowResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type deleteWorkflowResponseSuccess = deleteWorkflowResponse204 & {
+  data: void
+  status: 404
+}
+    
+export type deleteWorkflowResponseSuccess = (deleteWorkflowResponse204) & {
   headers: Headers;
 };
-export type deleteWorkflowResponseError = deleteWorkflowResponse404 & {
+export type deleteWorkflowResponseError = (deleteWorkflowResponse404) & {
   headers: Headers;
 };
 
-export type deleteWorkflowResponse =
-  | deleteWorkflowResponseSuccess
-  | deleteWorkflowResponseError;
+export type deleteWorkflowResponse = (deleteWorkflowResponseSuccess | deleteWorkflowResponseError)
 
-export const getDeleteWorkflowUrl = (
-  environmentId: string,
-  workflowId: string,
-) => {
-  return `/environments/${environmentId}/workflows/${workflowId}`;
-};
+export const getDeleteWorkflowUrl = (environmentId: string,
+    workflowId: string,) => {
 
-export const deleteWorkflow = async (
-  environmentId: string,
-  workflowId: string,
-  options?: RequestInit,
-): Promise<deleteWorkflowResponse> => {
-  return customFetch<deleteWorkflowResponse>(
-    getDeleteWorkflowUrl(environmentId, workflowId),
-    {
-      credentials: "include",
-      ...options,
-      method: "DELETE",
-    },
-  );
-};
 
-export const getDeleteWorkflowMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteWorkflow>>,
-    TError,
-    { environmentId: string; workflowId: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteWorkflow>>,
-  TError,
-  { environmentId: string; workflowId: string },
-  TContext
-> => {
-  const mutationKey = ["deleteWorkflow"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteWorkflow>>,
-    { environmentId: string; workflowId: string }
-  > = (props) => {
-    const { environmentId, workflowId } = props ?? {};
+  return `/environments/${environmentId}/workflows/${workflowId}`
+}
 
-    return deleteWorkflow(environmentId, workflowId, requestOptions);
-  };
+export const deleteWorkflow = async (environmentId: string,
+    workflowId: string, options?: RequestInit): Promise<deleteWorkflowResponse> => {
+  
+  return customFetch<deleteWorkflowResponse>(getDeleteWorkflowUrl(environmentId,workflowId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type DeleteWorkflowMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteWorkflow>>
->;
 
-export type DeleteWorkflowMutationError = void;
 
-/**
+export const getDeleteWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext> => {
+
+const mutationKey = ['deleteWorkflow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkflow>>, {environmentId: string;workflowId: string}> = (props) => {
+          const {environmentId,workflowId} = props ?? {};
+
+          return  deleteWorkflow(environmentId,workflowId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkflow>>>
+    
+    export type DeleteWorkflowMutationError = void
+
+    /**
  * @summary Delete a workflow
  */
-export const useDeleteWorkflow = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteWorkflow>>,
-      TError,
-      { environmentId: string; workflowId: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteWorkflow>>,
-  TError,
-  { environmentId: string; workflowId: string },
-  TContext
-> => {
-  const mutationOptions = getDeleteWorkflowMutationOptions(options);
+export const useDeleteWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{environmentId: string;workflowId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkflow>>,
+        TError,
+        {environmentId: string;workflowId: string},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getDeleteWorkflowMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Returns a paginated list of trigger runs for this workflow, most recent first
  * @summary List runs for a workflow
  */
 export type listWorkflowRunsResponse200 = {
-  data: ListRunsResponseDto;
-  status: 200;
-};
+  data: ListRunsResponseDto
+  status: 200
+}
 
 export type listWorkflowRunsResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type listWorkflowRunsResponseSuccess = listWorkflowRunsResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type listWorkflowRunsResponseSuccess = (listWorkflowRunsResponse200) & {
   headers: Headers;
 };
-export type listWorkflowRunsResponseError = listWorkflowRunsResponse404 & {
+export type listWorkflowRunsResponseError = (listWorkflowRunsResponse404) & {
   headers: Headers;
 };
 
-export type listWorkflowRunsResponse =
-  | listWorkflowRunsResponseSuccess
-  | listWorkflowRunsResponseError;
+export type listWorkflowRunsResponse = (listWorkflowRunsResponseSuccess | listWorkflowRunsResponseError)
 
-export const getListWorkflowRunsUrl = (
-  environmentId: string,
-  workflowId: string,
-  params?: ListWorkflowRunsParams,
-) => {
+export const getListWorkflowRunsUrl = (environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/environments/${environmentId}/workflows/${workflowId}/runs?${stringifiedParams}`
-    : `/environments/${environmentId}/workflows/${workflowId}/runs`;
-};
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/${workflowId}/runs?${stringifiedParams}` : `/environments/${environmentId}/workflows/${workflowId}/runs`
+}
 
-export const listWorkflowRuns = async (
-  environmentId: string,
-  workflowId: string,
-  params?: ListWorkflowRunsParams,
-  options?: RequestInit,
-): Promise<listWorkflowRunsResponse> => {
-  return customFetch<listWorkflowRunsResponse>(
-    getListWorkflowRunsUrl(environmentId, workflowId, params),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export const listWorkflowRuns = async (environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: RequestInit): Promise<listWorkflowRunsResponse> => {
+  
+  return customFetch<listWorkflowRunsResponse>(getListWorkflowRunsUrl(environmentId,workflowId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getListWorkflowRunsQueryKey = (
-  environmentId?: string,
-  workflowId?: string,
-  params?: ListWorkflowRunsParams,
+
+
+
+
+export const getListWorkflowRunsQueryKey = (environmentId?: string,
+    workflowId?: string,
+    params?: ListWorkflowRunsParams,) => {
+    return [
+    `/environments/${environmentId}/workflows/${workflowId}/runs`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListWorkflowRunsQueryOptions = <TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [
-    `/environments/${environmentId}/workflows/${workflowId}/runs`,
-    ...(params ? [params] : []),
-  ] as const;
-};
 
-export const getListWorkflowRunsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listWorkflowRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params?: ListWorkflowRunsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listWorkflowRuns>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getListWorkflowRunsQueryKey(environmentId, workflowId, params);
+  const queryKey =  queryOptions?.queryKey ?? getListWorkflowRunsQueryKey(environmentId,workflowId,params);
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listWorkflowRuns>>
-  > = ({ signal }) =>
-    listWorkflowRuns(environmentId, workflowId, params, {
-      signal,
-      ...requestOptions,
-    });
+  
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(environmentId && workflowId),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof listWorkflowRuns>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkflowRuns>>> = ({ signal }) => listWorkflowRuns(environmentId,workflowId,params, { signal, ...requestOptions });
 
-export type ListWorkflowRunsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listWorkflowRuns>>
->;
-export type ListWorkflowRunsQueryError = void;
+      
 
-export function useListWorkflowRuns<
-  TData = Awaited<ReturnType<typeof listWorkflowRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params: undefined | ListWorkflowRunsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listWorkflowRuns>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId && workflowId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListWorkflowRunsQueryResult = NonNullable<Awaited<ReturnType<typeof listWorkflowRuns>>>
+export type ListWorkflowRunsQueryError = void
+
+
+export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params: undefined |  ListWorkflowRunsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listWorkflowRuns>>,
           TError,
           Awaited<ReturnType<typeof listWorkflowRuns>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useListWorkflowRuns<
-  TData = Awaited<ReturnType<typeof listWorkflowRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params?: ListWorkflowRunsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listWorkflowRuns>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listWorkflowRuns>>,
           TError,
           Awaited<ReturnType<typeof listWorkflowRuns>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useListWorkflowRuns<
-  TData = Awaited<ReturnType<typeof listWorkflowRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params?: ListWorkflowRunsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listWorkflowRuns>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary List runs for a workflow
  */
 
-export function useListWorkflowRuns<
-  TData = Awaited<ReturnType<typeof listWorkflowRuns>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params?: ListWorkflowRunsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listWorkflowRuns>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getListWorkflowRunsQueryOptions(
-    environmentId,
-    workflowId,
-    params,
-    options,
-  );
+export function useListWorkflowRuns<TData = Awaited<ReturnType<typeof listWorkflowRuns>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListWorkflowRunsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkflowRuns>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getListWorkflowRunsQueryOptions(environmentId,workflowId,params,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.
  * @summary Preview a broadcast's audience size
  */
 export type previewBroadcastResponse200 = {
-  data: PreviewBroadcastResponseDto;
-  status: 200;
-};
+  data: PreviewBroadcastResponseDto
+  status: 200
+}
 
 export type previewBroadcastResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type previewBroadcastResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type previewBroadcastResponseSuccess = previewBroadcastResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type previewBroadcastResponseSuccess = (previewBroadcastResponse200) & {
   headers: Headers;
 };
-export type previewBroadcastResponseError = (
-  | previewBroadcastResponse400
-  | previewBroadcastResponse404
-) & {
+export type previewBroadcastResponseError = (previewBroadcastResponse400 | previewBroadcastResponse404) & {
   headers: Headers;
 };
 
-export type previewBroadcastResponse =
-  | previewBroadcastResponseSuccess
-  | previewBroadcastResponseError;
+export type previewBroadcastResponse = (previewBroadcastResponseSuccess | previewBroadcastResponseError)
 
-export const getPreviewBroadcastUrl = (
-  environmentId: string,
-  workflowId: string,
-) => {
-  return `/environments/${environmentId}/workflows/${workflowId}/broadcast/preview`;
-};
+export const getPreviewBroadcastUrl = (environmentId: string,
+    workflowId: string,) => {
 
-export const previewBroadcast = async (
-  environmentId: string,
-  workflowId: string,
-  triggerBroadcastDto: TriggerBroadcastDto,
-  options?: RequestInit,
-): Promise<previewBroadcastResponse> => {
-  return customFetch<previewBroadcastResponse>(
-    getPreviewBroadcastUrl(environmentId, workflowId),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(triggerBroadcastDto),
-    },
-  );
-};
 
-export const getPreviewBroadcastMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof previewBroadcast>>,
-    TError,
-    { environmentId: string; workflowId: string; data: TriggerBroadcastDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof previewBroadcast>>,
-  TError,
-  { environmentId: string; workflowId: string; data: TriggerBroadcastDto },
-  TContext
-> => {
-  const mutationKey = ["previewBroadcast"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof previewBroadcast>>,
-    { environmentId: string; workflowId: string; data: TriggerBroadcastDto }
-  > = (props) => {
-    const { environmentId, workflowId, data } = props ?? {};
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcast/preview`
+}
 
-    return previewBroadcast(environmentId, workflowId, data, requestOptions);
-  };
+export const previewBroadcast = async (environmentId: string,
+    workflowId: string,
+    triggerBroadcastDto: TriggerBroadcastDto, options?: RequestInit): Promise<previewBroadcastResponse> => {
+  
+  return customFetch<previewBroadcastResponse>(getPreviewBroadcastUrl(environmentId,workflowId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      triggerBroadcastDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type PreviewBroadcastMutationResult = NonNullable<
-  Awaited<ReturnType<typeof previewBroadcast>>
->;
-export type PreviewBroadcastMutationBody = TriggerBroadcastDto;
-export type PreviewBroadcastMutationError = void;
 
-/**
+
+export const getPreviewBroadcastMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewBroadcast>>, TError,{environmentId: string;workflowId: string;data: TriggerBroadcastDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof previewBroadcast>>, TError,{environmentId: string;workflowId: string;data: TriggerBroadcastDto}, TContext> => {
+
+const mutationKey = ['previewBroadcast'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof previewBroadcast>>, {environmentId: string;workflowId: string;data: TriggerBroadcastDto}> = (props) => {
+          const {environmentId,workflowId,data} = props ?? {};
+
+          return  previewBroadcast(environmentId,workflowId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PreviewBroadcastMutationResult = NonNullable<Awaited<ReturnType<typeof previewBroadcast>>>
+    export type PreviewBroadcastMutationBody = TriggerBroadcastDto
+    export type PreviewBroadcastMutationError = void
+
+    /**
  * @summary Preview a broadcast's audience size
  */
-export const usePreviewBroadcast = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof previewBroadcast>>,
-      TError,
-      { environmentId: string; workflowId: string; data: TriggerBroadcastDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof previewBroadcast>>,
-  TError,
-  { environmentId: string; workflowId: string; data: TriggerBroadcastDto },
-  TContext
-> => {
-  const mutationOptions = getPreviewBroadcastMutationOptions(options);
+export const usePreviewBroadcast = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof previewBroadcast>>, TError,{environmentId: string;workflowId: string;data: TriggerBroadcastDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof previewBroadcast>>,
+        TError,
+        {environmentId: string;workflowId: string;data: TriggerBroadcastDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getPreviewBroadcastMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.
  * @summary Trigger a broadcast
  */
 export type triggerBroadcastResponse200 = {
-  data: TriggerBroadcastResponseDto;
-  status: 200;
-};
+  data: TriggerBroadcastResponseDto
+  status: 200
+}
 
 export type triggerBroadcastResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type triggerBroadcastResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type triggerBroadcastResponseSuccess = triggerBroadcastResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type triggerBroadcastResponseSuccess = (triggerBroadcastResponse200) & {
   headers: Headers;
 };
-export type triggerBroadcastResponseError = (
-  | triggerBroadcastResponse400
-  | triggerBroadcastResponse404
-) & {
+export type triggerBroadcastResponseError = (triggerBroadcastResponse400 | triggerBroadcastResponse404) & {
   headers: Headers;
 };
 
-export type triggerBroadcastResponse =
-  | triggerBroadcastResponseSuccess
-  | triggerBroadcastResponseError;
+export type triggerBroadcastResponse = (triggerBroadcastResponseSuccess | triggerBroadcastResponseError)
 
-export const getTriggerBroadcastUrl = (
-  environmentId: string,
-  workflowId: string,
-) => {
-  return `/environments/${environmentId}/workflows/${workflowId}/broadcast`;
-};
+export const getTriggerBroadcastUrl = (environmentId: string,
+    workflowId: string,) => {
 
-export const triggerBroadcast = async (
-  environmentId: string,
-  workflowId: string,
-  triggerBroadcastDto: TriggerBroadcastDto,
-  options?: RequestInit,
-): Promise<triggerBroadcastResponse> => {
-  return customFetch<triggerBroadcastResponse>(
-    getTriggerBroadcastUrl(environmentId, workflowId),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(triggerBroadcastDto),
-    },
-  );
-};
 
-export const getTriggerBroadcastMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof triggerBroadcast>>,
-    TError,
-    { environmentId: string; workflowId: string; data: TriggerBroadcastDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof triggerBroadcast>>,
-  TError,
-  { environmentId: string; workflowId: string; data: TriggerBroadcastDto },
-  TContext
-> => {
-  const mutationKey = ["triggerBroadcast"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof triggerBroadcast>>,
-    { environmentId: string; workflowId: string; data: TriggerBroadcastDto }
-  > = (props) => {
-    const { environmentId, workflowId, data } = props ?? {};
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcast`
+}
 
-    return triggerBroadcast(environmentId, workflowId, data, requestOptions);
-  };
+export const triggerBroadcast = async (environmentId: string,
+    workflowId: string,
+    triggerBroadcastDto: TriggerBroadcastDto, options?: RequestInit): Promise<triggerBroadcastResponse> => {
+  
+  return customFetch<triggerBroadcastResponse>(getTriggerBroadcastUrl(environmentId,workflowId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      triggerBroadcastDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type TriggerBroadcastMutationResult = NonNullable<
-  Awaited<ReturnType<typeof triggerBroadcast>>
->;
-export type TriggerBroadcastMutationBody = TriggerBroadcastDto;
-export type TriggerBroadcastMutationError = void;
 
-/**
+
+export const getTriggerBroadcastMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerBroadcast>>, TError,{environmentId: string;workflowId: string;data: TriggerBroadcastDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof triggerBroadcast>>, TError,{environmentId: string;workflowId: string;data: TriggerBroadcastDto}, TContext> => {
+
+const mutationKey = ['triggerBroadcast'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof triggerBroadcast>>, {environmentId: string;workflowId: string;data: TriggerBroadcastDto}> = (props) => {
+          const {environmentId,workflowId,data} = props ?? {};
+
+          return  triggerBroadcast(environmentId,workflowId,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TriggerBroadcastMutationResult = NonNullable<Awaited<ReturnType<typeof triggerBroadcast>>>
+    export type TriggerBroadcastMutationBody = TriggerBroadcastDto
+    export type TriggerBroadcastMutationError = void
+
+    /**
  * @summary Trigger a broadcast
  */
-export const useTriggerBroadcast = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof triggerBroadcast>>,
-      TError,
-      { environmentId: string; workflowId: string; data: TriggerBroadcastDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof triggerBroadcast>>,
-  TError,
-  { environmentId: string; workflowId: string; data: TriggerBroadcastDto },
-  TContext
-> => {
-  const mutationOptions = getTriggerBroadcastMutationOptions(options);
+export const useTriggerBroadcast = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerBroadcast>>, TError,{environmentId: string;workflowId: string;data: TriggerBroadcastDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof triggerBroadcast>>,
+        TError,
+        {environmentId: string;workflowId: string;data: TriggerBroadcastDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getTriggerBroadcastMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Returns a paginated list of broadcasts triggered for this workflow, most recent first
  * @summary List broadcasts for a workflow
  */
 export type listBroadcastsResponse200 = {
-  data: ListBroadcastsResponseDto;
-  status: 200;
-};
+  data: ListBroadcastsResponseDto
+  status: 200
+}
 
 export type listBroadcastsResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type listBroadcastsResponseSuccess = listBroadcastsResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type listBroadcastsResponseSuccess = (listBroadcastsResponse200) & {
   headers: Headers;
 };
-export type listBroadcastsResponseError = listBroadcastsResponse404 & {
+export type listBroadcastsResponseError = (listBroadcastsResponse404) & {
   headers: Headers;
 };
 
-export type listBroadcastsResponse =
-  | listBroadcastsResponseSuccess
-  | listBroadcastsResponseError;
+export type listBroadcastsResponse = (listBroadcastsResponseSuccess | listBroadcastsResponseError)
 
-export const getListBroadcastsUrl = (
-  environmentId: string,
-  workflowId: string,
-  params?: ListBroadcastsParams,
-) => {
+export const getListBroadcastsUrl = (environmentId: string,
+    workflowId: string,
+    params?: ListBroadcastsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/environments/${environmentId}/workflows/${workflowId}/broadcasts?${stringifiedParams}`
-    : `/environments/${environmentId}/workflows/${workflowId}/broadcasts`;
-};
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/${workflowId}/broadcasts?${stringifiedParams}` : `/environments/${environmentId}/workflows/${workflowId}/broadcasts`
+}
 
-export const listBroadcasts = async (
-  environmentId: string,
-  workflowId: string,
-  params?: ListBroadcastsParams,
-  options?: RequestInit,
-): Promise<listBroadcastsResponse> => {
-  return customFetch<listBroadcastsResponse>(
-    getListBroadcastsUrl(environmentId, workflowId, params),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export const listBroadcasts = async (environmentId: string,
+    workflowId: string,
+    params?: ListBroadcastsParams, options?: RequestInit): Promise<listBroadcastsResponse> => {
+  
+  return customFetch<listBroadcastsResponse>(getListBroadcastsUrl(environmentId,workflowId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getListBroadcastsQueryKey = (
-  environmentId?: string,
-  workflowId?: string,
-  params?: ListBroadcastsParams,
+
+
+
+
+export const getListBroadcastsQueryKey = (environmentId?: string,
+    workflowId?: string,
+    params?: ListBroadcastsParams,) => {
+    return [
+    `/environments/${environmentId}/workflows/${workflowId}/broadcasts`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListBroadcastsQueryOptions = <TData = Awaited<ReturnType<typeof listBroadcasts>>, TError = void>(environmentId: string,
+    workflowId: string,
+    params?: ListBroadcastsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [
-    `/environments/${environmentId}/workflows/${workflowId}/broadcasts`,
-    ...(params ? [params] : []),
-  ] as const;
-};
 
-export const getListBroadcastsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listBroadcasts>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params?: ListBroadcastsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getListBroadcastsQueryKey(environmentId, workflowId, params);
+  const queryKey =  queryOptions?.queryKey ?? getListBroadcastsQueryKey(environmentId,workflowId,params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof listBroadcasts>>> = ({
-    signal,
-  }) =>
-    listBroadcasts(environmentId, workflowId, params, {
-      signal,
-      ...requestOptions,
-    });
+  
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(environmentId && workflowId),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof listBroadcasts>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBroadcasts>>> = ({ signal }) => listBroadcasts(environmentId,workflowId,params, { signal, ...requestOptions });
 
-export type ListBroadcastsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listBroadcasts>>
->;
-export type ListBroadcastsQueryError = void;
+      
 
-export function useListBroadcasts<
-  TData = Awaited<ReturnType<typeof listBroadcasts>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params: undefined | ListBroadcastsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId && workflowId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListBroadcastsQueryResult = NonNullable<Awaited<ReturnType<typeof listBroadcasts>>>
+export type ListBroadcastsQueryError = void
+
+
+export function useListBroadcasts<TData = Awaited<ReturnType<typeof listBroadcasts>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params: undefined |  ListBroadcastsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listBroadcasts>>,
           TError,
           Awaited<ReturnType<typeof listBroadcasts>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useListBroadcasts<
-  TData = Awaited<ReturnType<typeof listBroadcasts>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params?: ListBroadcastsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListBroadcasts<TData = Awaited<ReturnType<typeof listBroadcasts>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListBroadcastsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listBroadcasts>>,
           TError,
           Awaited<ReturnType<typeof listBroadcasts>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useListBroadcasts<
-  TData = Awaited<ReturnType<typeof listBroadcasts>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params?: ListBroadcastsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListBroadcasts<TData = Awaited<ReturnType<typeof listBroadcasts>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListBroadcastsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary List broadcasts for a workflow
  */
 
-export function useListBroadcasts<
-  TData = Awaited<ReturnType<typeof listBroadcasts>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  params?: ListBroadcastsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getListBroadcastsQueryOptions(
-    environmentId,
-    workflowId,
-    params,
-    options,
-  );
+export function useListBroadcasts<TData = Awaited<ReturnType<typeof listBroadcasts>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    params?: ListBroadcastsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBroadcasts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getListBroadcastsQueryOptions(environmentId,workflowId,params,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)
  * @summary Get a broadcast
  */
 export type getBroadcastResponse200 = {
-  data: BroadcastDetailResponseDto;
-  status: 200;
-};
+  data: BroadcastDetailResponseDto
+  status: 200
+}
 
 export type getBroadcastResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type getBroadcastResponseSuccess = getBroadcastResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type getBroadcastResponseSuccess = (getBroadcastResponse200) & {
   headers: Headers;
 };
-export type getBroadcastResponseError = getBroadcastResponse404 & {
+export type getBroadcastResponseError = (getBroadcastResponse404) & {
   headers: Headers;
 };
 
-export type getBroadcastResponse =
-  | getBroadcastResponseSuccess
-  | getBroadcastResponseError;
+export type getBroadcastResponse = (getBroadcastResponseSuccess | getBroadcastResponseError)
 
-export const getGetBroadcastUrl = (
-  environmentId: string,
-  workflowId: string,
-  broadcastId: string,
+export const getGetBroadcastUrl = (environmentId: string,
+    workflowId: string,
+    broadcastId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}`
+}
+
+export const getBroadcast = async (environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: RequestInit): Promise<getBroadcastResponse> => {
+  
+  return customFetch<getBroadcastResponse>(getGetBroadcastUrl(environmentId,workflowId,broadcastId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetBroadcastQueryKey = (environmentId?: string,
+    workflowId?: string,
+    broadcastId?: string,) => {
+    return [
+    `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}`
+    ] as const;
+    }
+
+    
+export const getGetBroadcastQueryOptions = <TData = Awaited<ReturnType<typeof getBroadcast>>, TError = void>(environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}`;
-};
 
-export const getBroadcast = async (
-  environmentId: string,
-  workflowId: string,
-  broadcastId: string,
-  options?: RequestInit,
-): Promise<getBroadcastResponse> => {
-  return customFetch<getBroadcastResponse>(
-    getGetBroadcastUrl(environmentId, workflowId, broadcastId),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getGetBroadcastQueryKey = (
-  environmentId?: string,
-  workflowId?: string,
-  broadcastId?: string,
-) => {
-  return [
-    `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}`,
-  ] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getGetBroadcastQueryKey(environmentId,workflowId,broadcastId);
 
-export const getGetBroadcastQueryOptions = <
-  TData = Awaited<ReturnType<typeof getBroadcast>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  broadcastId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getGetBroadcastQueryKey(environmentId, workflowId, broadcastId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBroadcast>>> = ({ signal }) => getBroadcast(environmentId,workflowId,broadcastId, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getBroadcast>>> = ({
-    signal,
-  }) =>
-    getBroadcast(environmentId, workflowId, broadcastId, {
-      signal,
-      ...requestOptions,
-    });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(environmentId && workflowId && broadcastId),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getBroadcast>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+      
 
-export type GetBroadcastQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getBroadcast>>
->;
-export type GetBroadcastQueryError = void;
+   return  { queryKey, queryFn, enabled: !!(environmentId && workflowId && broadcastId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
 
-export function useGetBroadcast<
-  TData = Awaited<ReturnType<typeof getBroadcast>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  broadcastId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>
-    > &
-      Pick<
+export type GetBroadcastQueryResult = NonNullable<Awaited<ReturnType<typeof getBroadcast>>>
+export type GetBroadcastQueryError = void
+
+
+export function useGetBroadcast<TData = Awaited<ReturnType<typeof getBroadcast>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    broadcastId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getBroadcast>>,
           TError,
           Awaited<ReturnType<typeof getBroadcast>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useGetBroadcast<
-  TData = Awaited<ReturnType<typeof getBroadcast>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  broadcastId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetBroadcast<TData = Awaited<ReturnType<typeof getBroadcast>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getBroadcast>>,
           TError,
           Awaited<ReturnType<typeof getBroadcast>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetBroadcast<
-  TData = Awaited<ReturnType<typeof getBroadcast>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  broadcastId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetBroadcast<TData = Awaited<ReturnType<typeof getBroadcast>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary Get a broadcast
  */
 
-export function useGetBroadcast<
-  TData = Awaited<ReturnType<typeof getBroadcast>>,
-  TError = void,
->(
-  environmentId: string,
-  workflowId: string,
-  broadcastId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetBroadcastQueryOptions(
-    environmentId,
-    workflowId,
-    broadcastId,
-    options,
-  );
+export function useGetBroadcast<TData = Awaited<ReturnType<typeof getBroadcast>>, TError = void>(
+ environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBroadcast>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getGetBroadcastQueryOptions(environmentId,workflowId,broadcastId,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Generic bounce-recording endpoint, identified by the run step's publicId - callers are expected to have that publicId available via whatever mechanism they use to learn about the bounce (e.g. a provider's native webhook echoing back metadata set at send time). Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.
  * @summary Record an inbound bounce event
  */
 export type recordInboundBounceResponse202 = {
-  data: void;
-  status: 202;
-};
+  data: void
+  status: 202
+}
 
 export type recordInboundBounceResponse401 = {
-  data: void;
-  status: 401;
-};
+  data: void
+  status: 401
+}
 
 export type recordInboundBounceResponse404 = {
-  data: void;
-  status: 404;
+  data: void
+  status: 404
+}
+    
+export type recordInboundBounceResponseSuccess = (recordInboundBounceResponse202) & {
+  headers: Headers;
 };
-
-export type recordInboundBounceResponseSuccess =
-  recordInboundBounceResponse202 & {
-    headers: Headers;
-  };
-export type recordInboundBounceResponseError = (
-  | recordInboundBounceResponse401
-  | recordInboundBounceResponse404
-) & {
+export type recordInboundBounceResponseError = (recordInboundBounceResponse401 | recordInboundBounceResponse404) & {
   headers: Headers;
 };
 
-export type recordInboundBounceResponse =
-  | recordInboundBounceResponseSuccess
-  | recordInboundBounceResponseError;
+export type recordInboundBounceResponse = (recordInboundBounceResponseSuccess | recordInboundBounceResponseError)
 
 export const getRecordInboundBounceUrl = () => {
-  return `/bounces/inbound`;
-};
 
-export const recordInboundBounce = async (
-  bounceWebhookBodyDto: BounceWebhookBodyDto,
-  options?: RequestInit,
-): Promise<recordInboundBounceResponse> => {
-  return customFetch<recordInboundBounceResponse>(getRecordInboundBounceUrl(), {
-    credentials: "include",
+
+  
+
+  return `/bounces/inbound`
+}
+
+export const recordInboundBounce = async (bounceWebhookBodyDto: BounceWebhookBodyDto, options?: RequestInit): Promise<recordInboundBounceResponse> => {
+  
+  return customFetch<recordInboundBounceResponse>(getRecordInboundBounceUrl(),
+  {
+      credentials: 'include',
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(bounceWebhookBodyDto),
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bounceWebhookBodyDto,)
+  }
+);}
 
-export const getRecordInboundBounceMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof recordInboundBounce>>,
-    TError,
-    { data: BounceWebhookBodyDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof recordInboundBounce>>,
-  TError,
-  { data: BounceWebhookBodyDto },
-  TContext
-> => {
-  const mutationKey = ["recordInboundBounce"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof recordInboundBounce>>,
-    { data: BounceWebhookBodyDto }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return recordInboundBounce(data, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getRecordInboundBounceMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordInboundBounce>>, TError,{data: BounceWebhookBodyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof recordInboundBounce>>, TError,{data: BounceWebhookBodyDto}, TContext> => {
 
-export type RecordInboundBounceMutationResult = NonNullable<
-  Awaited<ReturnType<typeof recordInboundBounce>>
->;
-export type RecordInboundBounceMutationBody = BounceWebhookBodyDto;
-export type RecordInboundBounceMutationError = void;
+const mutationKey = ['recordInboundBounce'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-/**
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordInboundBounce>>, {data: BounceWebhookBodyDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  recordInboundBounce(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordInboundBounceMutationResult = NonNullable<Awaited<ReturnType<typeof recordInboundBounce>>>
+    export type RecordInboundBounceMutationBody = BounceWebhookBodyDto
+    export type RecordInboundBounceMutationError = void
+
+    /**
  * @summary Record an inbound bounce event
  */
-export const useRecordInboundBounce = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof recordInboundBounce>>,
-      TError,
-      { data: BounceWebhookBodyDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof recordInboundBounce>>,
-  TError,
-  { data: BounceWebhookBodyDto },
-  TContext
-> => {
-  const mutationOptions = getRecordInboundBounceMutationOptions(options);
+export const useRecordInboundBounce = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordInboundBounce>>, TError,{data: BounceWebhookBodyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordInboundBounce>>,
+        TError,
+        {data: BounceWebhookBodyDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getRecordInboundBounceMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Creates or updates the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned.
  * @summary Configure an integration
  */
 export type upsertIntegrationResponse200 = {
-  data: IntegrationResponseDto;
-  status: 200;
-};
+  data: IntegrationResponseDto
+  status: 200
+}
 
 export type upsertIntegrationResponse400 = {
-  data: void;
-  status: 400;
-};
+  data: void
+  status: 400
+}
 
 export type upsertIntegrationResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type upsertIntegrationResponseSuccess = upsertIntegrationResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type upsertIntegrationResponseSuccess = (upsertIntegrationResponse200) & {
   headers: Headers;
 };
-export type upsertIntegrationResponseError = (
-  | upsertIntegrationResponse400
-  | upsertIntegrationResponse404
-) & {
+export type upsertIntegrationResponseError = (upsertIntegrationResponse400 | upsertIntegrationResponse404) & {
   headers: Headers;
 };
 
-export type upsertIntegrationResponse =
-  | upsertIntegrationResponseSuccess
-  | upsertIntegrationResponseError;
+export type upsertIntegrationResponse = (upsertIntegrationResponseSuccess | upsertIntegrationResponseError)
 
-export const getUpsertIntegrationUrl = (
-  environmentId: string,
-  type: string,
-) => {
-  return `/environments/${environmentId}/integrations/${type}`;
-};
+export const getUpsertIntegrationUrl = (environmentId: string,
+    type: string,) => {
 
-export const upsertIntegration = async (
-  environmentId: string,
-  type: string,
-  upsertIntegrationDto: UpsertIntegrationDto,
-  options?: RequestInit,
-): Promise<upsertIntegrationResponse> => {
-  return customFetch<upsertIntegrationResponse>(
-    getUpsertIntegrationUrl(environmentId, type),
-    {
-      credentials: "include",
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(upsertIntegrationDto),
-    },
-  );
-};
 
-export const getUpsertIntegrationMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof upsertIntegration>>,
-    TError,
-    { environmentId: string; type: string; data: UpsertIntegrationDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof upsertIntegration>>,
-  TError,
-  { environmentId: string; type: string; data: UpsertIntegrationDto },
-  TContext
-> => {
-  const mutationKey = ["upsertIntegration"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof upsertIntegration>>,
-    { environmentId: string; type: string; data: UpsertIntegrationDto }
-  > = (props) => {
-    const { environmentId, type, data } = props ?? {};
+  return `/environments/${environmentId}/integrations/${type}`
+}
 
-    return upsertIntegration(environmentId, type, data, requestOptions);
-  };
+export const upsertIntegration = async (environmentId: string,
+    type: string,
+    upsertIntegrationDto: UpsertIntegrationDto, options?: RequestInit): Promise<upsertIntegrationResponse> => {
+  
+  return customFetch<upsertIntegrationResponse>(getUpsertIntegrationUrl(environmentId,type),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      upsertIntegrationDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type UpsertIntegrationMutationResult = NonNullable<
-  Awaited<ReturnType<typeof upsertIntegration>>
->;
-export type UpsertIntegrationMutationBody = UpsertIntegrationDto;
-export type UpsertIntegrationMutationError = void;
 
-/**
+
+export const getUpsertIntegrationMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string;data: UpsertIntegrationDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string;data: UpsertIntegrationDto}, TContext> => {
+
+const mutationKey = ['upsertIntegration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertIntegration>>, {environmentId: string;type: string;data: UpsertIntegrationDto}> = (props) => {
+          const {environmentId,type,data} = props ?? {};
+
+          return  upsertIntegration(environmentId,type,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpsertIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof upsertIntegration>>>
+    export type UpsertIntegrationMutationBody = UpsertIntegrationDto
+    export type UpsertIntegrationMutationError = void
+
+    /**
  * @summary Configure an integration
  */
-export const useUpsertIntegration = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof upsertIntegration>>,
-      TError,
-      { environmentId: string; type: string; data: UpsertIntegrationDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof upsertIntegration>>,
-  TError,
-  { environmentId: string; type: string; data: UpsertIntegrationDto },
-  TContext
-> => {
-  const mutationOptions = getUpsertIntegrationMutationOptions(options);
+export const useUpsertIntegration = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertIntegration>>, TError,{environmentId: string;type: string;data: UpsertIntegrationDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof upsertIntegration>>,
+        TError,
+        {environmentId: string;type: string;data: UpsertIntegrationDto},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getUpsertIntegrationMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Returns the sanitized config for a single integration type (no secrets).
  * @summary Get an integration
  */
 export type getIntegrationResponse200 = {
-  data: IntegrationResponseDto;
-  status: 200;
-};
+  data: IntegrationResponseDto
+  status: 200
+}
 
 export type getIntegrationResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type getIntegrationResponseSuccess = getIntegrationResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type getIntegrationResponseSuccess = (getIntegrationResponse200) & {
   headers: Headers;
 };
-export type getIntegrationResponseError = getIntegrationResponse404 & {
+export type getIntegrationResponseError = (getIntegrationResponse404) & {
   headers: Headers;
 };
 
-export type getIntegrationResponse =
-  | getIntegrationResponseSuccess
-  | getIntegrationResponseError;
+export type getIntegrationResponse = (getIntegrationResponseSuccess | getIntegrationResponseError)
 
-export const getGetIntegrationUrl = (environmentId: string, type: string) => {
-  return `/environments/${environmentId}/integrations/${type}`;
-};
+export const getGetIntegrationUrl = (environmentId: string,
+    type: string,) => {
 
-export const getIntegration = async (
-  environmentId: string,
-  type: string,
-  options?: RequestInit,
-): Promise<getIntegrationResponse> => {
-  return customFetch<getIntegrationResponse>(
-    getGetIntegrationUrl(environmentId, type),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
 
-export const getGetIntegrationQueryKey = (
-  environmentId?: string,
-  type?: string,
+  
+
+  return `/environments/${environmentId}/integrations/${type}`
+}
+
+export const getIntegration = async (environmentId: string,
+    type: string, options?: RequestInit): Promise<getIntegrationResponse> => {
+  
+  return customFetch<getIntegrationResponse>(getGetIntegrationUrl(environmentId,type),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetIntegrationQueryKey = (environmentId?: string,
+    type?: string,) => {
+    return [
+    `/environments/${environmentId}/integrations/${type}`
+    ] as const;
+    }
+
+    
+export const getGetIntegrationQueryOptions = <TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(environmentId: string,
+    type: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [`/environments/${environmentId}/integrations/${type}`] as const;
-};
 
-export const getGetIntegrationQueryOptions = <
-  TData = Awaited<ReturnType<typeof getIntegration>>,
-  TError = void,
->(
-  environmentId: string,
-  type: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetIntegrationQueryKey(environmentId, type);
+  const queryKey =  queryOptions?.queryKey ?? getGetIntegrationQueryKey(environmentId,type);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIntegration>>> = ({
-    signal,
-  }) => getIntegration(environmentId, type, { signal, ...requestOptions });
+  
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(environmentId && type),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getIntegration>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIntegration>>> = ({ signal }) => getIntegration(environmentId,type, { signal, ...requestOptions });
 
-export type GetIntegrationQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getIntegration>>
->;
-export type GetIntegrationQueryError = void;
+      
 
-export function useGetIntegration<
-  TData = Awaited<ReturnType<typeof getIntegration>>,
-  TError = void,
->(
-  environmentId: string,
-  type: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId && type), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetIntegrationQueryResult = NonNullable<Awaited<ReturnType<typeof getIntegration>>>
+export type GetIntegrationQueryError = void
+
+
+export function useGetIntegration<TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(
+ environmentId: string,
+    type: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getIntegration>>,
           TError,
           Awaited<ReturnType<typeof getIntegration>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useGetIntegration<
-  TData = Awaited<ReturnType<typeof getIntegration>>,
-  TError = void,
->(
-  environmentId: string,
-  type: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetIntegration<TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(
+ environmentId: string,
+    type: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getIntegration>>,
           TError,
           Awaited<ReturnType<typeof getIntegration>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetIntegration<
-  TData = Awaited<ReturnType<typeof getIntegration>>,
-  TError = void,
->(
-  environmentId: string,
-  type: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetIntegration<TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(
+ environmentId: string,
+    type: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary Get an integration
  */
 
-export function useGetIntegration<
-  TData = Awaited<ReturnType<typeof getIntegration>>,
-  TError = void,
->(
-  environmentId: string,
-  type: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetIntegrationQueryOptions(
-    environmentId,
-    type,
-    options,
-  );
+export function useGetIntegration<TData = Awaited<ReturnType<typeof getIntegration>>, TError = void>(
+ environmentId: string,
+    type: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIntegration>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getGetIntegrationQueryOptions(environmentId,type,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * @summary Remove an integration
  */
 export type deleteIntegrationResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type deleteIntegrationResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type deleteIntegrationResponseSuccess = deleteIntegrationResponse204 & {
+  data: void
+  status: 404
+}
+    
+export type deleteIntegrationResponseSuccess = (deleteIntegrationResponse204) & {
   headers: Headers;
 };
-export type deleteIntegrationResponseError = deleteIntegrationResponse404 & {
+export type deleteIntegrationResponseError = (deleteIntegrationResponse404) & {
   headers: Headers;
 };
 
-export type deleteIntegrationResponse =
-  | deleteIntegrationResponseSuccess
-  | deleteIntegrationResponseError;
+export type deleteIntegrationResponse = (deleteIntegrationResponseSuccess | deleteIntegrationResponseError)
 
-export const getDeleteIntegrationUrl = (
-  environmentId: string,
-  type: string,
-) => {
-  return `/environments/${environmentId}/integrations/${type}`;
-};
+export const getDeleteIntegrationUrl = (environmentId: string,
+    type: string,) => {
 
-export const deleteIntegration = async (
-  environmentId: string,
-  type: string,
-  options?: RequestInit,
-): Promise<deleteIntegrationResponse> => {
-  return customFetch<deleteIntegrationResponse>(
-    getDeleteIntegrationUrl(environmentId, type),
-    {
-      credentials: "include",
-      ...options,
-      method: "DELETE",
-    },
-  );
-};
 
-export const getDeleteIntegrationMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteIntegration>>,
-    TError,
-    { environmentId: string; type: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteIntegration>>,
-  TError,
-  { environmentId: string; type: string },
-  TContext
-> => {
-  const mutationKey = ["deleteIntegration"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteIntegration>>,
-    { environmentId: string; type: string }
-  > = (props) => {
-    const { environmentId, type } = props ?? {};
+  return `/environments/${environmentId}/integrations/${type}`
+}
 
-    return deleteIntegration(environmentId, type, requestOptions);
-  };
+export const deleteIntegration = async (environmentId: string,
+    type: string, options?: RequestInit): Promise<deleteIntegrationResponse> => {
+  
+  return customFetch<deleteIntegrationResponse>(getDeleteIntegrationUrl(environmentId,type),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type DeleteIntegrationMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteIntegration>>
->;
 
-export type DeleteIntegrationMutationError = void;
 
-/**
+export const getDeleteIntegrationMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteIntegration>>, TError,{environmentId: string;type: string}, TContext> => {
+
+const mutationKey = ['deleteIntegration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteIntegration>>, {environmentId: string;type: string}> = (props) => {
+          const {environmentId,type} = props ?? {};
+
+          return  deleteIntegration(environmentId,type,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof deleteIntegration>>>
+    
+    export type DeleteIntegrationMutationError = void
+
+    /**
  * @summary Remove an integration
  */
-export const useDeleteIntegration = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteIntegration>>,
-      TError,
-      { environmentId: string; type: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteIntegration>>,
-  TError,
-  { environmentId: string; type: string },
-  TContext
-> => {
-  const mutationOptions = getDeleteIntegrationMutationOptions(options);
+export const useDeleteIntegration = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteIntegration>>,
+        TError,
+        {environmentId: string;type: string},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getDeleteIntegrationMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.
  * @summary Set an integration as primary
  */
 export type setPrimaryIntegrationResponse200 = {
-  data: IntegrationResponseDto;
-  status: 200;
-};
+  data: IntegrationResponseDto
+  status: 200
+}
 
 export type setPrimaryIntegrationResponse404 = {
-  data: void;
-  status: 404;
+  data: void
+  status: 404
+}
+    
+export type setPrimaryIntegrationResponseSuccess = (setPrimaryIntegrationResponse200) & {
+  headers: Headers;
+};
+export type setPrimaryIntegrationResponseError = (setPrimaryIntegrationResponse404) & {
+  headers: Headers;
 };
 
-export type setPrimaryIntegrationResponseSuccess =
-  setPrimaryIntegrationResponse200 & {
-    headers: Headers;
-  };
-export type setPrimaryIntegrationResponseError =
-  setPrimaryIntegrationResponse404 & {
-    headers: Headers;
-  };
+export type setPrimaryIntegrationResponse = (setPrimaryIntegrationResponseSuccess | setPrimaryIntegrationResponseError)
 
-export type setPrimaryIntegrationResponse =
-  | setPrimaryIntegrationResponseSuccess
-  | setPrimaryIntegrationResponseError;
+export const getSetPrimaryIntegrationUrl = (environmentId: string,
+    type: string,) => {
 
-export const getSetPrimaryIntegrationUrl = (
-  environmentId: string,
-  type: string,
-) => {
-  return `/environments/${environmentId}/integrations/${type}/primary`;
-};
 
-export const setPrimaryIntegration = async (
-  environmentId: string,
-  type: string,
-  options?: RequestInit,
-): Promise<setPrimaryIntegrationResponse> => {
-  return customFetch<setPrimaryIntegrationResponse>(
-    getSetPrimaryIntegrationUrl(environmentId, type),
-    {
-      credentials: "include",
-      ...options,
-      method: "PATCH",
-    },
-  );
-};
+  
 
-export const getSetPrimaryIntegrationMutationOptions = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof setPrimaryIntegration>>,
-    TError,
-    { environmentId: string; type: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof setPrimaryIntegration>>,
-  TError,
-  { environmentId: string; type: string },
-  TContext
-> => {
-  const mutationKey = ["setPrimaryIntegration"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  return `/environments/${environmentId}/integrations/${type}/primary`
+}
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof setPrimaryIntegration>>,
-    { environmentId: string; type: string }
-  > = (props) => {
-    const { environmentId, type } = props ?? {};
+export const setPrimaryIntegration = async (environmentId: string,
+    type: string, options?: RequestInit): Promise<setPrimaryIntegrationResponse> => {
+  
+  return customFetch<setPrimaryIntegrationResponse>(getSetPrimaryIntegrationUrl(environmentId,type),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH'
+    
+    
+  }
+);}
 
-    return setPrimaryIntegration(environmentId, type, requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type SetPrimaryIntegrationMutationResult = NonNullable<
-  Awaited<ReturnType<typeof setPrimaryIntegration>>
->;
 
-export type SetPrimaryIntegrationMutationError = void;
+export const getSetPrimaryIntegrationMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setPrimaryIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setPrimaryIntegration>>, TError,{environmentId: string;type: string}, TContext> => {
 
-/**
+const mutationKey = ['setPrimaryIntegration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setPrimaryIntegration>>, {environmentId: string;type: string}> = (props) => {
+          const {environmentId,type} = props ?? {};
+
+          return  setPrimaryIntegration(environmentId,type,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetPrimaryIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof setPrimaryIntegration>>>
+    
+    export type SetPrimaryIntegrationMutationError = void
+
+    /**
  * @summary Set an integration as primary
  */
-export const useSetPrimaryIntegration = <TError = void, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof setPrimaryIntegration>>,
-      TError,
-      { environmentId: string; type: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof setPrimaryIntegration>>,
-  TError,
-  { environmentId: string; type: string },
-  TContext
-> => {
-  const mutationOptions = getSetPrimaryIntegrationMutationOptions(options);
+export const useSetPrimaryIntegration = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setPrimaryIntegration>>, TError,{environmentId: string;type: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setPrimaryIntegration>>,
+        TError,
+        {environmentId: string;type: string},
+        TContext
+      > => {
 
-  return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getSetPrimaryIntegrationMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Returns every integration configured for this environment, sanitized (no secrets).
  * @summary List configured integrations
  */
 export type listIntegrationsResponse200 = {
-  data: ListIntegrationsResponseDto;
-  status: 200;
-};
+  data: ListIntegrationsResponseDto
+  status: 200
+}
 
 export type listIntegrationsResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type listIntegrationsResponseSuccess = listIntegrationsResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type listIntegrationsResponseSuccess = (listIntegrationsResponse200) & {
   headers: Headers;
 };
-export type listIntegrationsResponseError = listIntegrationsResponse404 & {
+export type listIntegrationsResponseError = (listIntegrationsResponse404) & {
   headers: Headers;
 };
 
-export type listIntegrationsResponse =
-  | listIntegrationsResponseSuccess
-  | listIntegrationsResponseError;
+export type listIntegrationsResponse = (listIntegrationsResponseSuccess | listIntegrationsResponseError)
 
-export const getListIntegrationsUrl = (environmentId: string) => {
-  return `/environments/${environmentId}/integrations`;
-};
+export const getListIntegrationsUrl = (environmentId: string,) => {
 
-export const listIntegrations = async (
-  environmentId: string,
-  options?: RequestInit,
-): Promise<listIntegrationsResponse> => {
-  return customFetch<listIntegrationsResponse>(
-    getListIntegrationsUrl(environmentId),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
 
-export const getListIntegrationsQueryKey = (environmentId?: string) => {
-  return [`/environments/${environmentId}/integrations`] as const;
-};
+  
 
-export const getListIntegrationsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listIntegrations>>,
-  TError = void,
->(
-  environmentId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listIntegrations>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
+  return `/environments/${environmentId}/integrations`
+}
+
+export const listIntegrations = async (environmentId: string, options?: RequestInit): Promise<listIntegrationsResponse> => {
+  
+  return customFetch<listIntegrationsResponse>(getListIntegrationsUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListIntegrationsQueryKey = (environmentId?: string,) => {
+    return [
+    `/environments/${environmentId}/integrations`
+    ] as const;
+    }
+
+    
+export const getListIntegrationsQueryOptions = <TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getListIntegrationsQueryKey(environmentId);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listIntegrations>>
-  > = ({ signal }) =>
-    listIntegrations(environmentId, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getListIntegrationsQueryKey(environmentId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!environmentId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof listIntegrations>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+  
 
-export type ListIntegrationsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listIntegrations>>
->;
-export type ListIntegrationsQueryError = void;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listIntegrations>>> = ({ signal }) => listIntegrations(environmentId, { signal, ...requestOptions });
 
-export function useListIntegrations<
-  TData = Awaited<ReturnType<typeof listIntegrations>>,
-  TError = void,
->(
-  environmentId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listIntegrations>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListIntegrationsQueryResult = NonNullable<Awaited<ReturnType<typeof listIntegrations>>>
+export type ListIntegrationsQueryError = void
+
+
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(
+ environmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listIntegrations>>,
           TError,
           Awaited<ReturnType<typeof listIntegrations>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useListIntegrations<
-  TData = Awaited<ReturnType<typeof listIntegrations>>,
-  TError = void,
->(
-  environmentId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listIntegrations>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listIntegrations>>,
           TError,
           Awaited<ReturnType<typeof listIntegrations>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useListIntegrations<
-  TData = Awaited<ReturnType<typeof listIntegrations>>,
-  TError = void,
->(
-  environmentId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listIntegrations>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary List configured integrations
  */
 
-export function useListIntegrations<
-  TData = Awaited<ReturnType<typeof listIntegrations>>,
-  TError = void,
->(
-  environmentId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listIntegrations>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getListIntegrationsQueryOptions(environmentId, options);
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = void>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getListIntegrationsQueryOptions(environmentId,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
+
+
+
+
 
 /**
  * Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.
  * @summary Get environment-wide analytics
  */
 export type getAnalyticsResponse200 = {
-  data: AnalyticsResponseDto;
-  status: 200;
-};
+  data: AnalyticsResponseDto
+  status: 200
+}
 
 export type getAnalyticsResponse404 = {
-  data: void;
-  status: 404;
-};
-
-export type getAnalyticsResponseSuccess = getAnalyticsResponse200 & {
+  data: void
+  status: 404
+}
+    
+export type getAnalyticsResponseSuccess = (getAnalyticsResponse200) & {
   headers: Headers;
 };
-export type getAnalyticsResponseError = getAnalyticsResponse404 & {
+export type getAnalyticsResponseError = (getAnalyticsResponse404) & {
   headers: Headers;
 };
 
-export type getAnalyticsResponse =
-  | getAnalyticsResponseSuccess
-  | getAnalyticsResponseError;
+export type getAnalyticsResponse = (getAnalyticsResponseSuccess | getAnalyticsResponseError)
 
-export const getGetAnalyticsUrl = (
-  environmentId: string,
-  params?: GetAnalyticsParams,
-) => {
+export const getGetAnalyticsUrl = (environmentId: string,
+    params?: GetAnalyticsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/environments/${environmentId}/analytics?${stringifiedParams}`
-    : `/environments/${environmentId}/analytics`;
-};
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/analytics?${stringifiedParams}` : `/environments/${environmentId}/analytics`
+}
 
-export const getAnalytics = async (
-  environmentId: string,
-  params?: GetAnalyticsParams,
-  options?: RequestInit,
-): Promise<getAnalyticsResponse> => {
-  return customFetch<getAnalyticsResponse>(
-    getGetAnalyticsUrl(environmentId, params),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+export const getAnalytics = async (environmentId: string,
+    params?: GetAnalyticsParams, options?: RequestInit): Promise<getAnalyticsResponse> => {
+  
+  return customFetch<getAnalyticsResponse>(getGetAnalyticsUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
 
-export const getGetAnalyticsQueryKey = (
-  environmentId?: string,
-  params?: GetAnalyticsParams,
+
+
+
+
+export const getGetAnalyticsQueryKey = (environmentId?: string,
+    params?: GetAnalyticsParams,) => {
+    return [
+    `/environments/${environmentId}/analytics`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getGetAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(environmentId: string,
+    params?: GetAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  return [
-    `/environments/${environmentId}/analytics`,
-    ...(params ? [params] : []),
-  ] as const;
-};
 
-export const getGetAnalyticsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getAnalytics>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: GetAnalyticsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getGetAnalyticsQueryKey(environmentId, params);
+  const queryKey =  queryOptions?.queryKey ?? getGetAnalyticsQueryKey(environmentId,params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAnalytics>>> = ({
-    signal,
-  }) => getAnalytics(environmentId, params, { signal, ...requestOptions });
+  
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!environmentId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getAnalytics>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAnalytics>>> = ({ signal }) => getAnalytics(environmentId,params, { signal, ...requestOptions });
 
-export type GetAnalyticsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getAnalytics>>
->;
-export type GetAnalyticsQueryError = void;
+      
 
-export function useGetAnalytics<
-  TData = Awaited<ReturnType<typeof getAnalytics>>,
-  TError = void,
->(
-  environmentId: string,
-  params: undefined | GetAnalyticsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type GetAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getAnalytics>>>
+export type GetAnalyticsQueryError = void
+
+
+export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(
+ environmentId: string,
+    params: undefined |  GetAnalyticsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAnalytics>>,
           TError,
           Awaited<ReturnType<typeof getAnalytics>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useGetAnalytics<
-  TData = Awaited<ReturnType<typeof getAnalytics>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: GetAnalyticsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(
+ environmentId: string,
+    params?: GetAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAnalytics>>,
           TError,
           Awaited<ReturnType<typeof getAnalytics>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetAnalytics<
-  TData = Awaited<ReturnType<typeof getAnalytics>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: GetAnalyticsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(
+ environmentId: string,
+    params?: GetAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 /**
  * @summary Get environment-wide analytics
  */
 
-export function useGetAnalytics<
-  TData = Awaited<ReturnType<typeof getAnalytics>>,
-  TError = void,
->(
-  environmentId: string,
-  params?: GetAnalyticsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetAnalyticsQueryOptions(
-    environmentId,
-    params,
-    options,
-  );
+export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>, TError = void>(
+ environmentId: string,
+    params?: GetAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalytics>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getGetAnalyticsQueryOptions(environmentId,params,options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
 
-export type streamableHttpControllerHandlePostRequestResponse201 = {
-  data: void;
-  status: 201;
-};
 
-export type streamableHttpControllerHandlePostRequestResponseSuccess =
-  streamableHttpControllerHandlePostRequestResponse201 & {
-    headers: Headers;
-  };
-export type streamableHttpControllerHandlePostRequestResponse =
-  streamableHttpControllerHandlePostRequestResponseSuccess;
+
+
+
+export type streamableHttpControllerHandlePostRequestResponse201 = {
+  data: void
+  status: 201
+}
+    
+export type streamableHttpControllerHandlePostRequestResponseSuccess = (streamableHttpControllerHandlePostRequestResponse201) & {
+  headers: Headers;
+};
+;
+
+export type streamableHttpControllerHandlePostRequestResponse = (streamableHttpControllerHandlePostRequestResponseSuccess)
 
 export const getStreamableHttpControllerHandlePostRequestUrl = () => {
-  return `/mcp`;
-};
 
-export const streamableHttpControllerHandlePostRequest = async (
-  options?: RequestInit,
-): Promise<streamableHttpControllerHandlePostRequestResponse> => {
-  return customFetch<streamableHttpControllerHandlePostRequestResponse>(
-    getStreamableHttpControllerHandlePostRequestUrl(),
-    {
-      credentials: "include",
-      ...options,
-      method: "POST",
-    },
-  );
-};
 
-export const getStreamableHttpControllerHandlePostRequestMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>,
-    TError,
-    void,
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationKey = ["streamableHttpControllerHandlePostRequest"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>,
-    void
-  > = () => {
-    return streamableHttpControllerHandlePostRequest(requestOptions);
-  };
+  return `/mcp`
+}
 
-  return { mutationFn, ...mutationOptions };
-};
+export const streamableHttpControllerHandlePostRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandlePostRequestResponse> => {
+  
+  return customFetch<streamableHttpControllerHandlePostRequestResponse>(getStreamableHttpControllerHandlePostRequestUrl(),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
 
-export type StreamableHttpControllerHandlePostRequestMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>
-  >;
 
-export type StreamableHttpControllerHandlePostRequestMutationError = unknown;
 
-export const useStreamableHttpControllerHandlePostRequest = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>,
-      TError,
-      void,
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationOptions =
-    getStreamableHttpControllerHandlePostRequestMutationOptions(options);
 
-  return useMutation(mutationOptions, queryClient);
-};
+export const getStreamableHttpControllerHandlePostRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>, TError,void, TContext> => {
 
+const mutationKey = ['streamableHttpControllerHandlePostRequest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>, void> = () => {
+          
+
+          return  streamableHttpControllerHandlePostRequest(requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StreamableHttpControllerHandlePostRequestMutationResult = NonNullable<Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>>
+    
+    export type StreamableHttpControllerHandlePostRequestMutationError = unknown
+
+    export const useStreamableHttpControllerHandlePostRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof streamableHttpControllerHandlePostRequest>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getStreamableHttpControllerHandlePostRequestMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 export type streamableHttpControllerHandleGetRequestResponse200 = {
-  data: void;
-  status: 200;
+  data: void
+  status: 200
+}
+    
+export type streamableHttpControllerHandleGetRequestResponseSuccess = (streamableHttpControllerHandleGetRequestResponse200) & {
+  headers: Headers;
 };
+;
 
-export type streamableHttpControllerHandleGetRequestResponseSuccess =
-  streamableHttpControllerHandleGetRequestResponse200 & {
-    headers: Headers;
-  };
-export type streamableHttpControllerHandleGetRequestResponse =
-  streamableHttpControllerHandleGetRequestResponseSuccess;
+export type streamableHttpControllerHandleGetRequestResponse = (streamableHttpControllerHandleGetRequestResponseSuccess)
 
 export const getStreamableHttpControllerHandleGetRequestUrl = () => {
-  return `/mcp`;
-};
 
-export const streamableHttpControllerHandleGetRequest = async (
-  options?: RequestInit,
-): Promise<streamableHttpControllerHandleGetRequestResponse> => {
-  return customFetch<streamableHttpControllerHandleGetRequestResponse>(
-    getStreamableHttpControllerHandleGetRequestUrl(),
-    {
-      credentials: "include",
-      ...options,
-      method: "GET",
-    },
-  );
-};
+
+  
+
+  return `/mcp`
+}
+
+export const streamableHttpControllerHandleGetRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandleGetRequestResponse> => {
+  
+  return customFetch<streamableHttpControllerHandleGetRequestResponse>(getStreamableHttpControllerHandleGetRequestUrl(),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
 
 export const getStreamableHttpControllerHandleGetRequestQueryKey = () => {
-  return [`/mcp`] as const;
-};
+    return [
+    `/mcp`
+    ] as const;
+    }
 
-export const getStreamableHttpControllerHandleGetRequestQueryOptions = <
-  TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-  TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<
-      Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-      TError,
-      TData
-    >
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+    
+export const getStreamableHttpControllerHandleGetRequestQueryOptions = <TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getStreamableHttpControllerHandleGetRequestQueryKey();
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>
-  > = ({ signal }) =>
-    streamableHttpControllerHandleGetRequest({ signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getStreamableHttpControllerHandleGetRequestQueryKey();
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
+  
 
-export type StreamableHttpControllerHandleGetRequestQueryResult = NonNullable<
-  Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>
->;
-export type StreamableHttpControllerHandleGetRequestQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>> = ({ signal }) => streamableHttpControllerHandleGetRequest({ signal, ...requestOptions });
 
-export function useStreamableHttpControllerHandleGetRequest<
-  TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-  TError = unknown,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type StreamableHttpControllerHandleGetRequestQueryResult = NonNullable<Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>>
+export type StreamableHttpControllerHandleGetRequestQueryError = unknown
+
+
+export function useStreamableHttpControllerHandleGetRequest<TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
           TError,
           Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData>;
-};
-export function useStreamableHttpControllerHandleGetRequest<
-  TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useStreamableHttpControllerHandleGetRequest<TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
           TError,
           Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useStreamableHttpControllerHandleGetRequest<
-  TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useStreamableHttpControllerHandleGetRequest<TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
 
-export function useStreamableHttpControllerHandleGetRequest<
-  TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions =
-    getStreamableHttpControllerHandleGetRequestQueryOptions(options);
+export function useStreamableHttpControllerHandleGetRequest<TData = Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleGetRequest>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData> };
+  const queryOptions = getStreamableHttpControllerHandleGetRequestQueryOptions(options)
 
-  query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
 
   return query;
 }
 
-export type streamableHttpControllerHandleDeleteRequestResponse200 = {
-  data: void;
-  status: 200;
-};
 
-export type streamableHttpControllerHandleDeleteRequestResponseSuccess =
-  streamableHttpControllerHandleDeleteRequestResponse200 & {
-    headers: Headers;
-  };
-export type streamableHttpControllerHandleDeleteRequestResponse =
-  streamableHttpControllerHandleDeleteRequestResponseSuccess;
+
+
+
+export type streamableHttpControllerHandleDeleteRequestResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type streamableHttpControllerHandleDeleteRequestResponseSuccess = (streamableHttpControllerHandleDeleteRequestResponse200) & {
+  headers: Headers;
+};
+;
+
+export type streamableHttpControllerHandleDeleteRequestResponse = (streamableHttpControllerHandleDeleteRequestResponseSuccess)
 
 export const getStreamableHttpControllerHandleDeleteRequestUrl = () => {
-  return `/mcp`;
-};
 
-export const streamableHttpControllerHandleDeleteRequest = async (
-  options?: RequestInit,
-): Promise<streamableHttpControllerHandleDeleteRequestResponse> => {
-  return customFetch<streamableHttpControllerHandleDeleteRequestResponse>(
-    getStreamableHttpControllerHandleDeleteRequestUrl(),
-    {
-      credentials: "include",
-      ...options,
-      method: "DELETE",
-    },
-  );
-};
 
-export const getStreamableHttpControllerHandleDeleteRequestMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>,
-    TError,
-    void,
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationKey = ["streamableHttpControllerHandleDeleteRequest"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>,
-    void
-  > = () => {
-    return streamableHttpControllerHandleDeleteRequest(requestOptions);
-  };
+  return `/mcp`
+}
 
-  return { mutationFn, ...mutationOptions };
-};
+export const streamableHttpControllerHandleDeleteRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandleDeleteRequestResponse> => {
+  
+  return customFetch<streamableHttpControllerHandleDeleteRequestResponse>(getStreamableHttpControllerHandleDeleteRequestUrl(),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-export type StreamableHttpControllerHandleDeleteRequestMutationResult =
-  NonNullable<
-    Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>
-  >;
 
-export type StreamableHttpControllerHandleDeleteRequestMutationError = unknown;
 
-export const useStreamableHttpControllerHandleDeleteRequest = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>,
-      TError,
-      void,
-      TContext
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationOptions =
-    getStreamableHttpControllerHandleDeleteRequestMutationOptions(options);
 
-  return useMutation(mutationOptions, queryClient);
-};
+export const getStreamableHttpControllerHandleDeleteRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>, TError,void, TContext> => {
+
+const mutationKey = ['streamableHttpControllerHandleDeleteRequest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>, void> = () => {
+          
+
+          return  streamableHttpControllerHandleDeleteRequest(requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StreamableHttpControllerHandleDeleteRequestMutationResult = NonNullable<Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>>
+    
+    export type StreamableHttpControllerHandleDeleteRequestMutationError = unknown
+
+    export const useStreamableHttpControllerHandleDeleteRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof streamableHttpControllerHandleDeleteRequest>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getStreamableHttpControllerHandleDeleteRequestMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }

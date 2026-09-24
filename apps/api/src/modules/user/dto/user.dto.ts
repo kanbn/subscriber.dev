@@ -9,7 +9,6 @@ export const UpdateUserSchema = z.object({
 const UserApiKeySchema = z.object({
   id: z.number(),
   prefix: z.string().nullable(),
-  key: z.string(),
 });
 
 export const UserResponseSchema = z.object({

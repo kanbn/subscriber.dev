@@ -24,7 +24,6 @@ export const getById = async (db: dbClient, id: number) => {
         columns: {
           id: true,
           prefix: true,
-          key: true,
         },
         orderBy: desc(apikey.createdAt),
         limit: 1,

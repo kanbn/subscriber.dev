@@ -1,8 +1,13 @@
+import { convert } from "html-to-text";
+
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
-import { createEmailUnsubscribeLink } from "@subscriber.dev/shared/utils";
+import {
+  createEmailUnsubscribeLink,
+  createOneClickUnsubscribeUrl,
+} from "@subscriber.dev/shared/utils";
 
 import { decrypt } from "../../common/encryption.js";
 import { INTEGRATION_PROVIDERS } from "../integrations/providers/index.js";
@@ -18,6 +23,21 @@ interface SubscriberForSend {
   environmentId: number;
   publicId: string;
   email: string | null;
+}
+
+async function buildListUnsubscribeHeaders(
+  subscriber: SubscriberForSend,
+): Promise<Record<string, string> | undefined> {
+  const oneClickUrl = await createOneClickUnsubscribeUrl(
+    subscriber.environmentId,
+    subscriber.publicId,
+  );
+  if (!oneClickUrl?.startsWith("https://")) return undefined;
+
+  return {
+    "List-Unsubscribe": `<${oneClickUrl}>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  };
 }
 
 export async function sendEmailStep(
@@ -81,6 +101,8 @@ export async function sendEmailStep(
     unsubscribeUrl && !bodyHasUnsubscribeToken
       ? `${interpolatedBody}<p style="font-size:12px;color:#666;">Don't want these emails? <a href="${unsubscribeUrl}">Unsubscribe</a></p>`
       : interpolatedBody;
+  const text = convert(html, { wordwrap: false });
+  const headers = await buildListUnsubscribeHeaders(subscriber);
 
   let lastError: unknown;
   for (const integration of candidates) {
@@ -94,6 +116,8 @@ export async function sendEmailStep(
         to: subscriber.email,
         subject,
         html,
+        text,
+        headers,
       });
       await workflowRunRepo.updateRunStepStatus(
         db,

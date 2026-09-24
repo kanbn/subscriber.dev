@@ -22,7 +22,7 @@ export const ListSubscribersQuerySchema = z.object({
 });
 
 export const ListSubscribersResponseSchema = z.object({
-  subscribers: z.array(SubscriberSchema),
+  subscribers: z.array(SubscriberSchema.omit({ unsubscribeUrl: true })),
   limit: z.number(),
   offset: z.number(),
 });

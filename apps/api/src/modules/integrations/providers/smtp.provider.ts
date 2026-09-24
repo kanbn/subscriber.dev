@@ -53,6 +53,7 @@ export const smtpProvider: IntegrationProvider<SmtpConfig, SmtpSecret> = {
       message.to,
       message.subject,
       message.html,
+      { text: message.text, headers: message.headers },
     );
 
     return { providerMessageId: response.messageId };

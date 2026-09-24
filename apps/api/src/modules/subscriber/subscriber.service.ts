@@ -76,7 +76,7 @@ interface SubscriberRow {
 export class SubscriberService {
   constructor(private readonly workflowService: WorkflowService) {}
 
-  private async toSubscriberDto(subscriber: SubscriberRow) {
+  private toSubscriberSummaryDto(subscriber: SubscriberRow) {
     return {
       publicId: subscriber.publicId,
       email: subscriber.email,
@@ -88,6 +88,12 @@ export class SubscriberService {
       attributes: subscriber.attributes,
       createdAt: subscriber.createdAt.toISOString(),
       updatedAt: subscriber.updatedAt.toISOString(),
+    };
+  }
+
+  private async toSubscriberDto(subscriber: SubscriberRow) {
+    return {
+      ...this.toSubscriberSummaryDto(subscriber),
       unsubscribeUrl: await createEmailUnsubscribeLink(
         subscriber.environmentId,
         subscriber.publicId,
@@ -586,7 +592,9 @@ export class SubscriberService {
     const rows = await subscriberRepo.listSubscribers(db, environmentId, opts);
 
     return {
-      subscribers: await Promise.all(rows.map((s) => this.toSubscriberDto(s))),
+      // Unsubscribe links are bearer tokens, so the bulk listing omits them;
+      // fetch a single subscriber to get theirs.
+      subscribers: rows.map((s) => this.toSubscriberSummaryDto(s)),
       limit: opts.limit,
       offset: opts.offset,
     };

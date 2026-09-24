@@ -363,8 +363,91 @@ describe("createWorkflow", () => {
         steps: [{ type: "webhook", delayMs: 0, config: webhookConfig }],
       }),
     );
-    expect(result.steps[0]).toEqual(expect.objectContaining(webhookConfig));
+    expect(result.steps[0]).toEqual(
+      expect.objectContaining({
+        url: "https://discord.com/***/xyz",
+        body: webhookConfig.body,
+      }),
+    );
     expect(result.steps[0]).not.toHaveProperty("subject");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// updateWorkflow – webhook URL redaction
+// ---------------------------------------------------------------------------
+
+describe("updateWorkflow webhook URLs", () => {
+  const realUrl = "https://discord.com/api/webhooks/123/secret-token";
+  const workflow = {
+    id: 1,
+    publicId: "wf_abc",
+    key: "user-signup",
+    name: "Signup",
+    description: null,
+    status: "active" as const,
+    type: "automation" as const,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  beforeEach(() => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.updateWorkflow).mockResolvedValue(workflow as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([
+      {
+        publicId: "step_1",
+        stepOrder: 0,
+        type: "webhook",
+        delayMs: 0,
+        config: { url: realUrl, body: "{}" },
+      },
+    ] as any);
+    vi.mocked(workflowRepo.replaceWorkflowSteps).mockImplementation(
+      async (_db, _id, steps) =>
+        steps.map((s, i) => ({
+          ...s,
+          publicId: `step_${i}`,
+          stepOrder: i,
+        })) as any,
+    );
+  });
+
+  it("restores the stored URL when the redacted form is sent back", async () => {
+    const result = await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      steps: [
+        {
+          type: "webhook",
+          delayMs: 0,
+          url: "https://discord.com/***oken",
+          body: '{"content":"changed"}',
+        },
+      ],
+      updatedBy: 1,
+    });
+
+    expect(workflowRepo.replaceWorkflowSteps).toHaveBeenCalledWith(mockDb, 1, [
+      {
+        type: "webhook",
+        delayMs: 0,
+        config: { url: realUrl, body: '{"content":"changed"}' },
+      },
+    ]);
+    expect(result.steps[0]?.url).toBe("https://discord.com/***oken");
+  });
+
+  it("stores a new URL as given", async () => {
+    const newUrl = "https://hooks.slack.com/services/T0/B0/other";
+    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      steps: [{ type: "webhook", delayMs: 0, url: newUrl, body: "{}" }],
+      updatedBy: 1,
+    });
+
+    expect(workflowRepo.replaceWorkflowSteps).toHaveBeenCalledWith(mockDb, 1, [
+      { type: "webhook", delayMs: 0, config: { url: newUrl, body: "{}" } },
+    ]);
   });
 });
 

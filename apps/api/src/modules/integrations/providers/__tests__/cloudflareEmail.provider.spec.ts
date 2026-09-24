@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 describe("send", () => {
-  it("POSTs to the sending endpoint with the bearer token and a derived text part", async () => {
+  it("POSTs to the sending endpoint with the bearer token, text part and headers", async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: () =>
@@ -37,6 +37,12 @@ describe("send", () => {
       to: "alice@example.com",
       subject: "Hi Alice",
       html: "<p>Welcome <strong>Alice</strong>!</p>",
+      text: "Welcome Alice!",
+      headers: {
+        "List-Unsubscribe":
+          "<https://api.example.com/unsubscribe/one-click?token=abc>",
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
 
     expect(result).toEqual({ providerMessageId: "msg-123" });
@@ -57,7 +63,34 @@ describe("send", () => {
       subject: "Hi Alice",
       html: "<p>Welcome <strong>Alice</strong>!</p>",
       text: "Welcome Alice!",
+      headers: {
+        "List-Unsubscribe":
+          "<https://api.example.com/unsubscribe/one-click?token=abc>",
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
+  });
+
+  it("omits headers when none are given", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          errors: [],
+          result: { message_id: "msg-123" },
+        }),
+    });
+
+    await cloudflareEmailProvider.send(config, secret, {
+      to: "alice@example.com",
+      subject: "Hi",
+      html: "<p>Hi</p>",
+      text: "Hi",
+    });
+
+    const body = JSON.parse(fetchMock.mock.calls[0]![1].body);
+    expect(body).not.toHaveProperty("headers");
   });
 
   it("sends a plain address for from when no fromName is configured", async () => {
@@ -74,7 +107,7 @@ describe("send", () => {
     await cloudflareEmailProvider.send(
       { accountId: "acct_123", fromEmail: "hello@mail.kan.bn" },
       secret,
-      { to: "alice@example.com", subject: "Hi", html: "<p>Hi</p>" },
+      { to: "alice@example.com", subject: "Hi", html: "<p>Hi</p>", text: "Hi" },
     );
 
     const body = JSON.parse(fetchMock.mock.calls[0]![1].body);
@@ -97,6 +130,7 @@ describe("send", () => {
         to: "alice@example.com",
         subject: "Hi",
         html: "<p>Hi</p>",
+        text: "Hi",
       }),
     ).rejects.toThrow("Sender domain not verified");
   });

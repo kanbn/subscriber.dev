@@ -166,9 +166,7 @@ describe("listSubscribers", () => {
 
     expect(result.subscribers).toHaveLength(1);
     expect(result.subscribers[0]?.publicId).toBe("sub_abc");
-    expect(result.subscribers[0]?.unsubscribeUrl).toBe(
-      "https://api.example.com/unsubscribe?token=sub_abc",
-    );
+    expect(result.subscribers[0]).not.toHaveProperty("unsubscribeUrl");
     expect(result.limit).toBe(20);
     expect(result.offset).toBe(0);
   });

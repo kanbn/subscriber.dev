@@ -46,3 +46,39 @@ describe("unsubscribe", () => {
     ).rejects.toThrow("not found");
   });
 });
+
+describe("oneClickUnsubscribe", () => {
+  it("unsubscribes using the token from the query string", async () => {
+    mockService.unsubscribeByToken.mockResolvedValue({ unsubscribed: true });
+
+    const result = await controller.oneClickUnsubscribe("good-token");
+
+    expect(result).toEqual({ unsubscribed: true });
+    expect(mockService.unsubscribeByToken).toHaveBeenCalledWith(
+      {},
+      "good-token",
+    );
+  });
+
+  it("rejects a request with no token without calling the service", async () => {
+    await expect(controller.oneClickUnsubscribe(undefined)).rejects.toThrow(
+      "Invalid or expired unsubscribe link",
+    );
+    expect(mockService.unsubscribeByToken).not.toHaveBeenCalled();
+  });
+});
+
+describe("oneClickUnsubscribePage", () => {
+  it("redirects to the web confirmation page without unsubscribing", () => {
+    vi.stubEnv("NEXT_PUBLIC_BASE_URL", "https://app.example.com");
+
+    const result = controller.oneClickUnsubscribePage("a+b");
+
+    expect(result).toEqual({
+      url: "https://app.example.com/unsubscribe?token=a%2Bb",
+      statusCode: 302,
+    });
+    expect(mockService.unsubscribeByToken).not.toHaveBeenCalled();
+    vi.unstubAllEnvs();
+  });
+});

@@ -1,5 +1,20 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Post,
+  Query,
+  Redirect,
+} from "@nestjs/common";
+import {
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
@@ -33,5 +48,30 @@ export class UnsubscribeController {
     const db = createDrizzleClient();
 
     return this.subscriberService.unsubscribeByToken(db, body.token);
+  }
+
+  @Post("unsubscribe/one-click")
+  @HttpCode(HttpStatus.OK)
+  @ApiExcludeEndpoint()
+  async oneClickUnsubscribe(
+    @Query("token") token: string | undefined,
+  ): Promise<UnsubscribeResponseDto> {
+    if (!token) {
+      throw new NotFoundException("Invalid or expired unsubscribe link");
+    }
+    const db = createDrizzleClient();
+
+    return this.subscriberService.unsubscribeByToken(db, token);
+  }
+
+  @Get("unsubscribe/one-click")
+  @Redirect()
+  @ApiExcludeEndpoint()
+  oneClickUnsubscribePage(@Query("token") token: string | undefined) {
+    const params = token ? `?token=${encodeURIComponent(token)}` : "";
+    return {
+      url: `${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/unsubscribe${params}`,
+      statusCode: HttpStatus.FOUND,
+    };
   }
 }

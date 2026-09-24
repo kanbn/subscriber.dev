@@ -69,7 +69,12 @@ export const WorkflowStepResponseSchema = z.object({
   delayMs: z.number(),
   subject: z.string().optional(),
   body: z.string().optional(),
-  url: z.string().optional(),
+  url: z
+    .string()
+    .optional()
+    .describe(
+      "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
+    ),
 });
 
 export const WorkflowSchema = z.object({

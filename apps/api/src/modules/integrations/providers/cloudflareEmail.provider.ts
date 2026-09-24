@@ -1,4 +1,3 @@
-import { convert } from "html-to-text";
 import { z } from "zod";
 
 import type { BounceEvent, IntegrationProvider } from "./types.js";
@@ -78,12 +77,6 @@ function classifyBounce(errorDetail: string): "hard" | "soft" {
   return match?.[1] === "5" ? "hard" : "soft";
 }
 
-// Cloudflare accepts HTML-only, but including a text part is a documented
-// deliverability recommendation, not a strict requirement.
-function htmlToText(html: string): string {
-  return convert(html, { wordwrap: false });
-}
-
 export const cloudflareEmailProvider: IntegrationProvider<
   CloudflareEmailConfig,
   CloudflareEmailSecret
@@ -124,7 +117,8 @@ export const cloudflareEmailProvider: IntegrationProvider<
           from,
           subject: message.subject,
           html: message.html,
-          text: htmlToText(message.html),
+          text: message.text,
+          ...(message.headers ? { headers: message.headers } : {}),
         }),
       },
     );
