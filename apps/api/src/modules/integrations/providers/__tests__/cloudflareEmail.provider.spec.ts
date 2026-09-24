@@ -71,6 +71,27 @@ describe("send", () => {
     });
   });
 
+  it("sends reply_to when replyTo is configured", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          errors: [],
+          result: { message_id: "msg-123" },
+        }),
+    });
+
+    await cloudflareEmailProvider.send(
+      { ...config, replyTo: "henry@kan.bn" },
+      secret,
+      { to: "alice@example.com", subject: "Hi", html: "<p>Hi</p>", text: "Hi" },
+    );
+
+    const body = JSON.parse(fetchMock.mock.calls[0]![1].body);
+    expect(body.reply_to).toBe("henry@kan.bn");
+  });
+
   it("omits headers when none are given", async () => {
     fetchMock.mockResolvedValue({
       ok: true,

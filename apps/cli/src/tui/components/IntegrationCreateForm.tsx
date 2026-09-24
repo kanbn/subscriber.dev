@@ -9,6 +9,7 @@ export interface IntegrationCreateValues {
   secure: boolean;
   fromEmail: string;
   fromName: string;
+  replyTo: string;
   user: string;
   password: string;
 }
@@ -18,6 +19,7 @@ const TEXT_FIELDS = [
   { key: "port", label: "Port", mask: false },
   { key: "fromEmail", label: "From email", mask: false },
   { key: "fromName", label: "From name", mask: false },
+  { key: "replyTo", label: "Reply-to email (optional)", mask: false },
   { key: "user", label: "SMTP user", mask: false },
   { key: "password", label: "SMTP password", mask: true },
 ] as const;
@@ -49,6 +51,7 @@ export function IntegrationCreateForm({
     secure: true,
     fromEmail: "",
     fromName: "",
+    replyTo: "",
     user: "",
     password: "",
   });

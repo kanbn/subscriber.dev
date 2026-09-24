@@ -64,7 +64,11 @@ export const sendRawEmail = async (
   to: string,
   subject: string,
   html: string,
-  options: { text?: string; headers?: Record<string, string> } = {},
+  options: {
+    text?: string;
+    headers?: Record<string, string>;
+    replyTo?: string;
+  } = {},
 ) => {
   try {
     const response = await buildTransporter(config).sendMail({
@@ -74,6 +78,7 @@ export const sendRawEmail = async (
       html,
       text: options.text,
       headers: options.headers,
+      replyTo: options.replyTo,
     });
 
     if (!response.accepted.length) {

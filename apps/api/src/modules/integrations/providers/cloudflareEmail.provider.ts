@@ -6,6 +6,13 @@ const configSchema = z.object({
   accountId: z.string().min(1),
   fromEmail: z.string().email(),
   fromName: z.string().max(255).optional(),
+  replyTo: z
+    .string()
+    .email()
+    .optional()
+    .describe(
+      "Where replies go, if not fromEmail - e.g. when the sending subdomain has no inbox.",
+    ),
   zoneId: z.string().min(1).optional(),
 });
 
@@ -118,6 +125,7 @@ export const cloudflareEmailProvider: IntegrationProvider<
           subject: message.subject,
           html: message.html,
           text: message.text,
+          ...(config.replyTo ? { reply_to: config.replyTo } : {}),
           ...(message.headers ? { headers: message.headers } : {}),
         }),
       },

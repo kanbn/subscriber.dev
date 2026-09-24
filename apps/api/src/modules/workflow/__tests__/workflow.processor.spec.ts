@@ -170,6 +170,36 @@ describe("process", () => {
     );
   });
 
+  it("passes the SMTP integration's replyTo through to the send", async () => {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+      {
+        type: "smtp",
+        config: {
+          host: "smtp.example.com",
+          port: 587,
+          secure: false,
+          fromEmail: "hello@example.com",
+          fromName: "Example",
+          replyTo: "support@example.com",
+        },
+        encryptedSecret: "encrypted-blob",
+        priority: 1,
+      },
+    ] as any);
+
+    await processor.process(makeJob());
+
+    const [, , , , options] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(options?.replyTo).toBe("support@example.com");
+  });
+
+  it("omits replyTo when the integration doesn't set one", async () => {
+    await processor.process(makeJob());
+
+    const [, , , , options] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(options?.replyTo).toBeUndefined();
+  });
+
   it("sends a plain-text alternative and one-click List-Unsubscribe headers", async () => {
     await processor.process(makeJob());
 

@@ -7,6 +7,7 @@ export interface CloudflareEmailCreateValues {
   accountId: string;
   fromEmail: string;
   fromName: string;
+  replyTo: string;
   apiToken: string;
   zoneId: string;
 }
@@ -15,6 +16,7 @@ const TEXT_FIELDS = [
   { key: "accountId", label: "Account ID", mask: false },
   { key: "fromEmail", label: "From email", mask: false },
   { key: "fromName", label: "From name", mask: false },
+  { key: "replyTo", label: "Reply-to email (optional)", mask: false },
   { key: "apiToken", label: "API token", mask: true },
   {
     key: "zoneId",
@@ -49,6 +51,7 @@ export function CloudflareEmailCreateForm({
     accountId: "",
     fromEmail: "",
     fromName: "",
+    replyTo: "",
     apiToken: "",
     zoneId: "",
   });

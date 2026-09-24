@@ -52,6 +52,7 @@ export function IntegrationsScreen({
         secure: values.secure,
         fromEmail: values.fromEmail.trim(),
         fromName: values.fromName.trim() || undefined,
+        replyTo: values.replyTo.trim() || undefined,
         user: values.user.trim(),
         password: values.password,
       };
@@ -81,6 +82,7 @@ export function IntegrationsScreen({
         accountId: values.accountId.trim(),
         fromEmail: values.fromEmail.trim(),
         fromName: values.fromName.trim() || undefined,
+        replyTo: values.replyTo.trim() || undefined,
         apiToken: values.apiToken.trim(),
         zoneId: values.zoneId.trim() || undefined,
       };

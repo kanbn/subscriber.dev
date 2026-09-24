@@ -10,6 +10,13 @@ const configSchema = z.object({
   secure: z.boolean().default(true),
   fromEmail: z.string().email(),
   fromName: z.string().max(255).optional(),
+  replyTo: z
+    .string()
+    .email()
+    .optional()
+    .describe(
+      "Where replies go, if not fromEmail - e.g. when the sending subdomain has no inbox.",
+    ),
 });
 
 // user is a secret, not config - some providers (e.g. Postmark) use the same
@@ -53,7 +60,11 @@ export const smtpProvider: IntegrationProvider<SmtpConfig, SmtpSecret> = {
       message.to,
       message.subject,
       message.html,
-      { text: message.text, headers: message.headers },
+      {
+        text: message.text,
+        headers: message.headers,
+        replyTo: config.replyTo,
+      },
     );
 
     return { providerMessageId: response.messageId };
