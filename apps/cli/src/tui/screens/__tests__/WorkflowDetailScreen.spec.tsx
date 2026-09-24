@@ -448,6 +448,36 @@ describe("WorkflowDetailScreen broadcast", () => {
     return screen;
   }
 
+  it("sends a test to a single subscriber when 't' is pressed", async () => {
+    vi.mocked(triggerWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { triggered: true, runPublicId: "test-run-1" },
+    } as never);
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("t");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Send test to subscriber email:");
+    });
+
+    await tick();
+    stdin.write("test@example.com");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Triggered. Run: test-run-1");
+    });
+    expect(triggerWorkflow).toHaveBeenCalledWith("test-environment-1", {
+      key: "test-signup",
+      subscriber: { email: "test@example.com" },
+      payload: {},
+    });
+    expect(triggerBroadcast).not.toHaveBeenCalled();
+  });
+
   it("shows the audience menu when 'b' is pressed", async () => {
     const { lastFrame, stdin } = await loaded();
 

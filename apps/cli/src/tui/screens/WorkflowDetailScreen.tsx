@@ -100,10 +100,7 @@ export function WorkflowDetailScreen({
     if (!idle || !workflow) return;
     if (input === "d" || input === "D") {
       setDeleteStatus("confirming");
-    } else if (
-      (input === "t" || input === "T") &&
-      workflow.type === "automation"
-    ) {
+    } else if (input === "t" || input === "T") {
       setTriggerEmail("");
       setTriggerStatus("entering-email");
     } else if (input === "r" || input === "R") {
@@ -296,7 +293,11 @@ export function WorkflowDetailScreen({
 
       {triggerStatus === "entering-email" && (
         <Box>
-          <Text>Trigger for subscriber email: </Text>
+          <Text>
+            {workflow?.type === "broadcast"
+              ? "Send test to subscriber email: "
+              : "Trigger for subscriber email: "}
+          </Text>
           <TextInput
             value={triggerEmail}
             onChange={setTriggerEmail}
@@ -387,12 +388,14 @@ export function WorkflowDetailScreen({
         text={
           idle
             ? workflow?.type === "broadcast"
-              ? "d delete · e edit · b broadcast · r runs · h broadcasts · Esc back · q quit"
+              ? "d delete · e edit · t send test · b broadcast · r runs · h broadcasts · Esc back · q quit"
               : "d delete · e edit · t trigger · r runs · Esc back · q quit"
             : triggerStatus === "success" || triggerStatus === "error"
               ? "any key to continue"
               : triggerStatus === "entering-email"
-                ? "Enter to trigger · Esc back"
+                ? workflow?.type === "broadcast"
+                  ? "Enter to send test · Esc back"
+                  : "Enter to trigger · Esc back"
                 : broadcastStatus === "success" || broadcastStatus === "error"
                   ? "any key to continue"
                   : broadcastStatus === "entering-tag"
