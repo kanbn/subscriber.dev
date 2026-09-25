@@ -7,6 +7,14 @@ import { AudienceConditionSchema } from "../audienceQuery.js";
 
 export const TriggerBroadcastSchema = z.object({
   audience: AudienceConditionSchema,
+  sendOverHours: z
+    .number()
+    .positive()
+    .max(168)
+    .optional()
+    .describe(
+      "Spread sends evenly over this many hours (max 168) instead of sending as fast as possible. Gentler on sender reputation for large audiences, and leaves time to pause or cancel.",
+    ),
 });
 
 export const TriggerBroadcastResponseSchema = z.object({
@@ -27,6 +35,7 @@ export const BroadcastSummarySchema = z.object({
   publicId: z.string(),
   status: z.enum(workflowBroadcastStatuses),
   matchedCount: z.number().nullable(),
+  sendOverHours: z.number().nullable(),
   createdAt: z.iso.datetime(),
 });
 
@@ -48,6 +57,7 @@ export const BroadcastDetailResponseSchema = BroadcastSummarySchema.extend({
 });
 
 export class TriggerBroadcastDto extends createZodDto(TriggerBroadcastSchema) {}
+export class BroadcastSummaryDto extends createZodDto(BroadcastSummarySchema) {}
 export class TriggerBroadcastResponseDto extends createZodDto(
   TriggerBroadcastResponseSchema,
 ) {}

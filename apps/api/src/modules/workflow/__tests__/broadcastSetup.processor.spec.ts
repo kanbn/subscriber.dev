@@ -22,6 +22,7 @@ vi.mock("@subscriber.dev/db/repository/workflow.repo", () => ({
 
 vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
   getBroadcastById: vi.fn(),
+  incrementBroadcastSkipped: vi.fn(),
 }));
 
 vi.mock("../createRunForSubscriber.js", () => ({
@@ -79,7 +80,50 @@ describe("process", () => {
       createdBy: 1,
       broadcastId: 1,
     });
+    expect(
+      workflowBroadcastRepo.incrementBroadcastSkipped,
+    ).not.toHaveBeenCalled();
   });
+
+  it("passes the subscriber's send-window offset through as the run's start delay", async () => {
+    vi.mocked(workflowBroadcastRepo.getBroadcastById).mockResolvedValue(
+      mockBroadcast as any,
+    );
+    vi.mocked(subscriberRepo.getSubscriberById).mockResolvedValue(
+      mockSubscriber as any,
+    );
+    vi.mocked(workflowRepo.getWorkflowById).mockResolvedValue(
+      mockWorkflow as any,
+    );
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue(
+      mockSteps as any,
+    );
+
+    await processor.process({
+      data: { broadcastId: 1, subscriberId: 100, startDelayMs: 90_000 },
+    } as any);
+
+    expect(createRunForSubscriber).toHaveBeenCalledWith(
+      {},
+      mockStepsQueue,
+      expect.objectContaining({ startDelayMs: 90_000 }),
+    );
+  });
+
+  it.each(["cancelled", "failed"])(
+    "skips subscribers once the broadcast is %s",
+    async (status) => {
+      vi.mocked(workflowBroadcastRepo.getBroadcastById).mockResolvedValue({
+        ...mockBroadcast,
+        status,
+      } as any);
+
+      await processor.process(makeJob());
+
+      expect(subscriberRepo.getSubscriberById).not.toHaveBeenCalled();
+      expect(createRunForSubscriber).not.toHaveBeenCalled();
+    },
+  );
 
   it("is a no-op when the broadcast no longer exists", async () => {
     vi.mocked(workflowBroadcastRepo.getBroadcastById).mockResolvedValue(
@@ -91,7 +135,7 @@ describe("process", () => {
     expect(createRunForSubscriber).not.toHaveBeenCalled();
   });
 
-  it("is a no-op when the subscriber no longer exists", async () => {
+  it("counts the subscriber as skipped when the subscriber no longer exists", async () => {
     vi.mocked(workflowBroadcastRepo.getBroadcastById).mockResolvedValue(
       mockBroadcast as any,
     );
@@ -100,9 +144,12 @@ describe("process", () => {
     await processor.process(makeJob());
 
     expect(createRunForSubscriber).not.toHaveBeenCalled();
+    expect(
+      workflowBroadcastRepo.incrementBroadcastSkipped,
+    ).toHaveBeenCalledWith({}, 1);
   });
 
-  it("is a no-op when the workflow no longer exists", async () => {
+  it("counts the subscriber as skipped when the workflow no longer exists", async () => {
     vi.mocked(workflowBroadcastRepo.getBroadcastById).mockResolvedValue(
       mockBroadcast as any,
     );
@@ -114,9 +161,12 @@ describe("process", () => {
     await processor.process(makeJob());
 
     expect(createRunForSubscriber).not.toHaveBeenCalled();
+    expect(
+      workflowBroadcastRepo.incrementBroadcastSkipped,
+    ).toHaveBeenCalledWith({}, 1);
   });
 
-  it("is a no-op when the workflow has no steps", async () => {
+  it("counts the subscriber as skipped when the workflow has no steps", async () => {
     vi.mocked(workflowBroadcastRepo.getBroadcastById).mockResolvedValue(
       mockBroadcast as any,
     );
@@ -131,5 +181,8 @@ describe("process", () => {
     await processor.process(makeJob());
 
     expect(createRunForSubscriber).not.toHaveBeenCalled();
+    expect(
+      workflowBroadcastRepo.incrementBroadcastSkipped,
+    ).toHaveBeenCalledWith({}, 1);
   });
 });

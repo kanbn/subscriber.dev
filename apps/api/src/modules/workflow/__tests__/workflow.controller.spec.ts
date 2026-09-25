@@ -23,6 +23,9 @@ const mockService = {
   previewBroadcast: vi.fn(),
   listBroadcasts: vi.fn(),
   getBroadcast: vi.fn(),
+  pauseBroadcast: vi.fn(),
+  resumeBroadcast: vi.fn(),
+  cancelBroadcast: vi.fn(),
 };
 
 let controller: WorkflowController;
@@ -165,7 +168,50 @@ describe("triggerBroadcast", () => {
       "wf_1",
       { type: "optedIn" },
       1,
+      { sendOverHours: undefined },
     );
+  });
+
+  it("passes the send window through", async () => {
+    mockService.triggerBroadcast.mockResolvedValue({
+      broadcastId: "bc_1",
+      status: "pending",
+    });
+
+    await controller.triggerBroadcast(
+      mockUser as any,
+      mockEnvironment as any,
+      "wf_1",
+      { audience: { type: "optedIn" }, sendOverHours: 24 } as any,
+    );
+
+    expect(mockService.triggerBroadcast).toHaveBeenCalledWith(
+      {},
+      10,
+      "wf_1",
+      { type: "optedIn" },
+      1,
+      { sendOverHours: 24 },
+    );
+  });
+});
+
+describe.each([
+  ["pauseBroadcast", "paused"],
+  ["resumeBroadcast", "queued"],
+  ["cancelBroadcast", "cancelled"],
+] as const)("%s", (method, status) => {
+  it("delegates to the service", async () => {
+    mockService[method].mockResolvedValue({ publicId: "bc_1", status });
+
+    const result = await controller[method](
+      mockEnvironment as any,
+      "wf_1",
+      "bc_1",
+    );
+
+    expect(result).toEqual({ publicId: "bc_1", status });
+    expect(mockService[method]).toHaveBeenCalledWith({}, 10, "wf_1", "bc_1");
   });
 });
 

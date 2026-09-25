@@ -222,6 +222,19 @@ describe("completeRunIfAllStepsTerminal", () => {
     );
   });
 
+  it("closes the run with the given final status", async () => {
+    const updateChain = makeUpdateChain([]);
+    const db = makeMockDb({
+      findMany: vi.fn().mockResolvedValue([{ status: "cancelled" }]),
+      updateChain,
+    });
+
+    await completeRunIfAllStepsTerminal(db, 5, "cancelled");
+    expect(updateChain.set).toHaveBeenCalledWith(
+      expect.objectContaining({ status: "cancelled" }),
+    );
+  });
+
   it("leaves the run alone when a step is still pending", async () => {
     const updateChain = makeUpdateChain([]);
     const db = makeMockDb({

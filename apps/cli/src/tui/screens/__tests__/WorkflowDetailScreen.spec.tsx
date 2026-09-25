@@ -508,8 +508,14 @@ describe("WorkflowDetailScreen broadcast", () => {
     stdin.write("\r");
 
     await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Send over:");
+    });
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
       expect(lastFrame()).toContain(
-        "Broadcast to 4231 matched subscribers? This cannot be undone.",
+        "Broadcast to 4231 matched subscribers now?",
       );
     });
     expect(previewBroadcast).toHaveBeenCalledWith(
@@ -538,16 +544,74 @@ describe("WorkflowDetailScreen broadcast", () => {
     await tick();
     stdin.write("\r");
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain("This cannot be undone.");
+      expect(lastFrame()).toContain("Send over:");
+    });
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Broadcast to 4231");
     });
 
     await tick();
     stdin.write("\r");
 
     await vi.waitFor(() => {
-      expect(lastFrame()).not.toContain("This cannot be undone.");
+      expect(lastFrame()).not.toContain("Broadcast to 4231");
     });
     expect(triggerBroadcast).not.toHaveBeenCalled();
+  });
+
+  it("triggers with the chosen send window once confirmed", async () => {
+    vi.mocked(previewBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { matchedCount: 4231 },
+    } as never);
+    vi.mocked(triggerBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { broadcastId: "bc_1", status: "pending" },
+    } as never);
+    const { lastFrame, stdin } = await loaded();
+
+    await tick();
+    stdin.write("b");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("All opted-in subscribers");
+    });
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Send over:");
+    });
+
+    // "Send now" → "6 hours" → "24 hours"
+    await tick();
+    stdin.write("\u001B[B");
+    await tick();
+    stdin.write("\u001B[B");
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain(
+        "Broadcast to 4231 matched subscribers, spread over 24 hours?",
+      );
+    });
+
+    // Default is "No, cancel"; move to "Yes, send".
+    await tick();
+    stdin.write("\u001B[A");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Broadcast queued: bc_1");
+    });
+    expect(triggerBroadcast).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      { audience: { type: "optedIn" }, sendOverHours: 24 },
+    );
   });
 
   it("shows an error from the preview when the workflow is paused or has no steps", async () => {

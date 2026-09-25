@@ -92,6 +92,13 @@
       "when": 1787574643284,
       "tag": "20260824123043_MakeIntegrationPriorityNotNull",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790344808111,
+      "tag": "20260925140008_AddBroadcastPauseAndSendWindow",
+      "breakpoints": true
     }
   ]
 }

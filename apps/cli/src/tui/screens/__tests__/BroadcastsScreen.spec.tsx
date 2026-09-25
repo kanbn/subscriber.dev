@@ -1,13 +1,21 @@
 import { render } from "ink-testing-library";
 import { describe, expect, it, vi } from "vitest";
 
-import { getBroadcast, listBroadcasts } from "@subscriber.dev/api-client/cli";
+import {
+  cancelBroadcast,
+  getBroadcast,
+  listBroadcasts,
+  pauseBroadcast,
+} from "@subscriber.dev/api-client/cli";
 
 import { BroadcastsScreen } from "../BroadcastsScreen.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   listBroadcasts: vi.fn(),
   getBroadcast: vi.fn(),
+  pauseBroadcast: vi.fn(),
+  resumeBroadcast: vi.fn(),
+  cancelBroadcast: vi.fn(),
 }));
 
 const testBroadcast = {
@@ -21,6 +29,7 @@ const testDetail = {
   publicId: "test-broadcast-1",
   status: "queued",
   matchedCount: 42,
+  sendOverHours: 24,
   createdAt: "2026-01-01T00:00:00.000Z",
   sentCount: 10,
   failedCount: 1,
@@ -193,5 +202,124 @@ describe("BroadcastsScreen detail", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Error");
     });
+  });
+
+  async function openDetail() {
+    listBroadcastsMock([testBroadcast]);
+    vi.mocked(getBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testDetail,
+    } as never);
+    const screen = render(
+      <BroadcastsScreen
+        environmentId="test-environment-1"
+        workflowId="test-workflow-1"
+      />,
+    );
+    await vi.waitFor(() => {
+      expect(screen.lastFrame()).toContain("queued");
+    });
+    await tick();
+    screen.stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(screen.lastFrame()).toContain("sent: 10");
+    });
+    return screen;
+  }
+
+  it("shows the send window", async () => {
+    const { lastFrame } = await openDetail();
+
+    expect(lastFrame()).toContain("send window: spread over 24h");
+  });
+
+  it("pauses with 'p' and refreshes the detail", async () => {
+    vi.mocked(pauseBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { ...testBroadcast, status: "paused" },
+    } as never);
+    const { lastFrame, stdin } = await openDetail();
+    vi.mocked(getBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { ...testDetail, status: "paused" },
+    } as never);
+
+    await tick();
+    stdin.write("p");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Paused.");
+    });
+    expect(lastFrame()).toContain("status: paused");
+    expect(pauseBroadcast).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      "test-broadcast-1",
+    );
+  });
+
+  it("explains when an action isn't allowed in the current status", async () => {
+    vi.mocked(pauseBroadcast).mockResolvedValue({
+      status: 409,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const { lastFrame, stdin } = await openDetail();
+
+    await tick();
+    stdin.write("p");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Can't pause a broadcast that's queued.");
+    });
+  });
+
+  it("asks for confirmation before cancelling, defaulting to keep it", async () => {
+    const { lastFrame, stdin } = await openDetail();
+
+    await tick();
+    stdin.write("c");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Cancel this broadcast?");
+    });
+
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("Cancel this broadcast?");
+    });
+    expect(cancelBroadcast).not.toHaveBeenCalled();
+  });
+
+  it("cancels once confirmed", async () => {
+    vi.mocked(cancelBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { ...testBroadcast, status: "cancelled" },
+    } as never);
+    const { lastFrame, stdin } = await openDetail();
+
+    await tick();
+    stdin.write("c");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Cancel this broadcast?");
+    });
+    await tick();
+    stdin.write("\u001B[A");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Cancelled.");
+    });
+    expect(cancelBroadcast).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      "test-broadcast-1",
+    );
   });
 });

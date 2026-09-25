@@ -1060,6 +1060,11 @@ export type TriggerBroadcastDtoSchema0 = TriggerBroadcastDtoSchema0AnyOf | Trigg
 
 export interface TriggerBroadcastDto {
   audience: TriggerBroadcastDtoSchema0;
+  /**
+   * Spread sends evenly over this many hours (max 168) instead of sending as fast as possible. Gentler on sender reputation for large audiences, and leaves time to pause or cancel.
+   * @maximum 168
+   */
+  sendOverHours?: number;
 }
 
 export interface PreviewBroadcastResponseDto {
@@ -1074,6 +1079,8 @@ export const TriggerBroadcastResponseDtoStatus = {
   pending: 'pending',
   queued: 'queued',
   failed: 'failed',
+  paused: 'paused',
+  cancelled: 'cancelled',
 } as const;
 
 export interface TriggerBroadcastResponseDto {
@@ -1089,14 +1096,19 @@ export const ListBroadcastsResponseDtoBroadcastsItemStatus = {
   pending: 'pending',
   queued: 'queued',
   failed: 'failed',
+  paused: 'paused',
+  cancelled: 'cancelled',
 } as const;
 
 export type ListBroadcastsResponseDtoBroadcastsItemMatchedCount = number | null;
+
+export type ListBroadcastsResponseDtoBroadcastsItemSendOverHours = number | null;
 
 export type ListBroadcastsResponseDtoBroadcastsItem = {
   publicId: string;
   status: ListBroadcastsResponseDtoBroadcastsItemStatus;
   matchedCount: ListBroadcastsResponseDtoBroadcastsItemMatchedCount;
+  sendOverHours: ListBroadcastsResponseDtoBroadcastsItemSendOverHours;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
 };
@@ -1115,12 +1127,15 @@ export const BroadcastDetailResponseDtoStatus = {
   pending: 'pending',
   queued: 'queued',
   failed: 'failed',
+  paused: 'paused',
+  cancelled: 'cancelled',
 } as const;
 
 export interface BroadcastDetailResponseDto {
   publicId: string;
   status: BroadcastDetailResponseDtoStatus;
   matchedCount: number[];
+  sendOverHours: number[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   sentCount: number;
@@ -1131,6 +1146,27 @@ export interface BroadcastDetailResponseDto {
   hardBounceCount: number;
   softBounceCount: number;
   successRate: number[];
+}
+
+export type BroadcastSummaryDtoStatus = typeof BroadcastSummaryDtoStatus[keyof typeof BroadcastSummaryDtoStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BroadcastSummaryDtoStatus = {
+  pending: 'pending',
+  queued: 'queued',
+  failed: 'failed',
+  paused: 'paused',
+  cancelled: 'cancelled',
+} as const;
+
+export interface BroadcastSummaryDto {
+  publicId: string;
+  status: BroadcastSummaryDtoStatus;
+  matchedCount: number[];
+  sendOverHours: number[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
 }
 
 export type BounceWebhookBodyDtoBounceType = typeof BounceWebhookBodyDtoBounceType[keyof typeof BounceWebhookBodyDtoBounceType];
@@ -4684,6 +4720,309 @@ export function useGetBroadcast<TData = Awaited<ReturnType<typeof getBroadcast>>
 
 
 
+/**
+ * Holds every send that hasn't gone out yet until the broadcast is resumed. Already-sent emails are unaffected.
+ * @summary Pause a broadcast
+ */
+export type pauseBroadcastResponse200 = {
+  data: BroadcastSummaryDto
+  status: 200
+}
+
+export type pauseBroadcastResponse404 = {
+  data: void
+  status: 404
+}
+
+export type pauseBroadcastResponse409 = {
+  data: void
+  status: 409
+}
+    
+export type pauseBroadcastResponseSuccess = (pauseBroadcastResponse200) & {
+  headers: Headers;
+};
+export type pauseBroadcastResponseError = (pauseBroadcastResponse404 | pauseBroadcastResponse409) & {
+  headers: Headers;
+};
+
+export type pauseBroadcastResponse = (pauseBroadcastResponseSuccess | pauseBroadcastResponseError)
+
+export const getPauseBroadcastUrl = (environmentId: string,
+    workflowId: string,
+    broadcastId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}/pause`
+}
+
+export const pauseBroadcast = async (environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: RequestInit): Promise<pauseBroadcastResponse> => {
+  
+  return customFetch<pauseBroadcastResponse>(getPauseBroadcastUrl(environmentId,workflowId,broadcastId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getPauseBroadcastMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pauseBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof pauseBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext> => {
+
+const mutationKey = ['pauseBroadcast'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pauseBroadcast>>, {environmentId: string;workflowId: string;broadcastId: string}> = (props) => {
+          const {environmentId,workflowId,broadcastId} = props ?? {};
+
+          return  pauseBroadcast(environmentId,workflowId,broadcastId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PauseBroadcastMutationResult = NonNullable<Awaited<ReturnType<typeof pauseBroadcast>>>
+    
+    export type PauseBroadcastMutationError = void
+
+    /**
+ * @summary Pause a broadcast
+ */
+export const usePauseBroadcast = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pauseBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof pauseBroadcast>>,
+        TError,
+        {environmentId: string;workflowId: string;broadcastId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getPauseBroadcastMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Lets a paused broadcast carry on sending. The remaining sends keep their original spacing, pushed back by however long it was paused.
+ * @summary Resume a paused broadcast
+ */
+export type resumeBroadcastResponse200 = {
+  data: BroadcastSummaryDto
+  status: 200
+}
+
+export type resumeBroadcastResponse404 = {
+  data: void
+  status: 404
+}
+
+export type resumeBroadcastResponse409 = {
+  data: void
+  status: 409
+}
+    
+export type resumeBroadcastResponseSuccess = (resumeBroadcastResponse200) & {
+  headers: Headers;
+};
+export type resumeBroadcastResponseError = (resumeBroadcastResponse404 | resumeBroadcastResponse409) & {
+  headers: Headers;
+};
+
+export type resumeBroadcastResponse = (resumeBroadcastResponseSuccess | resumeBroadcastResponseError)
+
+export const getResumeBroadcastUrl = (environmentId: string,
+    workflowId: string,
+    broadcastId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}/resume`
+}
+
+export const resumeBroadcast = async (environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: RequestInit): Promise<resumeBroadcastResponse> => {
+  
+  return customFetch<resumeBroadcastResponse>(getResumeBroadcastUrl(environmentId,workflowId,broadcastId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getResumeBroadcastMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resumeBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resumeBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext> => {
+
+const mutationKey = ['resumeBroadcast'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resumeBroadcast>>, {environmentId: string;workflowId: string;broadcastId: string}> = (props) => {
+          const {environmentId,workflowId,broadcastId} = props ?? {};
+
+          return  resumeBroadcast(environmentId,workflowId,broadcastId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResumeBroadcastMutationResult = NonNullable<Awaited<ReturnType<typeof resumeBroadcast>>>
+    
+    export type ResumeBroadcastMutationError = void
+
+    /**
+ * @summary Resume a paused broadcast
+ */
+export const useResumeBroadcast = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resumeBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resumeBroadcast>>,
+        TError,
+        {environmentId: string;workflowId: string;broadcastId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getResumeBroadcastMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * Permanently stops a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone.
+ * @summary Cancel a broadcast
+ */
+export type cancelBroadcastResponse200 = {
+  data: BroadcastSummaryDto
+  status: 200
+}
+
+export type cancelBroadcastResponse404 = {
+  data: void
+  status: 404
+}
+
+export type cancelBroadcastResponse409 = {
+  data: void
+  status: 409
+}
+    
+export type cancelBroadcastResponseSuccess = (cancelBroadcastResponse200) & {
+  headers: Headers;
+};
+export type cancelBroadcastResponseError = (cancelBroadcastResponse404 | cancelBroadcastResponse409) & {
+  headers: Headers;
+};
+
+export type cancelBroadcastResponse = (cancelBroadcastResponseSuccess | cancelBroadcastResponseError)
+
+export const getCancelBroadcastUrl = (environmentId: string,
+    workflowId: string,
+    broadcastId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}/cancel`
+}
+
+export const cancelBroadcast = async (environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: RequestInit): Promise<cancelBroadcastResponse> => {
+  
+  return customFetch<cancelBroadcastResponse>(getCancelBroadcastUrl(environmentId,workflowId,broadcastId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getCancelBroadcastMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext> => {
+
+const mutationKey = ['cancelBroadcast'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelBroadcast>>, {environmentId: string;workflowId: string;broadcastId: string}> = (props) => {
+          const {environmentId,workflowId,broadcastId} = props ?? {};
+
+          return  cancelBroadcast(environmentId,workflowId,broadcastId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelBroadcastMutationResult = NonNullable<Awaited<ReturnType<typeof cancelBroadcast>>>
+    
+    export type CancelBroadcastMutationError = void
+
+    /**
+ * @summary Cancel a broadcast
+ */
+export const useCancelBroadcast = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelBroadcast>>,
+        TError,
+        {environmentId: string;workflowId: string;broadcastId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getCancelBroadcastMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Generic bounce-recording endpoint, identified by the run step's publicId - callers are expected to have that publicId available via whatever mechanism they use to learn about the bounce (e.g. a provider's native webhook echoing back metadata set at send time). Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.
  * @summary Record an inbound bounce event

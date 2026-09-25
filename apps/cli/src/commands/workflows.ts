@@ -6,6 +6,7 @@ import type {
   UpdateWorkflowDto,
 } from "@subscriber.dev/api-client/cli";
 import {
+  cancelBroadcast,
   createWorkflow,
   deleteWorkflow,
   getWorkflow,
@@ -13,6 +14,8 @@ import {
   listEnvironmentRuns,
   listWorkflowRuns,
   listWorkflows,
+  pauseBroadcast,
+  resumeBroadcast,
   triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
@@ -356,6 +359,10 @@ export function registerWorkflowsCommand(program: Command): void {
       'path to a JSON file with the audience filter (use "-" for stdin)',
     )
     .option(
+      "--send-over-hours <hours>",
+      "spread sends evenly over this many hours (max 168) instead of sending immediately",
+    )
+    .option(
       "--environment <environmentId>",
       "environment public ID (defaults to the current environment)",
     )
@@ -364,10 +371,28 @@ export function registerWorkflowsCommand(program: Command): void {
       run(
         async (
           workflowId: string,
-          opts: { audience: string; environment?: string; json?: boolean },
+          opts: {
+            audience: string;
+            sendOverHours?: string;
+            environment?: string;
+            json?: boolean;
+          },
         ) => {
           ensureLoggedIn();
           const environmentId = requireEnvironmentId(opts);
+
+          const sendOverHours =
+            opts.sendOverHours === undefined
+              ? undefined
+              : Number(opts.sendOverHours);
+          if (
+            sendOverHours !== undefined &&
+            !(sendOverHours > 0 && sendOverHours <= 168)
+          ) {
+            console.error("--send-over-hours must be between 0 and 168.");
+            process.exitCode = 1;
+            return;
+          }
 
           const result = readJsonFile(opts.audience);
           if (!result.ok) {
@@ -378,6 +403,7 @@ export function registerWorkflowsCommand(program: Command): void {
 
           const response = await triggerBroadcast(environmentId, workflowId, {
             audience: result.data,
+            sendOverHours,
           } as TriggerBroadcastDto);
           if (response.status === 400) {
             console.error("Workflow is paused or has no steps.");
@@ -427,6 +453,131 @@ export function registerWorkflowsCommand(program: Command): void {
             return;
           }
           printResult(response.data.broadcasts, opts);
+        },
+      ),
+    );
+
+  workflows
+    .command("broadcast-pause <workflowId> <broadcastId>")
+    .description("Pause a broadcast: hold every send that hasn't gone out yet")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          broadcastId: string,
+          opts: { environment?: string; json?: boolean },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await pauseBroadcast(
+            environmentId,
+            workflowId,
+            broadcastId,
+          );
+          if (response.status === 404) {
+            console.error("Workflow or broadcast not found.");
+            process.exitCode = 1;
+            return;
+          }
+          if (response.status === 409) {
+            console.error(`Can't pause this broadcast in its current status.`);
+            process.exitCode = 1;
+            return;
+          }
+          if (opts.json) {
+            printResult(response.data, opts);
+          } else {
+            console.log(`Paused broadcast ${broadcastId}.`);
+          }
+        },
+      ),
+    );
+
+  workflows
+    .command("broadcast-resume <workflowId> <broadcastId>")
+    .description("Resume a paused broadcast")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          broadcastId: string,
+          opts: { environment?: string; json?: boolean },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await resumeBroadcast(
+            environmentId,
+            workflowId,
+            broadcastId,
+          );
+          if (response.status === 404) {
+            console.error("Workflow or broadcast not found.");
+            process.exitCode = 1;
+            return;
+          }
+          if (response.status === 409) {
+            console.error(`Can't resume this broadcast in its current status.`);
+            process.exitCode = 1;
+            return;
+          }
+          if (opts.json) {
+            printResult(response.data, opts);
+          } else {
+            console.log(`Resumed broadcast ${broadcastId}.`);
+          }
+        },
+      ),
+    );
+
+  workflows
+    .command("broadcast-cancel <workflowId> <broadcastId>")
+    .description(
+      "Cancel a broadcast: stop every send that hasn't gone out yet (cannot be undone)",
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          broadcastId: string,
+          opts: { environment?: string; json?: boolean },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await cancelBroadcast(
+            environmentId,
+            workflowId,
+            broadcastId,
+          );
+          if (response.status === 404) {
+            console.error("Workflow or broadcast not found.");
+            process.exitCode = 1;
+            return;
+          }
+          if (response.status === 409) {
+            console.error(`Can't cancel this broadcast in its current status.`);
+            process.exitCode = 1;
+            return;
+          }
+          if (opts.json) {
+            printResult(response.data, opts);
+          } else {
+            console.log(`Cancelled broadcast ${broadcastId}.`);
+          }
         },
       ),
     );

@@ -110,7 +110,10 @@ export const getRunById = async (db: dbClient, id: number) => {
 export const updateRunStepStatus = async (
   db: dbClient,
   id: number,
-  status: Extract<WorkflowRunStepStatus, "sent" | "skipped" | "failed">,
+  status: Extract<
+    WorkflowRunStepStatus,
+    "sent" | "skipped" | "failed" | "cancelled"
+  >,
   errorMessage?: string,
   providerMessageId?: string,
 ) => {
@@ -189,6 +192,7 @@ export const cancelPendingForSubscriber = async (
 export const completeRunIfAllStepsTerminal = async (
   db: dbClient,
   runId: number,
+  finalStatus: "completed" | "cancelled" = "completed",
 ) => {
   const steps = await db.query.workflowRunSteps.findMany({
     where: eq(workflowRunSteps.runId, runId),
@@ -199,8 +203,10 @@ export const completeRunIfAllStepsTerminal = async (
   if (allTerminal) {
     await db
       .update(workflowRuns)
-      .set({ status: "completed", completedAt: new Date() })
-      .where(eq(workflowRuns.id, runId));
+      .set({ status: finalStatus, completedAt: new Date() })
+      .where(
+        and(eq(workflowRuns.id, runId), eq(workflowRuns.status, "active")),
+      );
   }
 };
 

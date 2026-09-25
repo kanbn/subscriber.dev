@@ -23,6 +23,13 @@ import { Hints } from "../components/Hints.js";
 import { WorkflowMetaForm } from "../components/WorkflowMetaForm.js";
 import { useAsyncData } from "../useAsyncData.js";
 
+const SEND_WINDOW_OPTIONS: { label: string; value: number | null }[] = [
+  { label: "Send now", value: null },
+  { label: "6 hours", value: 6 },
+  { label: "24 hours", value: 24 },
+  { label: "48 hours", value: 48 },
+];
+
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
 type TriggerStatus =
   | "idle"
@@ -36,6 +43,7 @@ type BroadcastStatus =
   | "choosing-audience"
   | "entering-tag"
   | "previewing"
+  | "choosing-window"
   | "confirming"
   | "triggering"
   | "success"
@@ -81,6 +89,9 @@ export function WorkflowDetailScreen({
     TriggerBroadcastDto["audience"] | null
   >(null);
   const [pendingCount, setPendingCount] = useState<number | null>(null);
+  const [pendingWindowHours, setPendingWindowHours] = useState<number | null>(
+    null,
+  );
 
   const idle =
     deleteStatus === "idle" &&
@@ -204,7 +215,7 @@ export function WorkflowDetailScreen({
         return;
       }
       setPendingCount(response.data.matchedCount);
-      setBroadcastStatus("confirming");
+      setBroadcastStatus("choosing-window");
     } catch (err) {
       setBroadcastMessage(err instanceof Error ? err.message : String(err));
       setBroadcastStatus("error");
@@ -218,6 +229,7 @@ export function WorkflowDetailScreen({
     try {
       const response = await triggerBroadcast(environmentId, workflowId, {
         audience: pendingAudience,
+        sendOverHours: pendingWindowHours ?? undefined,
       } as TriggerBroadcastDto);
       if (response.status === 400) {
         setBroadcastMessage("Workflow is paused or has no steps.");
@@ -362,14 +374,27 @@ export function WorkflowDetailScreen({
       {broadcastStatus === "previewing" && (
         <Text color="gray">Checking audience size…</Text>
       )}
+      {broadcastStatus === "choosing-window" && (
+        <Box flexDirection="column">
+          <Text>Send over:</Text>
+          <SelectInput
+            items={SEND_WINDOW_OPTIONS}
+            onSelect={(item) => {
+              setPendingWindowHours(item.value);
+              setBroadcastStatus("confirming");
+            }}
+          />
+        </Box>
+      )}
       {broadcastStatus === "confirming" && pendingCount !== null && (
         <ConfirmPrompt
-          message={`Broadcast to ${pendingCount} matched subscriber${pendingCount === 1 ? "" : "s"}? This cannot be undone.`}
+          message={`Broadcast to ${pendingCount} matched subscriber${pendingCount === 1 ? "" : "s"}${pendingWindowHours ? `, spread over ${pendingWindowHours} hours` : " now"}? You can pause or cancel it from broadcast history.`}
           confirmLabel="Yes, send"
           onConfirm={() => void handleSubmitBroadcast()}
           onCancel={() => {
             setPendingAudience(null);
             setPendingCount(null);
+            setPendingWindowHours(null);
             setBroadcastStatus("idle");
           }}
         />

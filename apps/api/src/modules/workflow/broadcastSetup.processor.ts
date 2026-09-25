@@ -37,21 +37,24 @@ export class BroadcastSetupProcessor extends WorkerHost {
       this.logger.warn(`Broadcast ${job.data.broadcastId} no longer exists`);
       return;
     }
+    if (broadcast.status === "cancelled" || broadcast.status === "failed") {
+      return;
+    }
 
     const subscriber = await subscriberRepo.getSubscriberById(
       db,
       job.data.subscriberId,
     );
-    if (!subscriber) return;
-
-    const workflow = await workflowRepo.getWorkflowById(
-      db,
-      broadcast.workflowId,
-    );
-    if (!workflow) return;
-
-    const steps = await workflowRepo.listStepsForWorkflow(db, workflow.id);
-    if (steps.length === 0) return;
+    const workflow =
+      subscriber &&
+      (await workflowRepo.getWorkflowById(db, broadcast.workflowId));
+    const steps = workflow
+      ? await workflowRepo.listStepsForWorkflow(db, workflow.id)
+      : [];
+    if (!subscriber || !workflow || steps.length === 0) {
+      await workflowBroadcastRepo.incrementBroadcastSkipped(db, broadcast.id);
+      return;
+    }
 
     await createRunForSubscriber(db, this.stepsQueue, {
       workflowId: workflow.id,
@@ -61,6 +64,7 @@ export class BroadcastSetupProcessor extends WorkerHost {
       payload: null,
       createdBy: broadcast.createdBy,
       broadcastId: broadcast.id,
+      startDelayMs: job.data.startDelayMs,
     });
   }
 }

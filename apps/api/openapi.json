@@ -18,7 +18,9 @@
             }
           }
         },
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "security": [
           {
             "bearer": []
@@ -53,7 +55,9 @@
             }
           }
         },
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "security": [
           {
             "bearer": []
@@ -78,7 +82,9 @@
             }
           }
         },
-        "tags": ["Test"],
+        "tags": [
+          "Test"
+        ],
         "security": [
           {
             "bearer": []
@@ -111,7 +117,9 @@
             }
           }
         },
-        "tags": ["Test"],
+        "tags": [
+          "Test"
+        ],
         "security": [
           {
             "bearer": []
@@ -139,7 +147,9 @@
             }
           }
         },
-        "tags": ["Workspaces"],
+        "tags": [
+          "Workspaces"
+        ],
         "security": [
           {
             "bearer": []
@@ -172,7 +182,9 @@
             }
           }
         },
-        "tags": ["Workspaces"],
+        "tags": [
+          "Workspaces"
+        ],
         "security": [
           {
             "bearer": []
@@ -209,7 +221,9 @@
             "description": "Workspace not found"
           }
         },
-        "tags": ["Workspaces"],
+        "tags": [
+          "Workspaces"
+        ],
         "security": [
           {
             "bearer": []
@@ -254,7 +268,9 @@
             "description": "Workspace not found"
           }
         },
-        "tags": ["Workspaces"],
+        "tags": [
+          "Workspaces"
+        ],
         "security": [
           {
             "bearer": []
@@ -326,7 +342,10 @@
             "in": "query",
             "description": "Filter by the subscriber's latest email preference (true = opted in, false = opted out)",
             "schema": {
-              "enum": ["true", "false"],
+              "enum": [
+                "true",
+                "false"
+              ],
               "type": "boolean"
             }
           },
@@ -354,7 +373,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -403,7 +424,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -441,7 +464,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -487,7 +512,9 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -541,7 +568,9 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -578,7 +607,9 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -626,7 +657,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -682,7 +715,9 @@
             "description": "Subscriber or preferences not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -738,7 +773,9 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -784,7 +821,9 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": ["Subscribers"],
+        "tags": [
+          "Subscribers"
+        ],
         "security": [
           {
             "bearer": []
@@ -823,7 +862,9 @@
             "description": "Invalid or expired unsubscribe link"
           }
         },
-        "tags": ["Unsubscribe"]
+        "tags": [
+          "Unsubscribe"
+        ]
       }
     },
     "/environments/{environmentId}/workflows/trigger": {
@@ -866,7 +907,9 @@
             "description": "Environment, workflow, or subscriber not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -914,7 +957,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -953,7 +998,10 @@
             "required": false,
             "in": "query",
             "schema": {
-              "enum": ["automation", "broadcast"],
+              "enum": [
+                "automation",
+                "broadcast"
+              ],
               "type": "string"
             }
           },
@@ -981,7 +1029,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1041,7 +1091,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1087,7 +1139,9 @@
             "description": "Workflow not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1141,7 +1195,9 @@
             "description": "Workflow not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1178,7 +1234,9 @@
             "description": "Workflow not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1246,7 +1304,9 @@
             "description": "Workflow not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1305,7 +1365,9 @@
             "description": "Workflow not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1364,7 +1426,9 @@
             "description": "Workflow not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1432,7 +1496,9 @@
             "description": "Workflow not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1486,7 +1552,186 @@
             "description": "Workflow or broadcast not found"
           }
         },
-        "tags": ["Workflows"],
+        "tags": [
+          "Workflows"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/pause": {
+      "post": {
+        "operationId": "pauseBroadcast",
+        "summary": "Pause a broadcast",
+        "description": "Holds every send that hasn't gone out yet until the broadcast is resumed. Already-sent emails are unaffected.",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          },
+          "409": {
+            "description": "Broadcast isn't pending or queued"
+          }
+        },
+        "tags": [
+          "Workflows"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/resume": {
+      "post": {
+        "operationId": "resumeBroadcast",
+        "summary": "Resume a paused broadcast",
+        "description": "Lets a paused broadcast carry on sending. The remaining sends keep their original spacing, pushed back by however long it was paused.",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          },
+          "409": {
+            "description": "Broadcast isn't paused"
+          }
+        },
+        "tags": [
+          "Workflows"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/cancel": {
+      "post": {
+        "operationId": "cancelBroadcast",
+        "summary": "Cancel a broadcast",
+        "description": "Permanently stops a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone.",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          },
+          "409": {
+            "description": "Broadcast isn't pending, queued or paused"
+          }
+        },
+        "tags": [
+          "Workflows"
+        ],
         "security": [
           {
             "bearer": []
@@ -1521,7 +1766,9 @@
             "description": "Run step not found"
           }
         },
-        "tags": ["Bounces"]
+        "tags": [
+          "Bounces"
+        ]
       }
     },
     "/environments/{environmentId}/integrations/{type}": {
@@ -1575,7 +1822,9 @@
             "description": "Environment or integration type not found"
           }
         },
-        "tags": ["Integrations"],
+        "tags": [
+          "Integrations"
+        ],
         "security": [
           {
             "bearer": []
@@ -1619,7 +1868,9 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": ["Integrations"],
+        "tags": [
+          "Integrations"
+        ],
         "security": [
           {
             "bearer": []
@@ -1655,7 +1906,9 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": ["Integrations"],
+        "tags": [
+          "Integrations"
+        ],
         "security": [
           {
             "bearer": []
@@ -1701,7 +1954,9 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": ["Integrations"],
+        "tags": [
+          "Integrations"
+        ],
         "security": [
           {
             "bearer": []
@@ -1739,7 +1994,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Integrations"],
+        "tags": [
+          "Integrations"
+        ],
         "security": [
           {
             "bearer": []
@@ -1788,7 +2045,9 @@
             "description": "Environment not found"
           }
         },
-        "tags": ["Analytics"],
+        "tags": [
+          "Analytics"
+        ],
         "security": [
           {
             "bearer": []
@@ -1891,10 +2150,16 @@
                   "type": "number"
                 },
                 "prefix": {
-                  "type": ["string", "null"]
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
-              "required": ["id", "prefix"]
+              "required": [
+                "id",
+                "prefix"
+              ]
             }
           }
         },
@@ -1943,7 +2208,12 @@
             }
           }
         },
-        "required": ["publicId", "name", "image", "stripeCustomerId"]
+        "required": [
+          "publicId",
+          "name",
+          "image",
+          "stripeCustomerId"
+        ]
       },
       "TestResponseDto": {
         "type": "object",
@@ -1972,7 +2242,12 @@
             "selfRequired": false
           }
         },
-        "required": ["message", "timestamp", "success", "echo"]
+        "required": [
+          "message",
+          "timestamp",
+          "success",
+          "echo"
+        ]
       },
       "TestRequestDto": {
         "type": "object",
@@ -1986,7 +2261,9 @@
             "type": "string"
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "WorkspaceDto": {
         "type": "object",
@@ -2004,7 +2281,12 @@
             "type": "string"
           }
         },
-        "required": ["id", "publicId", "name", "slug"]
+        "required": [
+          "id",
+          "publicId",
+          "name",
+          "slug"
+        ]
       },
       "CreateWorkspaceDto": {
         "type": "object",
@@ -2015,7 +2297,9 @@
             "maxLength": 255
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "CreateWorkspaceResponseDto": {
         "type": "object",
@@ -2057,7 +2341,10 @@
             "selfRequired": true
           }
         },
-        "required": ["workspace", "environment"]
+        "required": [
+          "workspace",
+          "environment"
+        ]
       },
       "ListEnvironmentsResponseDto": {
         "type": "object",
@@ -2080,11 +2367,18 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "publicId", "name", "slug"]
+              "required": [
+                "id",
+                "publicId",
+                "name",
+                "slug"
+              ]
             }
           }
         },
-        "required": ["environments"]
+        "required": [
+          "environments"
+        ]
       },
       "CreateEnvironmentDto": {
         "type": "object",
@@ -2095,7 +2389,9 @@
             "maxLength": 255
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "EnvironmentDto": {
         "type": "object",
@@ -2113,7 +2409,12 @@
             "type": "string"
           }
         },
-        "required": ["id", "publicId", "name", "slug"]
+        "required": [
+          "id",
+          "publicId",
+          "name",
+          "slug"
+        ]
       },
       "ListSubscribersResponseDto": {
         "type": "object",
@@ -2127,22 +2428,40 @@
                   "type": "string"
                 },
                 "email": {
-                  "type": ["string", "null"]
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "phone": {
-                  "type": ["string", "null"]
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "externalId": {
-                  "type": ["string", "null"]
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "firstName": {
-                  "type": ["string", "null"]
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "lastName": {
-                  "type": ["string", "null"]
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "name": {
-                  "type": ["string", "null"]
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "attributes": {
                   "type": "object",
@@ -2184,7 +2503,11 @@
             "type": "number"
           }
         },
-        "required": ["subscribers", "limit", "offset"]
+        "required": [
+          "subscribers",
+          "limit",
+          "offset"
+        ]
       },
       "ListTagsResponseDto": {
         "type": "object",
@@ -2196,7 +2519,9 @@
             }
           }
         },
-        "required": ["tags"]
+        "required": [
+          "tags"
+        ]
       },
       "GetSubscriberResponseDto": {
         "type": "object",
@@ -2208,22 +2533,40 @@
                 "type": "string"
               },
               "email": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "phone": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "externalId": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "firstName": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "lastName": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "name": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "attributes": {
                 "type": "object",
@@ -2244,7 +2587,10 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               },
               "unsubscribeUrl": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "tags": {
                 "type": "array",
@@ -2273,11 +2619,19 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               }
             },
-            "required": ["publicId", "email", "version", "createdAt"],
+            "required": [
+              "publicId",
+              "email",
+              "version",
+              "createdAt"
+            ],
             "nullable": true
           }
         },
-        "required": ["subscriber", "preferences"]
+        "required": [
+          "subscriber",
+          "preferences"
+        ]
       },
       "CreateSubscriberDto": {
         "type": "object",
@@ -2330,7 +2684,10 @@
             "selfRequired": false
           }
         },
-        "required": ["attributes", "preferences"]
+        "required": [
+          "attributes",
+          "preferences"
+        ]
       },
       "CreateSubscriberResponseDto": {
         "type": "object",
@@ -2342,22 +2699,40 @@
                 "type": "string"
               },
               "email": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "phone": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "externalId": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "firstName": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "lastName": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "name": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "attributes": {
                 "type": "object",
@@ -2378,7 +2753,10 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               },
               "unsubscribeUrl": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
             "selfRequired": true
@@ -2404,7 +2782,10 @@
             "selfRequired": true
           }
         },
-        "required": ["subscriber", "preferences"]
+        "required": [
+          "subscriber",
+          "preferences"
+        ]
       },
       "BulkUpsertSubscribersDto": {
         "type": "object",
@@ -2462,7 +2843,9 @@
             }
           }
         },
-        "required": ["subscribers"]
+        "required": [
+          "subscribers"
+        ]
       },
       "BulkUpsertSubscribersResponseDto": {
         "type": "object",
@@ -2477,7 +2860,11 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": ["created", "updated", "error"]
+                  "enum": [
+                    "created",
+                    "updated",
+                    "error"
+                  ]
                 },
                 "subscriber": {
                   "type": "object",
@@ -2486,22 +2873,40 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "phone": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "externalId": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "firstName": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "lastName": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "name": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "attributes": {
                       "type": "object",
@@ -2522,7 +2927,10 @@
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     },
                     "unsubscribeUrl": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "required": [
@@ -2557,13 +2965,21 @@
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
-                  "required": ["publicId", "email", "version", "createdAt"]
+                  "required": [
+                    "publicId",
+                    "email",
+                    "version",
+                    "createdAt"
+                  ]
                 },
                 "error": {
                   "type": "string"
                 }
               },
-              "required": ["index", "status"]
+              "required": [
+                "index",
+                "status"
+              ]
             }
           },
           "summary": {
@@ -2582,7 +2998,10 @@
             "selfRequired": true
           }
         },
-        "required": ["results", "summary"]
+        "required": [
+          "results",
+          "summary"
+        ]
       },
       "UpdateSubscriberDto": {
         "type": "object",
@@ -2643,22 +3062,40 @@
                 "type": "string"
               },
               "email": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "phone": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "externalId": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "firstName": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "lastName": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "name": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "attributes": {
                 "type": "object",
@@ -2679,13 +3116,18 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               },
               "unsubscribeUrl": {
-                "type": ["string", "null"]
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
             "selfRequired": true
           }
         },
-        "required": ["subscriber"]
+        "required": [
+          "subscriber"
+        ]
       },
       "UpdatePreferencesDto": {
         "type": "object",
@@ -2722,7 +3164,9 @@
             "selfRequired": true
           }
         },
-        "required": ["preferences"]
+        "required": [
+          "preferences"
+        ]
       },
       "AddTagDto": {
         "type": "object",
@@ -2733,7 +3177,9 @@
             "maxLength": 100
           }
         },
-        "required": ["tag"]
+        "required": [
+          "tag"
+        ]
       },
       "TagResponseDto": {
         "type": "object",
@@ -2742,7 +3188,9 @@
             "type": "string"
           }
         },
-        "required": ["tag"]
+        "required": [
+          "tag"
+        ]
       },
       "UnsubscribeBodyDto": {
         "type": "object",
@@ -2752,7 +3200,9 @@
             "minLength": 1
           }
         },
-        "required": ["token"]
+        "required": [
+          "token"
+        ]
       },
       "UnsubscribeResponseDto": {
         "type": "object",
@@ -2761,7 +3211,9 @@
             "type": "boolean"
           }
         },
-        "required": ["unsubscribed"]
+        "required": [
+          "unsubscribed"
+        ]
       },
       "TriggerWorkflowDto": {
         "type": "object",
@@ -2798,7 +3250,11 @@
             "selfRequired": false
           }
         },
-        "required": ["key", "subscriber", "payload"]
+        "required": [
+          "key",
+          "subscriber",
+          "payload"
+        ]
       },
       "TriggerWorkflowResponseDto": {
         "type": "object",
@@ -2813,7 +3269,9 @@
             "type": "string"
           }
         },
-        "required": ["triggered"]
+        "required": [
+          "triggered"
+        ]
       },
       "CreateWorkflowDto": {
         "type": "object",
@@ -2837,7 +3295,10 @@
             "default": "automation",
             "description": "Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.",
             "type": "string",
-            "enum": ["automation", "broadcast"]
+            "enum": [
+              "automation",
+              "broadcast"
+            ]
           },
           "steps": {
             "minItems": 1,
@@ -2870,7 +3331,11 @@
                       "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}."
                     }
                   },
-                  "required": ["type", "subject", "body"]
+                  "required": [
+                    "type",
+                    "subject",
+                    "body"
+                  ]
                 },
                 {
                   "type": "object",
@@ -2897,13 +3362,21 @@
                       "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON."
                     }
                   },
-                  "required": ["type", "url", "body"]
+                  "required": [
+                    "type",
+                    "url",
+                    "body"
+                  ]
                 }
               ]
             }
           }
         },
-        "required": ["key", "name", "steps"]
+        "required": [
+          "key",
+          "name",
+          "steps"
+        ]
       },
       "WorkflowResponseDto": {
         "type": "object",
@@ -2925,11 +3398,17 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "paused"]
+            "enum": [
+              "active",
+              "paused"
+            ]
           },
           "type": {
             "type": "string",
-            "enum": ["automation", "broadcast"]
+            "enum": [
+              "automation",
+              "broadcast"
+            ]
           },
           "steps": {
             "type": "array",
@@ -2959,7 +3438,12 @@
                   "type": "string"
                 }
               },
-              "required": ["publicId", "stepOrder", "type", "delayMs"]
+              "required": [
+                "publicId",
+                "stepOrder",
+                "type",
+                "delayMs"
+              ]
             }
           },
           "createdAt": {
@@ -3003,15 +3487,24 @@
                   "type": "string"
                 },
                 "description": {
-                  "type": ["string", "null"]
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "status": {
                   "type": "string",
-                  "enum": ["active", "paused"]
+                  "enum": [
+                    "active",
+                    "paused"
+                  ]
                 },
                 "type": {
                   "type": "string",
-                  "enum": ["automation", "broadcast"]
+                  "enum": [
+                    "automation",
+                    "broadcast"
+                  ]
                 },
                 "steps": {
                   "type": "array",
@@ -3041,7 +3534,12 @@
                         "type": "string"
                       }
                     },
-                    "required": ["publicId", "stepOrder", "type", "delayMs"]
+                    "required": [
+                      "publicId",
+                      "stepOrder",
+                      "type",
+                      "delayMs"
+                    ]
                   }
                 },
                 "createdAt": {
@@ -3075,7 +3573,11 @@
             "type": "number"
           }
         },
-        "required": ["workflows", "limit", "offset"]
+        "required": [
+          "workflows",
+          "limit",
+          "offset"
+        ]
       },
       "ListEnvironmentRunsResponseDto": {
         "type": "object",
@@ -3090,7 +3592,11 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": ["active", "completed", "cancelled"]
+                  "enum": [
+                    "active",
+                    "completed",
+                    "cancelled"
+                  ]
                 },
                 "triggeredAt": {
                   "type": "string",
@@ -3110,16 +3616,30 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "name": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "externalId": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
-                  "required": ["publicId", "email", "name", "externalId"]
+                  "required": [
+                    "publicId",
+                    "email",
+                    "name",
+                    "externalId"
+                  ]
                 },
                 "steps": {
                   "type": "array",
@@ -3155,11 +3675,17 @@
                         "nullable": true
                       },
                       "errorMessage": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "bounceType": {
                         "type": "string",
-                        "enum": ["hard", "soft"],
+                        "enum": [
+                          "hard",
+                          "soft"
+                        ],
                         "nullable": true
                       }
                     },
@@ -3187,7 +3713,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["publicId", "key", "name"]
+                  "required": [
+                    "publicId",
+                    "key",
+                    "name"
+                  ]
                 }
               },
               "required": [
@@ -3208,7 +3738,11 @@
             "type": "number"
           }
         },
-        "required": ["runs", "limit", "offset"]
+        "required": [
+          "runs",
+          "limit",
+          "offset"
+        ]
       },
       "WorkflowDetailResponseDto": {
         "type": "object",
@@ -3230,11 +3764,17 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "paused"]
+            "enum": [
+              "active",
+              "paused"
+            ]
           },
           "type": {
             "type": "string",
-            "enum": ["automation", "broadcast"]
+            "enum": [
+              "automation",
+              "broadcast"
+            ]
           },
           "steps": {
             "type": "array",
@@ -3264,7 +3804,12 @@
                   "type": "string"
                 }
               },
-              "required": ["publicId", "stepOrder", "type", "delayMs"]
+              "required": [
+                "publicId",
+                "stepOrder",
+                "type",
+                "delayMs"
+              ]
             }
           },
           "createdAt": {
@@ -3345,7 +3890,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "paused"]
+            "enum": [
+              "active",
+              "paused"
+            ]
           },
           "steps": {
             "description": "If provided, replaces ALL existing steps for this workflow.",
@@ -3379,7 +3927,11 @@
                       "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}."
                     }
                   },
-                  "required": ["type", "subject", "body"]
+                  "required": [
+                    "type",
+                    "subject",
+                    "body"
+                  ]
                 },
                 {
                   "type": "object",
@@ -3406,7 +3958,11 @@
                       "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON."
                     }
                   },
-                  "required": ["type", "url", "body"]
+                  "required": [
+                    "type",
+                    "url",
+                    "body"
+                  ]
                 }
               ]
             }
@@ -3426,7 +3982,11 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": ["active", "completed", "cancelled"]
+                  "enum": [
+                    "active",
+                    "completed",
+                    "cancelled"
+                  ]
                 },
                 "triggeredAt": {
                   "type": "string",
@@ -3446,16 +4006,30 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "name": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "externalId": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
-                  "required": ["publicId", "email", "name", "externalId"]
+                  "required": [
+                    "publicId",
+                    "email",
+                    "name",
+                    "externalId"
+                  ]
                 },
                 "steps": {
                   "type": "array",
@@ -3491,11 +4065,17 @@
                         "nullable": true
                       },
                       "errorMessage": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "bounceType": {
                         "type": "string",
-                        "enum": ["hard", "soft"],
+                        "enum": [
+                          "hard",
+                          "soft"
+                        ],
                         "nullable": true
                       }
                     },
@@ -3528,7 +4108,11 @@
             "type": "number"
           }
         },
-        "required": ["runs", "limit", "offset"]
+        "required": [
+          "runs",
+          "limit",
+          "offset"
+        ]
       },
       "TriggerBroadcastDto__schema0": {
         "anyOf": [
@@ -3540,7 +4124,9 @@
                 "const": "optedIn"
               }
             },
-            "required": ["type"]
+            "required": [
+              "type"
+            ]
           },
           {
             "type": "object",
@@ -3554,7 +4140,10 @@
                 "minLength": 1
               }
             },
-            "required": ["type", "tag"]
+            "required": [
+              "type",
+              "tag"
+            ]
           },
           {
             "type": "object",
@@ -3569,13 +4158,21 @@
               },
               "op": {
                 "type": "string",
-                "enum": ["equals", "contains", "exists"]
+                "enum": [
+                  "equals",
+                  "contains",
+                  "exists"
+                ]
               },
               "value": {
                 "type": "string"
               }
             },
-            "required": ["type", "field", "op"]
+            "required": [
+              "type",
+              "field",
+              "op"
+            ]
           },
           {
             "type": "object",
@@ -3592,7 +4189,10 @@
                 }
               }
             },
-            "required": ["type", "clauses"]
+            "required": [
+              "type",
+              "clauses"
+            ]
           },
           {
             "type": "object",
@@ -3609,7 +4209,10 @@
                 }
               }
             },
-            "required": ["type", "clauses"]
+            "required": [
+              "type",
+              "clauses"
+            ]
           },
           {
             "type": "object",
@@ -3622,7 +4225,10 @@
                 "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
               }
             },
-            "required": ["type", "clause"]
+            "required": [
+              "type",
+              "clause"
+            ]
           }
         ]
       },
@@ -3631,9 +4237,17 @@
         "properties": {
           "audience": {
             "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+          },
+          "sendOverHours": {
+            "description": "Spread sends evenly over this many hours (max 168) instead of sending as fast as possible. Gentler on sender reputation for large audiences, and leaves time to pause or cancel.",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 168
           }
         },
-        "required": ["audience"]
+        "required": [
+          "audience"
+        ]
       },
       "PreviewBroadcastResponseDto": {
         "type": "object",
@@ -3642,7 +4256,9 @@
             "type": "number"
           }
         },
-        "required": ["matchedCount"]
+        "required": [
+          "matchedCount"
+        ]
       },
       "TriggerBroadcastResponseDto": {
         "type": "object",
@@ -3652,10 +4268,19 @@
           },
           "status": {
             "type": "string",
-            "enum": ["pending", "queued", "failed"]
+            "enum": [
+              "pending",
+              "queued",
+              "failed",
+              "paused",
+              "cancelled"
+            ]
           }
         },
-        "required": ["broadcastId", "status"]
+        "required": [
+          "broadcastId",
+          "status"
+        ]
       },
       "ListBroadcastsResponseDto": {
         "type": "object",
@@ -3670,10 +4295,25 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": ["pending", "queued", "failed"]
+                  "enum": [
+                    "pending",
+                    "queued",
+                    "failed",
+                    "paused",
+                    "cancelled"
+                  ]
                 },
                 "matchedCount": {
-                  "type": ["number", "null"]
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "sendOverHours": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
                 },
                 "createdAt": {
                   "type": "string",
@@ -3681,7 +4321,13 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 }
               },
-              "required": ["publicId", "status", "matchedCount", "createdAt"]
+              "required": [
+                "publicId",
+                "status",
+                "matchedCount",
+                "sendOverHours",
+                "createdAt"
+              ]
             }
           },
           "limit": {
@@ -3691,7 +4337,11 @@
             "type": "number"
           }
         },
-        "required": ["broadcasts", "limit", "offset"]
+        "required": [
+          "broadcasts",
+          "limit",
+          "offset"
+        ]
       },
       "BroadcastDetailResponseDto": {
         "type": "object",
@@ -3701,9 +4351,21 @@
           },
           "status": {
             "type": "string",
-            "enum": ["pending", "queued", "failed"]
+            "enum": [
+              "pending",
+              "queued",
+              "failed",
+              "paused",
+              "cancelled"
+            ]
           },
           "matchedCount": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "sendOverHours": {
             "type": "array",
             "items": {
               "type": "number"
@@ -3746,6 +4408,7 @@
           "publicId",
           "status",
           "matchedCount",
+          "sendOverHours",
           "createdAt",
           "sentCount",
           "failedCount",
@@ -3757,6 +4420,48 @@
           "successRate"
         ]
       },
+      "BroadcastSummaryDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "queued",
+              "failed",
+              "paused",
+              "cancelled"
+            ]
+          },
+          "matchedCount": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "sendOverHours": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "publicId",
+          "status",
+          "matchedCount",
+          "sendOverHours",
+          "createdAt"
+        ]
+      },
       "BounceWebhookBodyDto": {
         "type": "object",
         "properties": {
@@ -3766,7 +4471,10 @@
           },
           "bounceType": {
             "type": "string",
-            "enum": ["hard", "soft"]
+            "enum": [
+              "hard",
+              "soft"
+            ]
           },
           "reason": {
             "type": "string",
@@ -3774,7 +4482,11 @@
             "maxLength": 2000
           }
         },
-        "required": ["runStepPublicId", "bounceType", "reason"]
+        "required": [
+          "runStepPublicId",
+          "bounceType",
+          "reason"
+        ]
       },
       "UpsertIntegrationDto": {
         "type": "object",
@@ -3797,7 +4509,11 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           }
         },
-        "required": ["type", "priority", "updatedAt"]
+        "required": [
+          "type",
+          "priority",
+          "updatedAt"
+        ]
       },
       "ListIntegrationsResponseDto": {
         "type": "object",
@@ -3819,12 +4535,18 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 }
               },
-              "required": ["type", "priority", "updatedAt"],
+              "required": [
+                "type",
+                "priority",
+                "updatedAt"
+              ],
               "additionalProperties": {}
             }
           }
         },
-        "required": ["integrations"]
+        "required": [
+          "integrations"
+        ]
       },
       "AnalyticsResponseDto": {
         "type": "object",
@@ -3869,7 +4591,10 @@
                 "type": "number"
               },
               "successRate": {
-                "type": ["number", "null"]
+                "type": [
+                  "number",
+                  "null"
+                ]
               }
             },
             "selfRequired": true
@@ -3887,7 +4612,12 @@
             "selfRequired": true
           }
         },
-        "required": ["days", "subscribers", "sends", "bounces"]
+        "required": [
+          "days",
+          "subscribers",
+          "sends",
+          "bounces"
+        ]
       }
     }
   }

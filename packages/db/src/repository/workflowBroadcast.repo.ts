@@ -1,4 +1,4 @@
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import type { WorkflowBroadcastStatus } from "@subscriber.dev/db/schema";
@@ -15,6 +15,7 @@ export const createBroadcast = async (
     workflowId: number;
     environmentId: number;
     audienceQuery: Record<string, unknown>;
+    sendOverMs?: number | null;
     createdBy: number;
   },
 ) => {
@@ -25,6 +26,7 @@ export const createBroadcast = async (
       workflowId: data.workflowId,
       environmentId: data.environmentId,
       audienceQuery: data.audienceQuery,
+      sendOverMs: data.sendOverMs ?? null,
       createdBy: data.createdBy,
     })
     .returning();
@@ -51,6 +53,213 @@ export const updateBroadcastProgress = async (
     .returning();
 
   return result;
+};
+
+export const markBroadcastDispatched = async (
+  db: dbClient,
+  id: number,
+  matchedCount: number,
+) => {
+  await db
+    .update(workflowBroadcasts)
+    .set({ matchedCount })
+    .where(eq(workflowBroadcasts.id, id));
+  await db
+    .update(workflowBroadcasts)
+    .set({ status: "queued" })
+    .where(
+      and(
+        eq(workflowBroadcasts.id, id),
+        eq(workflowBroadcasts.status, "pending"),
+      ),
+    );
+};
+
+export const transitionBroadcastStatus = async (
+  db: dbClient,
+  id: number,
+  from: WorkflowBroadcastStatus[],
+  to: WorkflowBroadcastStatus,
+) => {
+  const [result] = await db
+    .update(workflowBroadcasts)
+    .set({ status: to })
+    .where(
+      and(
+        eq(workflowBroadcasts.id, id),
+        inArray(workflowBroadcasts.status, from),
+      ),
+    )
+    .returning();
+
+  return result;
+};
+
+export const pauseBroadcast = async (db: dbClient, id: number) => {
+  const [result] = await db
+    .update(workflowBroadcasts)
+    .set({ status: "paused", pausedAt: sql`now()` })
+    .where(
+      and(
+        eq(workflowBroadcasts.id, id),
+        inArray(workflowBroadcasts.status, ["pending", "queued"]),
+      ),
+    )
+    .returning();
+
+  return result;
+};
+
+export const resumeBroadcast = async (db: dbClient, id: number) => {
+  return await db.transaction(async (tx) => {
+    const [resumed] = await tx
+      .update(workflowBroadcasts)
+      .set({
+        status: sql`CASE WHEN ${workflowBroadcasts.matchedCount} IS NULL THEN 'pending' ELSE 'queued' END::"workflowBroadcastStatus"`,
+      })
+      .where(
+        and(
+          eq(workflowBroadcasts.id, id),
+          eq(workflowBroadcasts.status, "paused"),
+        ),
+      )
+      .returning();
+    if (!resumed) return undefined;
+
+    if (resumed.pausedAt) {
+      await tx
+        .update(workflowRunSteps)
+        .set({
+          scheduledAt: sql`${workflowRunSteps.scheduledAt} + (now()::timestamp - GREATEST((SELECT ${workflowBroadcasts.pausedAt} FROM ${workflowBroadcasts} WHERE ${workflowBroadcasts.id} = ${id}), ${workflowRunSteps.createdAt}))`,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            inArray(workflowRunSteps.runId, broadcastRunIds(db, id)),
+            eq(workflowRunSteps.status, "pending"),
+          ),
+        );
+    }
+
+    const [cleared] = await tx
+      .update(workflowBroadcasts)
+      .set({ pausedAt: null })
+      .where(eq(workflowBroadcasts.id, id))
+      .returning();
+    return cleared;
+  });
+};
+
+export const markBroadcastFailed = async (db: dbClient, id: number) => {
+  await db
+    .update(workflowBroadcasts)
+    .set({ status: "failed" })
+    .where(
+      and(
+        eq(workflowBroadcasts.id, id),
+        inArray(workflowBroadcasts.status, ["pending", "queued", "paused"]),
+      ),
+    );
+};
+
+export const incrementBroadcastSkipped = async (db: dbClient, id: number) => {
+  await db
+    .update(workflowBroadcasts)
+    .set({ skippedCount: sql`${workflowBroadcasts.skippedCount} + 1` })
+    .where(eq(workflowBroadcasts.id, id));
+};
+
+const broadcastRunIds = (db: dbClient, broadcastId: number) =>
+  db
+    .select({ id: workflowRuns.id })
+    .from(workflowRuns)
+    .where(eq(workflowRuns.broadcastId, broadcastId));
+
+export const listPendingStepsForBroadcast = async (
+  db: dbClient,
+  broadcastId: number,
+) => {
+  return await db
+    .select({
+      id: workflowRunSteps.id,
+      bullJobId: workflowRunSteps.bullJobId,
+      scheduledAt: workflowRunSteps.scheduledAt,
+    })
+    .from(workflowRunSteps)
+    .innerJoin(workflowRuns, eq(workflowRunSteps.runId, workflowRuns.id))
+    .where(
+      and(
+        eq(workflowRuns.broadcastId, broadcastId),
+        eq(workflowRunSteps.status, "pending"),
+      ),
+    );
+};
+
+export const countRunsForBroadcast = async (
+  db: dbClient,
+  broadcastId: number,
+) => {
+  const [row] = await db
+    .select({ count: count() })
+    .from(workflowRuns)
+    .where(eq(workflowRuns.broadcastId, broadcastId));
+  return row?.count ?? 0;
+};
+
+export const cancelPendingStepsForBroadcast = async (
+  db: dbClient,
+  broadcastId: number,
+  reason: string,
+) => {
+  const runIds = broadcastRunIds(db, broadcastId);
+
+  await db
+    .update(workflowRunSteps)
+    .set({ status: "cancelled", errorMessage: reason, updatedAt: new Date() })
+    .where(
+      and(
+        inArray(workflowRunSteps.runId, runIds),
+        eq(workflowRunSteps.status, "pending"),
+      ),
+    );
+
+  await db
+    .update(workflowRuns)
+    .set({ status: "cancelled", completedAt: new Date() })
+    .where(
+      and(
+        eq(workflowRuns.broadcastId, broadcastId),
+        eq(workflowRuns.status, "active"),
+      ),
+    );
+};
+
+export const getBroadcastSendState = async (
+  db: dbClient,
+  runStepId: number,
+): Promise<
+  { state: "send" | "hold" | "cancel"; scheduledAt: Date } | undefined
+> => {
+  const [row] = await db
+    .select({
+      status: workflowBroadcasts.status,
+      scheduledAt: workflowRunSteps.scheduledAt,
+    })
+    .from(workflowRunSteps)
+    .innerJoin(workflowRuns, eq(workflowRunSteps.runId, workflowRuns.id))
+    .innerJoin(
+      workflowBroadcasts,
+      eq(workflowRuns.broadcastId, workflowBroadcasts.id),
+    )
+    .where(eq(workflowRunSteps.id, runStepId));
+
+  if (!row) return undefined;
+  const { scheduledAt } = row;
+  if (row.status === "paused") return { state: "hold", scheduledAt };
+  if (row.status === "cancelled" || row.status === "failed") {
+    return { state: "cancel", scheduledAt };
+  }
+  return { state: "send", scheduledAt };
 };
 
 export const getBroadcastByPublicId = async (

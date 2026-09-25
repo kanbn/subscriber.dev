@@ -6,8 +6,10 @@ import {
   getBroadcastBounceBreakdown,
   getBroadcastById,
   getBroadcastByPublicId,
+  getBroadcastSendState,
   getBroadcastStepCounts,
   listBroadcastsForWorkflow,
+  transitionBroadcastStatus,
   updateBroadcastProgress,
 } from "@subscriber.dev/db/repository/workflowBroadcast.repo";
 
@@ -231,5 +233,49 @@ describe("getBroadcastBounceBreakdown", () => {
     const result = await getBroadcastBounceBreakdown(db, 1);
 
     expect(result).toEqual({ hard: 0, soft: 0 });
+  });
+});
+
+describe("getBroadcastSendState", () => {
+  function dbReturning(rows: unknown[]) {
+    const where = vi.fn().mockResolvedValue(rows);
+    const join2 = vi.fn().mockReturnValue({ where });
+    const join1 = vi.fn().mockReturnValue({ innerJoin: join2 });
+    const from = vi.fn().mockReturnValue({ innerJoin: join1 });
+    return { select: vi.fn().mockReturnValue({ from }) } as unknown as dbClient;
+  }
+
+  it.each([
+    ["pending", "send"],
+    ["queued", "send"],
+    ["paused", "hold"],
+    ["cancelled", "cancel"],
+    ["failed", "cancel"],
+  ])("maps a %s broadcast to %s", async (status, expected) => {
+    const scheduledAt = new Date(0);
+    expect(
+      await getBroadcastSendState(dbReturning([{ status, scheduledAt }]), 1),
+    ).toEqual({ state: expected, scheduledAt });
+  });
+
+  it("is undefined for a step that isn't part of a broadcast", async () => {
+    expect(await getBroadcastSendState(dbReturning([]), 1)).toBeUndefined();
+  });
+});
+
+describe("transitionBroadcastStatus", () => {
+  it("returns undefined when the broadcast wasn't in an allowed status", async () => {
+    const updateChain = makeUpdateChain([]);
+    const db = makeMockDb({ updateChain });
+
+    const result = await transitionBroadcastStatus(
+      db,
+      1,
+      ["pending", "queued"],
+      "paused",
+    );
+
+    expect(result).toBeUndefined();
+    expect(updateChain.set).toHaveBeenCalledWith({ status: "paused" });
   });
 });

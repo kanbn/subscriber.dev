@@ -22,6 +22,7 @@ interface CreateRunForSubscriberInput {
   payload?: Record<string, unknown> | null;
   createdBy: number | null;
   broadcastId?: number | null;
+  startDelayMs?: number;
 }
 
 export async function createRunForSubscriber(
@@ -29,7 +30,7 @@ export async function createRunForSubscriber(
   queue: Queue,
   input: CreateRunForSubscriberInput,
 ) {
-  let cumulativeDelayMs = 0;
+  let cumulativeDelayMs = input.startDelayMs ?? 0;
   const now = new Date();
   const plannedSteps = input.steps.map((step) => {
     cumulativeDelayMs += step.delayMs;

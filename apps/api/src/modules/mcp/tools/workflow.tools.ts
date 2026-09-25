@@ -293,7 +293,7 @@ export class WorkflowTools {
   @Tool({
     name: "trigger_broadcast",
     description:
-      "Fan this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via list_broadcasts/get_broadcast) for progress. Sends real email/webhooks; call preview_broadcast first to check the matched count.",
+      "Fan this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via list_broadcasts/get_broadcast) for progress. Sends real email/webhooks; call preview_broadcast first to check the matched count. For large audiences, set sendOverHours to spread sends out; a running broadcast can be stopped with pause_broadcast or cancel_broadcast.",
     parameters: TriggerBroadcastSchema.extend({
       environmentId: z.string(),
       workflowId: z.string(),
@@ -322,6 +322,7 @@ export class WorkflowTools {
       args.workflowId,
       args.audience,
       user.id,
+      { sendOverHours: args.sendOverHours },
     );
   }
 
@@ -390,6 +391,114 @@ export class WorkflowTools {
     );
 
     return this.workflowService.getBroadcast(
+      db,
+      environment.id,
+      args.workflowId,
+      args.broadcastId,
+    );
+  }
+
+  @Tool({
+    name: "pause_broadcast",
+    description:
+      "Pause a running broadcast: every send that hasn't gone out yet is held until resume_broadcast. Already-sent emails are unaffected.",
+    parameters: z.object({
+      environmentId: z.string(),
+      workflowId: z.string(),
+      broadcastId: z.string(),
+    }),
+    annotations: { idempotentHint: true },
+  })
+  async pauseBroadcast(
+    args: {
+      environmentId: string;
+      workflowId: string;
+      broadcastId: string;
+    },
+    _context: unknown,
+    rawRequest: { user?: unknown; db?: unknown } | undefined,
+  ) {
+    const user = requireMcpUser(rawRequest);
+    const db = requireMcpDb(rawRequest);
+    const environment = await requireEnvironment(
+      db,
+      user.id,
+      args.environmentId,
+    );
+
+    return this.workflowService.pauseBroadcast(
+      db,
+      environment.id,
+      args.workflowId,
+      args.broadcastId,
+    );
+  }
+
+  @Tool({
+    name: "resume_broadcast",
+    description:
+      "Resume a paused broadcast. The remaining sends keep their original spacing, pushed back by however long it was paused. Sends real email/webhooks.",
+    parameters: z.object({
+      environmentId: z.string(),
+      workflowId: z.string(),
+      broadcastId: z.string(),
+    }),
+    annotations: { destructiveHint: true, openWorldHint: true },
+  })
+  async resumeBroadcast(
+    args: {
+      environmentId: string;
+      workflowId: string;
+      broadcastId: string;
+    },
+    _context: unknown,
+    rawRequest: { user?: unknown; db?: unknown } | undefined,
+  ) {
+    const user = requireMcpUser(rawRequest);
+    const db = requireMcpDb(rawRequest);
+    const environment = await requireEnvironment(
+      db,
+      user.id,
+      args.environmentId,
+    );
+
+    return this.workflowService.resumeBroadcast(
+      db,
+      environment.id,
+      args.workflowId,
+      args.broadcastId,
+    );
+  }
+
+  @Tool({
+    name: "cancel_broadcast",
+    description:
+      "Permanently stop a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone — prefer pause_broadcast if it might need to carry on.",
+    parameters: z.object({
+      environmentId: z.string(),
+      workflowId: z.string(),
+      broadcastId: z.string(),
+    }),
+    annotations: { destructiveHint: true },
+  })
+  async cancelBroadcast(
+    args: {
+      environmentId: string;
+      workflowId: string;
+      broadcastId: string;
+    },
+    _context: unknown,
+    rawRequest: { user?: unknown; db?: unknown } | undefined,
+  ) {
+    const user = requireMcpUser(rawRequest);
+    const db = requireMcpDb(rawRequest);
+    const environment = await requireEnvironment(
+      db,
+      user.id,
+      args.environmentId,
+    );
+
+    return this.workflowService.cancelBroadcast(
       db,
       environment.id,
       args.workflowId,

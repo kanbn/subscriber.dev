@@ -5,7 +5,8 @@
  * REST API for Subscriber - Customer.io alternative
  * OpenAPI spec version: 1.0
  */
-import { cliFetch } from './mutator/cli-fetch.js';
+import { cliFetch } from "./mutator/cli-fetch.js";
+
 export type UserResponseDtoApiKeysItemPrefix = string | null;
 
 export type UserResponseDtoApiKeysItem = {
@@ -130,7 +131,9 @@ export type ListSubscribersResponseDtoSubscribersItemName = string | null;
 /**
  * @nullable
  */
-export type ListSubscribersResponseDtoSubscribersItemAttributes = {[key: string]: unknown} | null;
+export type ListSubscribersResponseDtoSubscribersItemAttributes = {
+  [key: string]: unknown;
+} | null;
 
 export type ListSubscribersResponseDtoSubscribersItem = {
   publicId: string;
@@ -173,7 +176,9 @@ export type GetSubscriberResponseDtoSubscriberName = string | null;
 /**
  * @nullable
  */
-export type GetSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+export type GetSubscriberResponseDtoSubscriberAttributes = {
+  [key: string]: unknown;
+} | null;
 
 export type GetSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
@@ -212,7 +217,7 @@ export interface GetSubscriberResponseDto {
   preferences: GetSubscriberResponseDtoPreferences;
 }
 
-export type CreateSubscriberDtoAttributes = {[key: string]: unknown};
+export type CreateSubscriberDtoAttributes = { [key: string]: unknown };
 
 export type CreateSubscriberDtoPreferences = {
   email?: boolean;
@@ -251,7 +256,9 @@ export type CreateSubscriberResponseDtoSubscriberName = string | null;
 /**
  * @nullable
  */
-export type CreateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+export type CreateSubscriberResponseDtoSubscriberAttributes = {
+  [key: string]: unknown;
+} | null;
 
 export type CreateSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
@@ -285,7 +292,9 @@ export interface CreateSubscriberResponseDto {
   preferences: CreateSubscriberResponseDtoPreferences;
 }
 
-export type BulkUpsertSubscribersDtoSubscribersItemAttributes = {[key: string]: unknown};
+export type BulkUpsertSubscribersDtoSubscribersItemAttributes = {
+  [key: string]: unknown;
+};
 
 /**
  * Omit entirely to leave existing preferences untouched on update.
@@ -321,34 +330,49 @@ export interface BulkUpsertSubscribersDto {
   subscribers: BulkUpsertSubscribersDtoSubscribersItem[];
 }
 
-export type BulkUpsertSubscribersResponseDtoResultsItemStatus = typeof BulkUpsertSubscribersResponseDtoResultsItemStatus[keyof typeof BulkUpsertSubscribersResponseDtoResultsItemStatus];
-
+export type BulkUpsertSubscribersResponseDtoResultsItemStatus =
+  (typeof BulkUpsertSubscribersResponseDtoResultsItemStatus)[keyof typeof BulkUpsertSubscribersResponseDtoResultsItemStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const BulkUpsertSubscribersResponseDtoResultsItemStatus = {
-  created: 'created',
-  updated: 'updated',
-  error: 'error',
+  created: "created",
+  updated: "updated",
+  error: "error",
 } as const;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberEmail = string | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberEmail =
+  | string
+  | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberPhone = string | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberPhone =
+  | string
+  | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberExternalId = string | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberExternalId =
+  | string
+  | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberFirstName = string | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberFirstName =
+  | string
+  | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberLastName = string | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberLastName =
+  | string
+  | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberName = string | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberName =
+  | string
+  | null;
 
 /**
  * @nullable
  */
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes = {[key: string]: unknown} | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes = {
+  [key: string]: unknown;
+} | null;
 
-export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberUnsubscribeUrl = string | null;
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberUnsubscribeUrl =
+  string | null;
 
 export type BulkUpsertSubscribersResponseDtoResultsItemSubscriber = {
   publicId: string;
@@ -397,7 +421,7 @@ export interface BulkUpsertSubscribersResponseDto {
 /**
  * @nullable
  */
-export type UpdateSubscriberDtoAttributes = {[key: string]: unknown} | null;
+export type UpdateSubscriberDtoAttributes = { [key: string]: unknown } | null;
 
 export interface UpdateSubscriberDto {
   /**
@@ -429,7 +453,9 @@ export type UpdateSubscriberResponseDtoSubscriberName = string | null;
 /**
  * @nullable
  */
-export type UpdateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
+export type UpdateSubscriberResponseDtoSubscriberAttributes = {
+  [key: string]: unknown;
+} | null;
 
 export type UpdateSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
@@ -502,7 +528,7 @@ export type TriggerWorkflowDtoSubscriber = {
 /**
  * Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.
  */
-export type TriggerWorkflowDtoPayload = {[key: string]: unknown};
+export type TriggerWorkflowDtoPayload = { [key: string]: unknown };
 
 export interface TriggerWorkflowDto {
   /**
@@ -524,17 +550,17 @@ export interface TriggerWorkflowResponseDto {
 /**
  * Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.
  */
-export type CreateWorkflowDtoType = typeof CreateWorkflowDtoType[keyof typeof CreateWorkflowDtoType];
-
+export type CreateWorkflowDtoType =
+  (typeof CreateWorkflowDtoType)[keyof typeof CreateWorkflowDtoType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateWorkflowDtoType = {
-  automation: 'automation',
-  broadcast: 'broadcast',
+  automation: "automation",
+  broadcast: "broadcast",
 } as const;
 
 export type CreateWorkflowDtoStepsItemOneOf = {
-  type: 'email';
+  type: "email";
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -554,7 +580,7 @@ export type CreateWorkflowDtoStepsItemOneOf = {
 };
 
 export type CreateWorkflowDtoStepsItemOneOfTwo = {
-  type: 'webhook';
+  type: "webhook";
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -570,7 +596,9 @@ export type CreateWorkflowDtoStepsItemOneOfTwo = {
   body: string;
 };
 
-export type CreateWorkflowDtoStepsItem = CreateWorkflowDtoStepsItemOneOf | CreateWorkflowDtoStepsItemOneOfTwo;
+export type CreateWorkflowDtoStepsItem =
+  | CreateWorkflowDtoStepsItemOneOf
+  | CreateWorkflowDtoStepsItemOneOfTwo;
 
 export interface CreateWorkflowDto {
   /**
@@ -595,22 +623,22 @@ export interface CreateWorkflowDto {
   steps: CreateWorkflowDtoStepsItem[];
 }
 
-export type WorkflowResponseDtoStatus = typeof WorkflowResponseDtoStatus[keyof typeof WorkflowResponseDtoStatus];
-
+export type WorkflowResponseDtoStatus =
+  (typeof WorkflowResponseDtoStatus)[keyof typeof WorkflowResponseDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkflowResponseDtoStatus = {
-  active: 'active',
-  paused: 'paused',
+  active: "active",
+  paused: "paused",
 } as const;
 
-export type WorkflowResponseDtoType = typeof WorkflowResponseDtoType[keyof typeof WorkflowResponseDtoType];
-
+export type WorkflowResponseDtoType =
+  (typeof WorkflowResponseDtoType)[keyof typeof WorkflowResponseDtoType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkflowResponseDtoType = {
-  automation: 'automation',
-  broadcast: 'broadcast',
+  automation: "automation",
+  broadcast: "broadcast",
 } as const;
 
 export type WorkflowResponseDtoStepsItem = {
@@ -640,22 +668,22 @@ export interface WorkflowResponseDto {
 
 export type ListWorkflowsResponseDtoWorkflowsItemDescription = string | null;
 
-export type ListWorkflowsResponseDtoWorkflowsItemStatus = typeof ListWorkflowsResponseDtoWorkflowsItemStatus[keyof typeof ListWorkflowsResponseDtoWorkflowsItemStatus];
-
+export type ListWorkflowsResponseDtoWorkflowsItemStatus =
+  (typeof ListWorkflowsResponseDtoWorkflowsItemStatus)[keyof typeof ListWorkflowsResponseDtoWorkflowsItemStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListWorkflowsResponseDtoWorkflowsItemStatus = {
-  active: 'active',
-  paused: 'paused',
+  active: "active",
+  paused: "paused",
 } as const;
 
-export type ListWorkflowsResponseDtoWorkflowsItemType = typeof ListWorkflowsResponseDtoWorkflowsItemType[keyof typeof ListWorkflowsResponseDtoWorkflowsItemType];
-
+export type ListWorkflowsResponseDtoWorkflowsItemType =
+  (typeof ListWorkflowsResponseDtoWorkflowsItemType)[keyof typeof ListWorkflowsResponseDtoWorkflowsItemType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListWorkflowsResponseDtoWorkflowsItemType = {
-  automation: 'automation',
-  broadcast: 'broadcast',
+  automation: "automation",
+  broadcast: "broadcast",
 } as const;
 
 export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
@@ -689,21 +717,27 @@ export interface ListWorkflowsResponseDto {
   offset: number;
 }
 
-export type ListEnvironmentRunsResponseDtoRunsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStatus];
-
+export type ListEnvironmentRunsResponseDtoRunsItemStatus =
+  (typeof ListEnvironmentRunsResponseDtoRunsItemStatus)[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEnvironmentRunsResponseDtoRunsItemStatus = {
-  active: 'active',
-  completed: 'completed',
-  cancelled: 'cancelled',
+  active: "active",
+  completed: "completed",
+  cancelled: "cancelled",
 } as const;
 
-export type ListEnvironmentRunsResponseDtoRunsItemSubscriberEmail = string | null;
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberEmail =
+  | string
+  | null;
 
-export type ListEnvironmentRunsResponseDtoRunsItemSubscriberName = string | null;
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberName =
+  | string
+  | null;
 
-export type ListEnvironmentRunsResponseDtoRunsItemSubscriberExternalId = string | null;
+export type ListEnvironmentRunsResponseDtoRunsItemSubscriberExternalId =
+  | string
+  | null;
 
 export type ListEnvironmentRunsResponseDtoRunsItemSubscriber = {
   publicId: string;
@@ -712,31 +746,34 @@ export type ListEnvironmentRunsResponseDtoRunsItemSubscriber = {
   externalId: ListEnvironmentRunsResponseDtoRunsItemSubscriberExternalId;
 };
 
-export type ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus];
-
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus =
+  (typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus)[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEnvironmentRunsResponseDtoRunsItemStepsItemStatus = {
-  pending: 'pending',
-  sent: 'sent',
-  skipped: 'skipped',
-  failed: 'failed',
-  cancelled: 'cancelled',
-  bounced: 'bounced',
+  pending: "pending",
+  sent: "sent",
+  skipped: "skipped",
+  failed: "failed",
+  cancelled: "cancelled",
+  bounced: "bounced",
 } as const;
 
-export type ListEnvironmentRunsResponseDtoRunsItemStepsItemErrorMessage = string | null;
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemErrorMessage =
+  | string
+  | null;
 
 /**
  * @nullable
  */
-export type ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType] | null;
-
+export type ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType =
+  | (typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType)[keyof typeof ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType]
+  | null;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEnvironmentRunsResponseDtoRunsItemStepsItemBounceType = {
-  hard: 'hard',
-  soft: 'soft',
+  hard: "hard",
+  soft: "soft",
 } as const;
 
 export type ListEnvironmentRunsResponseDtoRunsItemStepsItem = {
@@ -782,22 +819,22 @@ export interface ListEnvironmentRunsResponseDto {
   offset: number;
 }
 
-export type WorkflowDetailResponseDtoStatus = typeof WorkflowDetailResponseDtoStatus[keyof typeof WorkflowDetailResponseDtoStatus];
-
+export type WorkflowDetailResponseDtoStatus =
+  (typeof WorkflowDetailResponseDtoStatus)[keyof typeof WorkflowDetailResponseDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkflowDetailResponseDtoStatus = {
-  active: 'active',
-  paused: 'paused',
+  active: "active",
+  paused: "paused",
 } as const;
 
-export type WorkflowDetailResponseDtoType = typeof WorkflowDetailResponseDtoType[keyof typeof WorkflowDetailResponseDtoType];
-
+export type WorkflowDetailResponseDtoType =
+  (typeof WorkflowDetailResponseDtoType)[keyof typeof WorkflowDetailResponseDtoType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkflowDetailResponseDtoType = {
-  automation: 'automation',
-  broadcast: 'broadcast',
+  automation: "automation",
+  broadcast: "broadcast",
 } as const;
 
 export type WorkflowDetailResponseDtoStepsItem = {
@@ -833,17 +870,17 @@ export interface WorkflowDetailResponseDto {
   successRate: number[];
 }
 
-export type UpdateWorkflowDtoStatus = typeof UpdateWorkflowDtoStatus[keyof typeof UpdateWorkflowDtoStatus];
-
+export type UpdateWorkflowDtoStatus =
+  (typeof UpdateWorkflowDtoStatus)[keyof typeof UpdateWorkflowDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateWorkflowDtoStatus = {
-  active: 'active',
-  paused: 'paused',
+  active: "active",
+  paused: "paused",
 } as const;
 
 export type UpdateWorkflowDtoStepsItemOneOf = {
-  type: 'email';
+  type: "email";
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -863,7 +900,7 @@ export type UpdateWorkflowDtoStepsItemOneOf = {
 };
 
 export type UpdateWorkflowDtoStepsItemOneOfTwo = {
-  type: 'webhook';
+  type: "webhook";
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
    * @minimum 0
@@ -879,7 +916,9 @@ export type UpdateWorkflowDtoStepsItemOneOfTwo = {
   body: string;
 };
 
-export type UpdateWorkflowDtoStepsItem = UpdateWorkflowDtoStepsItemOneOf | UpdateWorkflowDtoStepsItemOneOfTwo;
+export type UpdateWorkflowDtoStepsItem =
+  | UpdateWorkflowDtoStepsItemOneOf
+  | UpdateWorkflowDtoStepsItemOneOfTwo;
 
 export interface UpdateWorkflowDto {
   /**
@@ -906,14 +945,14 @@ export interface UpdateWorkflowDto {
   steps?: UpdateWorkflowDtoStepsItem[];
 }
 
-export type ListRunsResponseDtoRunsItemStatus = typeof ListRunsResponseDtoRunsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStatus];
-
+export type ListRunsResponseDtoRunsItemStatus =
+  (typeof ListRunsResponseDtoRunsItemStatus)[keyof typeof ListRunsResponseDtoRunsItemStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListRunsResponseDtoRunsItemStatus = {
-  active: 'active',
-  completed: 'completed',
-  cancelled: 'cancelled',
+  active: "active",
+  completed: "completed",
+  cancelled: "cancelled",
 } as const;
 
 export type ListRunsResponseDtoRunsItemSubscriberEmail = string | null;
@@ -929,17 +968,17 @@ export type ListRunsResponseDtoRunsItemSubscriber = {
   externalId: ListRunsResponseDtoRunsItemSubscriberExternalId;
 };
 
-export type ListRunsResponseDtoRunsItemStepsItemStatus = typeof ListRunsResponseDtoRunsItemStepsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStepsItemStatus];
-
+export type ListRunsResponseDtoRunsItemStepsItemStatus =
+  (typeof ListRunsResponseDtoRunsItemStepsItemStatus)[keyof typeof ListRunsResponseDtoRunsItemStepsItemStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListRunsResponseDtoRunsItemStepsItemStatus = {
-  pending: 'pending',
-  sent: 'sent',
-  skipped: 'skipped',
-  failed: 'failed',
-  cancelled: 'cancelled',
-  bounced: 'bounced',
+  pending: "pending",
+  sent: "sent",
+  skipped: "skipped",
+  failed: "failed",
+  cancelled: "cancelled",
+  bounced: "bounced",
 } as const;
 
 export type ListRunsResponseDtoRunsItemStepsItemErrorMessage = string | null;
@@ -947,13 +986,14 @@ export type ListRunsResponseDtoRunsItemStepsItemErrorMessage = string | null;
 /**
  * @nullable
  */
-export type ListRunsResponseDtoRunsItemStepsItemBounceType = typeof ListRunsResponseDtoRunsItemStepsItemBounceType[keyof typeof ListRunsResponseDtoRunsItemStepsItemBounceType] | null;
-
+export type ListRunsResponseDtoRunsItemStepsItemBounceType =
+  | (typeof ListRunsResponseDtoRunsItemStepsItemBounceType)[keyof typeof ListRunsResponseDtoRunsItemStepsItemBounceType]
+  | null;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListRunsResponseDtoRunsItemStepsItemBounceType = {
-  hard: 'hard',
-  soft: 'soft',
+  hard: "hard",
+  soft: "soft",
 } as const;
 
 export type ListRunsResponseDtoRunsItemStepsItem = {
@@ -993,27 +1033,27 @@ export interface ListRunsResponseDto {
 }
 
 export type TriggerBroadcastDtoSchema0AnyOf = {
-  type: 'optedIn';
+  type: "optedIn";
 };
 
 export type TriggerBroadcastDtoSchema0AnyOfTwo = {
-  type: 'tag';
+  type: "tag";
   /** @minLength 1 */
   tag: string;
 };
 
-export type TriggerBroadcastDtoSchema0AnyOfThreeOp = typeof TriggerBroadcastDtoSchema0AnyOfThreeOp[keyof typeof TriggerBroadcastDtoSchema0AnyOfThreeOp];
-
+export type TriggerBroadcastDtoSchema0AnyOfThreeOp =
+  (typeof TriggerBroadcastDtoSchema0AnyOfThreeOp)[keyof typeof TriggerBroadcastDtoSchema0AnyOfThreeOp];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TriggerBroadcastDtoSchema0AnyOfThreeOp = {
-  equals: 'equals',
-  contains: 'contains',
-  exists: 'exists',
+  equals: "equals",
+  contains: "contains",
+  exists: "exists",
 } as const;
 
 export type TriggerBroadcastDtoSchema0AnyOfThree = {
-  type: 'attribute';
+  type: "attribute";
   /** @minLength 1 */
   field: string;
   op: TriggerBroadcastDtoSchema0AnyOfThreeOp;
@@ -1021,40 +1061,53 @@ export type TriggerBroadcastDtoSchema0AnyOfThree = {
 };
 
 export type TriggerBroadcastDtoSchema0AnyOfFive = {
-  type: 'and';
+  type: "and";
   /** @minItems 1 */
   clauses: TriggerBroadcastDtoSchema0[];
 };
 
 export type TriggerBroadcastDtoSchema0AnyOfSix = {
-  type: 'or';
+  type: "or";
   /** @minItems 1 */
   clauses: TriggerBroadcastDtoSchema0[];
 };
 
 export type TriggerBroadcastDtoSchema0AnyOfSeven = {
-  type: 'not';
+  type: "not";
   clause: TriggerBroadcastDtoSchema0;
 };
 
-export type TriggerBroadcastDtoSchema0 = TriggerBroadcastDtoSchema0AnyOf | TriggerBroadcastDtoSchema0AnyOfTwo | TriggerBroadcastDtoSchema0AnyOfThree | TriggerBroadcastDtoSchema0AnyOfFive | TriggerBroadcastDtoSchema0AnyOfSix | TriggerBroadcastDtoSchema0AnyOfSeven;
+export type TriggerBroadcastDtoSchema0 =
+  | TriggerBroadcastDtoSchema0AnyOf
+  | TriggerBroadcastDtoSchema0AnyOfTwo
+  | TriggerBroadcastDtoSchema0AnyOfThree
+  | TriggerBroadcastDtoSchema0AnyOfFive
+  | TriggerBroadcastDtoSchema0AnyOfSix
+  | TriggerBroadcastDtoSchema0AnyOfSeven;
 
 export interface TriggerBroadcastDto {
   audience: TriggerBroadcastDtoSchema0;
+  /**
+   * Spread sends evenly over this many hours (max 168) instead of sending as fast as possible. Gentler on sender reputation for large audiences, and leaves time to pause or cancel.
+   * @maximum 168
+   */
+  sendOverHours?: number;
 }
 
 export interface PreviewBroadcastResponseDto {
   matchedCount: number;
 }
 
-export type TriggerBroadcastResponseDtoStatus = typeof TriggerBroadcastResponseDtoStatus[keyof typeof TriggerBroadcastResponseDtoStatus];
-
+export type TriggerBroadcastResponseDtoStatus =
+  (typeof TriggerBroadcastResponseDtoStatus)[keyof typeof TriggerBroadcastResponseDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TriggerBroadcastResponseDtoStatus = {
-  pending: 'pending',
-  queued: 'queued',
-  failed: 'failed',
+  pending: "pending",
+  queued: "queued",
+  failed: "failed",
+  paused: "paused",
+  cancelled: "cancelled",
 } as const;
 
 export interface TriggerBroadcastResponseDto {
@@ -1062,22 +1115,29 @@ export interface TriggerBroadcastResponseDto {
   status: TriggerBroadcastResponseDtoStatus;
 }
 
-export type ListBroadcastsResponseDtoBroadcastsItemStatus = typeof ListBroadcastsResponseDtoBroadcastsItemStatus[keyof typeof ListBroadcastsResponseDtoBroadcastsItemStatus];
-
+export type ListBroadcastsResponseDtoBroadcastsItemStatus =
+  (typeof ListBroadcastsResponseDtoBroadcastsItemStatus)[keyof typeof ListBroadcastsResponseDtoBroadcastsItemStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListBroadcastsResponseDtoBroadcastsItemStatus = {
-  pending: 'pending',
-  queued: 'queued',
-  failed: 'failed',
+  pending: "pending",
+  queued: "queued",
+  failed: "failed",
+  paused: "paused",
+  cancelled: "cancelled",
 } as const;
 
 export type ListBroadcastsResponseDtoBroadcastsItemMatchedCount = number | null;
+
+export type ListBroadcastsResponseDtoBroadcastsItemSendOverHours =
+  | number
+  | null;
 
 export type ListBroadcastsResponseDtoBroadcastsItem = {
   publicId: string;
   status: ListBroadcastsResponseDtoBroadcastsItemStatus;
   matchedCount: ListBroadcastsResponseDtoBroadcastsItemMatchedCount;
+  sendOverHours: ListBroadcastsResponseDtoBroadcastsItemSendOverHours;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
 };
@@ -1088,20 +1148,23 @@ export interface ListBroadcastsResponseDto {
   offset: number;
 }
 
-export type BroadcastDetailResponseDtoStatus = typeof BroadcastDetailResponseDtoStatus[keyof typeof BroadcastDetailResponseDtoStatus];
-
+export type BroadcastDetailResponseDtoStatus =
+  (typeof BroadcastDetailResponseDtoStatus)[keyof typeof BroadcastDetailResponseDtoStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const BroadcastDetailResponseDtoStatus = {
-  pending: 'pending',
-  queued: 'queued',
-  failed: 'failed',
+  pending: "pending",
+  queued: "queued",
+  failed: "failed",
+  paused: "paused",
+  cancelled: "cancelled",
 } as const;
 
 export interface BroadcastDetailResponseDto {
   publicId: string;
   status: BroadcastDetailResponseDtoStatus;
   matchedCount: number[];
+  sendOverHours: number[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   sentCount: number;
@@ -1114,13 +1177,34 @@ export interface BroadcastDetailResponseDto {
   successRate: number[];
 }
 
-export type BounceWebhookBodyDtoBounceType = typeof BounceWebhookBodyDtoBounceType[keyof typeof BounceWebhookBodyDtoBounceType];
+export type BroadcastSummaryDtoStatus =
+  (typeof BroadcastSummaryDtoStatus)[keyof typeof BroadcastSummaryDtoStatus];
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BroadcastSummaryDtoStatus = {
+  pending: "pending",
+  queued: "queued",
+  failed: "failed",
+  paused: "paused",
+  cancelled: "cancelled",
+} as const;
+
+export interface BroadcastSummaryDto {
+  publicId: string;
+  status: BroadcastSummaryDtoStatus;
+  matchedCount: number[];
+  sendOverHours: number[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+}
+
+export type BounceWebhookBodyDtoBounceType =
+  (typeof BounceWebhookBodyDtoBounceType)[keyof typeof BounceWebhookBodyDtoBounceType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const BounceWebhookBodyDtoBounceType = {
-  hard: 'hard',
-  soft: 'soft',
+  hard: "hard",
+  soft: "soft",
 } as const;
 
 export interface BounceWebhookBodyDto {
@@ -1134,7 +1218,9 @@ export interface BounceWebhookBodyDto {
   reason: string;
 }
 
-export interface UpsertIntegrationDto {[key: string]: unknown}
+export interface UpsertIntegrationDto {
+  [key: string]: unknown;
+}
 
 export interface IntegrationResponseDto {
   type: string;
@@ -1186,1967 +1272,2101 @@ export interface AnalyticsResponseDto {
 }
 
 export type ListSubscribersParams = {
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-/**
- * @minimum 0
- * @maximum 9007199254740991
- */
-offset?: number;
-/**
- * Filter to the subscriber with this exact email address
- * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
- */
-email?: string;
-/**
- * Filter to the subscriber with this exact external ID
- */
-externalId?: string;
-/**
- * Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name
- * @minLength 1
- */
-q?: string;
-/**
- * Filter by the subscriber's latest email preference (true = opted in, false = opted out)
- */
-emailOptedIn?: boolean;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  offset?: number;
+  /**
+   * Filter to the subscriber with this exact email address
+   * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+   */
+  email?: string;
+  /**
+   * Filter to the subscriber with this exact external ID
+   */
+  externalId?: string;
+  /**
+   * Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name
+   * @minLength 1
+   */
+  q?: string;
+  /**
+   * Filter by the subscriber's latest email preference (true = opted in, false = opted out)
+   */
+  emailOptedIn?: boolean;
 };
 
 export type ListWorkflowsParams = {
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-/**
- * @minimum 0
- * @maximum 9007199254740991
- */
-offset?: number;
-type?: ListWorkflowsType;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  offset?: number;
+  type?: ListWorkflowsType;
 };
 
-export type ListWorkflowsType = typeof ListWorkflowsType[keyof typeof ListWorkflowsType];
-
+export type ListWorkflowsType =
+  (typeof ListWorkflowsType)[keyof typeof ListWorkflowsType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListWorkflowsType = {
-  automation: 'automation',
-  broadcast: 'broadcast',
+  automation: "automation",
+  broadcast: "broadcast",
 } as const;
 
 export type ListEnvironmentRunsParams = {
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-/**
- * @minimum 0
- * @maximum 9007199254740991
- */
-offset?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  offset?: number;
 };
 
 export type ListWorkflowRunsParams = {
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-/**
- * @minimum 0
- * @maximum 9007199254740991
- */
-offset?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  offset?: number;
 };
 
 export type ListBroadcastsParams = {
-/**
- * @minimum 1
- * @maximum 100
- */
-limit?: number;
-/**
- * @minimum 0
- * @maximum 9007199254740991
- */
-offset?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  offset?: number;
 };
 
 export type GetAnalyticsParams = {
-/**
- * @minimum 1
- * @maximum 365
- */
-days?: number;
+  /**
+   * @minimum 1
+   * @maximum 365
+   */
+  days?: number;
 };
 
 /**
  * @summary Get current user
  */
 export type getCurrentUserResponse200 = {
-  data: UserResponseDto
-  status: 200
-}
-    
-export type getCurrentUserResponseSuccess = (getCurrentUserResponse200) & {
+  data: UserResponseDto;
+  status: 200;
+};
+
+export type getCurrentUserResponseSuccess = getCurrentUserResponse200 & {
   headers: Headers;
 };
-;
-
-export type getCurrentUserResponse = (getCurrentUserResponseSuccess)
+export type getCurrentUserResponse = getCurrentUserResponseSuccess;
 
 export const getGetCurrentUserUrl = () => {
+  return `/users/me`;
+};
 
-
-  
-
-  return `/users/me`
-}
-
-export const getCurrentUser = async ( options?: RequestInit): Promise<getCurrentUserResponse> => {
-  
-  return cliFetch<getCurrentUserResponse>(getGetCurrentUserUrl(),
-  {      
+export const getCurrentUser = async (
+  options?: RequestInit,
+): Promise<getCurrentUserResponse> => {
+  return cliFetch<getCurrentUserResponse>(getGetCurrentUserUrl(), {
     ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+    method: "GET",
+  });
+};
 
 /**
  * @summary Update current user
  */
 export type updateCurrentUserResponse200 = {
-  data: UpdateUserResponseDto
-  status: 200
-}
-    
-export type updateCurrentUserResponseSuccess = (updateCurrentUserResponse200) & {
+  data: UpdateUserResponseDto;
+  status: 200;
+};
+
+export type updateCurrentUserResponseSuccess = updateCurrentUserResponse200 & {
   headers: Headers;
 };
-;
-
-export type updateCurrentUserResponse = (updateCurrentUserResponseSuccess)
+export type updateCurrentUserResponse = updateCurrentUserResponseSuccess;
 
 export const getUpdateCurrentUserUrl = () => {
+  return `/users`;
+};
 
-
-  
-
-  return `/users`
-}
-
-export const updateCurrentUser = async (updateUserDto: UpdateUserDto, options?: RequestInit): Promise<updateCurrentUserResponse> => {
-  
-  return cliFetch<updateCurrentUserResponse>(getUpdateCurrentUserUrl(),
-  {      
+export const updateCurrentUser = async (
+  updateUserDto: UpdateUserDto,
+  options?: RequestInit,
+): Promise<updateCurrentUserResponse> => {
+  return cliFetch<updateCurrentUserResponse>(getUpdateCurrentUserUrl(), {
     ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateUserDto,)
-  }
-);}
-
-
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateUserDto),
+  });
+};
 
 /**
  * @summary Get test message
  */
 export type getTestResponse200 = {
-  data: TestResponseDto
-  status: 200
-}
-    
-export type getTestResponseSuccess = (getTestResponse200) & {
+  data: TestResponseDto;
+  status: 200;
+};
+
+export type getTestResponseSuccess = getTestResponse200 & {
   headers: Headers;
 };
-;
-
-export type getTestResponse = (getTestResponseSuccess)
+export type getTestResponse = getTestResponseSuccess;
 
 export const getGetTestUrl = () => {
+  return `/test`;
+};
 
-
-  
-
-  return `/test`
-}
-
-export const getTest = async ( options?: RequestInit): Promise<getTestResponse> => {
-  
-  return cliFetch<getTestResponse>(getGetTestUrl(),
-  {      
+export const getTest = async (
+  options?: RequestInit,
+): Promise<getTestResponse> => {
+  return cliFetch<getTestResponse>(getGetTestUrl(), {
     ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+    method: "GET",
+  });
+};
 
 /**
  * @summary Post test data
  */
 export type createTestResponse200 = {
-  data: TestResponseDto
-  status: 200
-}
-    
-export type createTestResponseSuccess = (createTestResponse200) & {
+  data: TestResponseDto;
+  status: 200;
+};
+
+export type createTestResponseSuccess = createTestResponse200 & {
   headers: Headers;
 };
-;
-
-export type createTestResponse = (createTestResponseSuccess)
+export type createTestResponse = createTestResponseSuccess;
 
 export const getCreateTestUrl = () => {
+  return `/test`;
+};
 
-
-  
-
-  return `/test`
-}
-
-export const createTest = async (testRequestDto: TestRequestDto, options?: RequestInit): Promise<createTestResponse> => {
-  
-  return cliFetch<createTestResponse>(getCreateTestUrl(),
-  {      
+export const createTest = async (
+  testRequestDto: TestRequestDto,
+  options?: RequestInit,
+): Promise<createTestResponse> => {
+  return cliFetch<createTestResponse>(getCreateTestUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      testRequestDto,)
-  }
-);}
-
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(testRequestDto),
+  });
+};
 
 /**
  * @summary Get user's workspaces
  */
 export type getWorkspacesResponse200 = {
-  data: WorkspaceDto[]
-  status: 200
-}
-    
-export type getWorkspacesResponseSuccess = (getWorkspacesResponse200) & {
+  data: WorkspaceDto[];
+  status: 200;
+};
+
+export type getWorkspacesResponseSuccess = getWorkspacesResponse200 & {
   headers: Headers;
 };
-;
-
-export type getWorkspacesResponse = (getWorkspacesResponseSuccess)
+export type getWorkspacesResponse = getWorkspacesResponseSuccess;
 
 export const getGetWorkspacesUrl = () => {
+  return `/workspaces`;
+};
 
-
-  
-
-  return `/workspaces`
-}
-
-export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspacesResponse> => {
-  
-  return cliFetch<getWorkspacesResponse>(getGetWorkspacesUrl(),
-  {      
+export const getWorkspaces = async (
+  options?: RequestInit,
+): Promise<getWorkspacesResponse> => {
+  return cliFetch<getWorkspacesResponse>(getGetWorkspacesUrl(), {
     ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+    method: "GET",
+  });
+};
 
 /**
  * @summary Create a new workspace
  */
 export type createWorkspaceResponse201 = {
-  data: CreateWorkspaceResponseDto
-  status: 201
-}
-    
-export type createWorkspaceResponseSuccess = (createWorkspaceResponse201) & {
+  data: CreateWorkspaceResponseDto;
+  status: 201;
+};
+
+export type createWorkspaceResponseSuccess = createWorkspaceResponse201 & {
   headers: Headers;
 };
-;
-
-export type createWorkspaceResponse = (createWorkspaceResponseSuccess)
+export type createWorkspaceResponse = createWorkspaceResponseSuccess;
 
 export const getCreateWorkspaceUrl = () => {
+  return `/workspaces`;
+};
 
-
-  
-
-  return `/workspaces`
-}
-
-export const createWorkspace = async (createWorkspaceDto: CreateWorkspaceDto, options?: RequestInit): Promise<createWorkspaceResponse> => {
-  
-  return cliFetch<createWorkspaceResponse>(getCreateWorkspaceUrl(),
-  {      
+export const createWorkspace = async (
+  createWorkspaceDto: CreateWorkspaceDto,
+  options?: RequestInit,
+): Promise<createWorkspaceResponse> => {
+  return cliFetch<createWorkspaceResponse>(getCreateWorkspaceUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createWorkspaceDto,)
-  }
-);}
-
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createWorkspaceDto),
+  });
+};
 
 /**
  * @summary List a workspace's environments
  */
 export type listEnvironmentsResponse200 = {
-  data: ListEnvironmentsResponseDto
-  status: 200
-}
+  data: ListEnvironmentsResponseDto;
+  status: 200;
+};
 
 export type listEnvironmentsResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type listEnvironmentsResponseSuccess = (listEnvironmentsResponse200) & {
-  headers: Headers;
-};
-export type listEnvironmentsResponseError = (listEnvironmentsResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type listEnvironmentsResponse = (listEnvironmentsResponseSuccess | listEnvironmentsResponseError)
+export type listEnvironmentsResponseSuccess = listEnvironmentsResponse200 & {
+  headers: Headers;
+};
+export type listEnvironmentsResponseError = listEnvironmentsResponse404 & {
+  headers: Headers;
+};
 
-export const getListEnvironmentsUrl = (workspaceId: string,) => {
+export type listEnvironmentsResponse =
+  | listEnvironmentsResponseSuccess
+  | listEnvironmentsResponseError;
 
+export const getListEnvironmentsUrl = (workspaceId: string) => {
+  return `/workspaces/${workspaceId}/environments`;
+};
 
-  
-
-  return `/workspaces/${workspaceId}/environments`
-}
-
-export const listEnvironments = async (workspaceId: string, options?: RequestInit): Promise<listEnvironmentsResponse> => {
-  
-  return cliFetch<listEnvironmentsResponse>(getListEnvironmentsUrl(workspaceId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const listEnvironments = async (
+  workspaceId: string,
+  options?: RequestInit,
+): Promise<listEnvironmentsResponse> => {
+  return cliFetch<listEnvironmentsResponse>(
+    getListEnvironmentsUrl(workspaceId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * @summary Create a new environment in a workspace
  */
 export type createEnvironmentResponse201 = {
-  data: EnvironmentDto
-  status: 201
-}
+  data: EnvironmentDto;
+  status: 201;
+};
 
 export type createEnvironmentResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type createEnvironmentResponseSuccess = (createEnvironmentResponse201) & {
-  headers: Headers;
-};
-export type createEnvironmentResponseError = (createEnvironmentResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type createEnvironmentResponse = (createEnvironmentResponseSuccess | createEnvironmentResponseError)
+export type createEnvironmentResponseSuccess = createEnvironmentResponse201 & {
+  headers: Headers;
+};
+export type createEnvironmentResponseError = createEnvironmentResponse404 & {
+  headers: Headers;
+};
 
-export const getCreateEnvironmentUrl = (workspaceId: string,) => {
+export type createEnvironmentResponse =
+  | createEnvironmentResponseSuccess
+  | createEnvironmentResponseError;
 
+export const getCreateEnvironmentUrl = (workspaceId: string) => {
+  return `/workspaces/${workspaceId}/environments`;
+};
 
-  
-
-  return `/workspaces/${workspaceId}/environments`
-}
-
-export const createEnvironment = async (workspaceId: string,
-    createEnvironmentDto: CreateEnvironmentDto, options?: RequestInit): Promise<createEnvironmentResponse> => {
-  
-  return cliFetch<createEnvironmentResponse>(getCreateEnvironmentUrl(workspaceId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createEnvironmentDto,)
-  }
-);}
-
-
+export const createEnvironment = async (
+  workspaceId: string,
+  createEnvironmentDto: CreateEnvironmentDto,
+  options?: RequestInit,
+): Promise<createEnvironmentResponse> => {
+  return cliFetch<createEnvironmentResponse>(
+    getCreateEnvironmentUrl(workspaceId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createEnvironmentDto),
+    },
+  );
+};
 
 /**
  * Returns a paginated list of active subscribers in the environment
  * @summary List subscribers
  */
 export type listSubscribersResponse200 = {
-  data: ListSubscribersResponseDto
-  status: 200
-}
+  data: ListSubscribersResponseDto;
+  status: 200;
+};
 
 export type listSubscribersResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type listSubscribersResponseSuccess = (listSubscribersResponse200) & {
+  data: void;
+  status: 404;
+};
+
+export type listSubscribersResponseSuccess = listSubscribersResponse200 & {
   headers: Headers;
 };
-export type listSubscribersResponseError = (listSubscribersResponse404) & {
+export type listSubscribersResponseError = listSubscribersResponse404 & {
   headers: Headers;
 };
 
-export type listSubscribersResponse = (listSubscribersResponseSuccess | listSubscribersResponseError)
+export type listSubscribersResponse =
+  | listSubscribersResponseSuccess
+  | listSubscribersResponseError;
 
-export const getListSubscribersUrl = (environmentId: string,
-    params?: ListSubscribersParams,) => {
+export const getListSubscribersUrl = (
+  environmentId: string,
+  params?: ListSubscribersParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/environments/${environmentId}/subscribers?${stringifiedParams}` : `/environments/${environmentId}/subscribers`
-}
+  return stringifiedParams.length > 0
+    ? `/environments/${environmentId}/subscribers?${stringifiedParams}`
+    : `/environments/${environmentId}/subscribers`;
+};
 
-export const listSubscribers = async (environmentId: string,
-    params?: ListSubscribersParams, options?: RequestInit): Promise<listSubscribersResponse> => {
-  
-  return cliFetch<listSubscribersResponse>(getListSubscribersUrl(environmentId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const listSubscribers = async (
+  environmentId: string,
+  params?: ListSubscribersParams,
+  options?: RequestInit,
+): Promise<listSubscribersResponse> => {
+  return cliFetch<listSubscribersResponse>(
+    getListSubscribersUrl(environmentId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * Creates a new subscriber in the specified environment and initialises their preferences
  * @summary Create a new subscriber
  */
 export type createSubscriberResponse201 = {
-  data: CreateSubscriberResponseDto
-  status: 201
-}
+  data: CreateSubscriberResponseDto;
+  status: 201;
+};
 
 export type createSubscriberResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type createSubscriberResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type createSubscriberResponseSuccess = (createSubscriberResponse201) & {
-  headers: Headers;
-};
-export type createSubscriberResponseError = (createSubscriberResponse400 | createSubscriberResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type createSubscriberResponse = (createSubscriberResponseSuccess | createSubscriberResponseError)
+export type createSubscriberResponseSuccess = createSubscriberResponse201 & {
+  headers: Headers;
+};
+export type createSubscriberResponseError = (
+  | createSubscriberResponse400
+  | createSubscriberResponse404
+) & {
+  headers: Headers;
+};
 
-export const getCreateSubscriberUrl = (environmentId: string,) => {
+export type createSubscriberResponse =
+  | createSubscriberResponseSuccess
+  | createSubscriberResponseError;
 
+export const getCreateSubscriberUrl = (environmentId: string) => {
+  return `/environments/${environmentId}/subscribers`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers`
-}
-
-export const createSubscriber = async (environmentId: string,
-    createSubscriberDto: CreateSubscriberDto, options?: RequestInit): Promise<createSubscriberResponse> => {
-  
-  return cliFetch<createSubscriberResponse>(getCreateSubscriberUrl(environmentId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createSubscriberDto,)
-  }
-);}
-
-
+export const createSubscriber = async (
+  environmentId: string,
+  createSubscriberDto: CreateSubscriberDto,
+  options?: RequestInit,
+): Promise<createSubscriberResponse> => {
+  return cliFetch<createSubscriberResponse>(
+    getCreateSubscriberUrl(environmentId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(createSubscriberDto),
+    },
+  );
+};
 
 /**
  * Returns every distinct tag currently in use across subscribers in the environment
  * @summary List distinct tags
  */
 export type listTagsResponse200 = {
-  data: ListTagsResponseDto
-  status: 200
-}
+  data: ListTagsResponseDto;
+  status: 200;
+};
 
 export type listTagsResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type listTagsResponseSuccess = (listTagsResponse200) & {
-  headers: Headers;
-};
-export type listTagsResponseError = (listTagsResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type listTagsResponse = (listTagsResponseSuccess | listTagsResponseError)
+export type listTagsResponseSuccess = listTagsResponse200 & {
+  headers: Headers;
+};
+export type listTagsResponseError = listTagsResponse404 & {
+  headers: Headers;
+};
 
-export const getListTagsUrl = (environmentId: string,) => {
+export type listTagsResponse = listTagsResponseSuccess | listTagsResponseError;
 
+export const getListTagsUrl = (environmentId: string) => {
+  return `/environments/${environmentId}/subscribers/tags`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers/tags`
-}
-
-export const listTags = async (environmentId: string, options?: RequestInit): Promise<listTagsResponse> => {
-  
-  return cliFetch<listTagsResponse>(getListTagsUrl(environmentId),
-  {      
+export const listTags = async (
+  environmentId: string,
+  options?: RequestInit,
+): Promise<listTagsResponse> => {
+  return cliFetch<listTagsResponse>(getListTagsUrl(environmentId), {
     ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+    method: "GET",
+  });
+};
 
 /**
  * Returns a single subscriber with their latest preferences
  * @summary Get a subscriber
  */
 export type getSubscriberResponse200 = {
-  data: GetSubscriberResponseDto
-  status: 200
-}
+  data: GetSubscriberResponseDto;
+  status: 200;
+};
 
 export type getSubscriberResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type getSubscriberResponseSuccess = (getSubscriberResponse200) & {
-  headers: Headers;
-};
-export type getSubscriberResponseError = (getSubscriberResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type getSubscriberResponse = (getSubscriberResponseSuccess | getSubscriberResponseError)
+export type getSubscriberResponseSuccess = getSubscriberResponse200 & {
+  headers: Headers;
+};
+export type getSubscriberResponseError = getSubscriberResponse404 & {
+  headers: Headers;
+};
 
-export const getGetSubscriberUrl = (environmentId: string,
-    subscriberId: string,) => {
+export type getSubscriberResponse =
+  | getSubscriberResponseSuccess
+  | getSubscriberResponseError;
 
+export const getGetSubscriberUrl = (
+  environmentId: string,
+  subscriberId: string,
+) => {
+  return `/environments/${environmentId}/subscribers/${subscriberId}`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers/${subscriberId}`
-}
-
-export const getSubscriber = async (environmentId: string,
-    subscriberId: string, options?: RequestInit): Promise<getSubscriberResponse> => {
-  
-  return cliFetch<getSubscriberResponse>(getGetSubscriberUrl(environmentId,subscriberId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const getSubscriber = async (
+  environmentId: string,
+  subscriberId: string,
+  options?: RequestInit,
+): Promise<getSubscriberResponse> => {
+  return cliFetch<getSubscriberResponse>(
+    getGetSubscriberUrl(environmentId, subscriberId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * Updates subscriber fields. All fields are optional.
  * @summary Update a subscriber
  */
 export type updateSubscriberResponse200 = {
-  data: UpdateSubscriberResponseDto
-  status: 200
-}
+  data: UpdateSubscriberResponseDto;
+  status: 200;
+};
 
 export type updateSubscriberResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type updateSubscriberResponseSuccess = (updateSubscriberResponse200) & {
-  headers: Headers;
-};
-export type updateSubscriberResponseError = (updateSubscriberResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type updateSubscriberResponse = (updateSubscriberResponseSuccess | updateSubscriberResponseError)
+export type updateSubscriberResponseSuccess = updateSubscriberResponse200 & {
+  headers: Headers;
+};
+export type updateSubscriberResponseError = updateSubscriberResponse404 & {
+  headers: Headers;
+};
 
-export const getUpdateSubscriberUrl = (environmentId: string,
-    subscriberId: string,) => {
+export type updateSubscriberResponse =
+  | updateSubscriberResponseSuccess
+  | updateSubscriberResponseError;
 
+export const getUpdateSubscriberUrl = (
+  environmentId: string,
+  subscriberId: string,
+) => {
+  return `/environments/${environmentId}/subscribers/${subscriberId}`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers/${subscriberId}`
-}
-
-export const updateSubscriber = async (environmentId: string,
-    subscriberId: string,
-    updateSubscriberDto: UpdateSubscriberDto, options?: RequestInit): Promise<updateSubscriberResponse> => {
-  
-  return cliFetch<updateSubscriberResponse>(getUpdateSubscriberUrl(environmentId,subscriberId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateSubscriberDto,)
-  }
-);}
-
-
+export const updateSubscriber = async (
+  environmentId: string,
+  subscriberId: string,
+  updateSubscriberDto: UpdateSubscriberDto,
+  options?: RequestInit,
+): Promise<updateSubscriberResponse> => {
+  return cliFetch<updateSubscriberResponse>(
+    getUpdateSubscriberUrl(environmentId, subscriberId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateSubscriberDto),
+    },
+  );
+};
 
 /**
  * Soft-deletes a subscriber. The record is retained but excluded from all queries.
  * @summary Delete a subscriber
  */
 export type deleteSubscriberResponse204 = {
-  data: void
-  status: 204
-}
+  data: void;
+  status: 204;
+};
 
 export type deleteSubscriberResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type deleteSubscriberResponseSuccess = (deleteSubscriberResponse204) & {
-  headers: Headers;
-};
-export type deleteSubscriberResponseError = (deleteSubscriberResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type deleteSubscriberResponse = (deleteSubscriberResponseSuccess | deleteSubscriberResponseError)
+export type deleteSubscriberResponseSuccess = deleteSubscriberResponse204 & {
+  headers: Headers;
+};
+export type deleteSubscriberResponseError = deleteSubscriberResponse404 & {
+  headers: Headers;
+};
 
-export const getDeleteSubscriberUrl = (environmentId: string,
-    subscriberId: string,) => {
+export type deleteSubscriberResponse =
+  | deleteSubscriberResponseSuccess
+  | deleteSubscriberResponseError;
 
+export const getDeleteSubscriberUrl = (
+  environmentId: string,
+  subscriberId: string,
+) => {
+  return `/environments/${environmentId}/subscribers/${subscriberId}`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers/${subscriberId}`
-}
-
-export const deleteSubscriber = async (environmentId: string,
-    subscriberId: string, options?: RequestInit): Promise<deleteSubscriberResponse> => {
-  
-  return cliFetch<deleteSubscriberResponse>(getDeleteSubscriberUrl(environmentId,subscriberId),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-
-
+export const deleteSubscriber = async (
+  environmentId: string,
+  subscriberId: string,
+  options?: RequestInit,
+): Promise<deleteSubscriberResponse> => {
+  return cliFetch<deleteSubscriberResponse>(
+    getDeleteSubscriberUrl(environmentId, subscriberId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
 
 /**
  * Upserts up to 500 subscribers per request. Each row is matched to an existing subscriber by publicId, then externalId, then email (in that order); if none match, a new subscriber is created. Rows are processed independently, so one failing row does not fail the batch.
  * @summary Bulk create or update subscribers
  */
 export type bulkUpsertSubscribersResponse200 = {
-  data: BulkUpsertSubscribersResponseDto
-  status: 200
-}
+  data: BulkUpsertSubscribersResponseDto;
+  status: 200;
+};
 
 export type bulkUpsertSubscribersResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type bulkUpsertSubscribersResponseSuccess = (bulkUpsertSubscribersResponse200) & {
-  headers: Headers;
-};
-export type bulkUpsertSubscribersResponseError = (bulkUpsertSubscribersResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type bulkUpsertSubscribersResponse = (bulkUpsertSubscribersResponseSuccess | bulkUpsertSubscribersResponseError)
+export type bulkUpsertSubscribersResponseSuccess =
+  bulkUpsertSubscribersResponse200 & {
+    headers: Headers;
+  };
+export type bulkUpsertSubscribersResponseError =
+  bulkUpsertSubscribersResponse404 & {
+    headers: Headers;
+  };
 
-export const getBulkUpsertSubscribersUrl = (environmentId: string,) => {
+export type bulkUpsertSubscribersResponse =
+  | bulkUpsertSubscribersResponseSuccess
+  | bulkUpsertSubscribersResponseError;
 
+export const getBulkUpsertSubscribersUrl = (environmentId: string) => {
+  return `/environments/${environmentId}/subscribers/bulk`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers/bulk`
-}
-
-export const bulkUpsertSubscribers = async (environmentId: string,
-    bulkUpsertSubscribersDto: BulkUpsertSubscribersDto, options?: RequestInit): Promise<bulkUpsertSubscribersResponse> => {
-  
-  return cliFetch<bulkUpsertSubscribersResponse>(getBulkUpsertSubscribersUrl(environmentId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      bulkUpsertSubscribersDto,)
-  }
-);}
-
-
+export const bulkUpsertSubscribers = async (
+  environmentId: string,
+  bulkUpsertSubscribersDto: BulkUpsertSubscribersDto,
+  options?: RequestInit,
+): Promise<bulkUpsertSubscribersResponse> => {
+  return cliFetch<bulkUpsertSubscribersResponse>(
+    getBulkUpsertSubscribersUrl(environmentId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(bulkUpsertSubscribersDto),
+    },
+  );
+};
 
 /**
  * Creates a new preference record with updated values (immutable pattern)
  * @summary Update subscriber preferences
  */
 export type updateSubscriberPreferencesResponse200 = {
-  data: UpdatePreferencesResponseDto
-  status: 200
-}
+  data: UpdatePreferencesResponseDto;
+  status: 200;
+};
 
 export type updateSubscriberPreferencesResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type updateSubscriberPreferencesResponseSuccess = (updateSubscriberPreferencesResponse200) & {
-  headers: Headers;
-};
-export type updateSubscriberPreferencesResponseError = (updateSubscriberPreferencesResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type updateSubscriberPreferencesResponse = (updateSubscriberPreferencesResponseSuccess | updateSubscriberPreferencesResponseError)
+export type updateSubscriberPreferencesResponseSuccess =
+  updateSubscriberPreferencesResponse200 & {
+    headers: Headers;
+  };
+export type updateSubscriberPreferencesResponseError =
+  updateSubscriberPreferencesResponse404 & {
+    headers: Headers;
+  };
 
-export const getUpdateSubscriberPreferencesUrl = (environmentId: string,
-    subscriberId: string,) => {
+export type updateSubscriberPreferencesResponse =
+  | updateSubscriberPreferencesResponseSuccess
+  | updateSubscriberPreferencesResponseError;
 
+export const getUpdateSubscriberPreferencesUrl = (
+  environmentId: string,
+  subscriberId: string,
+) => {
+  return `/environments/${environmentId}/subscribers/${subscriberId}/preferences`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers/${subscriberId}/preferences`
-}
-
-export const updateSubscriberPreferences = async (environmentId: string,
-    subscriberId: string,
-    updatePreferencesDto: UpdatePreferencesDto, options?: RequestInit): Promise<updateSubscriberPreferencesResponse> => {
-  
-  return cliFetch<updateSubscriberPreferencesResponse>(getUpdateSubscriberPreferencesUrl(environmentId,subscriberId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updatePreferencesDto,)
-  }
-);}
-
-
+export const updateSubscriberPreferences = async (
+  environmentId: string,
+  subscriberId: string,
+  updatePreferencesDto: UpdatePreferencesDto,
+  options?: RequestInit,
+): Promise<updateSubscriberPreferencesResponse> => {
+  return cliFetch<updateSubscriberPreferencesResponse>(
+    getUpdateSubscriberPreferencesUrl(environmentId, subscriberId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updatePreferencesDto),
+    },
+  );
+};
 
 /**
  * Adds a tag to the subscriber. Adding a tag that's already present is a no-op.
  * @summary Add a tag to a subscriber
  */
 export type addSubscriberTagResponse200 = {
-  data: TagResponseDto
-  status: 200
-}
+  data: TagResponseDto;
+  status: 200;
+};
 
 export type addSubscriberTagResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type addSubscriberTagResponseSuccess = (addSubscriberTagResponse200) & {
-  headers: Headers;
-};
-export type addSubscriberTagResponseError = (addSubscriberTagResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type addSubscriberTagResponse = (addSubscriberTagResponseSuccess | addSubscriberTagResponseError)
+export type addSubscriberTagResponseSuccess = addSubscriberTagResponse200 & {
+  headers: Headers;
+};
+export type addSubscriberTagResponseError = addSubscriberTagResponse404 & {
+  headers: Headers;
+};
 
-export const getAddSubscriberTagUrl = (environmentId: string,
-    subscriberId: string,) => {
+export type addSubscriberTagResponse =
+  | addSubscriberTagResponseSuccess
+  | addSubscriberTagResponseError;
 
+export const getAddSubscriberTagUrl = (
+  environmentId: string,
+  subscriberId: string,
+) => {
+  return `/environments/${environmentId}/subscribers/${subscriberId}/tags`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers/${subscriberId}/tags`
-}
-
-export const addSubscriberTag = async (environmentId: string,
-    subscriberId: string,
-    addTagDto: AddTagDto, options?: RequestInit): Promise<addSubscriberTagResponse> => {
-  
-  return cliFetch<addSubscriberTagResponse>(getAddSubscriberTagUrl(environmentId,subscriberId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      addTagDto,)
-  }
-);}
-
-
+export const addSubscriberTag = async (
+  environmentId: string,
+  subscriberId: string,
+  addTagDto: AddTagDto,
+  options?: RequestInit,
+): Promise<addSubscriberTagResponse> => {
+  return cliFetch<addSubscriberTagResponse>(
+    getAddSubscriberTagUrl(environmentId, subscriberId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(addTagDto),
+    },
+  );
+};
 
 /**
  * @summary Remove a tag from a subscriber
  */
 export type removeSubscriberTagResponse204 = {
-  data: void
-  status: 204
-}
+  data: void;
+  status: 204;
+};
 
 export type removeSubscriberTagResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type removeSubscriberTagResponseSuccess = (removeSubscriberTagResponse204) & {
-  headers: Headers;
-};
-export type removeSubscriberTagResponseError = (removeSubscriberTagResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type removeSubscriberTagResponse = (removeSubscriberTagResponseSuccess | removeSubscriberTagResponseError)
+export type removeSubscriberTagResponseSuccess =
+  removeSubscriberTagResponse204 & {
+    headers: Headers;
+  };
+export type removeSubscriberTagResponseError =
+  removeSubscriberTagResponse404 & {
+    headers: Headers;
+  };
 
-export const getRemoveSubscriberTagUrl = (environmentId: string,
-    subscriberId: string,
-    tag: string,) => {
+export type removeSubscriberTagResponse =
+  | removeSubscriberTagResponseSuccess
+  | removeSubscriberTagResponseError;
 
+export const getRemoveSubscriberTagUrl = (
+  environmentId: string,
+  subscriberId: string,
+  tag: string,
+) => {
+  return `/environments/${environmentId}/subscribers/${subscriberId}/tags/${tag}`;
+};
 
-  
-
-  return `/environments/${environmentId}/subscribers/${subscriberId}/tags/${tag}`
-}
-
-export const removeSubscriberTag = async (environmentId: string,
-    subscriberId: string,
-    tag: string, options?: RequestInit): Promise<removeSubscriberTagResponse> => {
-  
-  return cliFetch<removeSubscriberTagResponse>(getRemoveSubscriberTagUrl(environmentId,subscriberId,tag),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-
-
+export const removeSubscriberTag = async (
+  environmentId: string,
+  subscriberId: string,
+  tag: string,
+  options?: RequestInit,
+): Promise<removeSubscriberTagResponse> => {
+  return cliFetch<removeSubscriberTagResponse>(
+    getRemoveSubscriberTagUrl(environmentId, subscriberId, tag),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
 
 /**
  * Called from the unsubscribe confirmation page linked from emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.
  * @summary Unsubscribe
  */
 export type unsubscribeResponse200 = {
-  data: UnsubscribeResponseDto
-  status: 200
-}
+  data: UnsubscribeResponseDto;
+  status: 200;
+};
 
 export type unsubscribeResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type unsubscribeResponseSuccess = (unsubscribeResponse200) & {
+  data: void;
+  status: 404;
+};
+
+export type unsubscribeResponseSuccess = unsubscribeResponse200 & {
   headers: Headers;
 };
-export type unsubscribeResponseError = (unsubscribeResponse404) & {
+export type unsubscribeResponseError = unsubscribeResponse404 & {
   headers: Headers;
 };
 
-export type unsubscribeResponse = (unsubscribeResponseSuccess | unsubscribeResponseError)
+export type unsubscribeResponse =
+  | unsubscribeResponseSuccess
+  | unsubscribeResponseError;
 
 export const getUnsubscribeUrl = () => {
+  return `/unsubscribe`;
+};
 
-
-  
-
-  return `/unsubscribe`
-}
-
-export const unsubscribe = async (unsubscribeBodyDto: UnsubscribeBodyDto, options?: RequestInit): Promise<unsubscribeResponse> => {
-  
-  return cliFetch<unsubscribeResponse>(getUnsubscribeUrl(),
-  {      
+export const unsubscribe = async (
+  unsubscribeBodyDto: UnsubscribeBodyDto,
+  options?: RequestInit,
+): Promise<unsubscribeResponse> => {
+  return cliFetch<unsubscribeResponse>(getUnsubscribeUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      unsubscribeBodyDto,)
-  }
-);}
-
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(unsubscribeBodyDto),
+  });
+};
 
 /**
  * Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.
  * @summary Trigger a workflow
  */
 export type triggerWorkflowResponse200 = {
-  data: TriggerWorkflowResponseDto
-  status: 200
-}
+  data: TriggerWorkflowResponseDto;
+  status: 200;
+};
 
 export type triggerWorkflowResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type triggerWorkflowResponseSuccess = (triggerWorkflowResponse200) & {
-  headers: Headers;
-};
-export type triggerWorkflowResponseError = (triggerWorkflowResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type triggerWorkflowResponse = (triggerWorkflowResponseSuccess | triggerWorkflowResponseError)
+export type triggerWorkflowResponseSuccess = triggerWorkflowResponse200 & {
+  headers: Headers;
+};
+export type triggerWorkflowResponseError = triggerWorkflowResponse404 & {
+  headers: Headers;
+};
 
-export const getTriggerWorkflowUrl = (environmentId: string,) => {
+export type triggerWorkflowResponse =
+  | triggerWorkflowResponseSuccess
+  | triggerWorkflowResponseError;
 
+export const getTriggerWorkflowUrl = (environmentId: string) => {
+  return `/environments/${environmentId}/workflows/trigger`;
+};
 
-  
-
-  return `/environments/${environmentId}/workflows/trigger`
-}
-
-export const triggerWorkflow = async (environmentId: string,
-    triggerWorkflowDto: TriggerWorkflowDto, options?: RequestInit): Promise<triggerWorkflowResponse> => {
-  
-  return cliFetch<triggerWorkflowResponse>(getTriggerWorkflowUrl(environmentId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      triggerWorkflowDto,)
-  }
-);}
-
-
+export const triggerWorkflow = async (
+  environmentId: string,
+  triggerWorkflowDto: TriggerWorkflowDto,
+  options?: RequestInit,
+): Promise<triggerWorkflowResponse> => {
+  return cliFetch<triggerWorkflowResponse>(
+    getTriggerWorkflowUrl(environmentId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(triggerWorkflowDto),
+    },
+  );
+};
 
 /**
  * Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step.
  * @summary Create a new workflow
  */
 export type createWorkflowResponse201 = {
-  data: WorkflowResponseDto
-  status: 201
-}
+  data: WorkflowResponseDto;
+  status: 201;
+};
 
 export type createWorkflowResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type createWorkflowResponseSuccess = (createWorkflowResponse201) & {
-  headers: Headers;
-};
-export type createWorkflowResponseError = (createWorkflowResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type createWorkflowResponse = (createWorkflowResponseSuccess | createWorkflowResponseError)
+export type createWorkflowResponseSuccess = createWorkflowResponse201 & {
+  headers: Headers;
+};
+export type createWorkflowResponseError = createWorkflowResponse404 & {
+  headers: Headers;
+};
 
-export const getCreateWorkflowUrl = (environmentId: string,) => {
+export type createWorkflowResponse =
+  | createWorkflowResponseSuccess
+  | createWorkflowResponseError;
 
+export const getCreateWorkflowUrl = (environmentId: string) => {
+  return `/environments/${environmentId}/workflows`;
+};
 
-  
-
-  return `/environments/${environmentId}/workflows`
-}
-
-export const createWorkflow = async (environmentId: string,
-    createWorkflowDto: CreateWorkflowDto, options?: RequestInit): Promise<createWorkflowResponse> => {
-  
-  return cliFetch<createWorkflowResponse>(getCreateWorkflowUrl(environmentId),
-  {      
+export const createWorkflow = async (
+  environmentId: string,
+  createWorkflowDto: CreateWorkflowDto,
+  options?: RequestInit,
+): Promise<createWorkflowResponse> => {
+  return cliFetch<createWorkflowResponse>(getCreateWorkflowUrl(environmentId), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createWorkflowDto,)
-  }
-);}
-
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createWorkflowDto),
+  });
+};
 
 /**
  * Returns a paginated list of workflows in the environment
  * @summary List workflows
  */
 export type listWorkflowsResponse200 = {
-  data: ListWorkflowsResponseDto
-  status: 200
-}
+  data: ListWorkflowsResponseDto;
+  status: 200;
+};
 
 export type listWorkflowsResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type listWorkflowsResponseSuccess = (listWorkflowsResponse200) & {
+  data: void;
+  status: 404;
+};
+
+export type listWorkflowsResponseSuccess = listWorkflowsResponse200 & {
   headers: Headers;
 };
-export type listWorkflowsResponseError = (listWorkflowsResponse404) & {
+export type listWorkflowsResponseError = listWorkflowsResponse404 & {
   headers: Headers;
 };
 
-export type listWorkflowsResponse = (listWorkflowsResponseSuccess | listWorkflowsResponseError)
+export type listWorkflowsResponse =
+  | listWorkflowsResponseSuccess
+  | listWorkflowsResponseError;
 
-export const getListWorkflowsUrl = (environmentId: string,
-    params?: ListWorkflowsParams,) => {
+export const getListWorkflowsUrl = (
+  environmentId: string,
+  params?: ListWorkflowsParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows?${stringifiedParams}` : `/environments/${environmentId}/workflows`
-}
+  return stringifiedParams.length > 0
+    ? `/environments/${environmentId}/workflows?${stringifiedParams}`
+    : `/environments/${environmentId}/workflows`;
+};
 
-export const listWorkflows = async (environmentId: string,
-    params?: ListWorkflowsParams, options?: RequestInit): Promise<listWorkflowsResponse> => {
-  
-  return cliFetch<listWorkflowsResponse>(getListWorkflowsUrl(environmentId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const listWorkflows = async (
+  environmentId: string,
+  params?: ListWorkflowsParams,
+  options?: RequestInit,
+): Promise<listWorkflowsResponse> => {
+  return cliFetch<listWorkflowsResponse>(
+    getListWorkflowsUrl(environmentId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * Returns a paginated list of trigger runs across every workflow in the environment, most recent first
  * @summary List all workflow runs
  */
 export type listEnvironmentRunsResponse200 = {
-  data: ListEnvironmentRunsResponseDto
-  status: 200
-}
+  data: ListEnvironmentRunsResponseDto;
+  status: 200;
+};
 
 export type listEnvironmentRunsResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type listEnvironmentRunsResponseSuccess = (listEnvironmentRunsResponse200) & {
-  headers: Headers;
-};
-export type listEnvironmentRunsResponseError = (listEnvironmentRunsResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type listEnvironmentRunsResponse = (listEnvironmentRunsResponseSuccess | listEnvironmentRunsResponseError)
+export type listEnvironmentRunsResponseSuccess =
+  listEnvironmentRunsResponse200 & {
+    headers: Headers;
+  };
+export type listEnvironmentRunsResponseError =
+  listEnvironmentRunsResponse404 & {
+    headers: Headers;
+  };
 
-export const getListEnvironmentRunsUrl = (environmentId: string,
-    params?: ListEnvironmentRunsParams,) => {
+export type listEnvironmentRunsResponse =
+  | listEnvironmentRunsResponseSuccess
+  | listEnvironmentRunsResponseError;
+
+export const getListEnvironmentRunsUrl = (
+  environmentId: string,
+  params?: ListEnvironmentRunsParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/runs?${stringifiedParams}` : `/environments/${environmentId}/workflows/runs`
-}
+  return stringifiedParams.length > 0
+    ? `/environments/${environmentId}/workflows/runs?${stringifiedParams}`
+    : `/environments/${environmentId}/workflows/runs`;
+};
 
-export const listEnvironmentRuns = async (environmentId: string,
-    params?: ListEnvironmentRunsParams, options?: RequestInit): Promise<listEnvironmentRunsResponse> => {
-  
-  return cliFetch<listEnvironmentRunsResponse>(getListEnvironmentRunsUrl(environmentId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const listEnvironmentRuns = async (
+  environmentId: string,
+  params?: ListEnvironmentRunsParams,
+  options?: RequestInit,
+): Promise<listEnvironmentRunsResponse> => {
+  return cliFetch<listEnvironmentRunsResponse>(
+    getListEnvironmentRunsUrl(environmentId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * Returns a single workflow with its steps
  * @summary Get a workflow
  */
 export type getWorkflowResponse200 = {
-  data: WorkflowDetailResponseDto
-  status: 200
-}
+  data: WorkflowDetailResponseDto;
+  status: 200;
+};
 
 export type getWorkflowResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type getWorkflowResponseSuccess = (getWorkflowResponse200) & {
-  headers: Headers;
-};
-export type getWorkflowResponseError = (getWorkflowResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type getWorkflowResponse = (getWorkflowResponseSuccess | getWorkflowResponseError)
+export type getWorkflowResponseSuccess = getWorkflowResponse200 & {
+  headers: Headers;
+};
+export type getWorkflowResponseError = getWorkflowResponse404 & {
+  headers: Headers;
+};
 
-export const getGetWorkflowUrl = (environmentId: string,
-    workflowId: string,) => {
+export type getWorkflowResponse =
+  | getWorkflowResponseSuccess
+  | getWorkflowResponseError;
 
+export const getGetWorkflowUrl = (
+  environmentId: string,
+  workflowId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}`;
+};
 
-  
-
-  return `/environments/${environmentId}/workflows/${workflowId}`
-}
-
-export const getWorkflow = async (environmentId: string,
-    workflowId: string, options?: RequestInit): Promise<getWorkflowResponse> => {
-  
-  return cliFetch<getWorkflowResponse>(getGetWorkflowUrl(environmentId,workflowId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const getWorkflow = async (
+  environmentId: string,
+  workflowId: string,
+  options?: RequestInit,
+): Promise<getWorkflowResponse> => {
+  return cliFetch<getWorkflowResponse>(
+    getGetWorkflowUrl(environmentId, workflowId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * Updates workflow fields. If `steps` is provided, it replaces ALL existing steps.
  * @summary Update a workflow
  */
 export type updateWorkflowResponse200 = {
-  data: WorkflowResponseDto
-  status: 200
-}
+  data: WorkflowResponseDto;
+  status: 200;
+};
 
 export type updateWorkflowResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type updateWorkflowResponseSuccess = (updateWorkflowResponse200) & {
-  headers: Headers;
-};
-export type updateWorkflowResponseError = (updateWorkflowResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type updateWorkflowResponse = (updateWorkflowResponseSuccess | updateWorkflowResponseError)
+export type updateWorkflowResponseSuccess = updateWorkflowResponse200 & {
+  headers: Headers;
+};
+export type updateWorkflowResponseError = updateWorkflowResponse404 & {
+  headers: Headers;
+};
 
-export const getUpdateWorkflowUrl = (environmentId: string,
-    workflowId: string,) => {
+export type updateWorkflowResponse =
+  | updateWorkflowResponseSuccess
+  | updateWorkflowResponseError;
 
+export const getUpdateWorkflowUrl = (
+  environmentId: string,
+  workflowId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}`;
+};
 
-  
-
-  return `/environments/${environmentId}/workflows/${workflowId}`
-}
-
-export const updateWorkflow = async (environmentId: string,
-    workflowId: string,
-    updateWorkflowDto: UpdateWorkflowDto, options?: RequestInit): Promise<updateWorkflowResponse> => {
-  
-  return cliFetch<updateWorkflowResponse>(getUpdateWorkflowUrl(environmentId,workflowId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateWorkflowDto,)
-  }
-);}
-
-
+export const updateWorkflow = async (
+  environmentId: string,
+  workflowId: string,
+  updateWorkflowDto: UpdateWorkflowDto,
+  options?: RequestInit,
+): Promise<updateWorkflowResponse> => {
+  return cliFetch<updateWorkflowResponse>(
+    getUpdateWorkflowUrl(environmentId, workflowId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(updateWorkflowDto),
+    },
+  );
+};
 
 /**
  * Soft-deletes a workflow. Existing in-flight runs are unaffected.
  * @summary Delete a workflow
  */
 export type deleteWorkflowResponse204 = {
-  data: void
-  status: 204
-}
+  data: void;
+  status: 204;
+};
 
 export type deleteWorkflowResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type deleteWorkflowResponseSuccess = (deleteWorkflowResponse204) & {
-  headers: Headers;
-};
-export type deleteWorkflowResponseError = (deleteWorkflowResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type deleteWorkflowResponse = (deleteWorkflowResponseSuccess | deleteWorkflowResponseError)
+export type deleteWorkflowResponseSuccess = deleteWorkflowResponse204 & {
+  headers: Headers;
+};
+export type deleteWorkflowResponseError = deleteWorkflowResponse404 & {
+  headers: Headers;
+};
 
-export const getDeleteWorkflowUrl = (environmentId: string,
-    workflowId: string,) => {
+export type deleteWorkflowResponse =
+  | deleteWorkflowResponseSuccess
+  | deleteWorkflowResponseError;
 
+export const getDeleteWorkflowUrl = (
+  environmentId: string,
+  workflowId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}`;
+};
 
-  
-
-  return `/environments/${environmentId}/workflows/${workflowId}`
-}
-
-export const deleteWorkflow = async (environmentId: string,
-    workflowId: string, options?: RequestInit): Promise<deleteWorkflowResponse> => {
-  
-  return cliFetch<deleteWorkflowResponse>(getDeleteWorkflowUrl(environmentId,workflowId),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-
-
+export const deleteWorkflow = async (
+  environmentId: string,
+  workflowId: string,
+  options?: RequestInit,
+): Promise<deleteWorkflowResponse> => {
+  return cliFetch<deleteWorkflowResponse>(
+    getDeleteWorkflowUrl(environmentId, workflowId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
 
 /**
  * Returns a paginated list of trigger runs for this workflow, most recent first
  * @summary List runs for a workflow
  */
 export type listWorkflowRunsResponse200 = {
-  data: ListRunsResponseDto
-  status: 200
-}
+  data: ListRunsResponseDto;
+  status: 200;
+};
 
 export type listWorkflowRunsResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type listWorkflowRunsResponseSuccess = (listWorkflowRunsResponse200) & {
+  data: void;
+  status: 404;
+};
+
+export type listWorkflowRunsResponseSuccess = listWorkflowRunsResponse200 & {
   headers: Headers;
 };
-export type listWorkflowRunsResponseError = (listWorkflowRunsResponse404) & {
+export type listWorkflowRunsResponseError = listWorkflowRunsResponse404 & {
   headers: Headers;
 };
 
-export type listWorkflowRunsResponse = (listWorkflowRunsResponseSuccess | listWorkflowRunsResponseError)
+export type listWorkflowRunsResponse =
+  | listWorkflowRunsResponseSuccess
+  | listWorkflowRunsResponseError;
 
-export const getListWorkflowRunsUrl = (environmentId: string,
-    workflowId: string,
-    params?: ListWorkflowRunsParams,) => {
+export const getListWorkflowRunsUrl = (
+  environmentId: string,
+  workflowId: string,
+  params?: ListWorkflowRunsParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/${workflowId}/runs?${stringifiedParams}` : `/environments/${environmentId}/workflows/${workflowId}/runs`
-}
+  return stringifiedParams.length > 0
+    ? `/environments/${environmentId}/workflows/${workflowId}/runs?${stringifiedParams}`
+    : `/environments/${environmentId}/workflows/${workflowId}/runs`;
+};
 
-export const listWorkflowRuns = async (environmentId: string,
-    workflowId: string,
-    params?: ListWorkflowRunsParams, options?: RequestInit): Promise<listWorkflowRunsResponse> => {
-  
-  return cliFetch<listWorkflowRunsResponse>(getListWorkflowRunsUrl(environmentId,workflowId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const listWorkflowRuns = async (
+  environmentId: string,
+  workflowId: string,
+  params?: ListWorkflowRunsParams,
+  options?: RequestInit,
+): Promise<listWorkflowRunsResponse> => {
+  return cliFetch<listWorkflowRunsResponse>(
+    getListWorkflowRunsUrl(environmentId, workflowId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.
  * @summary Preview a broadcast's audience size
  */
 export type previewBroadcastResponse200 = {
-  data: PreviewBroadcastResponseDto
-  status: 200
-}
+  data: PreviewBroadcastResponseDto;
+  status: 200;
+};
 
 export type previewBroadcastResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type previewBroadcastResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type previewBroadcastResponseSuccess = (previewBroadcastResponse200) & {
-  headers: Headers;
-};
-export type previewBroadcastResponseError = (previewBroadcastResponse400 | previewBroadcastResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type previewBroadcastResponse = (previewBroadcastResponseSuccess | previewBroadcastResponseError)
+export type previewBroadcastResponseSuccess = previewBroadcastResponse200 & {
+  headers: Headers;
+};
+export type previewBroadcastResponseError = (
+  | previewBroadcastResponse400
+  | previewBroadcastResponse404
+) & {
+  headers: Headers;
+};
 
-export const getPreviewBroadcastUrl = (environmentId: string,
-    workflowId: string,) => {
+export type previewBroadcastResponse =
+  | previewBroadcastResponseSuccess
+  | previewBroadcastResponseError;
 
+export const getPreviewBroadcastUrl = (
+  environmentId: string,
+  workflowId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcast/preview`;
+};
 
-  
-
-  return `/environments/${environmentId}/workflows/${workflowId}/broadcast/preview`
-}
-
-export const previewBroadcast = async (environmentId: string,
-    workflowId: string,
-    triggerBroadcastDto: TriggerBroadcastDto, options?: RequestInit): Promise<previewBroadcastResponse> => {
-  
-  return cliFetch<previewBroadcastResponse>(getPreviewBroadcastUrl(environmentId,workflowId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      triggerBroadcastDto,)
-  }
-);}
-
-
+export const previewBroadcast = async (
+  environmentId: string,
+  workflowId: string,
+  triggerBroadcastDto: TriggerBroadcastDto,
+  options?: RequestInit,
+): Promise<previewBroadcastResponse> => {
+  return cliFetch<previewBroadcastResponse>(
+    getPreviewBroadcastUrl(environmentId, workflowId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(triggerBroadcastDto),
+    },
+  );
+};
 
 /**
  * Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.
  * @summary Trigger a broadcast
  */
 export type triggerBroadcastResponse200 = {
-  data: TriggerBroadcastResponseDto
-  status: 200
-}
+  data: TriggerBroadcastResponseDto;
+  status: 200;
+};
 
 export type triggerBroadcastResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type triggerBroadcastResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type triggerBroadcastResponseSuccess = (triggerBroadcastResponse200) & {
-  headers: Headers;
-};
-export type triggerBroadcastResponseError = (triggerBroadcastResponse400 | triggerBroadcastResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type triggerBroadcastResponse = (triggerBroadcastResponseSuccess | triggerBroadcastResponseError)
+export type triggerBroadcastResponseSuccess = triggerBroadcastResponse200 & {
+  headers: Headers;
+};
+export type triggerBroadcastResponseError = (
+  | triggerBroadcastResponse400
+  | triggerBroadcastResponse404
+) & {
+  headers: Headers;
+};
 
-export const getTriggerBroadcastUrl = (environmentId: string,
-    workflowId: string,) => {
+export type triggerBroadcastResponse =
+  | triggerBroadcastResponseSuccess
+  | triggerBroadcastResponseError;
 
+export const getTriggerBroadcastUrl = (
+  environmentId: string,
+  workflowId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcast`;
+};
 
-  
-
-  return `/environments/${environmentId}/workflows/${workflowId}/broadcast`
-}
-
-export const triggerBroadcast = async (environmentId: string,
-    workflowId: string,
-    triggerBroadcastDto: TriggerBroadcastDto, options?: RequestInit): Promise<triggerBroadcastResponse> => {
-  
-  return cliFetch<triggerBroadcastResponse>(getTriggerBroadcastUrl(environmentId,workflowId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      triggerBroadcastDto,)
-  }
-);}
-
-
+export const triggerBroadcast = async (
+  environmentId: string,
+  workflowId: string,
+  triggerBroadcastDto: TriggerBroadcastDto,
+  options?: RequestInit,
+): Promise<triggerBroadcastResponse> => {
+  return cliFetch<triggerBroadcastResponse>(
+    getTriggerBroadcastUrl(environmentId, workflowId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(triggerBroadcastDto),
+    },
+  );
+};
 
 /**
  * Returns a paginated list of broadcasts triggered for this workflow, most recent first
  * @summary List broadcasts for a workflow
  */
 export type listBroadcastsResponse200 = {
-  data: ListBroadcastsResponseDto
-  status: 200
-}
+  data: ListBroadcastsResponseDto;
+  status: 200;
+};
 
 export type listBroadcastsResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type listBroadcastsResponseSuccess = (listBroadcastsResponse200) & {
+  data: void;
+  status: 404;
+};
+
+export type listBroadcastsResponseSuccess = listBroadcastsResponse200 & {
   headers: Headers;
 };
-export type listBroadcastsResponseError = (listBroadcastsResponse404) & {
+export type listBroadcastsResponseError = listBroadcastsResponse404 & {
   headers: Headers;
 };
 
-export type listBroadcastsResponse = (listBroadcastsResponseSuccess | listBroadcastsResponseError)
+export type listBroadcastsResponse =
+  | listBroadcastsResponseSuccess
+  | listBroadcastsResponseError;
 
-export const getListBroadcastsUrl = (environmentId: string,
-    workflowId: string,
-    params?: ListBroadcastsParams,) => {
+export const getListBroadcastsUrl = (
+  environmentId: string,
+  workflowId: string,
+  params?: ListBroadcastsParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/environments/${environmentId}/workflows/${workflowId}/broadcasts?${stringifiedParams}` : `/environments/${environmentId}/workflows/${workflowId}/broadcasts`
-}
+  return stringifiedParams.length > 0
+    ? `/environments/${environmentId}/workflows/${workflowId}/broadcasts?${stringifiedParams}`
+    : `/environments/${environmentId}/workflows/${workflowId}/broadcasts`;
+};
 
-export const listBroadcasts = async (environmentId: string,
-    workflowId: string,
-    params?: ListBroadcastsParams, options?: RequestInit): Promise<listBroadcastsResponse> => {
-  
-  return cliFetch<listBroadcastsResponse>(getListBroadcastsUrl(environmentId,workflowId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const listBroadcasts = async (
+  environmentId: string,
+  workflowId: string,
+  params?: ListBroadcastsParams,
+  options?: RequestInit,
+): Promise<listBroadcastsResponse> => {
+  return cliFetch<listBroadcastsResponse>(
+    getListBroadcastsUrl(environmentId, workflowId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)
  * @summary Get a broadcast
  */
 export type getBroadcastResponse200 = {
-  data: BroadcastDetailResponseDto
-  status: 200
-}
+  data: BroadcastDetailResponseDto;
+  status: 200;
+};
 
 export type getBroadcastResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type getBroadcastResponseSuccess = (getBroadcastResponse200) & {
-  headers: Headers;
-};
-export type getBroadcastResponseError = (getBroadcastResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type getBroadcastResponse = (getBroadcastResponseSuccess | getBroadcastResponseError)
+export type getBroadcastResponseSuccess = getBroadcastResponse200 & {
+  headers: Headers;
+};
+export type getBroadcastResponseError = getBroadcastResponse404 & {
+  headers: Headers;
+};
 
-export const getGetBroadcastUrl = (environmentId: string,
-    workflowId: string,
-    broadcastId: string,) => {
+export type getBroadcastResponse =
+  | getBroadcastResponseSuccess
+  | getBroadcastResponseError;
 
+export const getGetBroadcastUrl = (
+  environmentId: string,
+  workflowId: string,
+  broadcastId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}`;
+};
 
-  
+export const getBroadcast = async (
+  environmentId: string,
+  workflowId: string,
+  broadcastId: string,
+  options?: RequestInit,
+): Promise<getBroadcastResponse> => {
+  return cliFetch<getBroadcastResponse>(
+    getGetBroadcastUrl(environmentId, workflowId, broadcastId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
-  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}`
-}
+/**
+ * Holds every send that hasn't gone out yet until the broadcast is resumed. Already-sent emails are unaffected.
+ * @summary Pause a broadcast
+ */
+export type pauseBroadcastResponse200 = {
+  data: BroadcastSummaryDto;
+  status: 200;
+};
 
-export const getBroadcast = async (environmentId: string,
-    workflowId: string,
-    broadcastId: string, options?: RequestInit): Promise<getBroadcastResponse> => {
-  
-  return cliFetch<getBroadcastResponse>(getGetBroadcastUrl(environmentId,workflowId,broadcastId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
+export type pauseBroadcastResponse404 = {
+  data: void;
+  status: 404;
+};
 
+export type pauseBroadcastResponse409 = {
+  data: void;
+  status: 409;
+};
 
+export type pauseBroadcastResponseSuccess = pauseBroadcastResponse200 & {
+  headers: Headers;
+};
+export type pauseBroadcastResponseError = (
+  | pauseBroadcastResponse404
+  | pauseBroadcastResponse409
+) & {
+  headers: Headers;
+};
+
+export type pauseBroadcastResponse =
+  | pauseBroadcastResponseSuccess
+  | pauseBroadcastResponseError;
+
+export const getPauseBroadcastUrl = (
+  environmentId: string,
+  workflowId: string,
+  broadcastId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}/pause`;
+};
+
+export const pauseBroadcast = async (
+  environmentId: string,
+  workflowId: string,
+  broadcastId: string,
+  options?: RequestInit,
+): Promise<pauseBroadcastResponse> => {
+  return cliFetch<pauseBroadcastResponse>(
+    getPauseBroadcastUrl(environmentId, workflowId, broadcastId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
+
+/**
+ * Lets a paused broadcast carry on sending. The remaining sends keep their original spacing, pushed back by however long it was paused.
+ * @summary Resume a paused broadcast
+ */
+export type resumeBroadcastResponse200 = {
+  data: BroadcastSummaryDto;
+  status: 200;
+};
+
+export type resumeBroadcastResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type resumeBroadcastResponse409 = {
+  data: void;
+  status: 409;
+};
+
+export type resumeBroadcastResponseSuccess = resumeBroadcastResponse200 & {
+  headers: Headers;
+};
+export type resumeBroadcastResponseError = (
+  | resumeBroadcastResponse404
+  | resumeBroadcastResponse409
+) & {
+  headers: Headers;
+};
+
+export type resumeBroadcastResponse =
+  | resumeBroadcastResponseSuccess
+  | resumeBroadcastResponseError;
+
+export const getResumeBroadcastUrl = (
+  environmentId: string,
+  workflowId: string,
+  broadcastId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}/resume`;
+};
+
+export const resumeBroadcast = async (
+  environmentId: string,
+  workflowId: string,
+  broadcastId: string,
+  options?: RequestInit,
+): Promise<resumeBroadcastResponse> => {
+  return cliFetch<resumeBroadcastResponse>(
+    getResumeBroadcastUrl(environmentId, workflowId, broadcastId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
+
+/**
+ * Permanently stops a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone.
+ * @summary Cancel a broadcast
+ */
+export type cancelBroadcastResponse200 = {
+  data: BroadcastSummaryDto;
+  status: 200;
+};
+
+export type cancelBroadcastResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type cancelBroadcastResponse409 = {
+  data: void;
+  status: 409;
+};
+
+export type cancelBroadcastResponseSuccess = cancelBroadcastResponse200 & {
+  headers: Headers;
+};
+export type cancelBroadcastResponseError = (
+  | cancelBroadcastResponse404
+  | cancelBroadcastResponse409
+) & {
+  headers: Headers;
+};
+
+export type cancelBroadcastResponse =
+  | cancelBroadcastResponseSuccess
+  | cancelBroadcastResponseError;
+
+export const getCancelBroadcastUrl = (
+  environmentId: string,
+  workflowId: string,
+  broadcastId: string,
+) => {
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}/cancel`;
+};
+
+export const cancelBroadcast = async (
+  environmentId: string,
+  workflowId: string,
+  broadcastId: string,
+  options?: RequestInit,
+): Promise<cancelBroadcastResponse> => {
+  return cliFetch<cancelBroadcastResponse>(
+    getCancelBroadcastUrl(environmentId, workflowId, broadcastId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
 
 /**
  * Generic bounce-recording endpoint, identified by the run step's publicId - callers are expected to have that publicId available via whatever mechanism they use to learn about the bounce (e.g. a provider's native webhook echoing back metadata set at send time). Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.
  * @summary Record an inbound bounce event
  */
 export type recordInboundBounceResponse202 = {
-  data: void
-  status: 202
-}
+  data: void;
+  status: 202;
+};
 
 export type recordInboundBounceResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type recordInboundBounceResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type recordInboundBounceResponseSuccess = (recordInboundBounceResponse202) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
-export type recordInboundBounceResponseError = (recordInboundBounceResponse401 | recordInboundBounceResponse404) & {
+
+export type recordInboundBounceResponseSuccess =
+  recordInboundBounceResponse202 & {
+    headers: Headers;
+  };
+export type recordInboundBounceResponseError = (
+  | recordInboundBounceResponse401
+  | recordInboundBounceResponse404
+) & {
   headers: Headers;
 };
 
-export type recordInboundBounceResponse = (recordInboundBounceResponseSuccess | recordInboundBounceResponseError)
+export type recordInboundBounceResponse =
+  | recordInboundBounceResponseSuccess
+  | recordInboundBounceResponseError;
 
 export const getRecordInboundBounceUrl = () => {
+  return `/bounces/inbound`;
+};
 
-
-  
-
-  return `/bounces/inbound`
-}
-
-export const recordInboundBounce = async (bounceWebhookBodyDto: BounceWebhookBodyDto, options?: RequestInit): Promise<recordInboundBounceResponse> => {
-  
-  return cliFetch<recordInboundBounceResponse>(getRecordInboundBounceUrl(),
-  {      
+export const recordInboundBounce = async (
+  bounceWebhookBodyDto: BounceWebhookBodyDto,
+  options?: RequestInit,
+): Promise<recordInboundBounceResponse> => {
+  return cliFetch<recordInboundBounceResponse>(getRecordInboundBounceUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      bounceWebhookBodyDto,)
-  }
-);}
-
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(bounceWebhookBodyDto),
+  });
+};
 
 /**
  * Creates or updates the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned.
  * @summary Configure an integration
  */
 export type upsertIntegrationResponse200 = {
-  data: IntegrationResponseDto
-  status: 200
-}
+  data: IntegrationResponseDto;
+  status: 200;
+};
 
 export type upsertIntegrationResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type upsertIntegrationResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type upsertIntegrationResponseSuccess = (upsertIntegrationResponse200) & {
-  headers: Headers;
-};
-export type upsertIntegrationResponseError = (upsertIntegrationResponse400 | upsertIntegrationResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type upsertIntegrationResponse = (upsertIntegrationResponseSuccess | upsertIntegrationResponseError)
+export type upsertIntegrationResponseSuccess = upsertIntegrationResponse200 & {
+  headers: Headers;
+};
+export type upsertIntegrationResponseError = (
+  | upsertIntegrationResponse400
+  | upsertIntegrationResponse404
+) & {
+  headers: Headers;
+};
 
-export const getUpsertIntegrationUrl = (environmentId: string,
-    type: string,) => {
+export type upsertIntegrationResponse =
+  | upsertIntegrationResponseSuccess
+  | upsertIntegrationResponseError;
 
+export const getUpsertIntegrationUrl = (
+  environmentId: string,
+  type: string,
+) => {
+  return `/environments/${environmentId}/integrations/${type}`;
+};
 
-  
-
-  return `/environments/${environmentId}/integrations/${type}`
-}
-
-export const upsertIntegration = async (environmentId: string,
-    type: string,
-    upsertIntegrationDto: UpsertIntegrationDto, options?: RequestInit): Promise<upsertIntegrationResponse> => {
-  
-  return cliFetch<upsertIntegrationResponse>(getUpsertIntegrationUrl(environmentId,type),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      upsertIntegrationDto,)
-  }
-);}
-
-
+export const upsertIntegration = async (
+  environmentId: string,
+  type: string,
+  upsertIntegrationDto: UpsertIntegrationDto,
+  options?: RequestInit,
+): Promise<upsertIntegrationResponse> => {
+  return cliFetch<upsertIntegrationResponse>(
+    getUpsertIntegrationUrl(environmentId, type),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(upsertIntegrationDto),
+    },
+  );
+};
 
 /**
  * Returns the sanitized config for a single integration type (no secrets).
  * @summary Get an integration
  */
 export type getIntegrationResponse200 = {
-  data: IntegrationResponseDto
-  status: 200
-}
+  data: IntegrationResponseDto;
+  status: 200;
+};
 
 export type getIntegrationResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type getIntegrationResponseSuccess = (getIntegrationResponse200) & {
-  headers: Headers;
-};
-export type getIntegrationResponseError = (getIntegrationResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type getIntegrationResponse = (getIntegrationResponseSuccess | getIntegrationResponseError)
+export type getIntegrationResponseSuccess = getIntegrationResponse200 & {
+  headers: Headers;
+};
+export type getIntegrationResponseError = getIntegrationResponse404 & {
+  headers: Headers;
+};
 
-export const getGetIntegrationUrl = (environmentId: string,
-    type: string,) => {
+export type getIntegrationResponse =
+  | getIntegrationResponseSuccess
+  | getIntegrationResponseError;
 
+export const getGetIntegrationUrl = (environmentId: string, type: string) => {
+  return `/environments/${environmentId}/integrations/${type}`;
+};
 
-  
-
-  return `/environments/${environmentId}/integrations/${type}`
-}
-
-export const getIntegration = async (environmentId: string,
-    type: string, options?: RequestInit): Promise<getIntegrationResponse> => {
-  
-  return cliFetch<getIntegrationResponse>(getGetIntegrationUrl(environmentId,type),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const getIntegration = async (
+  environmentId: string,
+  type: string,
+  options?: RequestInit,
+): Promise<getIntegrationResponse> => {
+  return cliFetch<getIntegrationResponse>(
+    getGetIntegrationUrl(environmentId, type),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * @summary Remove an integration
  */
 export type deleteIntegrationResponse204 = {
-  data: void
-  status: 204
-}
+  data: void;
+  status: 204;
+};
 
 export type deleteIntegrationResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type deleteIntegrationResponseSuccess = (deleteIntegrationResponse204) & {
-  headers: Headers;
-};
-export type deleteIntegrationResponseError = (deleteIntegrationResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type deleteIntegrationResponse = (deleteIntegrationResponseSuccess | deleteIntegrationResponseError)
+export type deleteIntegrationResponseSuccess = deleteIntegrationResponse204 & {
+  headers: Headers;
+};
+export type deleteIntegrationResponseError = deleteIntegrationResponse404 & {
+  headers: Headers;
+};
 
-export const getDeleteIntegrationUrl = (environmentId: string,
-    type: string,) => {
+export type deleteIntegrationResponse =
+  | deleteIntegrationResponseSuccess
+  | deleteIntegrationResponseError;
 
+export const getDeleteIntegrationUrl = (
+  environmentId: string,
+  type: string,
+) => {
+  return `/environments/${environmentId}/integrations/${type}`;
+};
 
-  
-
-  return `/environments/${environmentId}/integrations/${type}`
-}
-
-export const deleteIntegration = async (environmentId: string,
-    type: string, options?: RequestInit): Promise<deleteIntegrationResponse> => {
-  
-  return cliFetch<deleteIntegrationResponse>(getDeleteIntegrationUrl(environmentId,type),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-
-
+export const deleteIntegration = async (
+  environmentId: string,
+  type: string,
+  options?: RequestInit,
+): Promise<deleteIntegrationResponse> => {
+  return cliFetch<deleteIntegrationResponse>(
+    getDeleteIntegrationUrl(environmentId, type),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
 
 /**
  * Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.
  * @summary Set an integration as primary
  */
 export type setPrimaryIntegrationResponse200 = {
-  data: IntegrationResponseDto
-  status: 200
-}
+  data: IntegrationResponseDto;
+  status: 200;
+};
 
 export type setPrimaryIntegrationResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type setPrimaryIntegrationResponseSuccess = (setPrimaryIntegrationResponse200) & {
-  headers: Headers;
-};
-export type setPrimaryIntegrationResponseError = (setPrimaryIntegrationResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type setPrimaryIntegrationResponse = (setPrimaryIntegrationResponseSuccess | setPrimaryIntegrationResponseError)
+export type setPrimaryIntegrationResponseSuccess =
+  setPrimaryIntegrationResponse200 & {
+    headers: Headers;
+  };
+export type setPrimaryIntegrationResponseError =
+  setPrimaryIntegrationResponse404 & {
+    headers: Headers;
+  };
 
-export const getSetPrimaryIntegrationUrl = (environmentId: string,
-    type: string,) => {
+export type setPrimaryIntegrationResponse =
+  | setPrimaryIntegrationResponseSuccess
+  | setPrimaryIntegrationResponseError;
 
+export const getSetPrimaryIntegrationUrl = (
+  environmentId: string,
+  type: string,
+) => {
+  return `/environments/${environmentId}/integrations/${type}/primary`;
+};
 
-  
-
-  return `/environments/${environmentId}/integrations/${type}/primary`
-}
-
-export const setPrimaryIntegration = async (environmentId: string,
-    type: string, options?: RequestInit): Promise<setPrimaryIntegrationResponse> => {
-  
-  return cliFetch<setPrimaryIntegrationResponse>(getSetPrimaryIntegrationUrl(environmentId,type),
-  {      
-    ...options,
-    method: 'PATCH'
-    
-    
-  }
-);}
-
-
+export const setPrimaryIntegration = async (
+  environmentId: string,
+  type: string,
+  options?: RequestInit,
+): Promise<setPrimaryIntegrationResponse> => {
+  return cliFetch<setPrimaryIntegrationResponse>(
+    getSetPrimaryIntegrationUrl(environmentId, type),
+    {
+      ...options,
+      method: "PATCH",
+    },
+  );
+};
 
 /**
  * Returns every integration configured for this environment, sanitized (no secrets).
  * @summary List configured integrations
  */
 export type listIntegrationsResponse200 = {
-  data: ListIntegrationsResponseDto
-  status: 200
-}
+  data: ListIntegrationsResponseDto;
+  status: 200;
+};
 
 export type listIntegrationsResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type listIntegrationsResponseSuccess = (listIntegrationsResponse200) & {
-  headers: Headers;
-};
-export type listIntegrationsResponseError = (listIntegrationsResponse404) & {
-  headers: Headers;
+  data: void;
+  status: 404;
 };
 
-export type listIntegrationsResponse = (listIntegrationsResponseSuccess | listIntegrationsResponseError)
+export type listIntegrationsResponseSuccess = listIntegrationsResponse200 & {
+  headers: Headers;
+};
+export type listIntegrationsResponseError = listIntegrationsResponse404 & {
+  headers: Headers;
+};
 
-export const getListIntegrationsUrl = (environmentId: string,) => {
+export type listIntegrationsResponse =
+  | listIntegrationsResponseSuccess
+  | listIntegrationsResponseError;
 
+export const getListIntegrationsUrl = (environmentId: string) => {
+  return `/environments/${environmentId}/integrations`;
+};
 
-  
-
-  return `/environments/${environmentId}/integrations`
-}
-
-export const listIntegrations = async (environmentId: string, options?: RequestInit): Promise<listIntegrationsResponse> => {
-  
-  return cliFetch<listIntegrationsResponse>(getListIntegrationsUrl(environmentId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const listIntegrations = async (
+  environmentId: string,
+  options?: RequestInit,
+): Promise<listIntegrationsResponse> => {
+  return cliFetch<listIntegrationsResponse>(
+    getListIntegrationsUrl(environmentId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 /**
  * Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.
  * @summary Get environment-wide analytics
  */
 export type getAnalyticsResponse200 = {
-  data: AnalyticsResponseDto
-  status: 200
-}
+  data: AnalyticsResponseDto;
+  status: 200;
+};
 
 export type getAnalyticsResponse404 = {
-  data: void
-  status: 404
-}
-    
-export type getAnalyticsResponseSuccess = (getAnalyticsResponse200) & {
+  data: void;
+  status: 404;
+};
+
+export type getAnalyticsResponseSuccess = getAnalyticsResponse200 & {
   headers: Headers;
 };
-export type getAnalyticsResponseError = (getAnalyticsResponse404) & {
+export type getAnalyticsResponseError = getAnalyticsResponse404 & {
   headers: Headers;
 };
 
-export type getAnalyticsResponse = (getAnalyticsResponseSuccess | getAnalyticsResponseError)
+export type getAnalyticsResponse =
+  | getAnalyticsResponseSuccess
+  | getAnalyticsResponseError;
 
-export const getGetAnalyticsUrl = (environmentId: string,
-    params?: GetAnalyticsParams,) => {
+export const getGetAnalyticsUrl = (
+  environmentId: string,
+  params?: GetAnalyticsParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? "null" : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/environments/${environmentId}/analytics?${stringifiedParams}` : `/environments/${environmentId}/analytics`
-}
+  return stringifiedParams.length > 0
+    ? `/environments/${environmentId}/analytics?${stringifiedParams}`
+    : `/environments/${environmentId}/analytics`;
+};
 
-export const getAnalytics = async (environmentId: string,
-    params?: GetAnalyticsParams, options?: RequestInit): Promise<getAnalyticsResponse> => {
-  
-  return cliFetch<getAnalyticsResponse>(getGetAnalyticsUrl(environmentId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const getAnalytics = async (
+  environmentId: string,
+  params?: GetAnalyticsParams,
+  options?: RequestInit,
+): Promise<getAnalyticsResponse> => {
+  return cliFetch<getAnalyticsResponse>(
+    getGetAnalyticsUrl(environmentId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 export type streamableHttpControllerHandlePostRequestResponse201 = {
-  data: void
-  status: 201
-}
-    
-export type streamableHttpControllerHandlePostRequestResponseSuccess = (streamableHttpControllerHandlePostRequestResponse201) & {
-  headers: Headers;
+  data: void;
+  status: 201;
 };
-;
 
-export type streamableHttpControllerHandlePostRequestResponse = (streamableHttpControllerHandlePostRequestResponseSuccess)
+export type streamableHttpControllerHandlePostRequestResponseSuccess =
+  streamableHttpControllerHandlePostRequestResponse201 & {
+    headers: Headers;
+  };
+export type streamableHttpControllerHandlePostRequestResponse =
+  streamableHttpControllerHandlePostRequestResponseSuccess;
 
 export const getStreamableHttpControllerHandlePostRequestUrl = () => {
+  return `/mcp`;
+};
 
-
-  
-
-  return `/mcp`
-}
-
-export const streamableHttpControllerHandlePostRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandlePostRequestResponse> => {
-  
-  return cliFetch<streamableHttpControllerHandlePostRequestResponse>(getStreamableHttpControllerHandlePostRequestUrl(),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-
-
+export const streamableHttpControllerHandlePostRequest = async (
+  options?: RequestInit,
+): Promise<streamableHttpControllerHandlePostRequestResponse> => {
+  return cliFetch<streamableHttpControllerHandlePostRequestResponse>(
+    getStreamableHttpControllerHandlePostRequestUrl(),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
 
 export type streamableHttpControllerHandleGetRequestResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type streamableHttpControllerHandleGetRequestResponseSuccess = (streamableHttpControllerHandleGetRequestResponse200) & {
-  headers: Headers;
+  data: void;
+  status: 200;
 };
-;
 
-export type streamableHttpControllerHandleGetRequestResponse = (streamableHttpControllerHandleGetRequestResponseSuccess)
+export type streamableHttpControllerHandleGetRequestResponseSuccess =
+  streamableHttpControllerHandleGetRequestResponse200 & {
+    headers: Headers;
+  };
+export type streamableHttpControllerHandleGetRequestResponse =
+  streamableHttpControllerHandleGetRequestResponseSuccess;
 
 export const getStreamableHttpControllerHandleGetRequestUrl = () => {
+  return `/mcp`;
+};
 
-
-  
-
-  return `/mcp`
-}
-
-export const streamableHttpControllerHandleGetRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandleGetRequestResponse> => {
-  
-  return cliFetch<streamableHttpControllerHandleGetRequestResponse>(getStreamableHttpControllerHandleGetRequestUrl(),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
+export const streamableHttpControllerHandleGetRequest = async (
+  options?: RequestInit,
+): Promise<streamableHttpControllerHandleGetRequestResponse> => {
+  return cliFetch<streamableHttpControllerHandleGetRequestResponse>(
+    getStreamableHttpControllerHandleGetRequestUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
 
 export type streamableHttpControllerHandleDeleteRequestResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type streamableHttpControllerHandleDeleteRequestResponseSuccess = (streamableHttpControllerHandleDeleteRequestResponse200) & {
-  headers: Headers;
+  data: void;
+  status: 200;
 };
-;
 
-export type streamableHttpControllerHandleDeleteRequestResponse = (streamableHttpControllerHandleDeleteRequestResponseSuccess)
+export type streamableHttpControllerHandleDeleteRequestResponseSuccess =
+  streamableHttpControllerHandleDeleteRequestResponse200 & {
+    headers: Headers;
+  };
+export type streamableHttpControllerHandleDeleteRequestResponse =
+  streamableHttpControllerHandleDeleteRequestResponseSuccess;
 
 export const getStreamableHttpControllerHandleDeleteRequestUrl = () => {
+  return `/mcp`;
+};
 
-
-  
-
-  return `/mcp`
-}
-
-export const streamableHttpControllerHandleDeleteRequest = async ( options?: RequestInit): Promise<streamableHttpControllerHandleDeleteRequestResponse> => {
-  
-  return cliFetch<streamableHttpControllerHandleDeleteRequestResponse>(getStreamableHttpControllerHandleDeleteRequestUrl(),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
+export const streamableHttpControllerHandleDeleteRequest = async (
+  options?: RequestInit,
+): Promise<streamableHttpControllerHandleDeleteRequestResponse> => {
+  return cliFetch<streamableHttpControllerHandleDeleteRequestResponse>(
+    getStreamableHttpControllerHandleDeleteRequestUrl(),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};

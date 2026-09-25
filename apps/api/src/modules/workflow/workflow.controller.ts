@@ -30,6 +30,7 @@ import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
   BroadcastDetailResponseDto,
+  BroadcastSummaryDto,
   ListBroadcastsQueryDto,
   ListBroadcastsResponseDto,
   PreviewBroadcastResponseDto,
@@ -341,6 +342,7 @@ export class WorkflowController {
       workflowId,
       input.audience,
       user.id,
+      { sendOverHours: input.sendOverHours },
     );
   }
 
@@ -392,6 +394,102 @@ export class WorkflowController {
     const db = createDrizzleClient();
 
     return this.workflowService.getBroadcast(
+      db,
+      environment.id,
+      workflowId,
+      broadcastId,
+    );
+  }
+
+  @Post(":workflowId/broadcasts/:broadcastId/pause")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "pauseBroadcast",
+    summary: "Pause a broadcast",
+    description:
+      "Holds every send that hasn't gone out yet until the broadcast is resumed. Already-sent emails are unaffected.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "workflowId", type: "string" })
+  @ApiParam({ name: "broadcastId", type: "string" })
+  @ApiResponse({ status: 200, type: BroadcastSummaryDto })
+  @ApiResponse({ status: 404, description: "Workflow or broadcast not found" })
+  @ApiResponse({
+    status: 409,
+    description: "Broadcast isn't pending or queued",
+  })
+  async pauseBroadcast(
+    @CurrentEnvironment() environment: EnvironmentForUser,
+    @Param("workflowId") workflowId: string,
+    @Param("broadcastId") broadcastId: string,
+  ): Promise<BroadcastSummaryDto> {
+    const db = createDrizzleClient();
+
+    return this.workflowService.pauseBroadcast(
+      db,
+      environment.id,
+      workflowId,
+      broadcastId,
+    );
+  }
+
+  @Post(":workflowId/broadcasts/:broadcastId/resume")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "resumeBroadcast",
+    summary: "Resume a paused broadcast",
+    description:
+      "Lets a paused broadcast carry on sending. The remaining sends keep their original spacing, pushed back by however long it was paused.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "workflowId", type: "string" })
+  @ApiParam({ name: "broadcastId", type: "string" })
+  @ApiResponse({ status: 200, type: BroadcastSummaryDto })
+  @ApiResponse({ status: 404, description: "Workflow or broadcast not found" })
+  @ApiResponse({
+    status: 409,
+    description: "Broadcast isn't paused",
+  })
+  async resumeBroadcast(
+    @CurrentEnvironment() environment: EnvironmentForUser,
+    @Param("workflowId") workflowId: string,
+    @Param("broadcastId") broadcastId: string,
+  ): Promise<BroadcastSummaryDto> {
+    const db = createDrizzleClient();
+
+    return this.workflowService.resumeBroadcast(
+      db,
+      environment.id,
+      workflowId,
+      broadcastId,
+    );
+  }
+
+  @Post(":workflowId/broadcasts/:broadcastId/cancel")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "cancelBroadcast",
+    summary: "Cancel a broadcast",
+    description:
+      "Permanently stops a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "workflowId", type: "string" })
+  @ApiParam({ name: "broadcastId", type: "string" })
+  @ApiResponse({ status: 200, type: BroadcastSummaryDto })
+  @ApiResponse({ status: 404, description: "Workflow or broadcast not found" })
+  @ApiResponse({
+    status: 409,
+    description: "Broadcast isn't pending, queued or paused",
+  })
+  async cancelBroadcast(
+    @CurrentEnvironment() environment: EnvironmentForUser,
+    @Param("workflowId") workflowId: string,
+    @Param("broadcastId") broadcastId: string,
+  ): Promise<BroadcastSummaryDto> {
+    const db = createDrizzleClient();
+
+    return this.workflowService.cancelBroadcast(
       db,
       environment.id,
       workflowId,

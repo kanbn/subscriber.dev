@@ -2,12 +2,14 @@ import type { z } from "zod";
 import { InjectQueue } from "@nestjs/bullmq";
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
 import { Queue } from "bullmq";
 
 import type { dbClient } from "@subscriber.dev/db/client";
+import type { WorkflowBroadcastStatus } from "@subscriber.dev/db/schema";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBroadcast.repo";
@@ -18,6 +20,7 @@ import type { WorkflowStepSchema } from "./dto/create-workflow.dto.js";
 import type {
   BounceEventJobData,
   BroadcastDispatchJobData,
+  BroadcastResumeJobData,
 } from "./workflow.constants.js";
 import { resolveAudienceSubscriberIds } from "./audienceQuery.js";
 import { createRunForSubscriber } from "./createRunForSubscriber.js";
@@ -26,10 +29,15 @@ import {
   BOUNCE_EVENTS_QUEUE_NAME,
   BROADCAST_DISPATCH_JOB_NAME,
   BROADCAST_DISPATCH_QUEUE_NAME,
+  BROADCAST_RESUME_JOB_NAME,
+  BROADCAST_RESUME_QUEUE_NAME,
   WORKFLOW_QUEUE_NAME,
 } from "./workflow.constants.js";
 
 type WorkflowStepInput = z.infer<typeof WorkflowStepSchema>;
+
+const HOUR_MS = 60 * 60 * 1000;
+const RESUME_SECOND_PASS_DELAY_MS = 60_000;
 
 interface CreateWorkflowData {
   key: string;
@@ -80,6 +88,8 @@ export class WorkflowService {
     private readonly broadcastDispatchQueue: Queue,
     @InjectQueue(BOUNCE_EVENTS_QUEUE_NAME)
     private readonly bounceEventsQueue: Queue,
+    @InjectQueue(BROADCAST_RESUME_QUEUE_NAME)
+    private readonly broadcastResumeQueue: Queue,
   ) {}
 
   private toWorkflowDto(
@@ -115,6 +125,160 @@ export class WorkflowService {
       createdAt: workflow.createdAt.toISOString(),
       updatedAt: workflow.updatedAt.toISOString(),
     };
+  }
+
+  private toBroadcastSummary(broadcast: {
+    publicId: string;
+    status: WorkflowBroadcastStatus;
+    matchedCount: number | null;
+    sendOverMs: number | null;
+    createdAt: Date;
+  }) {
+    return {
+      publicId: broadcast.publicId,
+      status: broadcast.status,
+      matchedCount: broadcast.matchedCount,
+      sendOverHours:
+        broadcast.sendOverMs === null ? null : broadcast.sendOverMs / HOUR_MS,
+      createdAt: broadcast.createdAt.toISOString(),
+    };
+  }
+
+  private async requireBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    broadcastPublicId: string,
+  ) {
+    const workflow = await workflowRepo.getWorkflowByPublicId(
+      db,
+      environmentId,
+      workflowPublicId,
+    );
+    if (!workflow) throw new NotFoundException("Workflow not found");
+
+    const broadcast = await workflowBroadcastRepo.getBroadcastByPublicId(
+      db,
+      workflow.id,
+      broadcastPublicId,
+    );
+    if (!broadcast) throw new NotFoundException("Broadcast not found");
+    return broadcast;
+  }
+
+  private async assertBroadcastNotFinished(
+    db: dbClient,
+    broadcast: {
+      id: number;
+      matchedCount: number | null;
+      skippedCount: number;
+    },
+  ) {
+    if (broadcast.matchedCount === null) return;
+    const [counts, runCount] = await Promise.all([
+      workflowBroadcastRepo.getBroadcastStepCounts(db, broadcast.id),
+      workflowBroadcastRepo.countRunsForBroadcast(db, broadcast.id),
+    ]);
+    const setUp = runCount + broadcast.skippedCount;
+    if (setUp >= broadcast.matchedCount && counts.pending === 0) {
+      throw new ConflictException("Broadcast has already finished sending");
+    }
+  }
+
+  async pauseBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    broadcastPublicId: string,
+  ) {
+    const broadcast = await this.requireBroadcast(
+      db,
+      environmentId,
+      workflowPublicId,
+      broadcastPublicId,
+    );
+    await this.assertBroadcastNotFinished(db, broadcast);
+    const updated = await workflowBroadcastRepo.pauseBroadcast(
+      db,
+      broadcast.id,
+    );
+    if (!updated) {
+      throw new ConflictException(
+        `Broadcast can't be paused while ${broadcast.status}`,
+      );
+    }
+    return this.toBroadcastSummary(updated);
+  }
+
+  async resumeBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    broadcastPublicId: string,
+  ) {
+    const broadcast = await this.requireBroadcast(
+      db,
+      environmentId,
+      workflowPublicId,
+      broadcastPublicId,
+    );
+    const updated = await workflowBroadcastRepo.resumeBroadcast(
+      db,
+      broadcast.id,
+    );
+    if (!updated) {
+      throw new ConflictException(
+        `Broadcast can't be resumed while ${broadcast.status}`,
+      );
+    }
+
+    for (const delay of [0, RESUME_SECOND_PASS_DELAY_MS]) {
+      await this.broadcastResumeQueue.add(
+        BROADCAST_RESUME_JOB_NAME,
+        { broadcastId: broadcast.id } satisfies BroadcastResumeJobData,
+        {
+          delay,
+          attempts: 3,
+          backoff: { type: "exponential", delay: 60_000 },
+          removeOnComplete: true,
+          removeOnFail: 1000,
+        },
+      );
+    }
+
+    return this.toBroadcastSummary(updated);
+  }
+
+  async cancelBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    broadcastPublicId: string,
+  ) {
+    const broadcast = await this.requireBroadcast(
+      db,
+      environmentId,
+      workflowPublicId,
+      broadcastPublicId,
+    );
+    await this.assertBroadcastNotFinished(db, broadcast);
+    const updated = await workflowBroadcastRepo.transitionBroadcastStatus(
+      db,
+      broadcast.id,
+      ["pending", "queued", "paused"],
+      "cancelled",
+    );
+    if (!updated) {
+      throw new ConflictException(
+        `Broadcast can't be cancelled while ${broadcast.status}`,
+      );
+    }
+    await workflowBroadcastRepo.cancelPendingStepsForBroadcast(
+      db,
+      broadcast.id,
+      "Broadcast cancelled",
+    );
+    return this.toBroadcastSummary(updated);
   }
 
   private successRate(sent: number, failed: number): number | null {
@@ -488,6 +652,7 @@ export class WorkflowService {
     workflowPublicId: string,
     audience: AudienceCondition,
     triggeredBy: number,
+    opts: { sendOverHours?: number } = {},
   ) {
     const workflow = await this.getWorkflowReadyForBroadcast(
       db,
@@ -499,6 +664,9 @@ export class WorkflowService {
       workflowId: workflow.id,
       environmentId,
       audienceQuery: audience as Record<string, unknown>,
+      sendOverMs: opts.sendOverHours
+        ? Math.round(opts.sendOverHours * HOUR_MS)
+        : null,
       createdBy: triggeredBy,
     });
 
@@ -536,12 +704,7 @@ export class WorkflowService {
     );
 
     return {
-      broadcasts: rows.map((b) => ({
-        publicId: b.publicId,
-        status: b.status,
-        matchedCount: b.matchedCount,
-        createdAt: b.createdAt.toISOString(),
-      })),
+      broadcasts: rows.map((b) => this.toBroadcastSummary(b)),
       limit: opts.limit,
       offset: opts.offset,
     };
@@ -553,19 +716,12 @@ export class WorkflowService {
     workflowPublicId: string,
     broadcastPublicId: string,
   ) {
-    const workflow = await workflowRepo.getWorkflowByPublicId(
+    const broadcast = await this.requireBroadcast(
       db,
       environmentId,
       workflowPublicId,
-    );
-    if (!workflow) throw new NotFoundException("Workflow not found");
-
-    const broadcast = await workflowBroadcastRepo.getBroadcastByPublicId(
-      db,
-      workflow.id,
       broadcastPublicId,
     );
-    if (!broadcast) throw new NotFoundException("Broadcast not found");
 
     const [counts, bounceBreakdown] = await Promise.all([
       workflowBroadcastRepo.getBroadcastStepCounts(db, broadcast.id),
@@ -573,10 +729,7 @@ export class WorkflowService {
     ]);
 
     return {
-      publicId: broadcast.publicId,
-      status: broadcast.status,
-      matchedCount: broadcast.matchedCount,
-      createdAt: broadcast.createdAt.toISOString(),
+      ...this.toBroadcastSummary(broadcast),
       sentCount: counts.sent,
       failedCount: counts.failed,
       skippedCount: counts.skipped,

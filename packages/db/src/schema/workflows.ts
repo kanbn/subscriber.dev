@@ -60,6 +60,8 @@ export const workflowBroadcastStatuses = [
   "pending",
   "queued",
   "failed",
+  "paused",
+  "cancelled",
 ] as const;
 export type WorkflowBroadcastStatus =
   (typeof workflowBroadcastStatuses)[number];
@@ -173,6 +175,9 @@ export const workflowBroadcasts = pgTable(
       .$type<Record<string, unknown>>(),
     status: workflowBroadcastStatusEnum("status").notNull().default("pending"),
     matchedCount: integer("matchedCount"),
+    sendOverMs: integer("sendOverMs"),
+    pausedAt: timestamp("pausedAt"),
+    skippedCount: integer("skippedCount").notNull().default(0),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     createdBy: bigint("createdBy", { mode: "number" }).references(
       () => users.id,

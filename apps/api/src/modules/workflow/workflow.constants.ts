@@ -3,6 +3,7 @@ export const WORKFLOW_STEP_JOB_NAME = "send-step";
 
 export interface WorkflowStepJobData {
   runStepId: number;
+  parked?: boolean;
 }
 
 export const BROADCAST_DISPATCH_QUEUE_NAME = "broadcast-dispatch";
@@ -18,9 +19,17 @@ export const BROADCAST_SETUP_JOB_NAME = "setup-subscriber";
 export interface BroadcastSetupJobData {
   broadcastId: number;
   subscriberId: number;
+  startDelayMs?: number;
 }
 
 export const BROADCAST_STEPS_QUEUE_NAME = "broadcast-steps";
+
+export const BROADCAST_RESUME_QUEUE_NAME = "broadcast-resume";
+export const BROADCAST_RESUME_JOB_NAME = "reschedule";
+
+export interface BroadcastResumeJobData {
+  broadcastId: number;
+}
 
 export const BOUNCE_EVENTS_QUEUE_NAME = "bounce-events";
 export const BOUNCE_EVENT_JOB_NAME = "record-bounce";

@@ -1,4 +1,8 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from "@nestjs/common";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
@@ -31,6 +35,11 @@ vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
   getBroadcastByPublicId: vi.fn(),
   getBroadcastStepCounts: vi.fn(),
   getBroadcastBounceBreakdown: vi.fn(),
+  transitionBroadcastStatus: vi.fn(),
+  cancelPendingStepsForBroadcast: vi.fn(),
+  pauseBroadcast: vi.fn(),
+  resumeBroadcast: vi.fn(),
+  countRunsForBroadcast: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
@@ -64,6 +73,10 @@ const mockBounceEventsQueue = {
   add: vi.fn(),
 };
 
+const mockBroadcastResumeQueue = {
+  add: vi.fn(),
+};
+
 let service: WorkflowService;
 
 beforeEach(() => {
@@ -73,6 +86,7 @@ beforeEach(() => {
     mockQueue as any,
     mockBroadcastDispatchQueue as any,
     mockBounceEventsQueue as any,
+    mockBroadcastResumeQueue as any,
   );
 });
 
@@ -705,6 +719,7 @@ describe("triggerBroadcast", () => {
       workflowId: 1,
       environmentId: 10,
       audienceQuery: audience,
+      sendOverMs: null,
       createdBy: 1,
     });
     expect(mockBroadcastDispatchQueue.add).toHaveBeenCalledWith(
@@ -712,6 +727,240 @@ describe("triggerBroadcast", () => {
       { broadcastId: 5 },
       expect.objectContaining({ attempts: 3 }),
     );
+  });
+
+  it("stores the send window in milliseconds", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue(
+      steps as any,
+    );
+    vi.mocked(workflowBroadcastRepo.createBroadcast).mockResolvedValue({
+      id: 5,
+      publicId: "bc_abc",
+      status: "pending",
+    } as any);
+
+    await service.triggerBroadcast(mockDb, 10, "wf_abc", audience, 1, {
+      sendOverHours: 1.5,
+    });
+
+    expect(workflowBroadcastRepo.createBroadcast).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({ sendOverMs: 90 * 60 * 1000 }),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// pauseBroadcast / resumeBroadcast / cancelBroadcast
+// ---------------------------------------------------------------------------
+
+describe("broadcast pause/resume/cancel", () => {
+  const broadcast = {
+    id: 5,
+    publicId: "bc_abc",
+    status: "queued" as const,
+    matchedCount: 100,
+    sendOverMs: null,
+    pausedAt: null,
+    skippedCount: 0,
+    createdAt: new Date("2026-01-01T00:00:00Z"),
+  };
+  const stillSending = {
+    pending: 40,
+    sent: 60,
+    skipped: 0,
+    failed: 0,
+    cancelled: 0,
+    bounced: 0,
+  };
+
+  beforeEach(() => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      id: 1,
+    } as any);
+    vi.mocked(workflowBroadcastRepo.getBroadcastByPublicId).mockResolvedValue(
+      broadcast as any,
+    );
+    vi.mocked(workflowBroadcastRepo.getBroadcastStepCounts).mockResolvedValue(
+      stillSending,
+    );
+    vi.mocked(workflowBroadcastRepo.countRunsForBroadcast).mockResolvedValue(
+      100,
+    );
+  });
+
+  it("pauses a broadcast that's still sending", async () => {
+    vi.mocked(workflowBroadcastRepo.pauseBroadcast).mockResolvedValue({
+      ...broadcast,
+      status: "paused",
+    } as any);
+
+    const result = await service.pauseBroadcast(mockDb, 10, "wf_abc", "bc_abc");
+
+    expect(result.status).toBe("paused");
+    expect(workflowBroadcastRepo.pauseBroadcast).toHaveBeenCalledWith(
+      mockDb,
+      5,
+    );
+  });
+
+  it("rejects pausing a broadcast in any other status", async () => {
+    vi.mocked(workflowBroadcastRepo.pauseBroadcast).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      service.pauseBroadcast(mockDb, 10, "wf_abc", "bc_abc"),
+    ).rejects.toThrow(ConflictException);
+  });
+
+  it.each(["pauseBroadcast", "cancelBroadcast"] as const)(
+    "%s rejects a broadcast that has already finished sending",
+    async (method) => {
+      vi.mocked(workflowBroadcastRepo.getBroadcastStepCounts).mockResolvedValue(
+        { ...stillSending, pending: 0, sent: 100 },
+      );
+
+      await expect(
+        service[method](mockDb, 10, "wf_abc", "bc_abc"),
+      ).rejects.toThrow("Broadcast has already finished sending");
+      expect(workflowBroadcastRepo.pauseBroadcast).not.toHaveBeenCalled();
+      expect(
+        workflowBroadcastRepo.transitionBroadcastStatus,
+      ).not.toHaveBeenCalled();
+    },
+  );
+
+  it("counts skipped subscribers towards a finished broadcast", async () => {
+    vi.mocked(workflowBroadcastRepo.getBroadcastByPublicId).mockResolvedValue({
+      ...broadcast,
+      skippedCount: 3,
+    } as any);
+    vi.mocked(workflowBroadcastRepo.getBroadcastStepCounts).mockResolvedValue({
+      ...stillSending,
+      pending: 0,
+      sent: 97,
+    });
+    vi.mocked(workflowBroadcastRepo.countRunsForBroadcast).mockResolvedValue(
+      97,
+    );
+
+    await expect(
+      service.cancelBroadcast(mockDb, 10, "wf_abc", "bc_abc"),
+    ).rejects.toThrow("Broadcast has already finished sending");
+  });
+
+  it("still allows pausing while subscribers are being set up", async () => {
+    vi.mocked(workflowBroadcastRepo.getBroadcastStepCounts).mockResolvedValue({
+      ...stillSending,
+      pending: 0,
+      sent: 30,
+    });
+    vi.mocked(workflowBroadcastRepo.countRunsForBroadcast).mockResolvedValue(
+      30,
+    );
+    vi.mocked(workflowBroadcastRepo.pauseBroadcast).mockResolvedValue({
+      ...broadcast,
+      status: "paused",
+    } as any);
+
+    await expect(
+      service.pauseBroadcast(mockDb, 10, "wf_abc", "bc_abc"),
+    ).resolves.toEqual(expect.objectContaining({ status: "paused" }));
+  });
+
+  it("resumes and queues a reschedule now plus a second pass a minute later", async () => {
+    vi.mocked(workflowBroadcastRepo.getBroadcastByPublicId).mockResolvedValue({
+      ...broadcast,
+      status: "paused",
+    } as any);
+    vi.mocked(workflowBroadcastRepo.resumeBroadcast).mockResolvedValue({
+      ...broadcast,
+      status: "queued",
+    } as any);
+
+    const result = await service.resumeBroadcast(
+      mockDb,
+      10,
+      "wf_abc",
+      "bc_abc",
+    );
+
+    expect(result.status).toBe("queued");
+    expect(workflowBroadcastRepo.resumeBroadcast).toHaveBeenCalledWith(
+      mockDb,
+      5,
+    );
+    const delays = mockBroadcastResumeQueue.add.mock.calls.map(
+      ([name, data, opts]) => [name, data, opts.delay],
+    );
+    expect(delays).toEqual([
+      ["reschedule", { broadcastId: 5 }, 0],
+      ["reschedule", { broadcastId: 5 }, 60_000],
+    ]);
+  });
+
+  it("rejects resuming a broadcast that isn't paused, without rescheduling", async () => {
+    vi.mocked(workflowBroadcastRepo.resumeBroadcast).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      service.resumeBroadcast(mockDb, 10, "wf_abc", "bc_abc"),
+    ).rejects.toThrow(ConflictException);
+    expect(mockBroadcastResumeQueue.add).not.toHaveBeenCalled();
+  });
+
+  it("cancels the broadcast and every pending step", async () => {
+    vi.mocked(
+      workflowBroadcastRepo.transitionBroadcastStatus,
+    ).mockResolvedValue({ ...broadcast, status: "cancelled" } as any);
+
+    const result = await service.cancelBroadcast(
+      mockDb,
+      10,
+      "wf_abc",
+      "bc_abc",
+    );
+
+    expect(result.status).toBe("cancelled");
+    expect(
+      workflowBroadcastRepo.transitionBroadcastStatus,
+    ).toHaveBeenCalledWith(
+      mockDb,
+      5,
+      ["pending", "queued", "paused"],
+      "cancelled",
+    );
+    expect(
+      workflowBroadcastRepo.cancelPendingStepsForBroadcast,
+    ).toHaveBeenCalledWith(mockDb, 5, "Broadcast cancelled");
+  });
+
+  it("doesn't touch steps when the broadcast can't be cancelled", async () => {
+    vi.mocked(
+      workflowBroadcastRepo.transitionBroadcastStatus,
+    ).mockResolvedValue(undefined);
+
+    await expect(
+      service.cancelBroadcast(mockDb, 10, "wf_abc", "bc_abc"),
+    ).rejects.toThrow(ConflictException);
+    expect(
+      workflowBroadcastRepo.cancelPendingStepsForBroadcast,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("throws NotFoundException for an unknown broadcast", async () => {
+    vi.mocked(workflowBroadcastRepo.getBroadcastByPublicId).mockResolvedValue(
+      undefined,
+    );
+
+    await expect(
+      service.pauseBroadcast(mockDb, 10, "wf_abc", "bc_missing"),
+    ).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -731,6 +980,7 @@ describe("listBroadcasts", () => {
         publicId: "bc_abc",
         status: "queued",
         matchedCount: 42,
+        sendOverMs: 2 * 60 * 60 * 1000,
         createdAt: new Date("2026-01-01T00:00:00Z"),
       },
     ] as any);
@@ -745,6 +995,7 @@ describe("listBroadcasts", () => {
         publicId: "bc_abc",
         status: "queued",
         matchedCount: 42,
+        sendOverHours: 2,
         createdAt: "2026-01-01T00:00:00.000Z",
       },
     ]);
@@ -883,6 +1134,7 @@ describe("getBroadcast", () => {
       publicId: "bc_abc",
       status: "queued",
       matchedCount: 3,
+      sendOverMs: null,
       createdAt: new Date("2026-01-01T00:00:00Z"),
     } as any);
     vi.mocked(workflowBroadcastRepo.getBroadcastStepCounts).mockResolvedValue({
@@ -903,6 +1155,7 @@ describe("getBroadcast", () => {
       publicId: "bc_abc",
       status: "queued",
       matchedCount: 3,
+      sendOverHours: null,
       createdAt: "2026-01-01T00:00:00.000Z",
       sentCount: 2,
       failedCount: 0,

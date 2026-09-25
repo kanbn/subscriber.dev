@@ -25,6 +25,15 @@ import {
 
 const SETUP_JOB_CHUNK_SIZE = 2000;
 
+export function sendWindowOffsetMs(
+  index: number,
+  total: number,
+  sendOverMs: number | null,
+): number {
+  if (!sendOverMs || total <= 1) return 0;
+  return Math.floor((index * sendOverMs) / total);
+}
+
 @Processor(BROADCAST_DISPATCH_QUEUE_NAME, { concurrency: 3 })
 @Injectable()
 export class BroadcastDispatchProcessor extends WorkerHost {
@@ -42,7 +51,7 @@ export class BroadcastDispatchProcessor extends WorkerHost {
       db,
       job.data.broadcastId,
     );
-    if (!broadcast) return;
+    if (!broadcast || broadcast.status === "cancelled") return;
 
     const subscriberIds = await resolveAudienceSubscriberIds(
       db,
@@ -50,14 +59,20 @@ export class BroadcastDispatchProcessor extends WorkerHost {
       broadcast.audienceQuery as AudienceCondition,
     );
 
-    for (let i = 0; i < subscriberIds.length; i += SETUP_JOB_CHUNK_SIZE) {
+    const total = subscriberIds.length;
+    for (let i = 0; i < total; i += SETUP_JOB_CHUNK_SIZE) {
       const chunk = subscriberIds.slice(i, i + SETUP_JOB_CHUNK_SIZE);
       await this.setupQueue.addBulk(
-        chunk.map((subscriberId) => ({
+        chunk.map((subscriberId, j) => ({
           name: BROADCAST_SETUP_JOB_NAME,
           data: {
             broadcastId: broadcast.id,
             subscriberId,
+            startDelayMs: sendWindowOffsetMs(
+              i + j,
+              total,
+              broadcast.sendOverMs,
+            ),
           } satisfies BroadcastSetupJobData,
           opts: {
             jobId: `broadcast-${broadcast.id}-subscriber-${subscriberId}`,
@@ -70,10 +85,11 @@ export class BroadcastDispatchProcessor extends WorkerHost {
       );
     }
 
-    await workflowBroadcastRepo.updateBroadcastProgress(db, broadcast.id, {
-      matchedCount: subscriberIds.length,
-      status: "queued",
-    });
+    await workflowBroadcastRepo.markBroadcastDispatched(
+      db,
+      broadcast.id,
+      total,
+    );
   }
 
   @OnWorkerEvent("failed")
@@ -85,11 +101,7 @@ export class BroadcastDispatchProcessor extends WorkerHost {
 
     if ((job.attemptsMade ?? 0) >= (job.opts.attempts ?? 1)) {
       const db = createDrizzleClient();
-      await workflowBroadcastRepo.updateBroadcastProgress(
-        db,
-        job.data.broadcastId,
-        { status: "failed" },
-      );
+      await workflowBroadcastRepo.markBroadcastFailed(db, job.data.broadcastId);
     }
   }
 }

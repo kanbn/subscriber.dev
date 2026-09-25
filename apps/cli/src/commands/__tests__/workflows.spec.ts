@@ -3,6 +3,7 @@ import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  cancelBroadcast,
   createWorkflow,
   deleteWorkflow,
   getWorkflow,
@@ -10,6 +11,8 @@ import {
   listEnvironmentRuns,
   listWorkflowRuns,
   listWorkflows,
+  pauseBroadcast,
+  resumeBroadcast,
   triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
@@ -29,6 +32,9 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   listEnvironmentRuns: vi.fn(),
   triggerBroadcast: vi.fn(),
   listBroadcasts: vi.fn(),
+  pauseBroadcast: vi.fn(),
+  resumeBroadcast: vi.fn(),
+  cancelBroadcast: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
@@ -684,6 +690,119 @@ describe("workflows broadcast", () => {
     expect(errorSpy).toHaveBeenCalledWith("Workflow not found.");
     expect(process.exitCode).toBe(1);
 
+    process.exitCode = undefined;
+  });
+});
+
+describe("workflows broadcast --send-over-hours", () => {
+  it("passes the send window through", async () => {
+    vi.mocked(readFileSync).mockReturnValue(
+      JSON.stringify({ type: "optedIn" }),
+    );
+    vi.mocked(triggerBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { broadcastId: "bc_1", status: "pending" },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      [
+        "workflows",
+        "broadcast",
+        "test-workflow-1",
+        "--audience",
+        "audience.json",
+        "--send-over-hours",
+        "48",
+      ],
+      { from: "user" },
+    );
+
+    expect(triggerBroadcast).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      { audience: { type: "optedIn" }, sendOverHours: 48 },
+    );
+  });
+
+  it("rejects an out-of-range window without calling the API", async () => {
+    vi.mocked(readFileSync).mockReturnValue(
+      JSON.stringify({ type: "optedIn" }),
+    );
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      [
+        "workflows",
+        "broadcast",
+        "test-workflow-1",
+        "--audience",
+        "audience.json",
+        "--send-over-hours",
+        "500",
+      ],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "--send-over-hours must be between 0 and 168.",
+    );
+    expect(triggerBroadcast).not.toHaveBeenCalled();
+    expect(process.exitCode).toBe(1);
+    process.exitCode = undefined;
+  });
+});
+
+describe.each([
+  ["broadcast-pause", pauseBroadcast, "Paused", "pause"],
+  ["broadcast-resume", resumeBroadcast, "Resumed", "resume"],
+  ["broadcast-cancel", cancelBroadcast, "Cancelled", "cancel"],
+] as const)("workflows %s", (command, fn, past, verb) => {
+  it("calls the API and confirms", async () => {
+    vi.mocked(fn).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { publicId: "bc_1", status: "paused" },
+    } as never);
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["workflows", command, "test-workflow-1", "bc_1"],
+      { from: "user" },
+    );
+
+    expect(fn).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      "bc_1",
+    );
+    expect(logSpy).toHaveBeenCalledWith(`${past} broadcast bc_1.`);
+  });
+
+  it("explains a 409 for a broadcast in the wrong status", async () => {
+    vi.mocked(fn).mockResolvedValue({
+      status: 409,
+      headers: new Headers(),
+      data: undefined,
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    process.exitCode = undefined;
+
+    await buildProgram().parseAsync(
+      ["workflows", command, "test-workflow-1", "bc_1"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      `Can't ${verb} this broadcast in its current status.`,
+    );
+    expect(process.exitCode).toBe(1);
     process.exitCode = undefined;
   });
 });
