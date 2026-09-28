@@ -1,19 +1,33 @@
 import { Box, Text, useInput } from "ink";
 import { useState } from "react";
 
+import type { UpsertIntegrationDto } from "@subscriber.dev/api-client/cli";
 import {
   deleteIntegration,
   getIntegration,
   setPrimaryIntegration,
+  upsertIntegration,
 } from "@subscriber.dev/api-client/cli";
 
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
+import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateForm.js";
 import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
+import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
+import {
+  cloudflareIntegrationBody,
+  smtpIntegrationBody,
+} from "../integrationBodies.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
 type PrimaryStatus = "idle" | "setting" | "error";
+
+const EDITABLE_TYPES = ["smtp", "cloudflare"];
+
+function text(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined) return "—";
@@ -51,9 +65,21 @@ export function IntegrationDetailScreen({
   const [primaryStatus, setPrimaryStatus] = useState<PrimaryStatus>("idle");
   const [primaryError, setPrimaryError] = useState("");
 
+  const [editing, setEditing] = useState(false);
+
   const isPrimary = state.status === "ready" && state.data.priority === 1;
+  const canEdit = state.status === "ready" && EDITABLE_TYPES.includes(type);
 
   useInput((input) => {
+    if (editing) return;
+    if (
+      deleteStatus === "idle" &&
+      canEdit &&
+      (input === "e" || input === "E")
+    ) {
+      setEditing(true);
+      return;
+    }
     if (deleteStatus === "idle" && (input === "d" || input === "D")) {
       setDeleteStatus("confirming");
     }
@@ -83,6 +109,73 @@ export function IntegrationDetailScreen({
       setPrimaryStatus("error");
     }
   };
+
+  const handleSave = async (
+    body: Record<string, unknown>,
+  ): Promise<string | undefined> => {
+    try {
+      const response = await upsertIntegration(
+        environmentId,
+        type,
+        body as unknown as UpsertIntegrationDto,
+      );
+      if (response.status === 400) {
+        return "Invalid config or failed verification.";
+      }
+      if (response.status !== 200) {
+        return "Failed to save integration.";
+      }
+      setEditing(false);
+      setRefreshKey((key) => key + 1);
+      return undefined;
+    } catch (err) {
+      return err instanceof Error ? err.message : String(err);
+    }
+  };
+
+  if (editing && state.status === "ready") {
+    const data = state.data;
+    return (
+      <Box flexDirection="column">
+        <Text bold>Edit integration: {type}</Text>
+        <Text dimColor>
+          Leave secret fields blank to keep the current ones.
+        </Text>
+        {type === "smtp" ? (
+          <IntegrationCreateForm
+            editing
+            initialValues={{
+              host: text(data.host),
+              port: data.port === undefined ? "" : String(data.port),
+              secure: data.secure !== false,
+              fromEmail: text(data.fromEmail),
+              fromName: text(data.fromName),
+              replyTo: text(data.replyTo),
+            }}
+            onSubmit={(values) =>
+              handleSave(smtpIntegrationBody(values, { editing: true }))
+            }
+            onCancel={() => setEditing(false)}
+          />
+        ) : (
+          <CloudflareEmailCreateForm
+            editing
+            initialValues={{
+              accountId: text(data.accountId),
+              fromEmail: text(data.fromEmail),
+              fromName: text(data.fromName),
+              replyTo: text(data.replyTo),
+              zoneId: text(data.zoneId),
+            }}
+            onSubmit={(values) =>
+              handleSave(cloudflareIntegrationBody(values, { editing: true }))
+            }
+            onCancel={() => setEditing(false)}
+          />
+        )}
+      </Box>
+    );
+  }
 
   const handleConfirmDelete = async () => {
     setDeleteStatus("deleting");
@@ -136,7 +229,7 @@ export function IntegrationDetailScreen({
       <Hints
         text={
           deleteStatus === "idle"
-            ? `d remove${isPrimary ? "" : " · p set primary"} · Esc back · q quit`
+            ? `${canEdit ? "e edit · " : ""}d remove${isPrimary ? "" : " · p set primary"} · Esc back · q quit`
             : "↑↓ navigate · Enter select"
         }
       />

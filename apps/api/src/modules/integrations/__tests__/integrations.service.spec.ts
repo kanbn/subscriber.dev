@@ -5,7 +5,7 @@ import type { dbClient } from "@subscriber.dev/db/client";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import { verifySmtpConnection } from "@subscriber.dev/email";
 
-import { encrypt } from "../../../common/encryption.js";
+import { decrypt, encrypt } from "../../../common/encryption.js";
 import { IntegrationsService } from "../integrations.service.js";
 
 vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
@@ -22,6 +22,7 @@ vi.mock("@subscriber.dev/email", () => ({
 
 vi.mock("../../../common/encryption.js", () => ({
   encrypt: vi.fn().mockReturnValue("encrypted-blob"),
+  decrypt: vi.fn(),
 }));
 
 const mockDb = {} as dbClient;
@@ -148,6 +149,86 @@ describe("upsert", () => {
     expect(result).toEqual(
       expect.objectContaining({ type: "smtp", host: "smtp.example.com" }),
     );
+  });
+
+  describe("updating an existing integration", () => {
+    const { user, password, ...configOnly } = validSmtpBody;
+
+    beforeEach(() => {
+      vi.mocked(
+        environmentIntegrationsRepo.getByEnvironmentAndType,
+      ).mockResolvedValue({
+        type: "smtp",
+        config: configOnly,
+        encryptedSecret: "stored-blob",
+        priority: 1,
+      } as any);
+      vi.mocked(decrypt).mockReturnValue(
+        JSON.stringify({ user: "stored-user", password: "stored-pass" }),
+      );
+      vi.mocked(
+        environmentIntegrationsRepo.upsertIntegration,
+      ).mockResolvedValue({
+        type: "smtp",
+        config: configOnly,
+        priority: 1,
+        updatedAt: new Date("2026-01-01"),
+      } as any);
+    });
+
+    it("keeps the stored secret when the update leaves it out", async () => {
+      await service.upsert(
+        mockDb,
+        10,
+        "smtp",
+        { ...configOnly, replyTo: "henry@kan.bn" },
+        1,
+      );
+
+      expect(decrypt).toHaveBeenCalledWith("stored-blob");
+      expect(verifySmtpConnection).toHaveBeenCalledWith(
+        expect.objectContaining({
+          user: "stored-user",
+          password: "stored-pass",
+        }),
+      );
+      expect(encrypt).toHaveBeenCalledWith(
+        JSON.stringify({ user: "stored-user", password: "stored-pass" }),
+      );
+      const [, , , savedConfig] = vi.mocked(
+        environmentIntegrationsRepo.upsertIntegration,
+      ).mock.calls[0]!;
+      expect(savedConfig).toEqual(
+        expect.objectContaining({ replyTo: "henry@kan.bn" }),
+      );
+    });
+
+    it("replaces just the secret fields that are given", async () => {
+      await service.upsert(
+        mockDb,
+        10,
+        "smtp",
+        { ...configOnly, password: "new-pass" },
+        1,
+      );
+
+      expect(encrypt).toHaveBeenCalledWith(
+        JSON.stringify({ user: "stored-user", password: "new-pass" }),
+      );
+    });
+
+    it("still refuses to save if the kept credentials no longer verify", async () => {
+      vi.mocked(verifySmtpConnection).mockRejectedValue(
+        new Error("Invalid login"),
+      );
+
+      await expect(
+        service.upsert(mockDb, 10, "smtp", configOnly, 1),
+      ).rejects.toThrow("Invalid login");
+      expect(
+        environmentIntegrationsRepo.upsertIntegration,
+      ).not.toHaveBeenCalled();
+    });
   });
 
   it("appends new integrations to the end of the existing failover order", async () => {

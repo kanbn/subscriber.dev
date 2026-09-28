@@ -45,7 +45,7 @@ export class IntegrationsController {
     operationId: "upsertIntegration",
     summary: "Configure an integration",
     description:
-      'Creates or updates the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned.',
+      'Creates or updates the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full.',
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "type", type: "string" })

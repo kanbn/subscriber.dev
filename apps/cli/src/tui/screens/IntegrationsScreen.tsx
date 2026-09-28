@@ -14,6 +14,10 @@ import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateForm.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
+import {
+  cloudflareIntegrationBody,
+  smtpIntegrationBody,
+} from "../integrationBodies.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 type Mode = "list" | "choosing-type" | "creating-smtp" | "creating-cloudflare";
@@ -46,16 +50,7 @@ export function IntegrationsScreen({
     values: IntegrationCreateValues,
   ): Promise<string | undefined> => {
     try {
-      const body = {
-        host: values.host.trim(),
-        port: values.port.trim(),
-        secure: values.secure,
-        fromEmail: values.fromEmail.trim(),
-        fromName: values.fromName.trim() || undefined,
-        replyTo: values.replyTo.trim() || undefined,
-        user: values.user.trim(),
-        password: values.password,
-      };
+      const body = smtpIntegrationBody(values);
       const response = await upsertIntegration(
         environmentId,
         "smtp",
@@ -78,14 +73,7 @@ export function IntegrationsScreen({
     values: CloudflareEmailCreateValues,
   ): Promise<string | undefined> => {
     try {
-      const body = {
-        accountId: values.accountId.trim(),
-        fromEmail: values.fromEmail.trim(),
-        fromName: values.fromName.trim() || undefined,
-        replyTo: values.replyTo.trim() || undefined,
-        apiToken: values.apiToken.trim(),
-        zoneId: values.zoneId.trim() || undefined,
-      };
+      const body = cloudflareIntegrationBody(values);
       const response = await upsertIntegration(
         environmentId,
         "cloudflare",

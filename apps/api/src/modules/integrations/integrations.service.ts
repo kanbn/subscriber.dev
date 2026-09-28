@@ -7,7 +7,7 @@ import {
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 
-import { encrypt } from "../../common/encryption.js";
+import { decrypt, encrypt } from "../../common/encryption.js";
 import { INTEGRATION_PROVIDERS } from "./providers/index.js";
 
 function toResponse(row: {
@@ -46,7 +46,21 @@ export class IntegrationsService {
       });
     }
 
-    const secretResult = provider.secretSchema.safeParse(body);
+    const current = await environmentIntegrationsRepo.getByEnvironmentAndType(
+      db,
+      environmentId,
+      type,
+    );
+    const storedSecret = current?.encryptedSecret
+      ? (JSON.parse(decrypt(current.encryptedSecret)) as Record<
+          string,
+          unknown
+        >)
+      : {};
+    const secretResult = provider.secretSchema.safeParse({
+      ...storedSecret,
+      ...body,
+    });
     if (!secretResult.success) {
       throw new BadRequestException({
         message: "Validation failed",

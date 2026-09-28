@@ -5122,7 +5122,7 @@ export const useRecordInboundBounce = <TError = void,
     }
     
 /**
- * Creates or updates the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned.
+ * Creates or updates the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full.
  * @summary Configure an integration
  */
 export type upsertIntegrationResponse200 = {

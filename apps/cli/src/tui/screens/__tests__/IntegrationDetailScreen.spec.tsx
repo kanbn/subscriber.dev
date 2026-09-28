@@ -5,6 +5,7 @@ import {
   deleteIntegration,
   getIntegration,
   setPrimaryIntegration,
+  upsertIntegration,
 } from "@subscriber.dev/api-client/cli";
 
 import { IntegrationDetailScreen } from "../IntegrationDetailScreen.js";
@@ -13,6 +14,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   getIntegration: vi.fn(),
   deleteIntegration: vi.fn(),
   setPrimaryIntegration: vi.fn(),
+  upsertIntegration: vi.fn(),
 }));
 
 function renderScreen(onDeleted = vi.fn()) {
@@ -182,5 +184,98 @@ describe("IntegrationDetailScreen set primary", () => {
       expect(lastFrame()).toContain("priority: 1");
     });
     expect(lastFrame()).not.toContain("p set primary");
+  });
+});
+
+describe("IntegrationDetailScreen edit", () => {
+  const smtpConfig = {
+    type: "smtp",
+    host: "smtp.example.com",
+    port: 465,
+    secure: true,
+    fromEmail: "hello@example.com",
+    fromName: "Example",
+    priority: 1,
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  };
+
+  async function openEditor() {
+    vi.mocked(getIntegration).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: smtpConfig,
+    } as never);
+    const screen = renderScreen();
+    await vi.waitFor(() => {
+      expect(screen.lastFrame()).toContain("host: smtp.example.com");
+    });
+    await tick();
+    screen.stdin.write("e");
+    await vi.waitFor(() => {
+      expect(screen.lastFrame()).toContain("Edit integration: smtp");
+    });
+    return screen;
+  }
+
+  it("opens a form pre-filled with the current config, keeping secrets unless changed", async () => {
+    const { lastFrame } = await openEditor();
+
+    expect(lastFrame()).toContain("Host: smtp.example.com");
+    expect(lastFrame()).toContain("From name: Example");
+    expect(lastFrame()).toContain("SMTP password: (unchanged)");
+    expect(lastFrame()).toContain("Save changes");
+  });
+
+  it("saves the edited config without sending secrets that were left blank", async () => {
+    vi.mocked(upsertIntegration).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: smtpConfig,
+    } as never);
+    const { lastFrame, stdin } = await openEditor();
+
+    // Menu: Host, Port, From email, From name, Reply-to, user, password,
+    // Secure, Save changes. Move to Reply-to and set it.
+    for (let i = 0; i < 4; i++) {
+      await tick();
+      stdin.write("\u001B[B");
+    }
+    await tick();
+    stdin.write("\r");
+    await tick();
+    stdin.write("henry@kan.bn");
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Reply-to email (optional): henry@kan.bn");
+    });
+
+    // The menu returns to the top after editing a field; "Save changes"
+    // is 8 items down (after the 7 text fields and Secure).
+    for (let i = 0; i < 8; i++) {
+      await tick();
+      stdin.write("\u001B[B");
+    }
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(upsertIntegration).toHaveBeenCalled();
+    });
+    const [environmentId, type, body] =
+      vi.mocked(upsertIntegration).mock.calls[0]!;
+    expect(environmentId).toBe("test-environment-1");
+    expect(type).toBe("smtp");
+    expect(body).toEqual(
+      expect.objectContaining({
+        host: "smtp.example.com",
+        replyTo: "henry@kan.bn",
+        user: undefined,
+        password: undefined,
+      }),
+    );
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("Edit integration");
+    });
   });
 });

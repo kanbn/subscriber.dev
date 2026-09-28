@@ -32,8 +32,14 @@ const CANCEL_VALUE = "__cancel__";
 
 type Mode = "menu" | "editing-text" | "submitting";
 
-function fieldPreview(key: TextFieldKey, value: string): string {
-  if (value.length === 0) return "—";
+function fieldPreview(
+  key: TextFieldKey,
+  value: string,
+  editing: boolean,
+): string {
+  if (value.length === 0) {
+    return editing && key === "apiToken" ? "(unchanged)" : "—";
+  }
   const field = TEXT_FIELDS.find((f) => f.key === key);
   return field?.mask ? "•".repeat(Math.min(value.length, 8)) : value;
 }
@@ -41,11 +47,16 @@ function fieldPreview(key: TextFieldKey, value: string): string {
 export function CloudflareEmailCreateForm({
   onSubmit,
   onCancel,
+  initialValues,
+  editing = false,
 }: {
   onSubmit: (
     values: CloudflareEmailCreateValues,
   ) => Promise<string | undefined>;
   onCancel: () => void;
+  initialValues?: Partial<CloudflareEmailCreateValues>;
+  // Editing an existing integration: a blank API token keeps the stored one.
+  editing?: boolean;
 }) {
   const [values, setValues] = useState<CloudflareEmailCreateValues>({
     accountId: "",
@@ -54,6 +65,7 @@ export function CloudflareEmailCreateForm({
     replyTo: "",
     apiToken: "",
     zoneId: "",
+    ...initialValues,
   });
   const [mode, setMode] = useState<Mode>("menu");
   const [editingField, setEditingField] = useState<TextFieldKey | null>(null);
@@ -63,9 +75,13 @@ export function CloudflareEmailCreateForm({
     if (
       values.accountId.trim().length === 0 ||
       values.fromEmail.trim().length === 0 ||
-      values.apiToken.trim().length === 0
+      (!editing && values.apiToken.trim().length === 0)
     ) {
-      setError("Account ID, from email, and API token are required.");
+      setError(
+        editing
+          ? "Account ID and from email are required."
+          : "Account ID, from email, and API token are required.",
+      );
       return;
     }
     setError("");
@@ -96,7 +112,7 @@ export function CloudflareEmailCreateForm({
   }
 
   if (mode === "submitting") {
-    return <Text color="gray">Creating…</Text>;
+    return <Text color="gray">{editing ? "Saving…" : "Creating…"}</Text>;
   }
 
   return (
@@ -105,10 +121,13 @@ export function CloudflareEmailCreateForm({
       <SelectInput
         items={[
           ...TEXT_FIELDS.map((field) => ({
-            label: `${field.label}: ${fieldPreview(field.key, values[field.key])}`,
+            label: `${field.label}: ${fieldPreview(field.key, values[field.key], editing)}`,
             value: field.key as string,
           })),
-          { label: "Create integration", value: SUBMIT_VALUE },
+          {
+            label: editing ? "Save changes" : "Create integration",
+            value: SUBMIT_VALUE,
+          },
           { label: "Cancel", value: CANCEL_VALUE },
         ]}
         onSelect={(item) => {
