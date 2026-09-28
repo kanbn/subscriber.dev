@@ -6,6 +6,7 @@ import {
   getBroadcast,
   listBroadcasts,
   pauseBroadcast,
+  redispatchBroadcast,
 } from "@subscriber.dev/api-client/cli";
 
 import { BroadcastsScreen } from "../BroadcastsScreen.js";
@@ -16,6 +17,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   pauseBroadcast: vi.fn(),
   resumeBroadcast: vi.fn(),
   cancelBroadcast: vi.fn(),
+  redispatchBroadcast: vi.fn(),
 }));
 
 const testBroadcast = {
@@ -317,6 +319,34 @@ describe("BroadcastsScreen detail", () => {
       expect(lastFrame()).toContain("Cancelled.");
     });
     expect(cancelBroadcast).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-workflow-1",
+      "test-broadcast-1",
+    );
+  });
+
+  it("sets up missing subscribers with 's' once confirmed", async () => {
+    vi.mocked(redispatchBroadcast).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testBroadcast,
+    } as never);
+    const { lastFrame, stdin } = await openDetail();
+
+    await tick();
+    stdin.write("s");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("hasn't been set up yet?");
+    });
+    await tick();
+    stdin.write("\u001B[A");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Setting up remaining subscribers.");
+    });
+    expect(redispatchBroadcast).toHaveBeenCalledWith(
       "test-environment-1",
       "test-workflow-1",
       "test-broadcast-1",

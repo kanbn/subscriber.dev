@@ -5024,6 +5024,107 @@ export const useCancelBroadcast = <TError = void,
     }
     
 /**
+ * Re-runs setup for every matching subscriber who hasn't been set up yet (for example after setup jobs failed), spread over a fresh send window. Subscribers already set up are skipped, so nobody receives the email twice.
+ * @summary Re-dispatch a broadcast
+ */
+export type redispatchBroadcastResponse200 = {
+  data: BroadcastSummaryDto
+  status: 200
+}
+
+export type redispatchBroadcastResponse404 = {
+  data: void
+  status: 404
+}
+
+export type redispatchBroadcastResponse409 = {
+  data: void
+  status: 409
+}
+    
+export type redispatchBroadcastResponseSuccess = (redispatchBroadcastResponse200) & {
+  headers: Headers;
+};
+export type redispatchBroadcastResponseError = (redispatchBroadcastResponse404 | redispatchBroadcastResponse409) & {
+  headers: Headers;
+};
+
+export type redispatchBroadcastResponse = (redispatchBroadcastResponseSuccess | redispatchBroadcastResponseError)
+
+export const getRedispatchBroadcastUrl = (environmentId: string,
+    workflowId: string,
+    broadcastId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}/redispatch`
+}
+
+export const redispatchBroadcast = async (environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: RequestInit): Promise<redispatchBroadcastResponse> => {
+  
+  return customFetch<redispatchBroadcastResponse>(getRedispatchBroadcastUrl(environmentId,workflowId,broadcastId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getRedispatchBroadcastMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof redispatchBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof redispatchBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext> => {
+
+const mutationKey = ['redispatchBroadcast'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof redispatchBroadcast>>, {environmentId: string;workflowId: string;broadcastId: string}> = (props) => {
+          const {environmentId,workflowId,broadcastId} = props ?? {};
+
+          return  redispatchBroadcast(environmentId,workflowId,broadcastId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RedispatchBroadcastMutationResult = NonNullable<Awaited<ReturnType<typeof redispatchBroadcast>>>
+    
+    export type RedispatchBroadcastMutationError = void
+
+    /**
+ * @summary Re-dispatch a broadcast
+ */
+export const useRedispatchBroadcast = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof redispatchBroadcast>>, TError,{environmentId: string;workflowId: string;broadcastId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof redispatchBroadcast>>,
+        TError,
+        {environmentId: string;workflowId: string;broadcastId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getRedispatchBroadcastMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
  * Generic bounce-recording endpoint, identified by the run step's publicId - callers are expected to have that publicId available via whatever mechanism they use to learn about the bounce (e.g. a provider's native webhook echoing back metadata set at send time). Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.
  * @summary Record an inbound bounce event
  */

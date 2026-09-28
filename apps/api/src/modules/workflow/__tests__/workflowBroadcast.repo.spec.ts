@@ -10,7 +10,6 @@ import {
   getBroadcastStepCounts,
   listBroadcastsForWorkflow,
   transitionBroadcastStatus,
-  updateBroadcastProgress,
 } from "@subscriber.dev/db/repository/workflowBroadcast.repo";
 
 function makeInsertChain(value: unknown) {
@@ -102,34 +101,6 @@ describe("getBroadcastById", () => {
 
     const result = await getBroadcastById(db, 999);
     expect(result).toBeUndefined();
-  });
-});
-
-describe("updateBroadcastProgress", () => {
-  it("updates matchedCount and status", async () => {
-    const row = { id: 1, matchedCount: 42, status: "queued" };
-    const updateChain = makeUpdateChain([row]);
-    const db = makeMockDb({ updateChain });
-
-    const result = await updateBroadcastProgress(db, 1, {
-      matchedCount: 42,
-      status: "queued",
-    });
-
-    expect(result).toEqual(row);
-    expect(updateChain.set).toHaveBeenCalledWith({
-      matchedCount: 42,
-      status: "queued",
-    });
-  });
-
-  it("updates status alone (e.g. marking failed)", async () => {
-    const updateChain = makeUpdateChain([{ id: 1, status: "failed" }]);
-    const db = makeMockDb({ updateChain });
-
-    await updateBroadcastProgress(db, 1, { status: "failed" });
-
-    expect(updateChain.set).toHaveBeenCalledWith({ status: "failed" });
   });
 });
 

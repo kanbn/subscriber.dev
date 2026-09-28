@@ -15,6 +15,7 @@ import {
   listWorkflowRuns,
   listWorkflows,
   pauseBroadcast,
+  redispatchBroadcast,
   resumeBroadcast,
   triggerBroadcast,
   triggerWorkflow,
@@ -577,6 +578,51 @@ export function registerWorkflowsCommand(program: Command): void {
             printResult(response.data, opts);
           } else {
             console.log(`Cancelled broadcast ${broadcastId}.`);
+          }
+        },
+      ),
+    );
+
+  workflows
+    .command("broadcast-redispatch <workflowId> <broadcastId>")
+    .description(
+      "Set up every matching subscriber who hasn't been set up yet (e.g. after setup failed), over a fresh send window; anyone already set up is skipped",
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          broadcastId: string,
+          opts: { environment?: string; json?: boolean },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await redispatchBroadcast(
+            environmentId,
+            workflowId,
+            broadcastId,
+          );
+          if (response.status === 404) {
+            console.error("Workflow or broadcast not found.");
+            process.exitCode = 1;
+            return;
+          }
+          if (response.status === 409) {
+            console.error(
+              `Can't re-dispatch this broadcast in its current status.`,
+            );
+            process.exitCode = 1;
+            return;
+          }
+          if (opts.json) {
+            printResult(response.data, opts);
+          } else {
+            console.log(`Re-dispatched broadcast ${broadcastId}.`);
           }
         },
       ),

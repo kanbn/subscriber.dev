@@ -2913,6 +2913,59 @@ export const cancelBroadcast = async (environmentId: string,
 
 
 /**
+ * Re-runs setup for every matching subscriber who hasn't been set up yet (for example after setup jobs failed), spread over a fresh send window. Subscribers already set up are skipped, so nobody receives the email twice.
+ * @summary Re-dispatch a broadcast
+ */
+export type redispatchBroadcastResponse200 = {
+  data: BroadcastSummaryDto
+  status: 200
+}
+
+export type redispatchBroadcastResponse404 = {
+  data: void
+  status: 404
+}
+
+export type redispatchBroadcastResponse409 = {
+  data: void
+  status: 409
+}
+    
+export type redispatchBroadcastResponseSuccess = (redispatchBroadcastResponse200) & {
+  headers: Headers;
+};
+export type redispatchBroadcastResponseError = (redispatchBroadcastResponse404 | redispatchBroadcastResponse409) & {
+  headers: Headers;
+};
+
+export type redispatchBroadcastResponse = (redispatchBroadcastResponseSuccess | redispatchBroadcastResponseError)
+
+export const getRedispatchBroadcastUrl = (environmentId: string,
+    workflowId: string,
+    broadcastId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/workflows/${workflowId}/broadcasts/${broadcastId}/redispatch`
+}
+
+export const redispatchBroadcast = async (environmentId: string,
+    workflowId: string,
+    broadcastId: string, options?: RequestInit): Promise<redispatchBroadcastResponse> => {
+  
+  return cliFetch<redispatchBroadcastResponse>(getRedispatchBroadcastUrl(environmentId,workflowId,broadcastId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+/**
  * Generic bounce-recording endpoint, identified by the run step's publicId - callers are expected to have that publicId available via whatever mechanism they use to learn about the bounce (e.g. a provider's native webhook echoing back metadata set at send time). Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.
  * @summary Record an inbound bounce event
  */

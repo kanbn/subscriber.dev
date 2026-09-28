@@ -12,6 +12,7 @@ import {
   listWorkflowRuns,
   listWorkflows,
   pauseBroadcast,
+  redispatchBroadcast,
   resumeBroadcast,
   triggerBroadcast,
   triggerWorkflow,
@@ -35,6 +36,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   pauseBroadcast: vi.fn(),
   resumeBroadcast: vi.fn(),
   cancelBroadcast: vi.fn(),
+  redispatchBroadcast: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
@@ -761,6 +763,7 @@ describe.each([
   ["broadcast-pause", pauseBroadcast, "Paused", "pause"],
   ["broadcast-resume", resumeBroadcast, "Resumed", "resume"],
   ["broadcast-cancel", cancelBroadcast, "Cancelled", "cancel"],
+  ["broadcast-redispatch", redispatchBroadcast, "Re-dispatched", "re-dispatch"],
 ] as const)("workflows %s", (command, fn, past, verb) => {
   it("calls the API and confirms", async () => {
     vi.mocked(fn).mockResolvedValue({

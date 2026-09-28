@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import type { WorkflowRunStepStatus } from "@subscriber.dev/db/schema";
@@ -105,6 +105,22 @@ export const getRunById = async (db: dbClient, id: number) => {
   return await db.query.workflowRuns.findFirst({
     where: eq(workflowRuns.id, id),
   });
+};
+
+export const listUnqueuedPendingSteps = async (db: dbClient, runId: number) => {
+  return await db
+    .select({
+      id: workflowRunSteps.id,
+      scheduledAt: workflowRunSteps.scheduledAt,
+    })
+    .from(workflowRunSteps)
+    .where(
+      and(
+        eq(workflowRunSteps.runId, runId),
+        eq(workflowRunSteps.status, "pending"),
+        isNull(workflowRunSteps.bullJobId),
+      ),
+    );
 };
 
 export const updateRunStepStatus = async (

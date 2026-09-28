@@ -12,26 +12,35 @@ export type dbClient = NodePgDatabase<typeof schema> & {
   $client: Pool;
 };
 
+const DEFAULT_POOL_MAX = 20;
+
+let client: dbClient | undefined;
+
 export const createDrizzleClient = (): dbClient => {
+  if (client) return client;
+
   const connectionString = process.env.POSTGRES_URL;
 
   if (!connectionString) {
     console.log("POSTGRES_URL environment variable is not set, using PGLite");
 
-    const client = new PGlite({
+    const pglite = new PGlite({
       dataDir: "./pgdata",
       extensions: { uuid_ossp },
     });
-    const db = drizzlePgLite(client, { schema });
+    const db = drizzlePgLite(pglite, { schema });
 
     migrate(db, { migrationsFolder: "../../packages/db/migrations" });
 
-    return db as unknown as dbClient;
+    client = db as unknown as dbClient;
+    return client;
   }
 
   const pool = new Pool({
     connectionString,
+    max: Number(process.env.POSTGRES_POOL_MAX) || DEFAULT_POOL_MAX,
   });
 
-  return drizzlePg(pool, { schema }) as dbClient;
+  client = drizzlePg(pool, { schema }) as dbClient;
+  return client;
 };

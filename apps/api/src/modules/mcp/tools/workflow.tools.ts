@@ -505,4 +505,40 @@ export class WorkflowTools {
       args.broadcastId,
     );
   }
+
+  @Tool({
+    name: "redispatch_broadcast",
+    description:
+      "Re-run setup for a queued broadcast (once its first dispatch has finished): every matching subscriber who hasn't been set up yet (e.g. after setup jobs failed) is set up and spread over a fresh send window. Anyone already set up is skipped, so nobody gets the email twice. Sends real email/webhooks.",
+    parameters: z.object({
+      environmentId: z.string(),
+      workflowId: z.string(),
+      broadcastId: z.string(),
+    }),
+    annotations: { destructiveHint: true, openWorldHint: true },
+  })
+  async redispatchBroadcast(
+    args: {
+      environmentId: string;
+      workflowId: string;
+      broadcastId: string;
+    },
+    _context: unknown,
+    rawRequest: { user?: unknown; db?: unknown } | undefined,
+  ) {
+    const user = requireMcpUser(rawRequest);
+    const db = requireMcpDb(rawRequest);
+    const environment = await requireEnvironment(
+      db,
+      user.id,
+      args.environmentId,
+    );
+
+    return this.workflowService.redispatchBroadcast(
+      db,
+      environment.id,
+      args.workflowId,
+      args.broadcastId,
+    );
+  }
 }

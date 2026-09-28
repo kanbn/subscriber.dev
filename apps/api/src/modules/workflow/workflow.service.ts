@@ -168,19 +168,14 @@ export class WorkflowService {
 
   private async assertBroadcastNotFinished(
     db: dbClient,
-    broadcast: {
-      id: number;
-      matchedCount: number | null;
-      skippedCount: number;
-    },
+    broadcast: { id: number; matchedCount: number | null },
   ) {
     if (broadcast.matchedCount === null) return;
     const [counts, runCount] = await Promise.all([
       workflowBroadcastRepo.getBroadcastStepCounts(db, broadcast.id),
       workflowBroadcastRepo.countRunsForBroadcast(db, broadcast.id),
     ]);
-    const setUp = runCount + broadcast.skippedCount;
-    if (setUp >= broadcast.matchedCount && counts.pending === 0) {
+    if (runCount >= broadcast.matchedCount && counts.pending === 0) {
       throw new ConflictException("Broadcast has already finished sending");
     }
   }
@@ -247,6 +242,42 @@ export class WorkflowService {
     }
 
     return this.toBroadcastSummary(updated);
+  }
+
+  private async enqueueDispatch(broadcastId: number) {
+    await this.broadcastDispatchQueue.add(
+      BROADCAST_DISPATCH_JOB_NAME,
+      { broadcastId } satisfies BroadcastDispatchJobData,
+      {
+        attempts: 3,
+        backoff: { type: "exponential", delay: 60_000 },
+        removeOnComplete: true,
+        removeOnFail: 1000,
+      },
+    );
+  }
+
+  async redispatchBroadcast(
+    db: dbClient,
+    environmentId: number,
+    workflowPublicId: string,
+    broadcastPublicId: string,
+  ) {
+    const broadcast = await this.requireBroadcast(
+      db,
+      environmentId,
+      workflowPublicId,
+      broadcastPublicId,
+    );
+    if (broadcast.status !== "queued") {
+      throw new ConflictException(
+        `Broadcast can't be re-dispatched while ${broadcast.status}`,
+      );
+    }
+
+    await this.enqueueDispatch(broadcast.id);
+
+    return this.toBroadcastSummary(broadcast);
   }
 
   async cancelBroadcast(
@@ -670,16 +701,7 @@ export class WorkflowService {
       createdBy: triggeredBy,
     });
 
-    await this.broadcastDispatchQueue.add(
-      BROADCAST_DISPATCH_JOB_NAME,
-      { broadcastId: broadcast.id } satisfies BroadcastDispatchJobData,
-      {
-        attempts: 3,
-        backoff: { type: "exponential", delay: 60_000 },
-        removeOnComplete: true,
-        removeOnFail: 1000,
-      },
-    );
+    await this.enqueueDispatch(broadcast.id);
 
     return { broadcastId: broadcast.publicId, status: broadcast.status };
   }

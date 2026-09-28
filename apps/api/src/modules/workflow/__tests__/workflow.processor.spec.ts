@@ -629,6 +629,19 @@ describe("onFailed", () => {
     );
   });
 
+  it("logs instead of throwing when recording the failure itself fails", async () => {
+    vi.mocked(workflowRunRepo.getRunStepByBullJobId).mockRejectedValue(
+      new Error("sorry, too many clients already"),
+    );
+
+    await expect(
+      processor.onFailed(
+        { ...makeJob(), attemptsMade: 3, opts: { attempts: 3 } },
+        new Error("boom"),
+      ),
+    ).resolves.toBeUndefined();
+  });
+
   it("does nothing while attempts remain", async () => {
     await processor.onFailed(
       { ...makeJob(), attemptsMade: 1, opts: { attempts: 3 } },

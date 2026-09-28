@@ -11,6 +11,7 @@ import {
   getBroadcast,
   listBroadcasts,
   pauseBroadcast,
+  redispatchBroadcast,
   resumeBroadcast,
 } from "@subscriber.dev/api-client/cli";
 
@@ -22,12 +23,20 @@ import { useAsyncData } from "../useAsyncData.js";
 
 type Broadcast = ListBroadcastsResponseDtoBroadcastsItem;
 type Mode = "list" | "loading-detail" | "detail";
-type ActionStatus = "idle" | "confirming-cancel" | "working";
+type ActionStatus =
+  | "idle"
+  | "confirming-cancel"
+  | "confirming-redispatch"
+  | "working";
 
 const ACTIONS = {
   pause: { call: pauseBroadcast, done: "Paused." },
   resume: { call: resumeBroadcast, done: "Resumed." },
   cancel: { call: cancelBroadcast, done: "Cancelled." },
+  redispatch: {
+    call: redispatchBroadcast,
+    done: "Setting up remaining subscribers.",
+  },
 } as const;
 
 function formatSendWindow(sendOverHours: unknown): string {
@@ -103,6 +112,8 @@ export function BroadcastsScreen({
       void runAction("resume");
     } else if (key === "c") {
       setActionStatus("confirming-cancel");
+    } else if (key === "s") {
+      setActionStatus("confirming-redispatch");
     }
   });
 
@@ -182,6 +193,15 @@ export function BroadcastsScreen({
         ) : (
           <Text color="red">Error: {detailError}</Text>
         )}
+        {actionStatus === "confirming-redispatch" && detail && (
+          <ConfirmPrompt
+            message="Set up every matching subscriber who hasn't been set up yet? They'll be sent this email over a fresh send window. Anyone already set up is skipped."
+            confirmLabel="Yes, set them up"
+            cancelLabel="No, leave it"
+            onConfirm={() => void runAction("redispatch")}
+            onCancel={() => setActionStatus("idle")}
+          />
+        )}
         {actionStatus === "confirming-cancel" && detail && (
           <ConfirmPrompt
             message="Cancel this broadcast? Every send that hasn't gone out yet will be stopped. This cannot be undone."
@@ -197,9 +217,10 @@ export function BroadcastsScreen({
         )}
         <Hints
           text={
-            actionStatus === "confirming-cancel"
+            actionStatus === "confirming-cancel" ||
+            actionStatus === "confirming-redispatch"
               ? "↑↓ navigate · Enter select"
-              : "p pause · r resume · c cancel · b back · q quit"
+              : "p pause · r resume · c cancel · s set up missing · b back · q quit"
           }
         />
       </Box>

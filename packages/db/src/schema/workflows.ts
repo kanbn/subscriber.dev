@@ -177,7 +177,6 @@ export const workflowBroadcasts = pgTable(
     matchedCount: integer("matchedCount"),
     sendOverMs: integer("sendOverMs"),
     pausedAt: timestamp("pausedAt"),
-    skippedCount: integer("skippedCount").notNull().default(0),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     createdBy: bigint("createdBy", { mode: "number" }).references(
       () => users.id,
@@ -242,6 +241,10 @@ export const workflowRuns = pgTable(
     index("workflow_runs_subscriberId_idx").on(table.subscriberId),
     index("workflow_runs_status_idx").on(table.status),
     index("workflow_runs_broadcastId_idx").on(table.broadcastId),
+    unique("workflow_runs_broadcast_subscriber").on(
+      table.broadcastId,
+      table.subscriberId,
+    ),
   ],
 );
 

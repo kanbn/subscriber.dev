@@ -75,7 +75,7 @@ export class BroadcastDispatchProcessor extends WorkerHost {
             ),
           } satisfies BroadcastSetupJobData,
           opts: {
-            jobId: `broadcast-${broadcast.id}-subscriber-${subscriberId}`,
+            jobId: `broadcast-${broadcast.id}-dispatch-${job.id}-subscriber-${subscriberId}`,
             attempts: 3,
             backoff: { type: "exponential" as const, delay: 60_000 },
             removeOnComplete: true,
@@ -100,8 +100,17 @@ export class BroadcastDispatchProcessor extends WorkerHost {
     );
 
     if ((job.attemptsMade ?? 0) >= (job.opts.attempts ?? 1)) {
-      const db = createDrizzleClient();
-      await workflowBroadcastRepo.markBroadcastFailed(db, job.data.broadcastId);
+      try {
+        const db = createDrizzleClient();
+        await workflowBroadcastRepo.markBroadcastFailed(
+          db,
+          job.data.broadcastId,
+        );
+      } catch (recordError) {
+        this.logger.error(
+          `Couldn't mark broadcast ${job.data.broadcastId} failed: ${recordError instanceof Error ? recordError.message : String(recordError)}`,
+        );
+      }
     }
   }
 }

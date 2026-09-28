@@ -1739,6 +1739,65 @@
         ]
       }
     },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/redispatch": {
+      "post": {
+        "operationId": "redispatchBroadcast",
+        "summary": "Re-dispatch a broadcast",
+        "description": "Re-runs setup for every matching subscriber who hasn't been set up yet (for example after setup jobs failed), spread over a fresh send window. Subscribers already set up are skipped, so nobody receives the email twice.",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          },
+          "409": {
+            "description": "Broadcast isn't queued"
+          }
+        },
+        "tags": [
+          "Workflows"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/bounces/inbound": {
       "post": {
         "operationId": "recordInboundBounce",

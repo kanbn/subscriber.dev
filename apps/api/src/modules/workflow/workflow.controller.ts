@@ -496,4 +496,36 @@ export class WorkflowController {
       broadcastId,
     );
   }
+
+  @Post(":workflowId/broadcasts/:broadcastId/redispatch")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    operationId: "redispatchBroadcast",
+    summary: "Re-dispatch a broadcast",
+    description:
+      "Re-runs setup for every matching subscriber who hasn't been set up yet (for example after setup jobs failed), spread over a fresh send window. Subscribers already set up are skipped, so nobody receives the email twice.",
+  })
+  @ApiParam({ name: "environmentId", type: "string" })
+  @ApiParam({ name: "workflowId", type: "string" })
+  @ApiParam({ name: "broadcastId", type: "string" })
+  @ApiResponse({ status: 200, type: BroadcastSummaryDto })
+  @ApiResponse({ status: 404, description: "Workflow or broadcast not found" })
+  @ApiResponse({
+    status: 409,
+    description: "Broadcast isn't queued",
+  })
+  async redispatchBroadcast(
+    @CurrentEnvironment() environment: EnvironmentForUser,
+    @Param("workflowId") workflowId: string,
+    @Param("broadcastId") broadcastId: string,
+  ): Promise<BroadcastSummaryDto> {
+    const db = createDrizzleClient();
+
+    return this.workflowService.redispatchBroadcast(
+      db,
+      environment.id,
+      workflowId,
+      broadcastId,
+    );
+  }
 }

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
@@ -18,11 +18,22 @@ const steps = [
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(workflowRunRepo.createRunWithSteps).mockResolvedValue({
-    run: { id: 7 },
-    runSteps: [{ id: 11 }, { id: 12 }],
-  } as any);
+  vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-01-01T00:00:00Z") });
+  vi.mocked(workflowRunRepo.createRunWithSteps).mockImplementation(
+    async (_db, data) =>
+      ({
+        run: { id: 7 },
+        runSteps: data.steps.map((step, i) => ({
+          id: 11 + i,
+          scheduledAt: step.scheduledAt,
+        })),
+      }) as any,
+  );
   mockQueue.add.mockResolvedValue({ id: "job" });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("createRunForSubscriber", () => {
@@ -46,9 +57,7 @@ describe("createRunForSubscriber", () => {
       (s) => s.scheduledAt.getTime() - planned[0]!.scheduledAt.getTime(),
     );
     expect(offsets).toEqual([0, 1_000]);
-    expect(planned[0]!.scheduledAt.getTime()).toBeGreaterThanOrEqual(
-      Date.now() + 59_000,
-    );
+    expect(planned[0]!.scheduledAt.getTime()).toBe(Date.now() + 60_000);
   });
 
   it("starts immediately without a start delay", async () => {

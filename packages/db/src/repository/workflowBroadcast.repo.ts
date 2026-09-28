@@ -41,20 +41,6 @@ export const getBroadcastById = async (db: dbClient, id: number) => {
   });
 };
 
-export const updateBroadcastProgress = async (
-  db: dbClient,
-  id: number,
-  data: { matchedCount?: number; status: WorkflowBroadcastStatus },
-) => {
-  const [result] = await db
-    .update(workflowBroadcasts)
-    .set(data)
-    .where(eq(workflowBroadcasts.id, id))
-    .returning();
-
-  return result;
-};
-
 export const markBroadcastDispatched = async (
   db: dbClient,
   id: number,
@@ -162,13 +148,6 @@ export const markBroadcastFailed = async (db: dbClient, id: number) => {
     );
 };
 
-export const incrementBroadcastSkipped = async (db: dbClient, id: number) => {
-  await db
-    .update(workflowBroadcasts)
-    .set({ skippedCount: sql`${workflowBroadcasts.skippedCount} + 1` })
-    .where(eq(workflowBroadcasts.id, id));
-};
-
 const broadcastRunIds = (db: dbClient, broadcastId: number) =>
   db
     .select({ id: workflowRuns.id })
@@ -193,6 +172,24 @@ export const listPendingStepsForBroadcast = async (
         eq(workflowRunSteps.status, "pending"),
       ),
     );
+};
+
+export const getRunForSubscriber = async (
+  db: dbClient,
+  broadcastId: number,
+  subscriberId: number,
+) => {
+  const [row] = await db
+    .select({ id: workflowRuns.id })
+    .from(workflowRuns)
+    .where(
+      and(
+        eq(workflowRuns.broadcastId, broadcastId),
+        eq(workflowRuns.subscriberId, subscriberId),
+      ),
+    )
+    .limit(1);
+  return row;
 };
 
 export const countRunsForBroadcast = async (

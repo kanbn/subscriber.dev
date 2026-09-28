@@ -99,13 +99,19 @@ export async function handleRunStepJobFailed(
   logger.error(`Run-step job ${job.id} failed: ${error.message}`);
 
   if ((job.attemptsMade ?? 0) >= (job.opts.attempts ?? 1)) {
-    const runStep = await workflowRunRepo.getRunStepByBullJobId(db, job.id);
-    if (runStep?.status === "pending") {
-      await workflowRunRepo.updateRunStepStatus(
-        db,
-        runStep.id,
-        "failed",
-        error.message,
+    try {
+      const runStep = await workflowRunRepo.getRunStepByBullJobId(db, job.id);
+      if (runStep?.status === "pending") {
+        await workflowRunRepo.updateRunStepStatus(
+          db,
+          runStep.id,
+          "failed",
+          error.message,
+        );
+      }
+    } catch (recordError) {
+      logger.error(
+        `Couldn't record failure of run-step job ${job.id}: ${recordError instanceof Error ? recordError.message : String(recordError)}`,
       );
     }
   }

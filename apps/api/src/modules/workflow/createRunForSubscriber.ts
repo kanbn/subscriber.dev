@@ -40,7 +40,6 @@ export async function createRunForSubscriber(
       type: step.type,
       configSnapshot: step.config,
       scheduledAt: new Date(now.getTime() + cumulativeDelayMs),
-      cumulativeDelayMs,
     };
   });
 
@@ -54,13 +53,23 @@ export async function createRunForSubscriber(
     steps: plannedSteps,
   });
 
-  for (const [i, runStep] of runSteps.entries()) {
+  await queueRunSteps(db, queue, runSteps);
+
+  return { run, runSteps };
+}
+
+export async function queueRunSteps(
+  db: dbClient,
+  queue: Queue,
+  steps: { id: number; scheduledAt: Date }[],
+) {
+  for (const step of steps) {
     const job = await queue.add(
       WORKFLOW_STEP_JOB_NAME,
-      { runStepId: runStep.id } satisfies WorkflowStepJobData,
+      { runStepId: step.id } satisfies WorkflowStepJobData,
       {
-        delay: plannedSteps[i]!.cumulativeDelayMs,
-        jobId: `run-step-${runStep.id}`,
+        delay: Math.max(0, step.scheduledAt.getTime() - Date.now()),
+        jobId: `run-step-${step.id}`,
         attempts: 3,
         backoff: { type: "exponential", delay: 60_000 },
         removeOnComplete: true,
@@ -68,9 +77,7 @@ export async function createRunForSubscriber(
       },
     );
     if (job.id) {
-      await workflowRunRepo.setRunStepBullJobId(db, runStep.id, job.id);
+      await workflowRunRepo.setRunStepBullJobId(db, step.id, job.id);
     }
   }
-
-  return { run, runSteps };
 }

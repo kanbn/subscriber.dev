@@ -14,7 +14,6 @@ vi.mock("@subscriber.dev/db/client", () => ({
 
 vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
   getBroadcastById: vi.fn(),
-  updateBroadcastProgress: vi.fn(),
   markBroadcastDispatched: vi.fn(),
   markBroadcastFailed: vi.fn(),
 }));
@@ -75,7 +74,7 @@ describe("process", () => {
         name: "setup-subscriber",
         data: { broadcastId: 1, subscriberId: 100, startDelayMs: 0 },
         opts: expect.objectContaining({
-          jobId: "broadcast-1-subscriber-100",
+          jobId: "broadcast-1-dispatch-job-1-subscriber-100",
           attempts: 3,
         }),
       }),
@@ -154,6 +153,21 @@ describe("sendWindowOffsetMs", () => {
     expect(sendWindowOffsetMs(0, 4, 1000)).toBe(0);
     expect(sendWindowOffsetMs(1, 4, 1000)).toBe(250);
     expect(sendWindowOffsetMs(3, 4, 1000)).toBe(750);
+  });
+});
+
+describe("onFailed never throws", () => {
+  it("logs instead of throwing when marking the broadcast failed fails", async () => {
+    vi.mocked(workflowBroadcastRepo.markBroadcastFailed).mockRejectedValue(
+      new Error("sorry, too many clients already"),
+    );
+
+    await expect(
+      processor.onFailed(
+        { ...makeJob(), attemptsMade: 3, opts: { attempts: 3 } },
+        new Error("boom"),
+      ),
+    ).resolves.toBeUndefined();
   });
 });
 

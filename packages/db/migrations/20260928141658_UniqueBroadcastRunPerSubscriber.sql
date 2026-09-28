@@ -1,0 +1,2 @@
+ALTER TABLE "workflow_broadcasts" DROP COLUMN "skippedCount";--> statement-breakpoint
+ALTER TABLE "workflow_runs" ADD CONSTRAINT "workflow_runs_broadcast_subscriber" UNIQUE("broadcastId","subscriberId");
