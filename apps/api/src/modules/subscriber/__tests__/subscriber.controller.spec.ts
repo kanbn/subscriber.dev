@@ -179,6 +179,7 @@ describe("createSubscriber", () => {
         environmentId: 10,
         email: "alice@example.com",
         createdBy: 1,
+        createdVia: "api",
       }),
     );
   });
@@ -209,6 +210,7 @@ describe("bulkUpsertSubscribers", () => {
       10,
       input.subscribers,
       1,
+      "api",
     );
   });
 });

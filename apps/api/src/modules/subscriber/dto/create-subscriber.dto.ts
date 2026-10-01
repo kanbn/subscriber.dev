@@ -34,6 +34,12 @@ export const SubscriberSchema = z.object({
   lastName: z.string().nullable(),
   name: z.string().nullable(),
   attributes: z.record(z.string(), z.unknown()).nullable(),
+  createdVia: z
+    .string()
+    .nullable()
+    .describe(
+      'How the subscriber was created: "api", "mcp", or an inbound source such as "stripe".',
+    ),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   unsubscribeUrl: z.string().nullable(),

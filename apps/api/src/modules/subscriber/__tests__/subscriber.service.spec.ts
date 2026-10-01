@@ -320,7 +320,11 @@ describe("createSubscriber", () => {
     );
 
     await expect(
-      service.createSubscriber(mockDb, { environmentId: 10, createdBy: 1 }),
+      service.createSubscriber(mockDb, {
+        environmentId: 10,
+        createdBy: 1,
+        createdVia: "api",
+      }),
     ).rejects.toThrow(BadRequestException);
   });
 
@@ -337,6 +341,7 @@ describe("createSubscriber", () => {
         environmentId: 10,
         email: "alice@example.com",
         createdBy: 1,
+        createdVia: "api",
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -355,6 +360,7 @@ describe("createSubscriber", () => {
         environmentId: 10,
         externalId: "ext_1",
         createdBy: 1,
+        createdVia: "api",
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -373,6 +379,7 @@ describe("createSubscriber", () => {
       environmentId: 10,
       email: "alice@example.com",
       createdBy: 1,
+      createdVia: "api",
     });
 
     expect(result.subscriber.publicId).toBe("sub_abc");
@@ -397,12 +404,17 @@ describe("bulkUpsertSubscribers", () => {
       10,
       [{ email: "alice@example.com" }],
       1,
+      "mcp",
     );
 
     expect(result.results).toEqual([
       expect.objectContaining({ index: 0, status: "created" }),
     ]);
     expect(result.summary).toEqual({ created: 1, updated: 0, errored: 0 });
+    expect(repo.createSubscriber).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({ createdBy: 1, createdVia: "mcp" }),
+    );
     expect(repo.createSubscriberPreferences).toHaveBeenCalledWith(mockDb, {
       subscriberId: mockSubscriber.id,
       email: true,
@@ -429,6 +441,7 @@ describe("bulkUpsertSubscribers", () => {
       10,
       [{ email: "alice@example.com", firstName: "Bob" }],
       1,
+      "api",
     );
 
     expect(result.results).toEqual([
@@ -461,6 +474,7 @@ describe("bulkUpsertSubscribers", () => {
       10,
       [{ email: "alice@example.com", preferences: { email: false } }],
       1,
+      "api",
     );
 
     expect(repo.createSubscriberPreferences).toHaveBeenCalledWith(mockDb, {
@@ -487,6 +501,7 @@ describe("bulkUpsertSubscribers", () => {
       10,
       [{}, { email: "alice@example.com" }],
       1,
+      "api",
     );
 
     expect(result.results[0]).toEqual(
@@ -516,6 +531,7 @@ describe("bulkUpsertSubscribers", () => {
       10,
       [{ email: "alice@example.com", externalId: "ext_2" }],
       1,
+      "api",
     );
 
     expect(result.results[0]).toEqual(
@@ -540,6 +556,7 @@ describe("bulkUpsertSubscribers", () => {
       10,
       [{ email: "fails@example.com" }, { email: "alice@example.com" }],
       1,
+      "api",
     );
 
     expect(result.results[0]?.status).toBe("error");

@@ -142,6 +142,7 @@ export class SubscriberTools {
       attributes: args.attributes ?? null,
       emailPreference: args.preferences?.email ?? true,
       createdBy: user.id,
+      createdVia: "mcp",
     });
   }
 
@@ -170,6 +171,7 @@ export class SubscriberTools {
       environment.id,
       args.subscribers,
       user.id,
+      "mcp",
     );
   }
 
