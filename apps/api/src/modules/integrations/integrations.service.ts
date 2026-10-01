@@ -8,7 +8,7 @@ import type { dbClient } from "@subscriber.dev/db/client";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 
 import { decrypt, encrypt } from "../../common/encryption.js";
-import { INTEGRATION_PROVIDERS } from "./providers/index.js";
+import { CONFIGURABLE_INTEGRATIONS } from "./providers/index.js";
 
 function toResponse(row: {
   type: string;
@@ -19,6 +19,7 @@ function toResponse(row: {
   return {
     type: row.type,
     ...row.config,
+    ...CONFIGURABLE_INTEGRATIONS[row.type]?.describe?.(row.config),
     priority: row.priority,
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -33,7 +34,7 @@ export class IntegrationsService {
     body: Record<string, unknown>,
     updatedBy: number,
   ) {
-    const provider = INTEGRATION_PROVIDERS[type];
+    const provider = CONFIGURABLE_INTEGRATIONS[type];
     if (!provider) {
       throw new NotFoundException(`Unknown integration type: ${type}`);
     }
@@ -51,6 +52,9 @@ export class IntegrationsService {
       environmentId,
       type,
     );
+    const config = provider.prepareConfig
+      ? provider.prepareConfig(configResult.data, current?.config)
+      : configResult.data;
     const storedSecret = current?.encryptedSecret
       ? (JSON.parse(decrypt(current.encryptedSecret)) as Record<
           string,
@@ -70,7 +74,7 @@ export class IntegrationsService {
 
     if (provider.verify) {
       try {
-        await provider.verify(configResult.data, secretResult.data);
+        await provider.verify(config, secretResult.data);
       } catch (error) {
         throw new BadRequestException(
           error instanceof Error
@@ -81,11 +85,6 @@ export class IntegrationsService {
     }
 
     const encryptedSecret = encrypt(JSON.stringify(secretResult.data));
-
-    // Only used if this is a brand new integration type for this
-    // environment - appended to the end of the failover order. Reconfiguring
-    // an existing integration never changes its position (see
-    // upsertIntegration's onConflictDoUpdate).
     const existing = await environmentIntegrationsRepo.listByEnvironment(
       db,
       environmentId,
@@ -98,7 +97,7 @@ export class IntegrationsService {
       db,
       environmentId,
       type,
-      configResult.data,
+      config,
       encryptedSecret,
       updatedBy,
       priorityIfNew,

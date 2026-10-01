@@ -20,6 +20,12 @@ vi.mock("@subscriber.dev/email", () => ({
   verifySmtpConnection: vi.fn(),
 }));
 
+vi.mock("@subscriber.dev/stripe", () => ({
+  createStripeClientForKey: vi.fn().mockReturnValue({
+    customers: { list: vi.fn().mockResolvedValue({ data: [] }) },
+  }),
+}));
+
 vi.mock("../../../common/encryption.js", () => ({
   encrypt: vi.fn().mockReturnValue("encrypted-blob"),
   decrypt: vi.fn(),
@@ -353,6 +359,44 @@ describe("delete", () => {
 
     await expect(service.delete(mockDb, 10, "smtp")).rejects.toThrow(
       NotFoundException,
+    );
+  });
+});
+
+describe("stripe integration", () => {
+  it("keeps the webhook token across updates and returns the webhook URL", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.example.com");
+    vi.mocked(
+      environmentIntegrationsRepo.getByEnvironmentAndType,
+    ).mockResolvedValue({
+      type: "stripe",
+      config: { webhookToken: "existing-token" },
+      encryptedSecret: "stored-blob",
+      priority: 2,
+    } as any);
+    vi.mocked(decrypt).mockReturnValue(JSON.stringify({ apiKey: "rk_1" }));
+    vi.mocked(environmentIntegrationsRepo.upsertIntegration).mockImplementation(
+      async (_db, _env, type, config) =>
+        ({ type, config, priority: 2, updatedAt: new Date(0) }) as any,
+    );
+
+    const result = await service.upsert(
+      mockDb,
+      10,
+      "stripe",
+      { webhookToken: "forged" },
+      1,
+    );
+    vi.unstubAllEnvs();
+
+    const [, , , savedConfig] = vi.mocked(
+      environmentIntegrationsRepo.upsertIntegration,
+    ).mock.calls[0]!;
+    expect(savedConfig).toEqual({ webhookToken: "existing-token" });
+    expect(result).toEqual(
+      expect.objectContaining({
+        webhookUrl: "https://api.example.com/webhooks/stripe/existing-token",
+      }),
     );
   });
 });

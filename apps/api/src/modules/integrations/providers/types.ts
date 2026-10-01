@@ -19,11 +19,20 @@ export interface BounceEvent {
   occurredAt: Date;
 }
 
-export interface IntegrationProvider<TConfig = unknown, TSecret = unknown> {
+export interface ConfigurableIntegration<TConfig = unknown, TSecret = unknown> {
   type: string;
   configSchema: z.ZodType<TConfig>;
   secretSchema: z.ZodType<TSecret>;
   verify?: (config: TConfig, secret: TSecret) => Promise<void>;
+  prepareConfig?: (
+    config: TConfig,
+    existing: Record<string, unknown> | undefined,
+  ) => TConfig;
+  describe?: (config: Record<string, unknown>) => Record<string, unknown>;
+}
+
+export interface IntegrationProvider<TConfig = unknown, TSecret = unknown>
+  extends ConfigurableIntegration<TConfig, TSecret> {
   send: (
     config: TConfig,
     secret: TSecret,

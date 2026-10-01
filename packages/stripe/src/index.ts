@@ -16,4 +16,7 @@ const createStripeClient = () => {
   return stripe;
 };
 
-export { createStripeClient };
+const createStripeClientForKey = (apiKey: string) =>
+  new Stripe(apiKey, { apiVersion: "2025-08-27.basil" });
+
+export { createStripeClient, createStripeClientForKey, Stripe };
