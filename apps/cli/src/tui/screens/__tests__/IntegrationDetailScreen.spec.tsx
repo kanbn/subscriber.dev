@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   deleteIntegration,
   getIntegration,
+  listInboundEvents,
   setPrimaryIntegration,
   upsertIntegration,
 } from "@subscriber.dev/api-client/cli";
@@ -12,6 +13,7 @@ import { IntegrationDetailScreen } from "../IntegrationDetailScreen.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   getIntegration: vi.fn(),
+  listInboundEvents: vi.fn(),
   deleteIntegration: vi.fn(),
   setPrimaryIntegration: vi.fn(),
   upsertIntegration: vi.fn(),
@@ -277,5 +279,62 @@ describe("IntegrationDetailScreen edit", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).not.toContain("Edit integration");
     });
+  });
+});
+
+describe("IntegrationDetailScreen stripe", () => {
+  it("shows the webhook URL and recent events with what happened", async () => {
+    vi.mocked(getIntegration).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        type: "stripe",
+        events: { trial_started: "trial-start" },
+        webhookUrl: "https://api.example.com/webhooks/stripe/tok",
+        priority: 3,
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      },
+    } as never);
+    vi.mocked(listInboundEvents).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        events: [
+          {
+            source: "stripe",
+            externalEventId: "evt_1",
+            type: "customer.subscription.created",
+            status: "processed",
+            matchedEvents: ["trial_started"],
+            outcome: "Triggered trial-start",
+            subscriberPublicId: "sub_1",
+            subscriberEmail: "a@example.com",
+            createdAt: new Date().toISOString(),
+            processedAt: new Date().toISOString(),
+          },
+        ],
+        limit: 10,
+        offset: 0,
+      },
+    } as never);
+
+    const { lastFrame } = render(
+      <IntegrationDetailScreen
+        environmentId="test-environment-1"
+        type="stripe"
+        onDeleted={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Recent events");
+    });
+    expect(lastFrame()).toContain(
+      "webhookUrl: https://api.example.com/webhooks/stripe/tok",
+    );
+    expect(lastFrame()).toContain(
+      "customer.subscription.created → processed: Triggered trial-start",
+    );
+    expect(lastFrame()).toContain("e edit");
   });
 });

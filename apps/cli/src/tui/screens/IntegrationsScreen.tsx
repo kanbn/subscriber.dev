@@ -10,17 +10,25 @@ import {
 
 import type { CloudflareEmailCreateValues } from "../components/CloudflareEmailCreateForm.js";
 import type { IntegrationCreateValues } from "../components/IntegrationCreateForm.js";
+import type { StripeIntegrationValues } from "../components/StripeIntegrationForm.js";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateForm.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
+import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
 import {
   cloudflareIntegrationBody,
   smtpIntegrationBody,
+  stripeIntegrationBody,
 } from "../integrationBodies.js";
 import { useAsyncData } from "../useAsyncData.js";
 
-type Mode = "list" | "choosing-type" | "creating-smtp" | "creating-cloudflare";
+type Mode =
+  | "list"
+  | "choosing-type"
+  | "creating-smtp"
+  | "creating-cloudflare"
+  | "creating-stripe";
 
 export function IntegrationsScreen({
   environmentId,
@@ -69,6 +77,28 @@ export function IntegrationsScreen({
     }
   };
 
+  const handleCreateStripe = async (
+    values: StripeIntegrationValues,
+  ): Promise<string | undefined> => {
+    try {
+      const response = await upsertIntegration(
+        environmentId,
+        "stripe",
+        stripeIntegrationBody(values) as unknown as UpsertIntegrationDto,
+      );
+      if (response.status === 400) {
+        return "Invalid config, or the API key can't read Stripe customers.";
+      }
+      if (response.status !== 200) {
+        return "Failed to create integration.";
+      }
+      onSelect("stripe");
+      return undefined;
+    } catch (err) {
+      return err instanceof Error ? err.message : String(err);
+    }
+  };
+
   const handleCreateCloudflare = async (
     values: CloudflareEmailCreateValues,
   ): Promise<string | undefined> => {
@@ -100,12 +130,9 @@ export function IntegrationsScreen({
           items={[
             { label: "SMTP", value: "smtp" as const },
             { label: "Cloudflare Email", value: "cloudflare" as const },
+            { label: "Stripe (trigger workflows)", value: "stripe" as const },
           ]}
-          onSelect={(item) =>
-            setMode(
-              item.value === "smtp" ? "creating-smtp" : "creating-cloudflare",
-            )
-          }
+          onSelect={(item) => setMode(`creating-${item.value}`)}
         />
         <Hints text="↑↓ navigate · Enter select · Esc back · q quit" />
       </Box>
@@ -118,6 +145,24 @@ export function IntegrationsScreen({
         <Text bold>New SMTP integration</Text>
         <IntegrationCreateForm
           onSubmit={handleCreateSmtp}
+          onCancel={() => setMode("list")}
+        />
+        <Hints text="↑↓ navigate · Enter select/edit" />
+      </Box>
+    );
+  }
+
+  if (mode === "creating-stripe") {
+    return (
+      <Box flexDirection="column">
+        <Text bold>New Stripe integration</Text>
+        <Text dimColor>
+          Add the signing secret after creating the webhook endpoint in Stripe
+          with the URL shown next. Choose which events start a workflow from the
+          workflow's triggers.
+        </Text>
+        <StripeIntegrationForm
+          onSubmit={handleCreateStripe}
           onCancel={() => setMode("list")}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />

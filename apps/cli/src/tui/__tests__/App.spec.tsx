@@ -33,6 +33,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   redispatchBroadcast: vi.fn(),
   listIntegrations: vi.fn(),
   getIntegration: vi.fn(),
+  listInboundEvents: vi.fn(),
   deleteIntegration: vi.fn(),
   getCurrentUser: vi.fn(),
 }));

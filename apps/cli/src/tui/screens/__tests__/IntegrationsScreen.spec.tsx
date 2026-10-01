@@ -156,6 +156,7 @@ describe("IntegrationsScreen create", () => {
     });
     expect(lastFrame()).toContain("SMTP");
     expect(lastFrame()).toContain("Cloudflare Email");
+    expect(lastFrame()).toContain("Stripe (trigger workflows)");
   });
 
   it("shows the SMTP field menu after choosing SMTP (the default option)", async () => {
