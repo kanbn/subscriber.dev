@@ -100,7 +100,7 @@ export class WorkflowController {
     operationId: "createWorkflow",
     summary: "Create a new workflow",
     description:
-      "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step.",
+      "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started.",
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 201, type: WorkflowResponseDto })
@@ -118,6 +118,7 @@ export class WorkflowController {
       description: input.description,
       type: input.type,
       steps: input.steps,
+      triggers: input.triggers,
       createdBy: user.id,
     });
   }
@@ -203,7 +204,7 @@ export class WorkflowController {
     operationId: "updateWorkflow",
     summary: "Update a workflow",
     description:
-      "Updates workflow fields. If `steps` is provided, it replaces ALL existing steps.",
+      "Updates workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers`.",
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
@@ -223,6 +224,7 @@ export class WorkflowController {
       description: input.description,
       status: input.status,
       steps: input.steps,
+      triggers: input.triggers,
       updatedBy: user.id,
     });
   }

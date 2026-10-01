@@ -9,7 +9,9 @@ import {
 import { Queue } from "bullmq";
 
 import type { dbClient } from "@subscriber.dev/db/client";
+import type { WorkflowTriggerInput } from "@subscriber.dev/db/repository/workflow.repo";
 import type { WorkflowBroadcastStatus } from "@subscriber.dev/db/schema";
+import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBroadcast.repo";
@@ -23,6 +25,8 @@ import type {
   BroadcastResumeJobData,
 } from "./workflow.constants.js";
 import { isUniqueViolation } from "../../common/isUniqueViolation.js";
+import { isTriggerEvent } from "../inbound/inboundSource.js";
+import { INBOUND_SOURCES } from "../inbound/sources/index.js";
 import { resolveAudienceSubscriberIds } from "./audienceQuery.js";
 import {
   createRunForSubscriber,
@@ -49,6 +53,7 @@ interface CreateWorkflowData {
   description?: string;
   type: "automation" | "broadcast";
   steps: WorkflowStepInput[];
+  triggers?: WorkflowTriggerInput[];
   createdBy: number;
 }
 
@@ -58,6 +63,7 @@ interface UpdateWorkflowData {
   description?: string | null;
   status?: "active" | "paused";
   steps?: WorkflowStepInput[];
+  triggers?: WorkflowTriggerInput[];
   updatedBy: number;
 }
 
@@ -68,6 +74,11 @@ interface TriggerWorkflowData {
   triggeredBy: number;
   // A retry with the same key returns the run the first attempt created.
   idempotencyKey?: string;
+}
+
+interface WorkflowTriggerRow {
+  source: string;
+  event: string;
 }
 
 interface WorkflowStepRow {
@@ -110,6 +121,8 @@ export class WorkflowService {
       updatedAt: Date;
     },
     steps: WorkflowStepRow[],
+    triggers: WorkflowTriggerRow[],
+    connectedSources: Set<string>,
   ) {
     return {
       publicId: workflow.publicId,
@@ -127,6 +140,14 @@ export class WorkflowService {
         stepOrder: s.stepOrder,
         type: s.type,
         delayMs: s.delayMs,
+      })),
+      triggers: triggers.map((t) => ({
+        source: t.source,
+        event: t.event,
+        label:
+          INBOUND_SOURCES[t.source]?.events.find((e) => e.name === t.event)
+            ?.label ?? t.event,
+        active: connectedSources.has(t.source),
       })),
       createdAt: workflow.createdAt.toISOString(),
       updatedAt: workflow.updatedAt.toISOString(),
@@ -323,6 +344,55 @@ export class WorkflowService {
     return totalAttempted > 0 ? sent / totalAttempted : null;
   }
 
+  private async connectedSources(db: dbClient, environmentId: number) {
+    const integrations = await environmentIntegrationsRepo.listByEnvironment(
+      db,
+      environmentId,
+    );
+    return new Set(
+      integrations
+        .filter((i) => INBOUND_SOURCES[i.type] && i.encryptedSecret)
+        .map((i) => i.type),
+    );
+  }
+
+  private validateTriggers(
+    type: "automation" | "broadcast",
+    triggers: WorkflowTriggerInput[],
+    connectedSources: Set<string>,
+  ): WorkflowTriggerInput[] {
+    if (triggers.length > 0 && type === "broadcast") {
+      throw new BadRequestException(
+        "Broadcast workflows can't have triggers; use an automation workflow",
+      );
+    }
+    for (const trigger of triggers) {
+      const source = INBOUND_SOURCES[trigger.source];
+      if (!source) {
+        throw new BadRequestException(
+          `Unknown trigger source "${trigger.source}". Available: ${Object.keys(INBOUND_SOURCES).join(", ")}`,
+        );
+      }
+      if (!isTriggerEvent(source, trigger.event)) {
+        throw new BadRequestException(
+          `Unknown ${source.name} event "${trigger.event}". Use one of ${source.events.map((e) => e.name).join(", ")}, or a raw event type such as checkout.session.completed`,
+        );
+      }
+      if (!connectedSources.has(trigger.source)) {
+        throw new BadRequestException(
+          `Connect the ${source.name} integration before adding its triggers`,
+        );
+      }
+    }
+    const seen = new Set<string>();
+    return triggers.filter((t) => {
+      const id = `${t.source}:${t.event}`;
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  }
+
   private toStepInputs(steps: WorkflowStepInput[]) {
     return steps.map((s) => {
       const { type, delayMs, ...config } = s;
@@ -358,17 +428,26 @@ export class WorkflowService {
     environmentId: number,
     data: CreateWorkflowData,
   ) {
-    const { workflow, steps } = await workflowRepo.createWorkflow(db, {
-      environmentId,
-      key: data.key,
-      name: data.name,
-      description: data.description ?? null,
-      type: data.type,
-      steps: this.toStepInputs(data.steps),
-      createdBy: data.createdBy,
-    });
+    const connectedSources = await this.connectedSources(db, environmentId);
+    const { workflow, steps, triggers } = await workflowRepo.createWorkflow(
+      db,
+      {
+        environmentId,
+        key: data.key,
+        name: data.name,
+        description: data.description ?? null,
+        type: data.type,
+        steps: this.toStepInputs(data.steps),
+        triggers: this.validateTriggers(
+          data.type,
+          data.triggers ?? [],
+          connectedSources,
+        ),
+        createdBy: data.createdBy,
+      },
+    );
 
-    return this.toWorkflowDto(workflow, steps);
+    return this.toWorkflowDto(workflow, steps, triggers, connectedSources);
   }
 
   async listWorkflows(
@@ -381,10 +460,14 @@ export class WorkflowService {
     },
   ) {
     const rows = await workflowRepo.listWorkflows(db, environmentId, opts);
+    const connectedSources = await this.connectedSources(db, environmentId);
     const workflows = await Promise.all(
       rows.map(async (workflow) => {
-        const steps = await workflowRepo.listStepsForWorkflow(db, workflow.id);
-        return this.toWorkflowDto(workflow, steps);
+        const [steps, triggers] = await Promise.all([
+          workflowRepo.listStepsForWorkflow(db, workflow.id),
+          workflowRepo.listTriggersForWorkflow(db, workflow.id),
+        ]);
+        return this.toWorkflowDto(workflow, steps, triggers, connectedSources);
       }),
     );
 
@@ -403,14 +486,17 @@ export class WorkflowService {
     );
     if (!workflow) throw new NotFoundException("Workflow not found");
 
-    const steps = await workflowRepo.listStepsForWorkflow(db, workflow.id);
-    const [counts, bounceBreakdown] = await Promise.all([
-      workflowRunRepo.getWorkflowStepCounts(db, workflow.id),
-      workflowRunRepo.getWorkflowBounceBreakdown(db, workflow.id),
-    ]);
+    const [steps, triggers, connectedSources, counts, bounceBreakdown] =
+      await Promise.all([
+        workflowRepo.listStepsForWorkflow(db, workflow.id),
+        workflowRepo.listTriggersForWorkflow(db, workflow.id),
+        this.connectedSources(db, environmentId),
+        workflowRunRepo.getWorkflowStepCounts(db, workflow.id),
+        workflowRunRepo.getWorkflowBounceBreakdown(db, workflow.id),
+      ]);
 
     return {
-      ...this.toWorkflowDto(workflow, steps),
+      ...this.toWorkflowDto(workflow, steps, triggers, connectedSources),
       sentCount: counts.sent,
       failedCount: counts.failed,
       skippedCount: counts.skipped,
@@ -435,6 +521,11 @@ export class WorkflowService {
     );
     if (!existing) throw new NotFoundException("Workflow not found");
 
+    const connectedSources = await this.connectedSources(db, environmentId);
+    const newTriggers = data.triggers
+      ? this.validateTriggers(existing.type, data.triggers, connectedSources)
+      : undefined;
+
     const workflow = await workflowRepo.updateWorkflow(db, existing.id, {
       key: data.key,
       name: data.name,
@@ -456,8 +547,11 @@ export class WorkflowService {
           ),
         )
       : await workflowRepo.listStepsForWorkflow(db, existing.id);
+    const triggers = newTriggers
+      ? await workflowRepo.replaceWorkflowTriggers(db, existing, newTriggers)
+      : await workflowRepo.listTriggersForWorkflow(db, existing.id);
 
-    return this.toWorkflowDto(workflow, steps);
+    return this.toWorkflowDto(workflow, steps, triggers, connectedSources);
   }
 
   async deleteWorkflow(
@@ -545,6 +639,8 @@ export class WorkflowService {
     }
   }
 
+  // Queues any steps of an earlier attempt's run that never made it onto the
+  // queue, e.g. because that attempt crashed straight after creating the run.
   private async resumeExistingRun(
     db: dbClient,
     environmentId: number,

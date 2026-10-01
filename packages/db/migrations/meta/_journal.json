@@ -120,6 +120,13 @@
       "when": 1790856565764,
       "tag": "20261001120925_AddSubscriberCreatedVia",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790870603320,
+      "tag": "20261001160323_AddWorkflowTriggers",
+      "breakpoints": true
     }
   ]
 }

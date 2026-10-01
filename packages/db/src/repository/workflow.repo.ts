@@ -1,13 +1,22 @@
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
-import { workflows, workflowSteps } from "@subscriber.dev/db/schema";
+import {
+  workflows,
+  workflowSteps,
+  workflowTriggers,
+} from "@subscriber.dev/db/schema";
 import { generateUID } from "@subscriber.dev/shared/utils";
 
 interface WorkflowStepInput {
   type: string;
   delayMs: number;
   config: Record<string, unknown>;
+}
+
+export interface WorkflowTriggerInput {
+  source: string;
+  event: string;
 }
 
 export const getWorkflowById = async (db: dbClient, id: number) => {
@@ -80,6 +89,7 @@ export const createWorkflow = async (
     description?: string | null;
     type?: "automation" | "broadcast";
     steps: WorkflowStepInput[];
+    triggers?: WorkflowTriggerInput[];
     createdBy: number;
   },
 ) => {
@@ -114,7 +124,21 @@ export const createWorkflow = async (
       )
       .returning();
 
-    return { workflow, steps: stepRows };
+    const triggerRows = data.triggers?.length
+      ? await tx
+          .insert(workflowTriggers)
+          .values(
+            data.triggers.map((t) => ({
+              workflowId: workflow.id,
+              environmentId: data.environmentId,
+              source: t.source,
+              event: t.event,
+            })),
+          )
+          .returning()
+      : [];
+
+    return { workflow, steps: stepRows, triggers: triggerRows };
   });
 };
 
@@ -176,4 +200,81 @@ export const softDeleteWorkflow = async (
     .returning();
 
   return result;
+};
+
+export const listTriggersForWorkflow = async (
+  db: dbClient,
+  workflowId: number,
+) => {
+  return await db
+    .select()
+    .from(workflowTriggers)
+    .where(eq(workflowTriggers.workflowId, workflowId))
+    .orderBy(asc(workflowTriggers.id));
+};
+
+export const replaceWorkflowTriggers = async (
+  db: dbClient,
+  workflow: { id: number; environmentId: number },
+  triggers: WorkflowTriggerInput[],
+) => {
+  return await db.transaction(async (tx) => {
+    await tx
+      .delete(workflowTriggers)
+      .where(eq(workflowTriggers.workflowId, workflow.id));
+    if (triggers.length === 0) return [];
+
+    return await tx
+      .insert(workflowTriggers)
+      .values(
+        triggers.map((t) => ({
+          workflowId: workflow.id,
+          environmentId: workflow.environmentId,
+          source: t.source,
+          event: t.event,
+        })),
+      )
+      .returning();
+  });
+};
+
+export const listWorkflowsTriggeredBy = async (
+  db: dbClient,
+  environmentId: number,
+  source: string,
+  events: string[],
+) => {
+  if (events.length === 0) return [];
+  return await db
+    .selectDistinct({ id: workflows.id, key: workflows.key })
+    .from(workflowTriggers)
+    .innerJoin(workflows, eq(workflows.id, workflowTriggers.workflowId))
+    .where(
+      and(
+        eq(workflowTriggers.environmentId, environmentId),
+        eq(workflowTriggers.source, source),
+        inArray(workflowTriggers.event, events),
+        isNull(workflows.deletedAt),
+      ),
+    )
+    .orderBy(asc(workflows.id));
+};
+
+export const countTriggersForSource = async (
+  db: dbClient,
+  environmentId: number,
+  source: string,
+) => {
+  const [row] = await db
+    .select({ count: count() })
+    .from(workflowTriggers)
+    .innerJoin(workflows, eq(workflows.id, workflowTriggers.workflowId))
+    .where(
+      and(
+        eq(workflowTriggers.environmentId, environmentId),
+        eq(workflowTriggers.source, source),
+        isNull(workflows.deletedAt),
+      ),
+    );
+  return row?.count ?? 0;
 };

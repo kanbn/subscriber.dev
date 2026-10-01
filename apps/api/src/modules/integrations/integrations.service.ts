@@ -6,8 +6,10 @@ import {
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
+import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 
 import { decrypt, encrypt } from "../../common/encryption.js";
+import { INBOUND_SOURCES } from "../inbound/sources/index.js";
 import { CONFIGURABLE_INTEGRATIONS } from "./providers/index.js";
 
 function toResponse(row: {
@@ -85,6 +87,7 @@ export class IntegrationsService {
     }
 
     const encryptedSecret = encrypt(JSON.stringify(secretResult.data));
+
     const existing = await environmentIntegrationsRepo.listByEnvironment(
       db,
       environmentId,
@@ -125,7 +128,15 @@ export class IntegrationsService {
     );
     if (!row) throw new NotFoundException("Integration not configured");
 
-    return toResponse(row);
+    if (!INBOUND_SOURCES[type]) return toResponse(row);
+    return {
+      ...toResponse(row),
+      triggerCount: await workflowRepo.countTriggersForSource(
+        db,
+        environmentId,
+        type,
+      ),
+    };
   }
 
   async list(db: dbClient, environmentId: number) {

@@ -1,7 +1,10 @@
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
-import { WorkflowStepSchema } from "./create-workflow.dto.js";
+import {
+  WorkflowStepSchema,
+  workflowTriggersSchema,
+} from "./create-workflow.dto.js";
 
 export const UpdateWorkflowSchema = z.object({
   key: z.string().min(1).max(255).optional(),
@@ -14,6 +17,11 @@ export const UpdateWorkflowSchema = z.object({
     .max(50)
     .optional()
     .describe("If provided, replaces ALL existing steps for this workflow."),
+  triggers: workflowTriggersSchema
+    .optional()
+    .describe(
+      "If provided, replaces ALL existing triggers for this workflow. Automation workflows only; each trigger's integration must be connected.",
+    ),
 });
 
 export class UpdateWorkflowDto extends createZodDto(UpdateWorkflowSchema) {}

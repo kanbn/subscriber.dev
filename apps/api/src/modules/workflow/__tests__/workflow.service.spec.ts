@@ -6,6 +6,7 @@ import {
 import { beforeEach, describe, expect, it, onTestFinished, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
+import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBroadcast.repo";
@@ -27,6 +28,12 @@ vi.mock("@subscriber.dev/db/repository/workflow.repo", () => ({
   replaceWorkflowSteps: vi.fn(),
   updateWorkflow: vi.fn(),
   softDeleteWorkflow: vi.fn(),
+  listTriggersForWorkflow: vi.fn(),
+  replaceWorkflowTriggers: vi.fn(),
+}));
+
+vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
+  listByEnvironment: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
@@ -84,6 +91,10 @@ let service: WorkflowService;
 beforeEach(() => {
   vi.clearAllMocks();
   mockQueue.remove.mockResolvedValue(undefined);
+  vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([]);
+  vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue(
+    [],
+  );
   service = new WorkflowService(
     mockQueue as any,
     mockBroadcastDispatchQueue as any,
@@ -409,6 +420,7 @@ describe("createWorkflow", () => {
     };
     vi.mocked(workflowRepo.createWorkflow).mockResolvedValue({
       workflow,
+      triggers: [],
       steps: [
         {
           publicId: "step_1",
@@ -457,6 +469,7 @@ describe("createWorkflow", () => {
     };
     vi.mocked(workflowRepo.createWorkflow).mockResolvedValue({
       workflow,
+      triggers: [],
       steps: [
         {
           publicId: "step_1",
@@ -495,6 +508,170 @@ describe("createWorkflow", () => {
 // ---------------------------------------------------------------------------
 // updateWorkflow – webhook URL redaction
 // ---------------------------------------------------------------------------
+
+describe("workflow triggers", () => {
+  const workflow = {
+    id: 1,
+    publicId: "wf_abc",
+    environmentId: 10,
+    key: "trial-welcome",
+    name: "Trial welcome",
+    description: null,
+    status: "active" as const,
+    type: "automation" as const,
+    createdAt: new Date(0),
+    updatedAt: new Date(0),
+  };
+  const steps = [
+    { type: "email" as const, delayMs: 0, subject: "s", body: "b" },
+  ];
+
+  function connectStripe() {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+      { type: "cloudflare", encryptedSecret: "x" },
+      { type: "stripe", encryptedSecret: "x" },
+    ] as any);
+  }
+
+  const create = (overrides: Record<string, unknown>) =>
+    service.createWorkflow(mockDb, 10, {
+      key: "trial-welcome",
+      name: "Trial welcome",
+      type: "automation",
+      steps,
+      createdBy: 1,
+      ...overrides,
+    });
+
+  it("saves the triggers once each and returns them labelled and active", async () => {
+    connectStripe();
+    vi.mocked(workflowRepo.createWorkflow).mockImplementation(
+      async (_db, data) =>
+        ({ workflow, steps: [], triggers: data.triggers }) as any,
+    );
+
+    const result = await create({
+      triggers: [
+        { source: "stripe", event: "trial_started" },
+        { source: "stripe", event: "trial_started" },
+        { source: "stripe", event: "checkout.session.completed" },
+      ],
+    });
+
+    expect(workflowRepo.createWorkflow).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({
+        triggers: [
+          { source: "stripe", event: "trial_started" },
+          { source: "stripe", event: "checkout.session.completed" },
+        ],
+      }),
+    );
+    expect(result.triggers).toEqual([
+      {
+        source: "stripe",
+        event: "trial_started",
+        label: "Trial started",
+        active: true,
+      },
+      {
+        source: "stripe",
+        event: "checkout.session.completed",
+        label: "checkout.session.completed",
+        active: true,
+      },
+    ]);
+  });
+
+  it("refuses triggers until the source's integration is connected", async () => {
+    await expect(
+      create({ triggers: [{ source: "stripe", event: "trial_started" }] }),
+    ).rejects.toThrow(
+      "Connect the Stripe integration before adding its triggers",
+    );
+    expect(workflowRepo.createWorkflow).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [
+      { source: "polar", event: "trial_started" },
+      'Unknown trigger source "polar"',
+    ],
+    [
+      { source: "stripe", event: "trial_begun" },
+      'Unknown Stripe event "trial_begun"',
+    ],
+  ])("rejects %o", async (trigger, message) => {
+    connectStripe();
+    await expect(create({ triggers: [trigger] })).rejects.toThrow(message);
+  });
+
+  it("refuses triggers on a broadcast workflow", async () => {
+    connectStripe();
+    await expect(
+      create({
+        type: "broadcast",
+        triggers: [{ source: "stripe", event: "trial_started" }],
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it("replaces the triggers on update, and keeps them when omitted", async () => {
+    connectStripe();
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.updateWorkflow).mockResolvedValue(workflow as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+    vi.mocked(workflowRepo.replaceWorkflowTriggers).mockResolvedValue([
+      { source: "stripe", event: "payment_failed" },
+    ] as any);
+
+    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      triggers: [{ source: "stripe", event: "payment_failed" }],
+      updatedBy: 1,
+    });
+    expect(workflowRepo.replaceWorkflowTriggers).toHaveBeenCalledWith(
+      mockDb,
+      workflow,
+      [{ source: "stripe", event: "payment_failed" }],
+    );
+
+    vi.mocked(workflowRepo.replaceWorkflowTriggers).mockClear();
+    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      name: "Renamed",
+      updatedBy: 1,
+    });
+    expect(workflowRepo.replaceWorkflowTriggers).not.toHaveBeenCalled();
+  });
+
+  it("shows triggers as inactive while their integration is disconnected", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+    vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([
+      { source: "stripe", event: "trial_started" },
+    ] as any);
+    vi.mocked(workflowRunRepo.getWorkflowStepCounts).mockResolvedValue({
+      sent: 0,
+      failed: 0,
+      skipped: 0,
+      pending: 0,
+      bounced: 0,
+    } as any);
+    vi.mocked(workflowRunRepo.getWorkflowBounceBreakdown).mockResolvedValue({
+      hard: 0,
+      soft: 0,
+    } as any);
+
+    const result = await service.getWorkflow(mockDb, 10, "wf_abc");
+
+    expect(result.triggers).toEqual([
+      expect.objectContaining({ event: "trial_started", active: false }),
+    ]);
+  });
+});
 
 describe("updateWorkflow webhook URLs", () => {
   const realUrl = "https://discord.com/api/webhooks/123/secret-token";

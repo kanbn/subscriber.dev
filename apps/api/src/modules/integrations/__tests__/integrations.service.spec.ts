@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
+import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 import { verifySmtpConnection } from "@subscriber.dev/email";
 
 import { decrypt, encrypt } from "../../../common/encryption.js";
@@ -14,6 +15,10 @@ vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
   upsertIntegration: vi.fn(),
   deleteIntegration: vi.fn(),
   setPrimary: vi.fn(),
+}));
+
+vi.mock("@subscriber.dev/db/repository/workflow.repo", () => ({
+  countTriggersForSource: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/email", () => ({
@@ -312,6 +317,28 @@ describe("get", () => {
       expect.objectContaining({ type: "smtp", host: "smtp.example.com" }),
     );
     expect(result).not.toHaveProperty("encryptedSecret");
+    expect(result).not.toHaveProperty("triggerCount");
+  });
+
+  it("says how many workflow triggers use an integration that offers them", async () => {
+    vi.mocked(
+      environmentIntegrationsRepo.getByEnvironmentAndType,
+    ).mockResolvedValue({
+      type: "stripe",
+      config: { webhookToken: "tok" },
+      encryptedSecret: "encrypted-blob",
+      updatedAt: new Date("2026-01-01"),
+    } as any);
+    vi.mocked(workflowRepo.countTriggersForSource).mockResolvedValue(3);
+
+    const result = await service.get(mockDb, 10, "stripe");
+
+    expect(result).toEqual(expect.objectContaining({ triggerCount: 3 }));
+    expect(workflowRepo.countTriggersForSource).toHaveBeenCalledWith(
+      mockDb,
+      10,
+      "stripe",
+    );
   });
 
   it("throws NotFoundException when not configured", async () => {

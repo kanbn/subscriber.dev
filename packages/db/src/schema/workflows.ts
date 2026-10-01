@@ -120,6 +120,7 @@ export const workflowsRelations = relations(workflows, ({ one, many }) => ({
   }),
   steps: many(workflowSteps),
   runs: many(workflowRuns),
+  triggers: many(workflowTriggers),
 }));
 
 export const workflowSteps = pgTable(
@@ -155,6 +156,44 @@ export const workflowStepsRelations = relations(workflowSteps, ({ one }) => ({
     references: [workflows.id],
   }),
 }));
+
+export const workflowTriggers = pgTable(
+  "workflow_triggers",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    workflowId: bigint("workflowId", { mode: "number" })
+      .notNull()
+      .references(() => workflows.id, { onDelete: "cascade" }),
+    environmentId: bigint("environmentId", { mode: "number" })
+      .notNull()
+      .references(() => environments.id, { onDelete: "cascade" }),
+    source: varchar("source", { length: 50 }).notNull(),
+    event: varchar("event", { length: 255 }).notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+  },
+  (table) => [
+    unique("workflow_triggers_workflow_source_event").on(
+      table.workflowId,
+      table.source,
+      table.event,
+    ),
+    index("workflow_triggers_environment_source_event_idx").on(
+      table.environmentId,
+      table.source,
+      table.event,
+    ),
+  ],
+);
+
+export const workflowTriggersRelations = relations(
+  workflowTriggers,
+  ({ one }) => ({
+    workflow: one(workflows, {
+      fields: [workflowTriggers.workflowId],
+      references: [workflows.id],
+    }),
+  }),
+);
 
 export const workflowBroadcasts = pgTable(
   "workflow_broadcasts",
