@@ -151,6 +151,11 @@ export type ListSubscribersResponseDtoSubscribersItemName = string | null;
  */
 export type ListSubscribersResponseDtoSubscribersItemAttributes = {[key: string]: unknown} | null;
 
+/**
+ * How the subscriber was created: "api", "mcp", or an inbound source such as "stripe".
+ */
+export type ListSubscribersResponseDtoSubscribersItemCreatedVia = string | null;
+
 export type ListSubscribersResponseDtoSubscribersItem = {
   publicId: string;
   email: ListSubscribersResponseDtoSubscribersItemEmail;
@@ -161,6 +166,8 @@ export type ListSubscribersResponseDtoSubscribersItem = {
   name: ListSubscribersResponseDtoSubscribersItemName;
   /** @nullable */
   attributes: ListSubscribersResponseDtoSubscribersItemAttributes;
+  /** How the subscriber was created: "api", "mcp", or an inbound source such as "stripe". */
+  createdVia: ListSubscribersResponseDtoSubscribersItemCreatedVia;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -194,6 +201,11 @@ export type GetSubscriberResponseDtoSubscriberName = string | null;
  */
 export type GetSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
 
+/**
+ * How the subscriber was created: "api", "mcp", or an inbound source such as "stripe".
+ */
+export type GetSubscriberResponseDtoSubscriberCreatedVia = string | null;
+
 export type GetSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
 export type GetSubscriberResponseDtoSubscriber = {
@@ -206,6 +218,8 @@ export type GetSubscriberResponseDtoSubscriber = {
   name?: GetSubscriberResponseDtoSubscriberName;
   /** @nullable */
   attributes?: GetSubscriberResponseDtoSubscriberAttributes;
+  /** How the subscriber was created: "api", "mcp", or an inbound source such as "stripe". */
+  createdVia?: GetSubscriberResponseDtoSubscriberCreatedVia;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt?: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -272,6 +286,11 @@ export type CreateSubscriberResponseDtoSubscriberName = string | null;
  */
 export type CreateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
 
+/**
+ * How the subscriber was created: "api", "mcp", or an inbound source such as "stripe".
+ */
+export type CreateSubscriberResponseDtoSubscriberCreatedVia = string | null;
+
 export type CreateSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
 export type CreateSubscriberResponseDtoSubscriber = {
@@ -284,6 +303,8 @@ export type CreateSubscriberResponseDtoSubscriber = {
   name?: CreateSubscriberResponseDtoSubscriberName;
   /** @nullable */
   attributes?: CreateSubscriberResponseDtoSubscriberAttributes;
+  /** How the subscriber was created: "api", "mcp", or an inbound source such as "stripe". */
+  createdVia?: CreateSubscriberResponseDtoSubscriberCreatedVia;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt?: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -367,6 +388,11 @@ export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberName = string |
  */
 export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes = {[key: string]: unknown} | null;
 
+/**
+ * How the subscriber was created: "api", "mcp", or an inbound source such as "stripe".
+ */
+export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberCreatedVia = string | null;
+
 export type BulkUpsertSubscribersResponseDtoResultsItemSubscriberUnsubscribeUrl = string | null;
 
 export type BulkUpsertSubscribersResponseDtoResultsItemSubscriber = {
@@ -379,6 +405,8 @@ export type BulkUpsertSubscribersResponseDtoResultsItemSubscriber = {
   name: BulkUpsertSubscribersResponseDtoResultsItemSubscriberName;
   /** @nullable */
   attributes: BulkUpsertSubscribersResponseDtoResultsItemSubscriberAttributes;
+  /** How the subscriber was created: "api", "mcp", or an inbound source such as "stripe". */
+  createdVia: BulkUpsertSubscribersResponseDtoResultsItemSubscriberCreatedVia;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -450,6 +478,11 @@ export type UpdateSubscriberResponseDtoSubscriberName = string | null;
  */
 export type UpdateSubscriberResponseDtoSubscriberAttributes = {[key: string]: unknown} | null;
 
+/**
+ * How the subscriber was created: "api", "mcp", or an inbound source such as "stripe".
+ */
+export type UpdateSubscriberResponseDtoSubscriberCreatedVia = string | null;
+
 export type UpdateSubscriberResponseDtoSubscriberUnsubscribeUrl = string | null;
 
 export type UpdateSubscriberResponseDtoSubscriber = {
@@ -462,6 +495,8 @@ export type UpdateSubscriberResponseDtoSubscriber = {
   name?: UpdateSubscriberResponseDtoSubscriberName;
   /** @nullable */
   attributes?: UpdateSubscriberResponseDtoSubscriberAttributes;
+  /** How the subscriber was created: "api", "mcp", or an inbound source such as "stripe". */
+  createdVia?: UpdateSubscriberResponseDtoSubscriberCreatedVia;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt?: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -591,6 +626,20 @@ export type CreateWorkflowDtoStepsItemOneOfTwo = {
 
 export type CreateWorkflowDtoStepsItem = CreateWorkflowDtoStepsItemOneOf | CreateWorkflowDtoStepsItemOneOfTwo;
 
+export type CreateWorkflowDtoTriggersItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+};
+
 export interface CreateWorkflowDto {
   /**
    * Stable identifier used to trigger this workflow, e.g. "user-signup". Unique within the environment.
@@ -612,6 +661,11 @@ export interface CreateWorkflowDto {
    * @maxItems 50
    */
   steps: CreateWorkflowDtoStepsItem[];
+  /**
+   * Events from connected integrations that start this workflow for the person they're about. Automation workflows only; the integration must be connected first.
+   * @maxItems 50
+   */
+  triggers?: CreateWorkflowDtoTriggersItem[];
 }
 
 export type WorkflowResponseDtoStatus = typeof WorkflowResponseDtoStatus[keyof typeof WorkflowResponseDtoStatus];
@@ -643,6 +697,24 @@ export type WorkflowResponseDtoStepsItem = {
   url?: string;
 };
 
+export type WorkflowResponseDtoTriggersItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+  /** Human-readable name of the event. */
+  label: string;
+  /** False while the source's integration is disconnected; the trigger resumes once it's reconnected. */
+  active: boolean;
+};
+
 export interface WorkflowResponseDto {
   publicId: string;
   key: string;
@@ -651,6 +723,7 @@ export interface WorkflowResponseDto {
   status: WorkflowResponseDtoStatus;
   type: WorkflowResponseDtoType;
   steps: WorkflowResponseDtoStepsItem[];
+  triggers: WorkflowResponseDtoTriggersItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -688,6 +761,24 @@ export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
   url?: string;
 };
 
+export type ListWorkflowsResponseDtoWorkflowsItemTriggersItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+  /** Human-readable name of the event. */
+  label: string;
+  /** False while the source's integration is disconnected; the trigger resumes once it's reconnected. */
+  active: boolean;
+};
+
 export type ListWorkflowsResponseDtoWorkflowsItem = {
   publicId: string;
   key: string;
@@ -696,6 +787,7 @@ export type ListWorkflowsResponseDtoWorkflowsItem = {
   status: ListWorkflowsResponseDtoWorkflowsItemStatus;
   type: ListWorkflowsResponseDtoWorkflowsItemType;
   steps: ListWorkflowsResponseDtoWorkflowsItemStepsItem[];
+  triggers: ListWorkflowsResponseDtoWorkflowsItemTriggersItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -830,6 +922,24 @@ export type WorkflowDetailResponseDtoStepsItem = {
   url?: string;
 };
 
+export type WorkflowDetailResponseDtoTriggersItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+  /** Human-readable name of the event. */
+  label: string;
+  /** False while the source's integration is disconnected; the trigger resumes once it's reconnected. */
+  active: boolean;
+};
+
 export interface WorkflowDetailResponseDto {
   publicId: string;
   key: string;
@@ -838,6 +948,7 @@ export interface WorkflowDetailResponseDto {
   status: WorkflowDetailResponseDtoStatus;
   type: WorkflowDetailResponseDtoType;
   steps: WorkflowDetailResponseDtoStepsItem[];
+  triggers: WorkflowDetailResponseDtoTriggersItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -900,6 +1011,20 @@ export type UpdateWorkflowDtoStepsItemOneOfTwo = {
 
 export type UpdateWorkflowDtoStepsItem = UpdateWorkflowDtoStepsItemOneOf | UpdateWorkflowDtoStepsItemOneOfTwo;
 
+export type UpdateWorkflowDtoTriggersItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+};
+
 export interface UpdateWorkflowDto {
   /**
    * @minLength 1
@@ -923,6 +1048,11 @@ export interface UpdateWorkflowDto {
    * @maxItems 50
    */
   steps?: UpdateWorkflowDtoStepsItem[];
+  /**
+   * If provided, replaces ALL existing triggers for this workflow. Automation workflows only; each trigger's integration must be connected.
+   * @maxItems 50
+   */
+  triggers?: UpdateWorkflowDtoTriggersItem[];
 }
 
 export type ListRunsResponseDtoRunsItemStatus = typeof ListRunsResponseDtoRunsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStatus];
@@ -1240,6 +1370,67 @@ export interface AnalyticsResponseDto {
   bounces: AnalyticsResponseDtoBounces;
 }
 
+export type ListInboundEventsResponseDtoEventsItemStatus = typeof ListInboundEventsResponseDtoEventsItemStatus[keyof typeof ListInboundEventsResponseDtoEventsItemStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListInboundEventsResponseDtoEventsItemStatus = {
+  received: 'received',
+  processed: 'processed',
+  ignored: 'ignored',
+  failed: 'failed',
+} as const;
+
+export type ListInboundEventsResponseDtoEventsItemOutcome = string | null;
+
+export type ListInboundEventsResponseDtoEventsItemSubscriberPublicId = string | null;
+
+export type ListInboundEventsResponseDtoEventsItemSubscriberEmail = string | null;
+
+export type ListInboundEventsResponseDtoEventsItem = {
+  source: string;
+  externalEventId: string;
+  type: string;
+  status: ListInboundEventsResponseDtoEventsItemStatus;
+  /** @nullable */
+  matchedEvents: string[] | null;
+  outcome: ListInboundEventsResponseDtoEventsItemOutcome;
+  subscriberPublicId: ListInboundEventsResponseDtoEventsItemSubscriberPublicId;
+  subscriberEmail: ListInboundEventsResponseDtoEventsItemSubscriberEmail;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+   * @nullable
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  processedAt: string | null;
+};
+
+export interface ListInboundEventsResponseDto {
+  events: ListInboundEventsResponseDtoEventsItem[];
+  limit: number;
+  offset: number;
+}
+
+export type ListTriggerSourcesResponseDtoSourcesItemEventsItem = {
+  /** Use as a trigger's `event`. */
+  name: string;
+  label: string;
+};
+
+export type ListTriggerSourcesResponseDtoSourcesItem = {
+  /** Use as a trigger's `source`, e.g. "stripe". */
+  source: string;
+  name: string;
+  /** Whether the integration is set up in this environment. Triggers can only be added for connected sources. */
+  connected: boolean;
+  events: ListTriggerSourcesResponseDtoSourcesItemEventsItem[];
+};
+
+export interface ListTriggerSourcesResponseDto {
+  sources: ListTriggerSourcesResponseDtoSourcesItem[];
+}
+
 export type ListSubscribersParams = {
 /**
  * @minimum 1
@@ -1339,6 +1530,23 @@ export type GetAnalyticsParams = {
  * @maximum 365
  */
 days?: number;
+};
+
+export type ListInboundEventsParams = {
+/**
+ * Only events from this source, e.g. "stripe".
+ */
+source?: string;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ * @maximum 9007199254740991
+ */
+offset?: number;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -3403,7 +3611,7 @@ export const useTriggerWorkflow = <TError = void,
     }
     
 /**
- * Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step.
+ * Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started.
  * @summary Create a new workflow
  */
 export type createWorkflowResponse201 = {
@@ -3901,7 +4109,7 @@ export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, 
 
 
 /**
- * Updates workflow fields. If `steps` is provided, it replaces ALL existing steps.
+ * Updates workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers`.
  * @summary Update a workflow
  */
 export type updateWorkflowResponse200 = {
@@ -5887,6 +6095,251 @@ export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
 
   const queryOptions = getGetAnalyticsQueryOptions(environmentId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Webhook events received from inbound sources (e.g. Stripe) for this environment, most recent first, with the events they matched and what happened (workflow triggered, no mapping, person not found, etc.).
+ * @summary List inbound webhook events
+ */
+export type listInboundEventsResponse200 = {
+  data: ListInboundEventsResponseDto
+  status: 200
+}
+    
+export type listInboundEventsResponseSuccess = (listInboundEventsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listInboundEventsResponse = (listInboundEventsResponseSuccess)
+
+export const getListInboundEventsUrl = (environmentId: string,
+    params?: ListInboundEventsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/environments/${environmentId}/inbound-events?${stringifiedParams}` : `/environments/${environmentId}/inbound-events`
+}
+
+export const listInboundEvents = async (environmentId: string,
+    params?: ListInboundEventsParams, options?: RequestInit): Promise<listInboundEventsResponse> => {
+  
+  return customFetch<listInboundEventsResponse>(getListInboundEventsUrl(environmentId,params),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListInboundEventsQueryKey = (environmentId?: string,
+    params?: ListInboundEventsParams,) => {
+    return [
+    `/environments/${environmentId}/inbound-events`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListInboundEventsQueryOptions = <TData = Awaited<ReturnType<typeof listInboundEvents>>, TError = unknown>(environmentId: string,
+    params?: ListInboundEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInboundEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInboundEventsQueryKey(environmentId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInboundEvents>>> = ({ signal }) => listInboundEvents(environmentId,params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInboundEvents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListInboundEventsQueryResult = NonNullable<Awaited<ReturnType<typeof listInboundEvents>>>
+export type ListInboundEventsQueryError = unknown
+
+
+export function useListInboundEvents<TData = Awaited<ReturnType<typeof listInboundEvents>>, TError = unknown>(
+ environmentId: string,
+    params: undefined |  ListInboundEventsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInboundEvents>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listInboundEvents>>,
+          TError,
+          Awaited<ReturnType<typeof listInboundEvents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListInboundEvents<TData = Awaited<ReturnType<typeof listInboundEvents>>, TError = unknown>(
+ environmentId: string,
+    params?: ListInboundEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInboundEvents>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listInboundEvents>>,
+          TError,
+          Awaited<ReturnType<typeof listInboundEvents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListInboundEvents<TData = Awaited<ReturnType<typeof listInboundEvents>>, TError = unknown>(
+ environmentId: string,
+    params?: ListInboundEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInboundEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary List inbound webhook events
+ */
+
+export function useListInboundEvents<TData = Awaited<ReturnType<typeof listInboundEvents>>, TError = unknown>(
+ environmentId: string,
+    params?: ListInboundEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInboundEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getListInboundEventsQueryOptions(environmentId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * Integrations whose events can trigger workflows (e.g. Stripe), whether each is connected in this environment, and the events each offers.
+ * @summary List workflow trigger sources
+ */
+export type listTriggerSourcesResponse200 = {
+  data: ListTriggerSourcesResponseDto
+  status: 200
+}
+    
+export type listTriggerSourcesResponseSuccess = (listTriggerSourcesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listTriggerSourcesResponse = (listTriggerSourcesResponseSuccess)
+
+export const getListTriggerSourcesUrl = (environmentId: string,) => {
+
+
+  
+
+  return `/environments/${environmentId}/trigger-sources`
+}
+
+export const listTriggerSources = async (environmentId: string, options?: RequestInit): Promise<listTriggerSourcesResponse> => {
+  
+  return customFetch<listTriggerSourcesResponse>(getListTriggerSourcesUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListTriggerSourcesQueryKey = (environmentId?: string,) => {
+    return [
+    `/environments/${environmentId}/trigger-sources`
+    ] as const;
+    }
+
+    
+export const getListTriggerSourcesQueryOptions = <TData = Awaited<ReturnType<typeof listTriggerSources>>, TError = unknown>(environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTriggerSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTriggerSourcesQueryKey(environmentId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTriggerSources>>> = ({ signal }) => listTriggerSources(environmentId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(environmentId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTriggerSources>>, TError, TData> & { queryKey: DataTag<QueryKey, TData> }
+}
+
+export type ListTriggerSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof listTriggerSources>>>
+export type ListTriggerSourcesQueryError = unknown
+
+
+export function useListTriggerSources<TData = Awaited<ReturnType<typeof listTriggerSources>>, TError = unknown>(
+ environmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTriggerSources>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTriggerSources>>,
+          TError,
+          Awaited<ReturnType<typeof listTriggerSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListTriggerSources<TData = Awaited<ReturnType<typeof listTriggerSources>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTriggerSources>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTriggerSources>>,
+          TError,
+          Awaited<ReturnType<typeof listTriggerSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+export function useListTriggerSources<TData = Awaited<ReturnType<typeof listTriggerSources>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTriggerSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> }
+/**
+ * @summary List workflow trigger sources
+ */
+
+export function useListTriggerSources<TData = Awaited<ReturnType<typeof listTriggerSources>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTriggerSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+
+  const queryOptions = getListTriggerSourcesQueryOptions(environmentId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
