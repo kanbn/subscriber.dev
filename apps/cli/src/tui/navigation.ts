@@ -39,6 +39,17 @@ export type Screen =
       workflowId: string;
     }
   | {
+      kind: "workflowTriggers";
+      environment: EnvironmentSummary;
+      workflowId: string;
+      pickSource?: string;
+    }
+  | {
+      kind: "integrationSetup";
+      environment: EnvironmentSummary;
+      type: string;
+    }
+  | {
       kind: "workflowRuns";
       environment: EnvironmentSummary;
       workflowId: string;

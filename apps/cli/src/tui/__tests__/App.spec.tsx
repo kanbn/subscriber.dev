@@ -5,9 +5,13 @@ import { describe, expect, it, vi } from "vitest";
 import {
   getCurrentUser,
   getSubscriber,
+  getWorkflow,
   getWorkspaces,
   listEnvironments,
   listSubscribers,
+  listTriggerSources,
+  listWorkflows,
+  upsertIntegration,
 } from "@subscriber.dev/api-client/cli";
 
 import { App } from "../App.js";
@@ -36,6 +40,9 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   listInboundEvents: vi.fn(),
   deleteIntegration: vi.fn(),
   getCurrentUser: vi.fn(),
+  listTriggerSources: vi.fn(),
+  updateWorkflow: vi.fn(),
+  upsertIntegration: vi.fn(),
 }));
 
 const exitMock = vi.fn();
@@ -132,6 +139,111 @@ describe("App navigation", () => {
       expect(lastFrame()).toContain("test@example.com");
     });
     expect(lastFrame()).not.toContain("publicId: test-subscriber-1");
+  });
+
+  it("sets up a disconnected trigger source from a workflow's triggers, then returns to pick its events", async () => {
+    const workflow = {
+      publicId: "wf_1",
+      key: "trial-welcome",
+      name: "Trial welcome",
+      description: null,
+      status: "active",
+      type: "automation",
+      steps: [],
+      triggers: [],
+      sentCount: 0,
+      failedCount: 0,
+      skippedCount: 0,
+      pendingCount: 0,
+      bouncedCount: 0,
+      hardBounceCount: 0,
+      softBounceCount: 0,
+      successRate: null,
+    };
+    const stripe = (connected: boolean) => ({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        sources: [
+          {
+            source: "stripe",
+            name: "Stripe",
+            connected,
+            events: [{ name: "trial_started", label: "Trial started" }],
+          },
+        ],
+      },
+    });
+    vi.mocked(getWorkspaces).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: [testWorkspace],
+    } as never);
+    vi.mocked(listEnvironments).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { environments: [testEnvironment] },
+    } as never);
+    vi.mocked(listWorkflows).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { workflows: [workflow], limit: 100, offset: 0 },
+    } as never);
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: workflow,
+    } as never);
+    vi.mocked(listTriggerSources)
+      .mockResolvedValueOnce(stripe(false) as never)
+      .mockResolvedValue(stripe(true) as never);
+    vi.mocked(upsertIntegration).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {},
+    } as never);
+
+    const { lastFrame, stdin } = render(<App />);
+    const press = async (key: string) => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      stdin.write(key);
+    };
+    const DOWN = "\u001B[B";
+
+    await vi.waitFor(() => expect(lastFrame()).toContain("Test Workspace"));
+    await press("\r");
+    await vi.waitFor(() => expect(lastFrame()).toContain("Staging"));
+    await press("\r");
+    await vi.waitFor(() => expect(lastFrame()).toContain("Workflows"));
+    await press(DOWN);
+    await press("\r");
+    await vi.waitFor(() => expect(lastFrame()).toContain("Trial welcome"));
+    await press("\r");
+    await vi.waitFor(() => expect(lastFrame()).toContain("key: trial-welcome"));
+    await press("g");
+    await vi.waitFor(() => expect(lastFrame()).toContain("+ Add trigger"));
+    await press("\r");
+    await vi.waitFor(() =>
+      expect(lastFrame()).toContain("Stripe · not connected — set it up"),
+    );
+    await press("\r");
+
+    await vi.waitFor(() =>
+      expect(lastFrame()).toContain("New Stripe integration"),
+    );
+    await press("\r");
+    await press("rk_test_1");
+    await press("\r");
+    await press(DOWN);
+    await press(DOWN);
+    await press("\r");
+
+    await vi.waitFor(() => expect(lastFrame()).toContain("[ ] Trial started"));
+    expect(upsertIntegration).toHaveBeenCalledWith(
+      "test-environment-1",
+      "stripe",
+      expect.objectContaining({ apiKey: "rk_test_1" }),
+    );
   });
 
   it("navigates to My Account and back with Escape", async () => {

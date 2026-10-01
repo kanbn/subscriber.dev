@@ -30,12 +30,23 @@ type Mode =
   | "creating-cloudflare"
   | "creating-stripe";
 
+const CREATE_MODES: Mode[] = [
+  "creating-smtp",
+  "creating-cloudflare",
+  "creating-stripe",
+];
+
 export function IntegrationsScreen({
   environmentId,
   onSelect,
+  createType,
+  onCancelCreate,
 }: {
   environmentId: string;
   onSelect: (type: string) => void;
+  // Opens straight into creating this type, e.g. when setting up a trigger.
+  createType?: string;
+  onCancelCreate?: () => void;
 }) {
   const state = useAsyncData(async () => {
     const response = await listIntegrations(environmentId);
@@ -45,7 +56,13 @@ export function IntegrationsScreen({
     return response.data.integrations;
   }, [environmentId]);
 
-  const [mode, setMode] = useState<Mode>("list");
+  const [mode, setMode] = useState<Mode>(() => {
+    const creating = `creating-${createType}`;
+    return CREATE_MODES.includes(creating as Mode)
+      ? (creating as Mode)
+      : "list";
+  });
+  const cancelCreate = onCancelCreate ?? (() => setMode("list"));
 
   useInput((input) => {
     if (mode !== "list") return;
@@ -145,7 +162,7 @@ export function IntegrationsScreen({
         <Text bold>New SMTP integration</Text>
         <IntegrationCreateForm
           onSubmit={handleCreateSmtp}
-          onCancel={() => setMode("list")}
+          onCancel={cancelCreate}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />
       </Box>
@@ -163,7 +180,7 @@ export function IntegrationsScreen({
         </Text>
         <StripeIntegrationForm
           onSubmit={handleCreateStripe}
-          onCancel={() => setMode("list")}
+          onCancel={cancelCreate}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />
       </Box>
@@ -176,7 +193,7 @@ export function IntegrationsScreen({
         <Text bold>New Cloudflare Email integration</Text>
         <CloudflareEmailCreateForm
           onSubmit={handleCreateCloudflare}
-          onCancel={() => setMode("list")}
+          onCancel={cancelCreate}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />
       </Box>

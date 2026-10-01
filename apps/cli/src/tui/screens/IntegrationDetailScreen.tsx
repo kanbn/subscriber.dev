@@ -78,6 +78,10 @@ export function IntegrationDetailScreen({
   const [editing, setEditing] = useState(false);
 
   const isPrimary = state.status === "ready" && state.data.priority === 1;
+  const triggerCount =
+    state.status === "ready" && typeof state.data.triggerCount === "number"
+      ? state.data.triggerCount
+      : 0;
   const canEdit = state.status === "ready" && EDITABLE_TYPES.includes(type);
 
   useInput((input) => {
@@ -255,7 +259,11 @@ export function IntegrationDetailScreen({
 
       {deleteStatus === "confirming" && (
         <ConfirmPrompt
-          message={`Remove integration "${type}"? This cannot be undone.`}
+          message={`Remove integration "${type}"? This cannot be undone.${
+            triggerCount > 0
+              ? ` ${triggerCount} workflow trigger${triggerCount === 1 ? "" : "s"} will stop until it's reconnected.`
+              : ""
+          }`}
           onConfirm={() => void handleConfirmDelete()}
           onCancel={() => setDeleteStatus("idle")}
         />
