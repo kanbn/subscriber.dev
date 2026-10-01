@@ -16,6 +16,7 @@ import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBr
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
 import type { BroadcastSetupJobData } from "./workflow.constants.js";
+import { isUniqueViolation } from "../../common/isUniqueViolation.js";
 import {
   createRunForSubscriber,
   queueRunSteps,
@@ -24,16 +25,6 @@ import {
   BROADCAST_SETUP_QUEUE_NAME,
   BROADCAST_STEPS_QUEUE_NAME,
 } from "./workflow.constants.js";
-
-function isUniqueViolation(error: unknown): boolean {
-  const code = (e: unknown) =>
-    typeof e === "object" && e !== null && "code" in e ? e.code : undefined;
-  const cause =
-    typeof error === "object" && error !== null && "cause" in error
-      ? error.cause
-      : undefined;
-  return code(error) === "23505" || code(cause) === "23505";
-}
 
 @Processor(BROADCAST_SETUP_QUEUE_NAME, { concurrency: 10 })
 @Injectable()

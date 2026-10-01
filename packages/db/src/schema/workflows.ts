@@ -228,6 +228,7 @@ export const workflowRuns = pgTable(
     ),
     status: workflowRunStatusEnum("status").notNull().default("active"),
     payload: jsonb("payload").$type<Record<string, unknown>>(),
+    idempotencyKey: varchar("idempotencyKey", { length: 255 }),
     triggeredAt: timestamp("triggeredAt").notNull().defaultNow(),
     completedAt: timestamp("completedAt"),
     createdBy: bigint("createdBy", { mode: "number" }).references(
@@ -244,6 +245,10 @@ export const workflowRuns = pgTable(
     unique("workflow_runs_broadcast_subscriber").on(
       table.broadcastId,
       table.subscriberId,
+    ),
+    unique("workflow_runs_environment_idempotencyKey").on(
+      table.environmentId,
+      table.idempotencyKey,
     ),
   ],
 );

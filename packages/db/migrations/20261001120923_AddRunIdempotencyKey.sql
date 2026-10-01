@@ -1,0 +1,2 @@
+ALTER TABLE "workflow_runs" ADD COLUMN "idempotencyKey" varchar(255);--> statement-breakpoint
+ALTER TABLE "workflow_runs" ADD CONSTRAINT "workflow_runs_environment_idempotencyKey" UNIQUE("environmentId","idempotencyKey");

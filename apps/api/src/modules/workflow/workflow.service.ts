@@ -22,8 +22,12 @@ import type {
   BroadcastDispatchJobData,
   BroadcastResumeJobData,
 } from "./workflow.constants.js";
+import { isUniqueViolation } from "../../common/isUniqueViolation.js";
 import { resolveAudienceSubscriberIds } from "./audienceQuery.js";
-import { createRunForSubscriber } from "./createRunForSubscriber.js";
+import {
+  createRunForSubscriber,
+  queueRunSteps,
+} from "./createRunForSubscriber.js";
 import {
   BOUNCE_EVENT_JOB_NAME,
   BOUNCE_EVENTS_QUEUE_NAME,
@@ -62,6 +66,8 @@ interface TriggerWorkflowData {
   subscriber: { publicId?: string; externalId?: string; email?: string };
   payload?: Record<string, unknown>;
   triggeredBy: number;
+  // A retry with the same key returns the run the first attempt created.
+  idempotencyKey?: string;
 }
 
 interface WorkflowStepRow {
@@ -507,15 +513,51 @@ export class WorkflowService {
     );
     if (!subscriber) throw new NotFoundException("Subscriber not found");
 
-    const { run } = await createRunForSubscriber(db, this.queue, {
-      workflowId: workflow.id,
-      steps,
-      environmentId,
-      subscriberId: subscriber.id,
-      payload: input.payload,
-      createdBy: input.triggeredBy,
-    });
+    if (input.idempotencyKey) {
+      const existing = await this.resumeExistingRun(
+        db,
+        environmentId,
+        input.idempotencyKey,
+      );
+      if (existing) return existing;
+    }
 
+    try {
+      const { run } = await createRunForSubscriber(db, this.queue, {
+        workflowId: workflow.id,
+        steps,
+        environmentId,
+        subscriberId: subscriber.id,
+        payload: input.payload,
+        createdBy: input.triggeredBy,
+        idempotencyKey: input.idempotencyKey,
+      });
+      return { triggered: true as const, runPublicId: run.publicId };
+    } catch (error) {
+      if (!input.idempotencyKey || !isUniqueViolation(error)) throw error;
+      const existing = await this.resumeExistingRun(
+        db,
+        environmentId,
+        input.idempotencyKey,
+      );
+      if (!existing) throw error;
+      return existing;
+    }
+  }
+
+  private async resumeExistingRun(
+    db: dbClient,
+    environmentId: number,
+    idempotencyKey: string,
+  ) {
+    const run = await workflowRunRepo.getRunByIdempotencyKey(
+      db,
+      environmentId,
+      idempotencyKey,
+    );
+    if (!run) return undefined;
+    const unqueued = await workflowRunRepo.listUnqueuedPendingSteps(db, run.id);
+    await queueRunSteps(db, this.queue, unqueued);
     return { triggered: true as const, runPublicId: run.publicId };
   }
 

@@ -44,6 +44,8 @@ vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
 
 vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
   createRunWithSteps: vi.fn(),
+  getRunByIdempotencyKey: vi.fn(),
+  listUnqueuedPendingSteps: vi.fn(),
   setRunStepBullJobId: vi.fn(),
   listPendingRunStepsForSubscriber: vi.fn(),
   cancelPendingForSubscriber: vi.fn(),
@@ -239,6 +241,100 @@ describe("triggerWorkflow", () => {
       201,
       "job-201",
     );
+  });
+});
+
+describe("triggerWorkflow with an idempotency key", () => {
+  const input = {
+    key: "user-signup",
+    subscriber: { email: "a@example.com" },
+    triggeredBy: 1,
+    idempotencyKey: "inbound:1:user-signup",
+  };
+
+  beforeEach(() => {
+    vi.mocked(workflowRepo.getWorkflowByKey).mockResolvedValue({
+      id: 1,
+      status: "active",
+    } as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([
+      { id: 10, stepOrder: 0, type: "email", delayMs: 0, config: {} },
+    ] as any);
+    vi.mocked(subscriberRepo.findSubscriberForUpsert).mockResolvedValue({
+      id: 100,
+    } as any);
+    vi.mocked(workflowRunRepo.listUnqueuedPendingSteps).mockResolvedValue([]);
+  });
+
+  it("stores the key on the new run", async () => {
+    vi.mocked(workflowRunRepo.getRunByIdempotencyKey).mockResolvedValue(
+      undefined,
+    );
+    vi.mocked(workflowRunRepo.createRunWithSteps).mockResolvedValue({
+      run: { id: 5, publicId: "run_abc" },
+      runSteps: [],
+    } as any);
+
+    await expect(service.triggerWorkflow(mockDb, 10, input)).resolves.toEqual({
+      triggered: true,
+      runPublicId: "run_abc",
+    });
+    expect(workflowRunRepo.createRunWithSteps).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({ idempotencyKey: "inbound:1:user-signup" }),
+    );
+  });
+
+  it("returns the existing run on a retry instead of creating another, queuing any of its steps that never were", async () => {
+    const stranded = [{ id: 200, scheduledAt: new Date() }];
+    vi.mocked(workflowRunRepo.getRunByIdempotencyKey).mockResolvedValue({
+      id: 5,
+      publicId: "run_abc",
+    });
+    vi.mocked(workflowRunRepo.listUnqueuedPendingSteps).mockResolvedValue(
+      stranded,
+    );
+    mockQueue.add.mockResolvedValue({ id: "run-step-200" });
+
+    await expect(service.triggerWorkflow(mockDb, 10, input)).resolves.toEqual({
+      triggered: true,
+      runPublicId: "run_abc",
+    });
+    expect(workflowRunRepo.createRunWithSteps).not.toHaveBeenCalled();
+    expect(mockQueue.add).toHaveBeenCalledWith(
+      "send-step",
+      { runStepId: 200 },
+      expect.objectContaining({ jobId: "run-step-200" }),
+    );
+  });
+
+  it("returns the winner's run when a concurrent trigger with the same key hits the unique constraint", async () => {
+    vi.mocked(workflowRunRepo.getRunByIdempotencyKey)
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({ id: 5, publicId: "run_abc" });
+    vi.mocked(workflowRunRepo.createRunWithSteps).mockRejectedValue(
+      Object.assign(new Error("Failed query"), { cause: { code: "23505" } }),
+    );
+
+    await expect(service.triggerWorkflow(mockDb, 10, input)).resolves.toEqual({
+      triggered: true,
+      runPublicId: "run_abc",
+    });
+  });
+
+  it("rethrows a unique-constraint clash when no trigger was given a key", async () => {
+    const clash = Object.assign(new Error("Failed query"), {
+      cause: { code: "23505" },
+    });
+    vi.mocked(workflowRunRepo.createRunWithSteps).mockRejectedValue(clash);
+
+    await expect(
+      service.triggerWorkflow(mockDb, 10, {
+        ...input,
+        idempotencyKey: undefined,
+      }),
+    ).rejects.toBe(clash);
+    expect(workflowRunRepo.getRunByIdempotencyKey).not.toHaveBeenCalled();
   });
 });
 
