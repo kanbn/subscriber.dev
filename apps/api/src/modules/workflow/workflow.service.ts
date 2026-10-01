@@ -71,8 +71,7 @@ interface TriggerWorkflowData {
   key: string;
   subscriber: { publicId?: string; externalId?: string; email?: string };
   payload?: Record<string, unknown>;
-  triggeredBy: number;
-  // A retry with the same key returns the run the first attempt created.
+  triggeredBy: number | null;
   idempotencyKey?: string;
 }
 

@@ -6,3 +6,4 @@ export * from "./invitations.js";
 export * from "./subscribers.js";
 export * from "./workflows.js";
 export * from "./environmentIntegrations.js";
+export * from "./inboundEvents.js";
