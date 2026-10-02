@@ -27,8 +27,18 @@ type Mode =
   | { kind: "list" }
   | { kind: "confirm-remove"; trigger: Trigger }
   | { kind: "choosing-source" }
-  | { kind: "choosing-events"; source: string; selected: string[] }
-  | { kind: "entering-raw"; source: string; selected: string[] }
+  | {
+      kind: "choosing-events";
+      source: string;
+      selected: string[];
+      custom?: string[];
+    }
+  | {
+      kind: "entering-raw";
+      source: string;
+      selected: string[];
+      custom?: string[];
+    }
   | { kind: "saving" };
 
 const ADD_VALUE = "__add__";
@@ -197,10 +207,19 @@ export function WorkflowTriggersScreen({
               return <Text color="red">Unknown source {mode.source}.</Text>;
             }
             const named = source.events.map((e) => e.name);
-            const raw = mode.selected.filter((e) => !named.includes(e));
+            const custom = [
+              ...new Set([
+                ...(mode.custom ?? []),
+                ...mode.selected.filter((e) => !named.includes(e)),
+              ]),
+            ];
+            const customSelected = custom.filter((e) =>
+              mode.selected.includes(e),
+            );
             const toggle = (event: string) =>
               setMode({
                 ...mode,
+                custom,
                 selected: mode.selected.includes(event)
                   ? mode.selected.filter((e) => e !== event)
                   : [...mode.selected, event],
@@ -215,8 +234,8 @@ export function WorkflowTriggersScreen({
                       label: `${mode.selected.includes(e.name) ? "[x]" : "[ ]"} ${e.label}`,
                       value: e.name,
                     })),
-                    ...raw.map((event) => ({
-                      label: `[x] ${event}`,
+                    ...custom.map((event) => ({
+                      label: `${mode.selected.includes(event) ? "[x]" : "[ ]"} ${event}`,
                       value: event,
                     })),
                     {
@@ -232,12 +251,19 @@ export function WorkflowTriggersScreen({
                     } else if (item.value === CANCEL_VALUE) {
                       setMode({ kind: "list" });
                     } else if (item.value === RAW_VALUE) {
-                      setMode({ ...mode, kind: "entering-raw" });
+                      setMode({ ...mode, custom, kind: "entering-raw" });
                     } else {
                       toggle(item.value);
                     }
                   }}
                 />
+                {customSelected.length > 0 && (
+                  <Text dimColor>
+                    Also enable {customSelected.join(", ")} on your{" "}
+                    {source.name} webhook endpoint: it only sends the events
+                    chosen there.
+                  </Text>
+                )}
               </Box>
             );
           }
@@ -295,7 +321,7 @@ function RawEventInput({
   mode,
   setMode,
 }: {
-  mode: { kind: "entering-raw"; source: string; selected: string[] };
+  mode: Extract<Mode, { kind: "entering-raw" }>;
   setMode: (mode: Mode) => void;
 }) {
   const [value, setValue] = useState("");
@@ -308,8 +334,8 @@ function RawEventInput({
         onSubmit={(submitted) => {
           const event = submitted.trim();
           setMode({
+            ...mode,
             kind: "choosing-events",
-            source: mode.source,
             selected:
               event && !mode.selected.includes(event)
                 ? [...mode.selected, event]

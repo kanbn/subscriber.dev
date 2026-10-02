@@ -134,6 +134,48 @@ describe("WorkflowTriggersScreen", () => {
     });
   });
 
+  it("adds a custom event type with a reminder to enable it in the source, keeping it listed once unticked", async () => {
+    mockWorkflow([]);
+    mockSources(true);
+    const { lastFrame, stdin } = renderScreen("stripe");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("+ Other Stripe event type…");
+    });
+    for (let i = 0; i < 2; i++) {
+      await tick();
+      stdin.write(DOWN);
+    }
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Event type");
+    });
+    await tick();
+    stdin.write("checkout.session.completed");
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("[x] checkout.session.completed");
+    });
+    expect(lastFrame()).toContain(
+      "Also enable checkout.session.completed on your Stripe webhook",
+    );
+
+    for (let i = 0; i < 2; i++) {
+      await tick();
+      stdin.write(DOWN);
+    }
+    await tick();
+    stdin.write("\r");
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("[ ] checkout.session.completed");
+    });
+    expect(lastFrame()).not.toContain("Also enable");
+  });
+
   it("sends you to set up a source that isn't connected, instead of letting you pick its events", async () => {
     mockWorkflow([]);
     mockSources(false);
