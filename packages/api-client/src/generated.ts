@@ -6108,7 +6108,7 @@ export function useGetAnalytics<TData = Awaited<ReturnType<typeof getAnalytics>>
 
 
 /**
- * Webhook events received from inbound sources (e.g. Stripe) for this environment, most recent first, with the events they matched and what happened (workflow triggered, no mapping, person not found, etc.).
+ * Webhook events received from inbound sources (e.g. Stripe) for this environment, most recent first, with the events they matched and what happened (workflow triggered, no workflow triggered by it, person not found, etc.).
  * @summary List inbound webhook events
  */
 export type listInboundEventsResponse200 = {

@@ -645,6 +645,43 @@ describe("workflow triggers", () => {
     expect(workflowRepo.replaceWorkflowTriggers).not.toHaveBeenCalled();
   });
 
+  it("keeps a workflow's existing triggers editable while their integration is disconnected, but refuses new ones", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.updateWorkflow).mockResolvedValue(workflow as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+    vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([
+      { source: "stripe", event: "trial_started" },
+      { source: "stripe", event: "payment_failed" },
+    ] as any);
+    vi.mocked(workflowRepo.replaceWorkflowTriggers).mockResolvedValue([
+      { source: "stripe", event: "trial_started" },
+    ] as any);
+
+    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      triggers: [{ source: "stripe", event: "trial_started" }],
+      updatedBy: 1,
+    });
+    expect(workflowRepo.replaceWorkflowTriggers).toHaveBeenCalledWith(
+      mockDb,
+      workflow,
+      [{ source: "stripe", event: "trial_started" }],
+    );
+
+    await expect(
+      service.updateWorkflow(mockDb, 10, "wf_abc", {
+        triggers: [
+          { source: "stripe", event: "trial_started" },
+          { source: "stripe", event: "trial_ending" },
+        ],
+        updatedBy: 1,
+      }),
+    ).rejects.toThrow(
+      "Connect the Stripe integration before adding its triggers",
+    );
+  });
+
   it("shows triggers as inactive while their integration is disconnected", async () => {
     vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
       workflow as any,

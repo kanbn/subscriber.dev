@@ -14,7 +14,7 @@ export class InboundTools {
   @Tool({
     name: "list_inbound_events",
     description:
-      'List webhook events received from inbound sources (e.g. Stripe) for an environment, most recent first: the event type, the events it matched (trial_started, trial_converted, …), and what happened (workflow triggered, no mapping, person not found, etc.). Use it to debug why a webhook-triggered email did or didn\'t send. Filter with `source`, e.g. "stripe".',
+      'List webhook events received from inbound sources (e.g. Stripe) for an environment, most recent first: the event type, the events it matched (trial_started, trial_converted, …), and what happened (workflow triggered, no workflow triggered by it, person not found, etc.). Use it to debug why a webhook-triggered email did or didn\'t send. Filter with `source`, e.g. "stripe".',
     parameters: ListInboundEventsQuerySchema.extend({
       environmentId: z.string(),
     }),

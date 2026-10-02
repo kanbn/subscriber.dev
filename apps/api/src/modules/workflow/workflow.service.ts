@@ -359,6 +359,7 @@ export class WorkflowService {
     type: "automation" | "broadcast",
     triggers: WorkflowTriggerInput[],
     connectedSources: Set<string>,
+    current: WorkflowTriggerInput[] = [],
   ): WorkflowTriggerInput[] {
     if (triggers.length > 0 && type === "broadcast") {
       throw new BadRequestException(
@@ -377,7 +378,10 @@ export class WorkflowService {
           `Unknown ${source.name} event "${trigger.event}". Use one of ${source.events.map((e) => e.name).join(", ")}, or a raw event type such as checkout.session.completed`,
         );
       }
-      if (!connectedSources.has(trigger.source)) {
+      const isNew = !current.some(
+        (t) => t.source === trigger.source && t.event === trigger.event,
+      );
+      if (isNew && !connectedSources.has(trigger.source)) {
         throw new BadRequestException(
           `Connect the ${source.name} integration before adding its triggers`,
         );
@@ -522,7 +526,12 @@ export class WorkflowService {
 
     const connectedSources = await this.connectedSources(db, environmentId);
     const newTriggers = data.triggers
-      ? this.validateTriggers(existing.type, data.triggers, connectedSources)
+      ? this.validateTriggers(
+          existing.type,
+          data.triggers,
+          connectedSources,
+          await workflowRepo.listTriggersForWorkflow(db, existing.id),
+        )
       : undefined;
 
     const workflow = await workflowRepo.updateWorkflow(db, existing.id, {
