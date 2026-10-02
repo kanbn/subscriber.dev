@@ -921,7 +921,7 @@
       "post": {
         "operationId": "createWorkflow",
         "summary": "Create a new workflow",
-        "description": "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step.",
+        "description": "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started.",
         "parameters": [
           {
             "name": "environmentId",
@@ -1151,7 +1151,7 @@
       "patch": {
         "operationId": "updateWorkflow",
         "summary": "Update a workflow",
-        "description": "Updates workflow fields. If `steps` is provided, it replaces ALL existing steps.",
+        "description": "Updates workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers`.",
         "parameters": [
           {
             "name": "workflowId",
@@ -2114,6 +2114,111 @@
         ]
       }
     },
+    "/environments/{environmentId}/inbound-events": {
+      "get": {
+        "operationId": "listInboundEvents",
+        "summary": "List inbound webhook events",
+        "description": "Webhook events received from inbound sources (e.g. Stripe) for this environment, most recent first, with the events they matched and what happened (workflow triggered, no workflow triggered by it, person not found, etc.).",
+        "parameters": [
+          {
+            "name": "source",
+            "required": false,
+            "in": "query",
+            "description": "Only events from this source, e.g. \"stripe\".",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListInboundEventsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Inbound events"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/environments/{environmentId}/trigger-sources": {
+      "get": {
+        "operationId": "listTriggerSources",
+        "summary": "List workflow trigger sources",
+        "description": "Integrations whose events can trigger workflows (e.g. Stripe), whether each is connected in this environment, and the events each offers.",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTriggerSourcesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Workflows"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/mcp": {
       "post": {
         "operationId": "StreamableHttpController_handlePostRequest",
@@ -2530,6 +2635,13 @@
                   "additionalProperties": {},
                   "nullable": true
                 },
+                "createdVia": {
+                  "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time",
@@ -2550,6 +2662,7 @@
                 "lastName",
                 "name",
                 "attributes",
+                "createdVia",
                 "createdAt",
                 "updatedAt"
               ]
@@ -2634,6 +2747,13 @@
                 },
                 "additionalProperties": {},
                 "nullable": true
+              },
+              "createdVia": {
+                "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "createdAt": {
                 "type": "string",
@@ -2800,6 +2920,13 @@
                 },
                 "additionalProperties": {},
                 "nullable": true
+              },
+              "createdVia": {
+                "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "createdAt": {
                 "type": "string",
@@ -2975,6 +3102,13 @@
                       "additionalProperties": {},
                       "nullable": true
                     },
+                    "createdVia": {
+                      "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -3001,6 +3135,7 @@
                     "lastName",
                     "name",
                     "attributes",
+                    "createdVia",
                     "createdAt",
                     "updatedAt",
                     "unsubscribeUrl"
@@ -3163,6 +3298,13 @@
                 },
                 "additionalProperties": {},
                 "nullable": true
+              },
+              "createdVia": {
+                "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "createdAt": {
                 "type": "string",
@@ -3429,6 +3571,31 @@
                 }
               ]
             }
+          },
+          "triggers": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                }
+              },
+              "required": [
+                "source",
+                "event"
+              ]
+            },
+            "description": "Events from connected integrations that start this workflow for the person they're about. Automation workflows only; the integration must be connected first."
           }
         },
         "required": [
@@ -3505,6 +3672,39 @@
               ]
             }
           },
+          "triggers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable name of the event."
+                },
+                "active": {
+                  "type": "boolean",
+                  "description": "False while the source's integration is disconnected; the trigger resumes once it's reconnected."
+                }
+              },
+              "required": [
+                "source",
+                "event",
+                "label",
+                "active"
+              ]
+            }
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -3524,6 +3724,7 @@
           "status",
           "type",
           "steps",
+          "triggers",
           "createdAt",
           "updatedAt"
         ]
@@ -3601,6 +3802,39 @@
                     ]
                   }
                 },
+                "triggers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                      },
+                      "event": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Human-readable name of the event."
+                      },
+                      "active": {
+                        "type": "boolean",
+                        "description": "False while the source's integration is disconnected; the trigger resumes once it's reconnected."
+                      }
+                    },
+                    "required": [
+                      "source",
+                      "event",
+                      "label",
+                      "active"
+                    ]
+                  }
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time",
@@ -3620,6 +3854,7 @@
                 "status",
                 "type",
                 "steps",
+                "triggers",
                 "createdAt",
                 "updatedAt"
               ]
@@ -3871,6 +4106,39 @@
               ]
             }
           },
+          "triggers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable name of the event."
+                },
+                "active": {
+                  "type": "boolean",
+                  "description": "False while the source's integration is disconnected; the trigger resumes once it's reconnected."
+                }
+              },
+              "required": [
+                "source",
+                "event",
+                "label",
+                "active"
+              ]
+            }
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -3917,6 +4185,7 @@
           "status",
           "type",
           "steps",
+          "triggers",
           "createdAt",
           "updatedAt",
           "sentCount",
@@ -4023,6 +4292,31 @@
                     "body"
                   ]
                 }
+              ]
+            }
+          },
+          "triggers": {
+            "description": "If provided, replaces ALL existing triggers for this workflow. Automation workflows only; each trigger's integration must be connected.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                }
+              },
+              "required": [
+                "source",
+                "event"
               ]
             }
           }
@@ -4676,6 +4970,148 @@
           "subscribers",
           "sends",
           "bounces"
+        ]
+      },
+      "ListInboundEventsResponseDto": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string"
+                },
+                "externalEventId": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "received",
+                    "processed",
+                    "ignored",
+                    "failed"
+                  ]
+                },
+                "matchedEvents": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "nullable": true
+                },
+                "outcome": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subscriberPublicId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subscriberEmail": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "processedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "source",
+                "externalEventId",
+                "type",
+                "status",
+                "matchedEvents",
+                "outcome",
+                "subscriberPublicId",
+                "subscriberEmail",
+                "createdAt",
+                "processedAt"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "events",
+          "limit",
+          "offset"
+        ]
+      },
+      "ListTriggerSourcesResponseDto": {
+        "type": "object",
+        "properties": {
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "description": "Use as a trigger's `source`, e.g. \"stripe\"."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "connected": {
+                  "type": "boolean",
+                  "description": "Whether the integration is set up in this environment. Triggers can only be added for connected sources."
+                },
+                "events": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Use as a trigger's `event`."
+                      },
+                      "label": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "label"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "source",
+                "name",
+                "connected",
+                "events"
+              ]
+            }
+          }
+        },
+        "required": [
+          "sources"
         ]
       }
     }

@@ -211,6 +211,7 @@ export function SubscriberDetailScreen({
                   ? loadedSubscriber.tags.join(", ")
                   : "—"}
               </Text>
+              <Text>createdVia: {loadedSubscriber.createdVia ?? "—"}</Text>
             </Box>
           );
         }}

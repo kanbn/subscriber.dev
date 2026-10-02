@@ -6,6 +6,7 @@ import {
 import { beforeEach, describe, expect, it, onTestFinished, vi } from "vitest";
 
 import type { dbClient } from "@subscriber.dev/db/client";
+import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
 import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBroadcast.repo";
@@ -27,6 +28,12 @@ vi.mock("@subscriber.dev/db/repository/workflow.repo", () => ({
   replaceWorkflowSteps: vi.fn(),
   updateWorkflow: vi.fn(),
   softDeleteWorkflow: vi.fn(),
+  listTriggersForWorkflow: vi.fn(),
+  replaceWorkflowTriggers: vi.fn(),
+}));
+
+vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
+  listByEnvironment: vi.fn(),
 }));
 
 vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
@@ -44,6 +51,8 @@ vi.mock("@subscriber.dev/db/repository/workflowBroadcast.repo", () => ({
 
 vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
   createRunWithSteps: vi.fn(),
+  getRunByIdempotencyKey: vi.fn(),
+  listUnqueuedPendingSteps: vi.fn(),
   setRunStepBullJobId: vi.fn(),
   listPendingRunStepsForSubscriber: vi.fn(),
   cancelPendingForSubscriber: vi.fn(),
@@ -82,6 +91,10 @@ let service: WorkflowService;
 beforeEach(() => {
   vi.clearAllMocks();
   mockQueue.remove.mockResolvedValue(undefined);
+  vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([]);
+  vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue(
+    [],
+  );
   service = new WorkflowService(
     mockQueue as any,
     mockBroadcastDispatchQueue as any,
@@ -242,6 +255,100 @@ describe("triggerWorkflow", () => {
   });
 });
 
+describe("triggerWorkflow with an idempotency key", () => {
+  const input = {
+    key: "user-signup",
+    subscriber: { email: "a@example.com" },
+    triggeredBy: 1,
+    idempotencyKey: "inbound:1:user-signup",
+  };
+
+  beforeEach(() => {
+    vi.mocked(workflowRepo.getWorkflowByKey).mockResolvedValue({
+      id: 1,
+      status: "active",
+    } as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([
+      { id: 10, stepOrder: 0, type: "email", delayMs: 0, config: {} },
+    ] as any);
+    vi.mocked(subscriberRepo.findSubscriberForUpsert).mockResolvedValue({
+      id: 100,
+    } as any);
+    vi.mocked(workflowRunRepo.listUnqueuedPendingSteps).mockResolvedValue([]);
+  });
+
+  it("stores the key on the new run", async () => {
+    vi.mocked(workflowRunRepo.getRunByIdempotencyKey).mockResolvedValue(
+      undefined,
+    );
+    vi.mocked(workflowRunRepo.createRunWithSteps).mockResolvedValue({
+      run: { id: 5, publicId: "run_abc" },
+      runSteps: [],
+    } as any);
+
+    await expect(service.triggerWorkflow(mockDb, 10, input)).resolves.toEqual({
+      triggered: true,
+      runPublicId: "run_abc",
+    });
+    expect(workflowRunRepo.createRunWithSteps).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({ idempotencyKey: "inbound:1:user-signup" }),
+    );
+  });
+
+  it("returns the existing run on a retry instead of creating another, queuing any of its steps that never were", async () => {
+    const stranded = [{ id: 200, scheduledAt: new Date() }];
+    vi.mocked(workflowRunRepo.getRunByIdempotencyKey).mockResolvedValue({
+      id: 5,
+      publicId: "run_abc",
+    });
+    vi.mocked(workflowRunRepo.listUnqueuedPendingSteps).mockResolvedValue(
+      stranded,
+    );
+    mockQueue.add.mockResolvedValue({ id: "run-step-200" });
+
+    await expect(service.triggerWorkflow(mockDb, 10, input)).resolves.toEqual({
+      triggered: true,
+      runPublicId: "run_abc",
+    });
+    expect(workflowRunRepo.createRunWithSteps).not.toHaveBeenCalled();
+    expect(mockQueue.add).toHaveBeenCalledWith(
+      "send-step",
+      { runStepId: 200 },
+      expect.objectContaining({ jobId: "run-step-200" }),
+    );
+  });
+
+  it("returns the winner's run when a concurrent trigger with the same key hits the unique constraint", async () => {
+    vi.mocked(workflowRunRepo.getRunByIdempotencyKey)
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({ id: 5, publicId: "run_abc" });
+    vi.mocked(workflowRunRepo.createRunWithSteps).mockRejectedValue(
+      Object.assign(new Error("Failed query"), { cause: { code: "23505" } }),
+    );
+
+    await expect(service.triggerWorkflow(mockDb, 10, input)).resolves.toEqual({
+      triggered: true,
+      runPublicId: "run_abc",
+    });
+  });
+
+  it("rethrows a unique-constraint clash when no trigger was given a key", async () => {
+    const clash = Object.assign(new Error("Failed query"), {
+      cause: { code: "23505" },
+    });
+    vi.mocked(workflowRunRepo.createRunWithSteps).mockRejectedValue(clash);
+
+    await expect(
+      service.triggerWorkflow(mockDb, 10, {
+        ...input,
+        idempotencyKey: undefined,
+      }),
+    ).rejects.toBe(clash);
+    expect(workflowRunRepo.getRunByIdempotencyKey).not.toHaveBeenCalled();
+  });
+});
+
 // ---------------------------------------------------------------------------
 // cancelPendingRunsForSubscriber
 // ---------------------------------------------------------------------------
@@ -313,6 +420,7 @@ describe("createWorkflow", () => {
     };
     vi.mocked(workflowRepo.createWorkflow).mockResolvedValue({
       workflow,
+      triggers: [],
       steps: [
         {
           publicId: "step_1",
@@ -361,6 +469,7 @@ describe("createWorkflow", () => {
     };
     vi.mocked(workflowRepo.createWorkflow).mockResolvedValue({
       workflow,
+      triggers: [],
       steps: [
         {
           publicId: "step_1",
@@ -399,6 +508,207 @@ describe("createWorkflow", () => {
 // ---------------------------------------------------------------------------
 // updateWorkflow – webhook URL redaction
 // ---------------------------------------------------------------------------
+
+describe("workflow triggers", () => {
+  const workflow = {
+    id: 1,
+    publicId: "wf_abc",
+    environmentId: 10,
+    key: "trial-welcome",
+    name: "Trial welcome",
+    description: null,
+    status: "active" as const,
+    type: "automation" as const,
+    createdAt: new Date(0),
+    updatedAt: new Date(0),
+  };
+  const steps = [
+    { type: "email" as const, delayMs: 0, subject: "s", body: "b" },
+  ];
+
+  function connectStripe() {
+    vi.mocked(environmentIntegrationsRepo.listByEnvironment).mockResolvedValue([
+      { type: "cloudflare", encryptedSecret: "x" },
+      { type: "stripe", encryptedSecret: "x" },
+    ] as any);
+  }
+
+  const create = (overrides: Record<string, unknown>) =>
+    service.createWorkflow(mockDb, 10, {
+      key: "trial-welcome",
+      name: "Trial welcome",
+      type: "automation",
+      steps,
+      createdBy: 1,
+      ...overrides,
+    });
+
+  it("saves the triggers once each and returns them labelled and active", async () => {
+    connectStripe();
+    vi.mocked(workflowRepo.createWorkflow).mockImplementation(
+      async (_db, data) =>
+        ({ workflow, steps: [], triggers: data.triggers }) as any,
+    );
+
+    const result = await create({
+      triggers: [
+        { source: "stripe", event: "trial_started" },
+        { source: "stripe", event: "trial_started" },
+        { source: "stripe", event: "checkout.session.completed" },
+      ],
+    });
+
+    expect(workflowRepo.createWorkflow).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({
+        triggers: [
+          { source: "stripe", event: "trial_started" },
+          { source: "stripe", event: "checkout.session.completed" },
+        ],
+      }),
+    );
+    expect(result.triggers).toEqual([
+      {
+        source: "stripe",
+        event: "trial_started",
+        label: "Trial started",
+        active: true,
+      },
+      {
+        source: "stripe",
+        event: "checkout.session.completed",
+        label: "checkout.session.completed",
+        active: true,
+      },
+    ]);
+  });
+
+  it("refuses triggers until the source's integration is connected", async () => {
+    await expect(
+      create({ triggers: [{ source: "stripe", event: "trial_started" }] }),
+    ).rejects.toThrow(
+      "Connect the Stripe integration before adding its triggers",
+    );
+    expect(workflowRepo.createWorkflow).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [
+      { source: "polar", event: "trial_started" },
+      'Unknown trigger source "polar"',
+    ],
+    [
+      { source: "stripe", event: "trial_begun" },
+      'Unknown Stripe event "trial_begun"',
+    ],
+  ])("rejects %o", async (trigger, message) => {
+    connectStripe();
+    await expect(create({ triggers: [trigger] })).rejects.toThrow(message);
+  });
+
+  it("refuses triggers on a broadcast workflow", async () => {
+    connectStripe();
+    await expect(
+      create({
+        type: "broadcast",
+        triggers: [{ source: "stripe", event: "trial_started" }],
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it("replaces the triggers on update, and keeps them when omitted", async () => {
+    connectStripe();
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.updateWorkflow).mockResolvedValue(workflow as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+    vi.mocked(workflowRepo.replaceWorkflowTriggers).mockResolvedValue([
+      { source: "stripe", event: "payment_failed" },
+    ] as any);
+
+    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      triggers: [{ source: "stripe", event: "payment_failed" }],
+      updatedBy: 1,
+    });
+    expect(workflowRepo.replaceWorkflowTriggers).toHaveBeenCalledWith(
+      mockDb,
+      workflow,
+      [{ source: "stripe", event: "payment_failed" }],
+    );
+
+    vi.mocked(workflowRepo.replaceWorkflowTriggers).mockClear();
+    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      name: "Renamed",
+      updatedBy: 1,
+    });
+    expect(workflowRepo.replaceWorkflowTriggers).not.toHaveBeenCalled();
+  });
+
+  it("keeps a workflow's existing triggers editable while their integration is disconnected, but refuses new ones", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.updateWorkflow).mockResolvedValue(workflow as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+    vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([
+      { source: "stripe", event: "trial_started" },
+      { source: "stripe", event: "payment_failed" },
+    ] as any);
+    vi.mocked(workflowRepo.replaceWorkflowTriggers).mockResolvedValue([
+      { source: "stripe", event: "trial_started" },
+    ] as any);
+
+    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      triggers: [{ source: "stripe", event: "trial_started" }],
+      updatedBy: 1,
+    });
+    expect(workflowRepo.replaceWorkflowTriggers).toHaveBeenCalledWith(
+      mockDb,
+      workflow,
+      [{ source: "stripe", event: "trial_started" }],
+    );
+
+    await expect(
+      service.updateWorkflow(mockDb, 10, "wf_abc", {
+        triggers: [
+          { source: "stripe", event: "trial_started" },
+          { source: "stripe", event: "trial_ending" },
+        ],
+        updatedBy: 1,
+      }),
+    ).rejects.toThrow(
+      "Connect the Stripe integration before adding its triggers",
+    );
+  });
+
+  it("shows triggers as inactive while their integration is disconnected", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+    vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([
+      { source: "stripe", event: "trial_started" },
+    ] as any);
+    vi.mocked(workflowRunRepo.getWorkflowStepCounts).mockResolvedValue({
+      sent: 0,
+      failed: 0,
+      skipped: 0,
+      pending: 0,
+      bounced: 0,
+    } as any);
+    vi.mocked(workflowRunRepo.getWorkflowBounceBreakdown).mockResolvedValue({
+      hard: 0,
+      soft: 0,
+    } as any);
+
+    const result = await service.getWorkflow(mockDb, 10, "wf_abc");
+
+    expect(result.triggers).toEqual([
+      expect.objectContaining({ event: "trial_started", active: false }),
+    ]);
+  });
+});
 
 describe("updateWorkflow webhook URLs", () => {
   const realUrl = "https://discord.com/api/webhooks/123/secret-token";

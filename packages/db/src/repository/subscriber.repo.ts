@@ -119,7 +119,8 @@ export const createSubscriber = async (
     lastName?: string | null;
     name?: string | null;
     attributes?: Record<string, unknown> | null;
-    createdBy: number;
+    createdBy: number | null;
+    createdVia: string;
   },
 ) => {
   const [result] = await db
@@ -135,6 +136,7 @@ export const createSubscriber = async (
       name: data.name ?? null,
       attributes: data.attributes ?? null,
       createdBy: data.createdBy,
+      createdVia: data.createdVia,
       updatedBy: data.createdBy,
     })
     .returning();

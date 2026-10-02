@@ -5,6 +5,7 @@ import type { UpsertIntegrationDto } from "@subscriber.dev/api-client/cli";
 import {
   deleteIntegration,
   getIntegration,
+  listInboundEvents,
   setPrimaryIntegration,
   upsertIntegration,
 } from "@subscriber.dev/api-client/cli";
@@ -14,16 +15,19 @@ import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateFo
 import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
+import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
+import { formatRelativeTime } from "../formatRelativeTime.js";
 import {
   cloudflareIntegrationBody,
   smtpIntegrationBody,
+  stripeIntegrationBody,
 } from "../integrationBodies.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
 type PrimaryStatus = "idle" | "setting" | "error";
 
-const EDITABLE_TYPES = ["smtp", "cloudflare"];
+const EDITABLE_TYPES = ["smtp", "cloudflare", "stripe"];
 
 function text(value: unknown): string {
   return typeof value === "string" ? value : "";
@@ -55,9 +59,15 @@ export function IntegrationDetailScreen({
     if (response.status !== 200) {
       throw new Error("Integration not found.");
     }
-    // The response has provider-specific fields beyond what the generated
-    // type declares (a known lossy conversion for open-dictionary DTOs).
     return response.data as unknown as Record<string, unknown>;
+  }, [environmentId, type, refreshKey]);
+
+  const inboundEvents = useAsyncData(async () => {
+    const response = await listInboundEvents(environmentId, {
+      source: type,
+      limit: 10,
+    });
+    return response.status === 200 ? response.data.events : [];
   }, [environmentId, type, refreshKey]);
 
   const [deleteStatus, setDeleteStatus] = useState<DeleteStatus>("idle");
@@ -68,6 +78,10 @@ export function IntegrationDetailScreen({
   const [editing, setEditing] = useState(false);
 
   const isPrimary = state.status === "ready" && state.data.priority === 1;
+  const triggerCount =
+    state.status === "ready" && typeof state.data.triggerCount === "number"
+      ? state.data.triggerCount
+      : 0;
   const canEdit = state.status === "ready" && EDITABLE_TYPES.includes(type);
 
   useInput((input) => {
@@ -157,6 +171,14 @@ export function IntegrationDetailScreen({
             }
             onCancel={() => setEditing(false)}
           />
+        ) : type === "stripe" ? (
+          <StripeIntegrationForm
+            editing
+            onSubmit={(values) =>
+              handleSave(stripeIntegrationBody(values, { editing: true }))
+            }
+            onCancel={() => setEditing(false)}
+          />
         ) : (
           <CloudflareEmailCreateForm
             editing
@@ -208,9 +230,40 @@ export function IntegrationDetailScreen({
         )}
       </AsyncBoundary>
 
+      {state.status === "ready" &&
+        "webhookUrl" in state.data &&
+        inboundEvents.status === "ready" &&
+        (() => {
+          const events = inboundEvents.data;
+          return (
+            <Box flexDirection="column" marginTop={1}>
+              <Text bold>Recent events</Text>
+              {events.length === 0 ? (
+                <Text dimColor>
+                  None yet. Point a webhook at webhookUrl, sending the events in
+                  eventsToEnable, then add triggers to your workflows.
+                </Text>
+              ) : (
+                events.map((event) => (
+                  <Text key={event.externalEventId}>
+                    {formatRelativeTime(event.createdAt as string)} {event.type}
+                    {" → "}
+                    {event.status}
+                    {event.outcome ? `: ${event.outcome}` : ""}
+                  </Text>
+                ))
+              )}
+            </Box>
+          );
+        })()}
+
       {deleteStatus === "confirming" && (
         <ConfirmPrompt
-          message={`Remove integration "${type}"? This cannot be undone.`}
+          message={`Remove integration "${type}"? This cannot be undone.${
+            triggerCount > 0
+              ? ` ${triggerCount} workflow trigger${triggerCount === 1 ? "" : "s"} will stop until it's reconnected.`
+              : ""
+          }`}
           onConfirm={() => void handleConfirmDelete()}
           onCancel={() => setDeleteStatus("idle")}
         />

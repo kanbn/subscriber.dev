@@ -43,6 +43,14 @@ const testWorkflow = {
       delayMs: 60000,
     },
   ],
+  triggers: [
+    {
+      source: "stripe",
+      event: "trial_started",
+      label: "Trial started",
+      active: true,
+    },
+  ],
   sentCount: 12,
   failedCount: 1,
   skippedCount: 2,
@@ -57,11 +65,13 @@ function renderScreen(
   onDeleted = vi.fn(),
   onViewRuns = vi.fn(),
   onViewBroadcasts = vi.fn(),
+  onViewTriggers = vi.fn(),
 ) {
   return {
     onDeleted,
     onViewRuns,
     onViewBroadcasts,
+    onViewTriggers,
     ...render(
       <WorkflowDetailScreen
         environmentId="test-environment-1"
@@ -69,6 +79,7 @@ function renderScreen(
         onDeleted={onDeleted}
         onViewRuns={onViewRuns}
         onViewBroadcasts={onViewBroadcasts}
+        onViewTriggers={onViewTriggers}
       />,
     ),
   };
@@ -147,6 +158,7 @@ describe("WorkflowDetailScreen", () => {
         onDeleted={vi.fn()}
         onViewRuns={vi.fn()}
         onViewBroadcasts={vi.fn()}
+        onViewTriggers={vi.fn()}
       />,
     );
 
@@ -404,6 +416,55 @@ describe("WorkflowDetailScreen runs", () => {
     stdin.write("r");
 
     expect(onViewRuns).toHaveBeenCalled();
+  });
+
+  it("lists the workflow's triggers, marking inactive ones", async () => {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        ...testWorkflow,
+        triggers: [
+          ...testWorkflow.triggers,
+          {
+            source: "stripe",
+            event: "payment_failed",
+            label: "Payment failed",
+            active: false,
+          },
+        ],
+      },
+    } as never);
+    const { lastFrame } = renderScreen();
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("stripe · Trial started");
+    });
+    expect(lastFrame()).toContain("stripe · Payment failed (inactive)");
+  });
+
+  it("calls onViewTriggers when 'g' is pressed", async () => {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testWorkflow,
+    } as never);
+    const onViewTriggers = vi.fn();
+    const { lastFrame, stdin } = renderScreen(
+      vi.fn(),
+      vi.fn(),
+      vi.fn(),
+      onViewTriggers,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("key: test-signup");
+    });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    stdin.write("g");
+
+    expect(onViewTriggers).toHaveBeenCalled();
   });
 
   it("calls onViewBroadcasts when 'h' is pressed", async () => {

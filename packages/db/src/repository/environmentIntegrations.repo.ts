@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import { environmentIntegrations } from "@subscriber.dev/db/schema";
@@ -12,6 +12,19 @@ export const getByEnvironmentAndType = async (
     where: and(
       eq(environmentIntegrations.environmentId, environmentId),
       eq(environmentIntegrations.type, type),
+    ),
+  });
+};
+
+export const getByWebhookToken = async (
+  db: dbClient,
+  type: string,
+  token: string,
+) => {
+  return await db.query.environmentIntegrations.findFirst({
+    where: and(
+      eq(environmentIntegrations.type, type),
+      sql`${environmentIntegrations.config}->>'webhookToken' = ${token}`,
     ),
   });
 };

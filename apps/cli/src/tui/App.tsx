@@ -15,6 +15,7 @@ import { UserScreen } from "./screens/UserScreen.js";
 import { WorkflowDetailScreen } from "./screens/WorkflowDetailScreen.js";
 import { WorkflowRunsScreen } from "./screens/WorkflowRunsScreen.js";
 import { WorkflowsScreen } from "./screens/WorkflowsScreen.js";
+import { WorkflowTriggersScreen } from "./screens/WorkflowTriggersScreen.js";
 import { WorkspacesScreen } from "./screens/WorkspacesScreen.js";
 
 export function App() {
@@ -142,6 +143,44 @@ export function App() {
               kind: "broadcasts",
               environment: screen.environment,
               workflowId: screen.workflowId,
+            })
+          }
+          onViewTriggers={() =>
+            push({
+              kind: "workflowTriggers",
+              environment: screen.environment,
+              workflowId: screen.workflowId,
+            })
+          }
+        />
+      )}
+
+      {screen.kind === "workflowTriggers" && (
+        <WorkflowTriggersScreen
+          environmentId={screen.environment.publicId}
+          workflowId={screen.workflowId}
+          pickSource={screen.pickSource}
+          onSetUp={(type) =>
+            push({
+              kind: "integrationSetup",
+              environment: screen.environment,
+              type,
+            })
+          }
+        />
+      )}
+
+      {screen.kind === "integrationSetup" && (
+        <IntegrationsScreen
+          environmentId={screen.environment.publicId}
+          createType={screen.type}
+          onCancelCreate={pop}
+          onSelect={(type) =>
+            setStack((s) => {
+              const below = s[s.length - 2];
+              return below?.kind === "workflowTriggers"
+                ? [...s.slice(0, -2), { ...below, pickSource: type }]
+                : s.slice(0, -1);
             })
           }
         />

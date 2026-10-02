@@ -201,6 +201,7 @@ export class SubscriberController {
       attributes: input.attributes ?? null,
       emailPreference: input.preferences?.email ?? true,
       createdBy: user.id,
+      createdVia: "api",
     });
   }
 
@@ -227,6 +228,7 @@ export class SubscriberController {
       environment.id,
       input.subscribers,
       user.id,
+      "api",
     );
   }
 

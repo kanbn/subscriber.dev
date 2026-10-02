@@ -1,6 +1,8 @@
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
+import { SubscriberSchema } from "./create-subscriber.dto.js";
+
 export const UpdateSubscriberSchema = z.object({
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
@@ -10,10 +12,6 @@ export const UpdateSubscriberSchema = z.object({
   name: z.string().optional().nullable(),
   attributes: z.record(z.string(), z.unknown()).optional().nullable(),
 });
-
-import {
-  SubscriberSchema,
-} from "./create-subscriber.dto.js";
 
 export const UpdateSubscriberResponseSchema = z.object({
   subscriber: SubscriberSchema,

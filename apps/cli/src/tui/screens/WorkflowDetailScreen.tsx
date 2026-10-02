@@ -55,12 +55,14 @@ export function WorkflowDetailScreen({
   onDeleted,
   onViewRuns,
   onViewBroadcasts,
+  onViewTriggers,
 }: {
   environmentId: string;
   workflowId: string;
   onDeleted: () => void;
   onViewRuns: () => void;
   onViewBroadcasts: () => void;
+  onViewTriggers: () => void;
 }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const state = useAsyncData(async () => {
@@ -128,6 +130,11 @@ export function WorkflowDetailScreen({
       workflow.type === "broadcast"
     ) {
       onViewBroadcasts();
+    } else if (
+      (input === "g" || input === "G") &&
+      workflow.type === "automation"
+    ) {
+      onViewTriggers();
     }
   });
 
@@ -261,6 +268,22 @@ export function WorkflowDetailScreen({
             <Text>name: {loadedWorkflow.name}</Text>
             <Text>status: {loadedWorkflow.status}</Text>
             <Text>description: {loadedWorkflow.description ?? "—"}</Text>
+            {loadedWorkflow.type === "automation" && (
+              <>
+                <Text bold>Triggers:</Text>
+                {loadedWorkflow.triggers.length === 0 ? (
+                  <Text dimColor> none (API only)</Text>
+                ) : (
+                  loadedWorkflow.triggers.map((t) => (
+                    <Text key={`${t.source}:${t.event}`} dimColor={!t.active}>
+                      {" "}
+                      {t.source} · {t.label}
+                      {t.active ? "" : " (inactive)"}
+                    </Text>
+                  ))
+                )}
+              </>
+            )}
             <Text bold>Steps:</Text>
             {loadedWorkflow.steps.map((step) => (
               <Text key={step.publicId}>
@@ -414,7 +437,7 @@ export function WorkflowDetailScreen({
           idle
             ? workflow?.type === "broadcast"
               ? "d delete · e edit · t send test · b broadcast · r runs · h broadcasts · Esc back · q quit"
-              : "d delete · e edit · t trigger · r runs · Esc back · q quit"
+              : "d delete · e edit · t trigger · g triggers · r runs · Esc back · q quit"
             : triggerStatus === "success" || triggerStatus === "error"
               ? "any key to continue"
               : triggerStatus === "entering-email"

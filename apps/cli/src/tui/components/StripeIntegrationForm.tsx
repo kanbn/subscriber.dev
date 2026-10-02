@@ -1,0 +1,107 @@
+import { Box, Text } from "ink";
+import SelectInput from "ink-select-input";
+import TextInput from "ink-text-input";
+import { useState } from "react";
+
+export interface StripeIntegrationValues {
+  apiKey: string;
+  webhookSecret: string;
+}
+
+const FIELDS = [
+  { key: "apiKey", label: "Stripe API key (restricted, read Customers)" },
+  { key: "webhookSecret", label: "Webhook signing secret (whsec_…)" },
+] as const;
+type FieldKey = (typeof FIELDS)[number]["key"];
+
+const SUBMIT_VALUE = "__submit__";
+const CANCEL_VALUE = "__cancel__";
+
+type Mode = "menu" | "editing-text" | "submitting";
+
+export function StripeIntegrationForm({
+  onSubmit,
+  onCancel,
+  editing = false,
+}: {
+  onSubmit: (values: StripeIntegrationValues) => Promise<string | undefined>;
+  onCancel: () => void;
+  editing?: boolean;
+}) {
+  const [values, setValues] = useState<StripeIntegrationValues>({
+    apiKey: "",
+    webhookSecret: "",
+  });
+  const [mode, setMode] = useState<Mode>("menu");
+  const [editingField, setEditingField] = useState<FieldKey | null>(null);
+  const [error, setError] = useState("");
+
+  const preview = (key: FieldKey) => {
+    const value = values[key];
+    if (value.length === 0) return editing ? "(unchanged)" : "—";
+    return "•".repeat(Math.min(value.length, 8));
+  };
+
+  const handleSubmit = async () => {
+    if (!editing && values.apiKey.trim().length === 0) {
+      setError("A Stripe API key is required.");
+      return;
+    }
+    setError("");
+    setMode("submitting");
+    const failure = await onSubmit(values);
+    if (failure) {
+      setError(failure);
+      setMode("menu");
+    }
+  };
+
+  if (mode === "editing-text" && editingField) {
+    return (
+      <Box>
+        <Text>{FIELDS.find((f) => f.key === editingField)!.label}: </Text>
+        <TextInput
+          value={values[editingField]}
+          onChange={(value) =>
+            setValues((prev) => ({ ...prev, [editingField]: value }))
+          }
+          onSubmit={() => setMode("menu")}
+          mask="*"
+        />
+      </Box>
+    );
+  }
+
+  if (mode === "submitting") {
+    return <Text color="gray">{editing ? "Saving…" : "Creating…"}</Text>;
+  }
+
+  return (
+    <Box flexDirection="column">
+      {error.length > 0 && <Text color="red">{error}</Text>}
+      <SelectInput
+        items={[
+          ...FIELDS.map((field) => ({
+            label: `${field.label}: ${preview(field.key)}`,
+            value: field.key as string,
+          })),
+          {
+            label: editing ? "Save changes" : "Create integration",
+            value: SUBMIT_VALUE,
+          },
+          { label: "Cancel", value: CANCEL_VALUE },
+        ]}
+        onSelect={(item) => {
+          if (item.value === SUBMIT_VALUE) {
+            void handleSubmit();
+          } else if (item.value === CANCEL_VALUE) {
+            onCancel();
+          } else {
+            setEditingField(item.value as FieldKey);
+            setMode("editing-text");
+          }
+        }}
+      />
+    </Box>
+  );
+}

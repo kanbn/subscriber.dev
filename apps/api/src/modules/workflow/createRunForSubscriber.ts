@@ -22,6 +22,7 @@ interface CreateRunForSubscriberInput {
   payload?: Record<string, unknown> | null;
   createdBy: number | null;
   broadcastId?: number | null;
+  idempotencyKey?: string | null;
   startDelayMs?: number;
 }
 
@@ -50,6 +51,7 @@ export async function createRunForSubscriber(
     payload: input.payload ?? null,
     createdBy: input.createdBy,
     broadcastId: input.broadcastId ?? null,
+    idempotencyKey: input.idempotencyKey ?? null,
     steps: plannedSteps,
   });
 

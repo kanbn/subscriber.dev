@@ -3,12 +3,14 @@ import { McpModule, McpTransportType } from "@rekog/mcp-nest";
 
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { AnalyticsModule } from "../analytics/analytics.module.js";
+import { InboundModule } from "../inbound/inbound.module.js";
 import { IntegrationsModule } from "../integrations/integrations.module.js";
 import { SubscriberModule } from "../subscriber/subscriber.module.js";
 import { UserModule } from "../user/user.module.js";
 import { WorkflowModule } from "../workflow/workflow.module.js";
 import { WorkspaceModule } from "../workspace/workspace.module.js";
 import { AnalyticsTools } from "./tools/analytics.tools.js";
+import { InboundTools } from "./tools/inbound.tools.js";
 import { IntegrationsTools } from "./tools/integrations.tools.js";
 import { SubscriberTools } from "./tools/subscriber.tools.js";
 import { UserTools } from "./tools/user.tools.js";
@@ -23,6 +25,7 @@ const TOOL_PROVIDERS = [
   UserTools,
   IntegrationsTools,
   AnalyticsTools,
+  InboundTools,
   WorkspaceTools,
 ];
 
@@ -39,6 +42,7 @@ const TOOL_PROVIDERS = [
     UserModule,
     IntegrationsModule,
     AnalyticsModule,
+    InboundModule,
     WorkspaceModule,
   ],
   providers: TOOL_PROVIDERS,

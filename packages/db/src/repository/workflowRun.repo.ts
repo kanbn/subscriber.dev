@@ -22,6 +22,7 @@ export const createRunWithSteps = async (
     payload: Record<string, unknown> | null;
     createdBy: number | null;
     broadcastId?: number | null;
+    idempotencyKey?: string | null;
     steps: RunStepInput[];
   },
 ) => {
@@ -35,6 +36,7 @@ export const createRunWithSteps = async (
         subscriberId: data.subscriberId,
         payload: data.payload,
         broadcastId: data.broadcastId ?? null,
+        idempotencyKey: data.idempotencyKey ?? null,
         createdBy: data.createdBy,
       })
       .returning();
@@ -203,6 +205,24 @@ export const cancelPendingForSubscriber = async (
         eq(workflowRuns.status, "active"),
       ),
     );
+};
+
+export const getRunByIdempotencyKey = async (
+  db: dbClient,
+  environmentId: number,
+  idempotencyKey: string,
+) => {
+  const [row] = await db
+    .select({ id: workflowRuns.id, publicId: workflowRuns.publicId })
+    .from(workflowRuns)
+    .where(
+      and(
+        eq(workflowRuns.environmentId, environmentId),
+        eq(workflowRuns.idempotencyKey, idempotencyKey),
+      ),
+    )
+    .limit(1);
+  return row;
 };
 
 export const completeRunIfAllStepsTerminal = async (

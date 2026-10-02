@@ -26,7 +26,8 @@ interface CreateSubscriberData {
   name?: string | null;
   attributes?: Record<string, unknown> | null;
   emailPreference?: boolean;
-  createdBy: number;
+  createdBy: number | null;
+  createdVia: string;
 }
 
 interface BulkUpsertSubscriberItem {
@@ -68,6 +69,7 @@ interface SubscriberRow {
   lastName: string | null;
   name: string | null;
   attributes: Record<string, unknown> | null;
+  createdVia: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -86,6 +88,7 @@ export class SubscriberService {
       lastName: subscriber.lastName,
       name: subscriber.name,
       attributes: subscriber.attributes,
+      createdVia: subscriber.createdVia,
       createdAt: subscriber.createdAt.toISOString(),
       updatedAt: subscriber.updatedAt.toISOString(),
     };
@@ -175,6 +178,7 @@ export class SubscriberService {
       name: data.name ?? null,
       attributes: data.attributes ?? null,
       createdBy: data.createdBy,
+      createdVia: data.createdVia,
     });
 
     if (!subscriber) {
@@ -209,6 +213,7 @@ export class SubscriberService {
     environmentId: number,
     rows: BulkUpsertSubscriberItem[],
     actorUserId: number,
+    createdVia: string,
   ) {
     const results: {
       index: number;
@@ -323,6 +328,7 @@ export class SubscriberService {
             name: row.name ?? null,
             attributes: row.attributes ?? null,
             createdBy: actorUserId,
+            createdVia,
           });
 
           if (!subscriber) {

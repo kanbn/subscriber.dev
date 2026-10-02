@@ -43,6 +43,27 @@ export const WorkflowStepSchema = z.discriminatedUnion("type", [
   WebhookWorkflowStepSchema,
 ]);
 
+export const WorkflowTriggerSchema = z.object({
+  source: z
+    .string()
+    .min(1)
+    .describe('Connected integration that fires the trigger, e.g. "stripe".'),
+  event: z
+    .string()
+    .min(1)
+    .max(255)
+    .describe(
+      'One of the source\'s events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".',
+    ),
+});
+
+export const workflowTriggersSchema = z
+  .array(WorkflowTriggerSchema)
+  .max(50)
+  .describe(
+    "Events from connected integrations that start this workflow for the person they're about. Automation workflows only; the integration must be connected first.",
+  );
+
 export const CreateWorkflowSchema = z.object({
   key: z
     .string()
@@ -60,6 +81,7 @@ export const CreateWorkflowSchema = z.object({
       "Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.",
     ),
   steps: z.array(WorkflowStepSchema).min(1).max(50),
+  triggers: workflowTriggersSchema.optional(),
 });
 
 export const WorkflowStepResponseSchema = z.object({
@@ -85,6 +107,16 @@ export const WorkflowSchema = z.object({
   status: z.enum(["active", "paused"]),
   type: z.enum(["automation", "broadcast"]),
   steps: z.array(WorkflowStepResponseSchema),
+  triggers: z.array(
+    WorkflowTriggerSchema.extend({
+      label: z.string().describe("Human-readable name of the event."),
+      active: z
+        .boolean()
+        .describe(
+          "False while the source's integration is disconnected; the trigger resumes once it's reconnected.",
+        ),
+    }),
+  ),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });

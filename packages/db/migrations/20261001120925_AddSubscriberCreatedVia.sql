@@ -1,0 +1,1 @@
+ALTER TABLE "subscribers" ADD COLUMN "createdVia" varchar(50);

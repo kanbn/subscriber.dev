@@ -34,6 +34,9 @@ export const subscribers = pgTable(
     lastName: varchar("lastName", { length: 255 }),
     name: varchar("name", { length: 255 }),
     attributes: jsonb("attributes").$type<Record<string, unknown>>(),
+    // How the subscriber was created: "api", "mcp", or an inbound source such
+    // as "stripe". Null for subscribers created before this was recorded.
+    createdVia: varchar("createdVia", { length: 50 }),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt").notNull().defaultNow(),
     deletedAt: timestamp("deletedAt"),

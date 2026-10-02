@@ -129,7 +129,7 @@ describe("createWorkflow", () => {
     });
 
     expect(db.transaction).toHaveBeenCalledTimes(1);
-    expect(result).toEqual({ workflow, steps });
+    expect(result).toEqual({ workflow, steps, triggers: [] });
   });
 
   it("throws if the workflow insert returns nothing", async () => {
