@@ -12,4 +12,5 @@ export const fakeSource = {
   personRef: vi.fn(),
   fetchPerson: vi.fn(),
   templateData: vi.fn(),
+  enrich: vi.fn(),
 } satisfies InboundSource<unknown>;

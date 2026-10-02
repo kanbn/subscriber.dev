@@ -77,6 +77,7 @@ beforeEach(() => {
   fakeSource.match.mockReturnValue(["signed_up"]);
   fakeSource.personRef.mockReturnValue("u_1");
   fakeSource.templateData.mockReturnValue({ plan: "free" });
+  fakeSource.enrich.mockResolvedValue({});
   workflowService.triggerWorkflow.mockResolvedValue({
     triggered: true,
     runPublicId: "run_1",
@@ -275,6 +276,37 @@ describe("process", () => {
         outcome: "Workflow missing not found",
       }),
     );
+  });
+
+  it("adds the source's extra template data, fetched with the integration's secret", async () => {
+    setup([welcome]);
+    vi.mocked(inboundEventRepo.getSubscriberByIdentity).mockResolvedValue(
+      subscriber,
+    );
+    fakeSource.enrich.mockResolvedValue({ invoiceUrl: "https://pay" });
+
+    await processor.process(job);
+
+    expect(fakeSource.enrich).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "user.created" }),
+      ["signed_up"],
+      { key: "k" },
+    );
+    expect(workflowService.triggerWorkflow).toHaveBeenCalledWith(
+      {},
+      10,
+      expect.objectContaining({
+        payload: { fake: { plan: "free", invoiceUrl: "https://pay" } },
+      }),
+    );
+  });
+
+  it("doesn't fetch extra data when no workflow is triggered by the event", async () => {
+    setup([]);
+
+    await processor.process(job);
+
+    expect(fakeSource.enrich).not.toHaveBeenCalled();
   });
 
   it("lets unexpected errors fail the job so it's retried", async () => {

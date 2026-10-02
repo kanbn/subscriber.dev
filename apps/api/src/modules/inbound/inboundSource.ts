@@ -33,6 +33,11 @@ export interface InboundSource<TSecret = unknown> {
   personRef(event: InboundEvent): string | undefined;
   fetchPerson(externalId: string, secret: TSecret): Promise<FetchedPerson>;
   templateData(event: InboundEvent, matched: string[]): Record<string, unknown>;
+  enrich?(
+    event: InboundEvent,
+    matched: string[],
+    secret: TSecret,
+  ): Promise<Record<string, unknown>>;
 }
 
 const RAW_EVENT_TYPE = /^[a-z0-9_]+(\.[a-z0-9_]+)+$/;

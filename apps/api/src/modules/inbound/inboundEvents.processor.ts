@@ -93,10 +93,11 @@ export class InboundEventsProcessor extends WorkerHost {
       return;
     }
 
+    const secret = JSON.parse(decrypt(integration.encryptedSecret)) as unknown;
     const resolved = await this.resolveSubscriber(db, {
       environmentId: row.environmentId,
       source,
-      secret: JSON.parse(decrypt(integration.encryptedSecret)) as unknown,
+      secret,
       personRef,
     });
     if ("skipReason" in resolved) {
@@ -109,7 +110,10 @@ export class InboundEventsProcessor extends WorkerHost {
     }
 
     const payload = {
-      [source.source]: source.templateData(event, matchedEvents),
+      [source.source]: {
+        ...source.templateData(event, matchedEvents),
+        ...(await source.enrich?.(event, matchedEvents, secret)),
+      },
     };
     const results: string[] = [];
     let anyTriggered = false;

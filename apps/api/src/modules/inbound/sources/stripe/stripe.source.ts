@@ -11,10 +11,14 @@ export const STRIPE_EVENTS = [
   { name: "trial_started", label: "Trial started" },
   { name: "trial_ending", label: "Trial ending (3 days before)" },
   { name: "trial_converted", label: "Trial converted to paid" },
+  {
+    name: "trial_payment_failed",
+    label: "Trial ended, payment failed (Stripe retries it)",
+  },
   { name: "trial_expired", label: "Trial expired unpaid" },
   { name: "subscription_started", label: "Subscription started (paid)" },
   { name: "subscription_canceled", label: "Subscription canceled" },
-  { name: "payment_failed", label: "Payment failed" },
+  { name: "payment_failed", label: "Renewal payment failed" },
 ] as const;
 
 export const STRIPE_EVENTS_TO_ENABLE = [
@@ -22,20 +26,18 @@ export const STRIPE_EVENTS_TO_ENABLE = [
   "customer.subscription.updated",
   "customer.subscription.deleted",
   "customer.subscription.trial_will_end",
-  "invoice.payment_failed",
 ] as const;
+
+const PAYMENT_FAILED_EVENTS = ["trial_payment_failed", "payment_failed"];
 
 export interface StripeSecret {
   apiKey: string;
   webhookSecret?: string;
 }
 
-const TRIAL_ENDED_UNPAID = new Set([
-  "paused",
-  "past_due",
-  "unpaid",
-  "incomplete_expired",
-]);
+// While Stripe retries a failed charge the subscription is past_due (or
+// unpaid, depending on the account's retry settings).
+const PAYMENT_RETRYING = new Set(["past_due", "unpaid"]);
 
 function objectOf(event: InboundEvent) {
   const data = event.payload.data as
@@ -64,29 +66,69 @@ export function matchStripeEvent(event: InboundEvent): string[] {
       return ["trial_ending"];
 
     case "customer.subscription.updated": {
+      const was = previous?.status;
       // Subscriptions that need a payment confirmed first start "incomplete".
-      if (previous?.status === "incomplete" && status === "active") {
+      if (was === "incomplete" && status === "active") {
         return ["subscription_started"];
       }
-      if (previous?.status !== "trialing") return [];
-      if (status === "active") return ["trial_converted"];
-      if (typeof status === "string" && TRIAL_ENDED_UNPAID.has(status)) {
-        return ["trial_expired"];
+      if (was === "trialing") {
+        if (status === "active") return ["trial_converted"];
+        // The first charge failed; Stripe retries it.
+        if (status === "past_due") return ["trial_payment_failed"];
+        // Ended without a payment method, or failed with no retries left.
+        if (status === "paused" || status === "unpaid") {
+          return ["trial_expired"];
+        }
+        return [];
+      }
+      if (
+        was === "active" &&
+        typeof status === "string" &&
+        PAYMENT_RETRYING.has(status)
+      ) {
+        return ["payment_failed"];
+      }
+      if (
+        typeof was === "string" &&
+        PAYMENT_RETRYING.has(was) &&
+        inFirstPeriodAfterTrial(object)
+      ) {
+        if (status === "active") return ["trial_converted"];
+        if (status === "unpaid") return ["trial_expired"];
       }
       return [];
     }
 
-    case "customer.subscription.deleted":
+    case "customer.subscription.deleted": {
+      const details = object.cancellation_details as
+        | { reason?: string | null }
+        | undefined;
+      const unpaidAfterTrial =
+        details?.reason === "payment_failed" && inFirstPeriodAfterTrial(object);
       return [
-        endedDuringTrial(object) ? "trial_expired" : "subscription_canceled",
+        endedDuringTrial(object) || unpaidAfterTrial
+          ? "trial_expired"
+          : "subscription_canceled",
       ];
-
-    case "invoice.payment_failed":
-      return ["payment_failed"];
+    }
 
     default:
       return [];
   }
+}
+
+function inFirstPeriodAfterTrial(
+  subscription: Record<string, unknown>,
+): boolean {
+  const items = subscription.items as
+    | { data?: { current_period_start?: unknown }[] }
+    | undefined;
+  const periodStart =
+    items?.data?.[0]?.current_period_start ?? subscription.current_period_start;
+  return (
+    typeof subscription.trial_end === "number" &&
+    periodStart === subscription.trial_end
+  );
 }
 
 function endedDuringTrial(subscription: Record<string, unknown>): boolean {
@@ -179,6 +221,31 @@ export const stripeSource: InboundSource<StripeSecret> = {
         subscriberExternalId:
           customer.metadata?.subscriberExternalId || undefined,
       },
+    };
+  },
+
+  async enrich(event, matched, secret) {
+    if (!matched.some((name) => PAYMENT_FAILED_EVENTS.includes(name))) {
+      return {};
+    }
+    const latest = objectOf(event).object.latest_invoice;
+    let invoice: Record<string, unknown> | null = null;
+    if (typeof latest === "string") {
+      try {
+        invoice = (await createStripeClientForKey(
+          secret.apiKey,
+        ).invoices.retrieve(latest)) as unknown as Record<string, unknown>;
+      } catch (error) {
+        if (!isResourceMissing(error)) throw error;
+      }
+    } else if (typeof latest === "object" && latest !== null) {
+      invoice = latest as Record<string, unknown>;
+    }
+    if (!invoice) return {};
+    return {
+      invoiceUrl: invoice.hosted_invoice_url ?? null,
+      amountDue: invoice.amount_due ?? null,
+      currency: invoice.currency ?? null,
     };
   },
 
