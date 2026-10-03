@@ -23,25 +23,35 @@ interface Trigger {
   event: string;
 }
 
+export type TriggerList = "triggers" | "exitConditions";
+
+const LIST_TEXT = {
+  triggers: { row: "Starts", noun: "trigger", verb: "start" },
+  exitConditions: { row: "Exits", noun: "exit condition", verb: "exit" },
+} as const;
+
 type Mode =
   | { kind: "list" }
-  | { kind: "confirm-remove"; trigger: Trigger }
-  | { kind: "choosing-source" }
+  | { kind: "confirm-remove"; list: TriggerList; trigger: Trigger }
+  | { kind: "choosing-source"; list: TriggerList }
   | {
       kind: "choosing-events";
+      list: TriggerList;
       source: string;
       selected: string[];
       custom?: string[];
     }
   | {
       kind: "entering-raw";
+      list: TriggerList;
       source: string;
       selected: string[];
       custom?: string[];
     }
   | { kind: "saving" };
 
-const ADD_VALUE = "__add__";
+const ADD_TRIGGER_VALUE = "__add_trigger__";
+const ADD_EXIT_VALUE = "__add_exit__";
 const RAW_VALUE = "__raw__";
 const SAVE_VALUE = "__save__";
 const CANCEL_VALUE = "__cancel__";
@@ -50,13 +60,15 @@ export function WorkflowTriggersScreen({
   environmentId,
   workflowId,
   pickSource,
+  pickList = "triggers",
   onSetUp,
 }: {
   environmentId: string;
   workflowId: string;
   // Opens the event picker for this source, e.g. right after setting it up.
   pickSource?: string;
-  onSetUp: (source: string) => void;
+  pickList?: TriggerList;
+  onSetUp: (source: string, list: TriggerList) => void;
 }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const state = useAsyncData(async () => {
@@ -69,19 +81,27 @@ export function WorkflowTriggersScreen({
     return { workflow: workflow.data, sources: sources.data.sources };
   }, [environmentId, workflowId, refreshKey]);
 
-  const triggers: Trigger[] =
+  // Older API versions don't return these, so treat them as empty.
+  const current = (list: TriggerList): Trigger[] =>
     state.status === "ready"
-      ? state.data.workflow.triggers.map(({ source, event }) => ({
+      ? (state.data.workflow[list] ?? []).map(({ source, event }) => ({
           source,
           event,
         }))
       : [];
-  const eventsFor = (source: string) =>
-    triggers.filter((t) => t.source === source).map((t) => t.event);
+  const eventsFor = (list: TriggerList, source: string) =>
+    current(list)
+      .filter((t) => t.source === source)
+      .map((t) => t.event);
 
   const [mode, setMode] = useState<Mode>(
     pickSource
-      ? { kind: "choosing-events", source: pickSource, selected: [] }
+      ? {
+          kind: "choosing-events",
+          list: pickList,
+          source: pickSource,
+          selected: [],
+        }
       : { kind: "list" },
   );
   // The picker opened from pickSource starts before the existing triggers
@@ -91,26 +111,26 @@ export function WorkflowTriggersScreen({
     if (!ready || !pickSource) return;
     setMode((current) =>
       current.kind === "choosing-events" && current.source === pickSource
-        ? { ...current, selected: eventsFor(pickSource) }
+        ? { ...current, selected: eventsFor(current.list, pickSource) }
         : current,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, pickSource]);
   const [error, setError] = useState("");
 
-  const save = async (next: Trigger[]) => {
+  const save = async (list: TriggerList, next: Trigger[]) => {
     setMode({ kind: "saving" });
     setError("");
     try {
       const response = await updateWorkflow(environmentId, workflowId, {
-        triggers: next,
+        [list]: next,
       } as UpdateWorkflowDto);
       if (response.status !== 200) {
         const body = response.data as { message?: unknown } | undefined;
         setError(
           typeof body?.message === "string"
             ? body.message
-            : "Failed to save triggers.",
+            : `Failed to save ${LIST_TEXT[list].noun}s.`,
         );
       }
     } catch (err) {
@@ -120,9 +140,9 @@ export function WorkflowTriggersScreen({
     setRefreshKey((k) => k + 1);
   };
 
-  const saveSource = (source: string, selected: string[]) =>
-    save([
-      ...triggers.filter((t) => t.source !== source),
+  const saveSource = (list: TriggerList, source: string, selected: string[]) =>
+    save(list, [
+      ...current(list).filter((t) => t.source !== source),
       ...selected.map((event) => ({ source, event })),
     ]);
 
@@ -133,9 +153,10 @@ export function WorkflowTriggersScreen({
 
   return (
     <Box flexDirection="column">
-      <Text bold>Triggers</Text>
+      <Text bold>Triggers and exit conditions</Text>
       <Text dimColor>
-        Start this workflow when a connected integration reports an event.
+        Start this workflow when a connected integration reports an event, and
+        exit a person's active run when it reports another.
       </Text>
       {error.length > 0 && <Text color="red">{error}</Text>}
       <AsyncBoundary state={state}>
@@ -156,11 +177,12 @@ export function WorkflowTriggersScreen({
           if (mode.kind === "confirm-remove") {
             return (
               <ConfirmPrompt
-                message={`Remove the trigger ${mode.trigger.source} · ${mode.trigger.event}?`}
+                message={`Remove the ${LIST_TEXT[mode.list].noun} ${mode.trigger.source} · ${mode.trigger.event}?`}
                 confirmLabel="Yes, remove"
                 onConfirm={() =>
                   void save(
-                    triggers.filter(
+                    mode.list,
+                    current(mode.list).filter(
                       (t) =>
                         t.source !== mode.trigger.source ||
                         t.event !== mode.trigger.event,
@@ -184,13 +206,14 @@ export function WorkflowTriggersScreen({
                 onSelect={(item) => {
                   const source = sourceOf(sources, item.value);
                   if (!source?.connected) {
-                    onSetUp(item.value);
+                    onSetUp(item.value, mode.list);
                     return;
                   }
                   setMode({
                     kind: "choosing-events",
+                    list: mode.list,
                     source: item.value,
-                    selected: eventsFor(item.value),
+                    selected: eventsFor(mode.list, item.value),
                   });
                 }}
               />
@@ -226,7 +249,10 @@ export function WorkflowTriggersScreen({
               });
             return (
               <Box flexDirection="column">
-                <Text>{source.name} events that start this workflow:</Text>
+                <Text>
+                  {source.name} events that {LIST_TEXT[mode.list].verb} this
+                  workflow:
+                </Text>
                 <SelectInput
                   limit={12}
                   items={[
@@ -247,7 +273,7 @@ export function WorkflowTriggersScreen({
                   ]}
                   onSelect={(item) => {
                     if (item.value === SAVE_VALUE) {
-                      void saveSource(mode.source, mode.selected);
+                      void saveSource(mode.list, mode.source, mode.selected);
                     } else if (item.value === CANCEL_VALUE) {
                       setMode({ kind: "list" });
                     } else if (item.value === RAW_VALUE) {
@@ -268,9 +294,18 @@ export function WorkflowTriggersScreen({
             );
           }
 
+          const rows = (["triggers", "exitConditions"] as const).flatMap(
+            (list) =>
+              (workflow[list] ?? []).map((t) => ({
+                label: `${LIST_TEXT[list].row} · ${sourceOf(sources, t.source)?.name ?? t.source} · ${t.label}${
+                  t.active ? "" : " (inactive: integration disconnected)"
+                }`,
+                value: `${list}\n${t.source}\n${t.event}`,
+              })),
+          );
           return (
             <Box flexDirection="column">
-              {workflow.triggers.length === 0 && (
+              {rows.length === 0 && (
                 <Text dimColor>
                   None yet. Without triggers, it only runs when triggered via
                   the API.
@@ -278,22 +313,27 @@ export function WorkflowTriggersScreen({
               )}
               <SelectInput
                 items={[
-                  ...workflow.triggers.map((t) => ({
-                    label: `${sourceOf(sources, t.source)?.name ?? t.source} · ${t.label}${
-                      t.active ? "" : " (inactive: integration disconnected)"
-                    }`,
-                    value: `${t.source}\n${t.event}`,
-                  })),
-                  { label: "+ Add trigger", value: ADD_VALUE },
+                  ...rows,
+                  { label: "+ Add trigger", value: ADD_TRIGGER_VALUE },
+                  { label: "+ Add exit condition", value: ADD_EXIT_VALUE },
                 ]}
                 onSelect={(item) => {
-                  if (item.value === ADD_VALUE) {
-                    setMode({ kind: "choosing-source" });
+                  if (item.value === ADD_TRIGGER_VALUE) {
+                    setMode({ kind: "choosing-source", list: "triggers" });
                     return;
                   }
-                  const [source = "", event = ""] = item.value.split("\n");
+                  if (item.value === ADD_EXIT_VALUE) {
+                    setMode({
+                      kind: "choosing-source",
+                      list: "exitConditions",
+                    });
+                    return;
+                  }
+                  const [list, source = "", event = ""] =
+                    item.value.split("\n");
                   setMode({
                     kind: "confirm-remove",
+                    list: list as TriggerList,
                     trigger: { source, event },
                   });
                 }}

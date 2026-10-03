@@ -10,6 +10,7 @@ import { Queue } from "bullmq";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import type { WorkflowTriggerInput } from "@subscriber.dev/db/repository/workflow.repo";
+import type { RunScope } from "@subscriber.dev/db/repository/workflowRun.repo";
 import type { WorkflowBroadcastStatus } from "@subscriber.dev/db/schema";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
@@ -54,6 +55,7 @@ interface CreateWorkflowData {
   type: "automation" | "broadcast";
   steps: WorkflowStepInput[];
   triggers?: WorkflowTriggerInput[];
+  exitConditions?: WorkflowTriggerInput[];
   createdBy: number;
 }
 
@@ -64,6 +66,7 @@ interface UpdateWorkflowData {
   status?: "active" | "paused";
   steps?: WorkflowStepInput[];
   triggers?: WorkflowTriggerInput[];
+  exitConditions?: WorkflowTriggerInput[];
   updatedBy: number;
 }
 
@@ -76,6 +79,7 @@ interface TriggerWorkflowData {
 }
 
 interface WorkflowTriggerRow {
+  action: "start" | "exit";
   source: string;
   event: string;
 }
@@ -140,14 +144,8 @@ export class WorkflowService {
         type: s.type,
         delayMs: s.delayMs,
       })),
-      triggers: triggers.map((t) => ({
-        source: t.source,
-        event: t.event,
-        label:
-          INBOUND_SOURCES[t.source]?.events.find((e) => e.name === t.event)
-            ?.label ?? t.event,
-        active: connectedSources.has(t.source),
-      })),
+      triggers: this.toTriggerDtos(triggers, "start", connectedSources),
+      exitConditions: this.toTriggerDtos(triggers, "exit", connectedSources),
       createdAt: workflow.createdAt.toISOString(),
       updatedAt: workflow.updatedAt.toISOString(),
     };
@@ -343,6 +341,23 @@ export class WorkflowService {
     return totalAttempted > 0 ? sent / totalAttempted : null;
   }
 
+  private toTriggerDtos(
+    triggers: WorkflowTriggerRow[],
+    action: WorkflowTriggerRow["action"],
+    connectedSources: Set<string>,
+  ) {
+    return triggers
+      .filter((t) => t.action === action)
+      .map((t) => ({
+        source: t.source,
+        event: t.event,
+        label:
+          INBOUND_SOURCES[t.source]?.events.find((e) => e.name === t.event)
+            ?.label ?? t.event,
+        active: connectedSources.has(t.source),
+      }));
+  }
+
   private async connectedSources(db: dbClient, environmentId: number) {
     const integrations = await environmentIntegrationsRepo.listByEnvironment(
       db,
@@ -363,7 +378,7 @@ export class WorkflowService {
   ): WorkflowTriggerInput[] {
     if (triggers.length > 0 && type === "broadcast") {
       throw new BadRequestException(
-        "Broadcast workflows can't have triggers; use an automation workflow",
+        "Broadcast workflows can't have triggers or exit conditions; use an automation workflow",
       );
     }
     for (const trigger of triggers) {
@@ -383,7 +398,7 @@ export class WorkflowService {
       );
       if (isNew && !connectedSources.has(trigger.source)) {
         throw new BadRequestException(
-          `Connect the ${source.name} integration before adding its triggers`,
+          `Connect the ${source.name} integration before adding its triggers or exit conditions`,
         );
       }
     }
@@ -444,6 +459,11 @@ export class WorkflowService {
         triggers: this.validateTriggers(
           data.type,
           data.triggers ?? [],
+          connectedSources,
+        ),
+        exitConditions: this.validateTriggers(
+          data.type,
+          data.exitConditions ?? [],
           connectedSources,
         ),
         createdBy: data.createdBy,
@@ -525,14 +545,20 @@ export class WorkflowService {
     if (!existing) throw new NotFoundException("Workflow not found");
 
     const connectedSources = await this.connectedSources(db, environmentId);
-    const newTriggers = data.triggers
-      ? this.validateTriggers(
-          existing.type,
-          data.triggers,
-          connectedSources,
-          await workflowRepo.listTriggersForWorkflow(db, existing.id),
-        )
-      : undefined;
+    const current = await workflowRepo.listTriggersForWorkflow(db, existing.id);
+    const validate = (
+      action: WorkflowTriggerRow["action"],
+      given: WorkflowTriggerInput[] | undefined,
+    ) =>
+      given &&
+      this.validateTriggers(
+        existing.type,
+        given,
+        connectedSources,
+        current.filter((t) => t.action === action),
+      );
+    const newTriggers = validate("start", data.triggers);
+    const newExitConditions = validate("exit", data.exitConditions);
 
     const workflow = await workflowRepo.updateWorkflow(db, existing.id, {
       key: data.key,
@@ -555,9 +581,26 @@ export class WorkflowService {
           ),
         )
       : await workflowRepo.listStepsForWorkflow(db, existing.id);
-    const triggers = newTriggers
-      ? await workflowRepo.replaceWorkflowTriggers(db, existing, newTriggers)
-      : await workflowRepo.listTriggersForWorkflow(db, existing.id);
+    if (newTriggers) {
+      await workflowRepo.replaceWorkflowTriggers(
+        db,
+        existing,
+        "start",
+        newTriggers,
+      );
+    }
+    if (newExitConditions) {
+      await workflowRepo.replaceWorkflowTriggers(
+        db,
+        existing,
+        "exit",
+        newExitConditions,
+      );
+    }
+    const triggers =
+      newTriggers || newExitConditions
+        ? await workflowRepo.listTriggersForWorkflow(db, existing.id)
+        : current;
 
     return this.toWorkflowDto(workflow, steps, triggers, connectedSources);
   }
@@ -758,12 +801,14 @@ export class WorkflowService {
     db: dbClient,
     subscriberId: number,
     reason: string,
-  ) {
+    scope?: RunScope,
+  ): Promise<number> {
     const pending = await workflowRunRepo.listPendingRunStepsForSubscriber(
       db,
       subscriberId,
+      scope,
     );
-    if (pending.length === 0) return;
+    if (pending.length === 0) return 0;
 
     await Promise.all(
       pending
@@ -771,11 +816,12 @@ export class WorkflowService {
         .map((s) => this.queue.remove(s.bullJobId!).catch(() => undefined)),
     );
 
-    await workflowRunRepo.cancelPendingForSubscriber(
+    return await workflowRunRepo.cancelPendingForSubscriber(
       db,
       subscriberId,
       pending.map((s) => s.id),
       reason,
+      scope,
     );
   }
 

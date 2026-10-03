@@ -443,6 +443,44 @@ describe("WorkflowDetailScreen runs", () => {
     expect(lastFrame()).toContain("stripe · Payment failed (inactive)");
   });
 
+  it("lists exit conditions", async () => {
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        ...testWorkflow,
+        exitConditions: [
+          {
+            source: "stripe",
+            event: "trial_converted",
+            label: "Trial converted to paid",
+            active: true,
+          },
+        ],
+      },
+    } as never);
+    const { lastFrame } = renderScreen();
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Exits when:");
+    });
+    expect(lastFrame()).toContain("stripe · Trial converted to paid");
+  });
+
+  it("copes with an API that doesn't return triggers yet", async () => {
+    const { triggers: _omitted, ...withoutTriggers } = testWorkflow;
+    vi.mocked(getWorkflow).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: withoutTriggers,
+    } as never);
+    const { lastFrame } = renderScreen();
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("none (API only)");
+    });
+  });
+
   it("calls onViewTriggers when 'g' is pressed", async () => {
     vi.mocked(getWorkflow).mockResolvedValue({
       status: 200,

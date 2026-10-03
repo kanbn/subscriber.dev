@@ -261,7 +261,7 @@ export function IntegrationDetailScreen({
         <ConfirmPrompt
           message={`Remove integration "${type}"? This cannot be undone.${
             triggerCount > 0
-              ? ` ${triggerCount} workflow trigger${triggerCount === 1 ? "" : "s"} will stop until it's reconnected.`
+              ? ` It's used by ${triggerCount} workflow trigger${triggerCount === 1 ? "" : "s"} or exit condition${triggerCount === 1 ? "" : "s"}, which will stop until it's reconnected.`
               : ""
           }`}
           onConfirm={() => void handleConfirmDelete()}

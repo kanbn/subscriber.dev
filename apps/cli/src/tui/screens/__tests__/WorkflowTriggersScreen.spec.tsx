@@ -26,13 +26,21 @@ const stripeEvents = [
   { name: "trial_ending", label: "Trial ending (3 days before)" },
 ];
 
+type TriggerRow = {
+  source: string;
+  event: string;
+  label: string;
+  active: boolean;
+};
+
 function mockWorkflow(
-  triggers: { source: string; event: string; label: string; active: boolean }[],
+  triggers: TriggerRow[],
+  exitConditions: TriggerRow[] = [],
 ) {
   vi.mocked(getWorkflow).mockResolvedValue({
     status: 200,
     headers: new Headers(),
-    data: { publicId: "wf_1", type: "automation", triggers },
+    data: { publicId: "wf_1", type: "automation", triggers, exitConditions },
   } as never);
 }
 
@@ -192,7 +200,7 @@ describe("WorkflowTriggersScreen", () => {
     await tick();
     stdin.write("\r");
 
-    expect(onSetUp).toHaveBeenCalledWith("stripe");
+    expect(onSetUp).toHaveBeenCalledWith("stripe", "triggers");
     expect(updateWorkflow).not.toHaveBeenCalled();
   });
 
@@ -252,6 +260,118 @@ describe("WorkflowTriggersScreen", () => {
       expect(updateWorkflow).toHaveBeenCalledWith("env_1", "wf_1", {
         triggers: [{ source: "stripe", event: "payment_failed" }],
       });
+    });
+  });
+
+  describe("exit conditions", () => {
+    it("adds an exit condition, saving it apart from the triggers", async () => {
+      mockWorkflow([
+        {
+          source: "stripe",
+          event: "trial_started",
+          label: "Trial started",
+          active: true,
+        },
+      ]);
+      mockSources(true);
+      const { lastFrame, stdin } = renderScreen();
+
+      await vi.waitFor(() => {
+        expect(lastFrame()).toContain("+ Add exit condition");
+      });
+      for (let i = 0; i < 2; i++) {
+        await tick();
+        stdin.write(DOWN);
+      }
+      await tick();
+      stdin.write("\r");
+      await vi.waitFor(() => {
+        expect(lastFrame()).not.toContain("+ Add exit condition");
+      });
+      await tick();
+      stdin.write("\r");
+      await vi.waitFor(() => {
+        expect(lastFrame()).toContain("Stripe events that exit this");
+      });
+      expect(lastFrame()).toContain("[ ] Trial started");
+
+      await tick();
+      stdin.write("\r");
+      await vi.waitFor(() => {
+        expect(lastFrame()).toContain("[x] Trial started");
+      });
+      for (let i = 0; i < 3; i++) {
+        await tick();
+        stdin.write(DOWN);
+      }
+      await tick();
+      stdin.write("\r");
+
+      await vi.waitFor(() => {
+        expect(updateWorkflow).toHaveBeenCalledWith("env_1", "wf_1", {
+          exitConditions: [{ source: "stripe", event: "trial_started" }],
+        });
+      });
+    });
+
+    it("lists exit conditions and removes one after confirming", async () => {
+      mockWorkflow(
+        [],
+        [
+          {
+            source: "stripe",
+            event: "trial_ending",
+            label: "Trial ending (3 days before)",
+            active: true,
+          },
+        ],
+      );
+      mockSources(true);
+      const { lastFrame, stdin } = renderScreen();
+
+      await vi.waitFor(() => {
+        expect(lastFrame()).toContain(
+          "Exits · Stripe · Trial ending (3 days before)",
+        );
+      });
+      await tick();
+      stdin.write("\r");
+      await vi.waitFor(() => {
+        expect(lastFrame()).toContain(
+          "Remove the exit condition stripe · trial_ending?",
+        );
+      });
+      await tick();
+      stdin.write(DOWN);
+      await tick();
+      stdin.write("\r");
+
+      await vi.waitFor(() => {
+        expect(updateWorkflow).toHaveBeenCalledWith("env_1", "wf_1", {
+          exitConditions: [],
+        });
+      });
+    });
+
+    it("tells set-up which list to come back to", async () => {
+      mockWorkflow([]);
+      mockSources(false);
+      const { lastFrame, stdin, onSetUp } = renderScreen();
+
+      await vi.waitFor(() => {
+        expect(lastFrame()).toContain("+ Add exit condition");
+      });
+      await tick();
+      stdin.write(DOWN);
+      await tick();
+      stdin.write("\r");
+      await vi.waitFor(() => {
+        expect(lastFrame()).toContain("not connected — set it up");
+      });
+      await tick();
+      stdin.write("\r");
+
+      expect(onSetUp).toHaveBeenCalledWith("stripe", "exitConditions");
     });
   });
 });

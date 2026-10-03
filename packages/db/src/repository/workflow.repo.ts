@@ -1,6 +1,7 @@
 import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
+import type { WorkflowTriggerAction } from "@subscriber.dev/db/schema";
 import {
   workflows,
   workflowSteps,
@@ -90,6 +91,7 @@ export const createWorkflow = async (
     type?: "automation" | "broadcast";
     steps: WorkflowStepInput[];
     triggers?: WorkflowTriggerInput[];
+    exitConditions?: WorkflowTriggerInput[];
     createdBy: number;
   },
 ) => {
@@ -124,13 +126,21 @@ export const createWorkflow = async (
       )
       .returning();
 
-    const triggerRows = data.triggers?.length
+    const triggerValues = [
+      ...(data.triggers ?? []).map((t) => ({ ...t, action: "start" as const })),
+      ...(data.exitConditions ?? []).map((t) => ({
+        ...t,
+        action: "exit" as const,
+      })),
+    ];
+    const triggerRows = triggerValues.length
       ? await tx
           .insert(workflowTriggers)
           .values(
-            data.triggers.map((t) => ({
+            triggerValues.map((t) => ({
               workflowId: workflow.id,
               environmentId: data.environmentId,
+              action: t.action,
               source: t.source,
               event: t.event,
             })),
@@ -216,12 +226,18 @@ export const listTriggersForWorkflow = async (
 export const replaceWorkflowTriggers = async (
   db: dbClient,
   workflow: { id: number; environmentId: number },
+  action: WorkflowTriggerAction,
   triggers: WorkflowTriggerInput[],
 ) => {
   return await db.transaction(async (tx) => {
     await tx
       .delete(workflowTriggers)
-      .where(eq(workflowTriggers.workflowId, workflow.id));
+      .where(
+        and(
+          eq(workflowTriggers.workflowId, workflow.id),
+          eq(workflowTriggers.action, action),
+        ),
+      );
     if (triggers.length === 0) return [];
 
     return await tx
@@ -230,6 +246,7 @@ export const replaceWorkflowTriggers = async (
         triggers.map((t) => ({
           workflowId: workflow.id,
           environmentId: workflow.environmentId,
+          action,
           source: t.source,
           event: t.event,
         })),
@@ -243,6 +260,7 @@ export const listWorkflowsTriggeredBy = async (
   environmentId: number,
   source: string,
   events: string[],
+  action: WorkflowTriggerAction = "start",
 ) => {
   if (events.length === 0) return [];
   return await db
@@ -252,6 +270,7 @@ export const listWorkflowsTriggeredBy = async (
     .where(
       and(
         eq(workflowTriggers.environmentId, environmentId),
+        eq(workflowTriggers.action, action),
         eq(workflowTriggers.source, source),
         inArray(workflowTriggers.event, events),
         isNull(workflows.deletedAt),

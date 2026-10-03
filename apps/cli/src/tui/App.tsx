@@ -160,11 +160,13 @@ export function App() {
           environmentId={screen.environment.publicId}
           workflowId={screen.workflowId}
           pickSource={screen.pickSource}
-          onSetUp={(type) =>
+          pickList={screen.pickList}
+          onSetUp={(type, list) =>
             push({
               kind: "integrationSetup",
               environment: screen.environment,
               type,
+              returnList: list,
             })
           }
         />
@@ -179,7 +181,14 @@ export function App() {
             setStack((s) => {
               const below = s[s.length - 2];
               return below?.kind === "workflowTriggers"
-                ? [...s.slice(0, -2), { ...below, pickSource: type }]
+                ? [
+                    ...s.slice(0, -2),
+                    {
+                      ...below,
+                      pickSource: type,
+                      pickList: screen.returnList,
+                    },
+                  ]
                 : s.slice(0, -1);
             })
           }
