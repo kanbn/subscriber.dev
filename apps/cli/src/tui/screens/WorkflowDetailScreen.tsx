@@ -271,16 +271,28 @@ export function WorkflowDetailScreen({
             {loadedWorkflow.type === "automation" && (
               <>
                 <Text bold>Triggers:</Text>
-                {loadedWorkflow.triggers.length === 0 ? (
+                {(loadedWorkflow.triggers ?? []).length === 0 ? (
                   <Text dimColor> none (API only)</Text>
                 ) : (
-                  loadedWorkflow.triggers.map((t) => (
+                  (loadedWorkflow.triggers ?? []).map((t) => (
                     <Text key={`${t.source}:${t.event}`} dimColor={!t.active}>
                       {" "}
                       {t.source} · {t.label}
                       {t.active ? "" : " (inactive)"}
                     </Text>
                   ))
+                )}
+                {(loadedWorkflow.exitConditions ?? []).length > 0 && (
+                  <>
+                    <Text bold>Exits when:</Text>
+                    {(loadedWorkflow.exitConditions ?? []).map((t) => (
+                      <Text key={`${t.source}:${t.event}`} dimColor={!t.active}>
+                        {" "}
+                        {t.source} · {t.label}
+                        {t.active ? "" : " (inactive)"}
+                      </Text>
+                    ))}
+                  </>
                 )}
               </>
             )}

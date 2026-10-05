@@ -2,6 +2,7 @@ import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
 import {
+  workflowExitConditionsSchema,
   WorkflowStepSchema,
   workflowTriggersSchema,
 } from "./create-workflow.dto.js";
@@ -21,6 +22,11 @@ export const UpdateWorkflowSchema = z.object({
     .optional()
     .describe(
       "If provided, replaces ALL existing triggers for this workflow. Automation workflows only; each trigger's integration must be connected.",
+    ),
+  exitConditions: workflowExitConditionsSchema
+    .optional()
+    .describe(
+      "If provided, replaces ALL existing exit conditions for this workflow. Each one's integration must be connected.",
     ),
 });
 

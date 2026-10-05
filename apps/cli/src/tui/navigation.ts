@@ -1,3 +1,5 @@
+import type { TriggerList } from "./screens/WorkflowTriggersScreen.js";
+
 export interface WorkspaceSummary {
   publicId: string;
   name: string;
@@ -43,11 +45,13 @@ export type Screen =
       environment: EnvironmentSummary;
       workflowId: string;
       pickSource?: string;
+      pickList?: TriggerList;
     }
   | {
       kind: "integrationSetup";
       environment: EnvironmentSummary;
       type: string;
+      returnList?: TriggerList;
     }
   | {
       kind: "workflowRuns";

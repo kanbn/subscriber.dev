@@ -35,7 +35,10 @@ vi.mock("../../../common/encryption.js", () => ({
   decrypt: vi.fn((blob: string) => blob),
 }));
 
-const workflowService = { triggerWorkflow: vi.fn() };
+const workflowService = {
+  triggerWorkflow: vi.fn(),
+  cancelPendingRunsForSubscriber: vi.fn(),
+};
 const subscriberService = { createSubscriber: vi.fn() };
 let processor: InboundEventsProcessor;
 
@@ -51,15 +54,22 @@ const row = {
 };
 const job = { data: { inboundEventId: 1 } } as any;
 
-// Connects the fake source, with these workflows triggered by the event.
-function setup(workflows: { id: number; key: string }[]) {
+// Connects the fake source, with these workflows triggered (and exited) by
+// the event.
+function setup(
+  workflows: { id: number; key: string }[],
+  exiting: { id: number; key: string }[] = [],
+) {
   vi.mocked(
     environmentIntegrationsRepo.getByEnvironmentAndType,
   ).mockResolvedValue({
     config: {},
     encryptedSecret: JSON.stringify({ key: "k" }),
   } as any);
-  vi.mocked(workflowRepo.listWorkflowsTriggeredBy).mockResolvedValue(workflows);
+  vi.mocked(workflowRepo.listWorkflowsTriggeredBy).mockImplementation(
+    async (_db, _env, _source, _events, action) =>
+      action === "exit" ? exiting : workflows,
+  );
 }
 
 const welcome = { id: 21, key: "welcome" };
@@ -122,13 +132,21 @@ describe("process", () => {
     expect(inboundEventRepo.completeInboundEvent).toHaveBeenCalledWith({}, 1, {
       status: "ignored",
       matchedEvents: ["signed_up"],
-      outcome: "No workflow is triggered by signed_up / user.created",
+      outcome: "No workflow is triggered or exited by signed_up / user.created",
     });
     expect(workflowRepo.listWorkflowsTriggeredBy).toHaveBeenCalledWith(
       {},
       10,
       "fake",
       ["signed_up", "user.created"],
+      "start",
+    );
+    expect(workflowRepo.listWorkflowsTriggeredBy).toHaveBeenCalledWith(
+      {},
+      10,
+      "fake",
+      ["signed_up", "user.created"],
+      "exit",
     );
   });
 
@@ -307,6 +325,111 @@ describe("process", () => {
     await processor.process(job);
 
     expect(fakeSource.enrich).not.toHaveBeenCalled();
+  });
+
+  describe("exit conditions", () => {
+    const nurture = { id: 31, key: "nurture" };
+
+    it("cancels the person's active runs of each exiting workflow", async () => {
+      setup([], [nurture]);
+      vi.mocked(inboundEventRepo.getSubscriberByIdentity).mockResolvedValue(
+        subscriber,
+      );
+      workflowService.cancelPendingRunsForSubscriber.mockResolvedValue(1);
+
+      await processor.process(job);
+
+      expect(
+        workflowService.cancelPendingRunsForSubscriber,
+      ).toHaveBeenCalledWith({}, 7, "Exited on Fake signed_up / user.created", {
+        workflowId: 31,
+        keepIdempotencyKey: "inbound:1:31",
+      });
+      expect(workflowService.triggerWorkflow).not.toHaveBeenCalled();
+      expect(fakeSource.enrich).not.toHaveBeenCalled();
+      expect(inboundEventRepo.completeInboundEvent).toHaveBeenCalledWith(
+        {},
+        1,
+        {
+          status: "processed",
+          matchedEvents: ["signed_up"],
+          subscriberId: 7,
+          outcome: "Exited nurture (1 run)",
+        },
+      );
+    });
+
+    it("is ignored when the person has no active run to exit", async () => {
+      setup([], [nurture]);
+      vi.mocked(inboundEventRepo.getSubscriberByIdentity).mockResolvedValue(
+        subscriber,
+      );
+      workflowService.cancelPendingRunsForSubscriber.mockResolvedValue(0);
+
+      await processor.process(job);
+
+      expect(inboundEventRepo.completeInboundEvent).toHaveBeenCalledWith(
+        {},
+        1,
+        expect.objectContaining({
+          status: "ignored",
+          outcome: "nurture had no active run to exit",
+        }),
+      );
+    });
+
+    it("doesn't create a subscriber just to exit nothing", async () => {
+      setup([], [nurture]);
+      fakeSource.fetchPerson.mockResolvedValue({
+        person: { email: "new@example.com" },
+      });
+
+      await processor.process(job);
+
+      expect(subscriberService.createSubscriber).not.toHaveBeenCalled();
+      expect(
+        workflowService.cancelPendingRunsForSubscriber,
+      ).not.toHaveBeenCalled();
+      expect(inboundEventRepo.completeInboundEvent).toHaveBeenCalledWith(
+        {},
+        1,
+        expect.objectContaining({
+          status: "ignored",
+          outcome:
+            "fake person u_1 isn't a subscriber, so there's nothing to exit",
+        }),
+      );
+    });
+
+    it("exits before triggering, so an event that does both restarts the workflow", async () => {
+      setup([welcome], [welcome]);
+      vi.mocked(inboundEventRepo.getSubscriberByIdentity).mockResolvedValue(
+        subscriber,
+      );
+      workflowService.cancelPendingRunsForSubscriber.mockResolvedValue(1);
+
+      await processor.process(job);
+
+      const exited =
+        workflowService.cancelPendingRunsForSubscriber.mock
+          .invocationCallOrder[0]!;
+      const triggered =
+        workflowService.triggerWorkflow.mock.invocationCallOrder[0]!;
+      expect(exited).toBeLessThan(triggered);
+      // A retry spares the run this event restarts, which carries this key.
+      const [, , , scope] =
+        workflowService.cancelPendingRunsForSubscriber.mock.calls[0]!;
+      const [, , input] = workflowService.triggerWorkflow.mock.calls[0]!;
+      expect(scope.keepIdempotencyKey).toBe(input.idempotencyKey);
+      expect(inboundEventRepo.completeInboundEvent).toHaveBeenCalledWith(
+        {},
+        1,
+        expect.objectContaining({
+          status: "processed",
+          outcome: "Exited welcome (1 run); Triggered welcome",
+        }),
+      );
+    });
   });
 
   it("lets unexpected errors fail the job so it's retried", async () => {

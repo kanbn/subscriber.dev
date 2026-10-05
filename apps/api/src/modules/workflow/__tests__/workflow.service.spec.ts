@@ -382,6 +382,7 @@ describe("cancelPendingRunsForSubscriber", () => {
       100,
       [1, 2],
       "opted out",
+      undefined,
     );
   });
 
@@ -399,6 +400,29 @@ describe("cancelPendingRunsForSubscriber", () => {
       100,
       [1],
       "opted out",
+      undefined,
+    );
+  });
+
+  it("can cancel just one workflow's runs, returning how many it cancelled", async () => {
+    const scope = { workflowId: 7, keepIdempotencyKey: "inbound:1:7" };
+    vi.mocked(
+      workflowRunRepo.listPendingRunStepsForSubscriber,
+    ).mockResolvedValue([{ id: 1, bullJobId: "run-step-1" }] as any);
+    vi.mocked(workflowRunRepo.cancelPendingForSubscriber).mockResolvedValue(1);
+
+    await expect(
+      service.cancelPendingRunsForSubscriber(mockDb, 100, "exited", scope),
+    ).resolves.toBe(1);
+    expect(
+      workflowRunRepo.listPendingRunStepsForSubscriber,
+    ).toHaveBeenCalledWith(mockDb, 100, scope);
+    expect(workflowRunRepo.cancelPendingForSubscriber).toHaveBeenCalledWith(
+      mockDb,
+      100,
+      [1],
+      "exited",
+      scope,
     );
   });
 });
@@ -547,7 +571,14 @@ describe("workflow triggers", () => {
     connectStripe();
     vi.mocked(workflowRepo.createWorkflow).mockImplementation(
       async (_db, data) =>
-        ({ workflow, steps: [], triggers: data.triggers }) as any,
+        ({
+          workflow,
+          steps: [],
+          triggers: [
+            ...(data.triggers ?? []).map((t) => ({ ...t, action: "start" })),
+            ...(data.exitConditions ?? []).map((t) => ({ ...t, action: "exit" })),
+          ],
+        }) as any,
     );
 
     const result = await create({
@@ -634,6 +665,7 @@ describe("workflow triggers", () => {
     expect(workflowRepo.replaceWorkflowTriggers).toHaveBeenCalledWith(
       mockDb,
       workflow,
+      "start",
       [{ source: "stripe", event: "payment_failed" }],
     );
 
@@ -652,8 +684,8 @@ describe("workflow triggers", () => {
     vi.mocked(workflowRepo.updateWorkflow).mockResolvedValue(workflow as any);
     vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
     vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([
-      { source: "stripe", event: "trial_started" },
-      { source: "stripe", event: "payment_failed" },
+      { action: "start", source: "stripe", event: "trial_started" },
+      { action: "start", source: "stripe", event: "payment_failed" },
     ] as any);
     vi.mocked(workflowRepo.replaceWorkflowTriggers).mockResolvedValue([
       { source: "stripe", event: "trial_started" },
@@ -666,6 +698,7 @@ describe("workflow triggers", () => {
     expect(workflowRepo.replaceWorkflowTriggers).toHaveBeenCalledWith(
       mockDb,
       workflow,
+      "start",
       [{ source: "stripe", event: "trial_started" }],
     );
 
@@ -682,13 +715,86 @@ describe("workflow triggers", () => {
     );
   });
 
+  it("saves exit conditions alongside triggers and returns them separately", async () => {
+    connectStripe();
+    vi.mocked(workflowRepo.createWorkflow).mockImplementation(
+      async (_db, data) =>
+        ({
+          workflow,
+          steps: [],
+          triggers: [
+            ...(data.triggers ?? []).map((t) => ({ ...t, action: "start" })),
+            ...(data.exitConditions ?? []).map((t) => ({ ...t, action: "exit" })),
+          ],
+        }) as any,
+    );
+
+    const result = await create({
+      triggers: [{ source: "stripe", event: "trial_started" }],
+      exitConditions: [{ source: "stripe", event: "trial_converted" }],
+    });
+
+    expect(workflowRepo.createWorkflow).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({
+        triggers: [{ source: "stripe", event: "trial_started" }],
+        exitConditions: [{ source: "stripe", event: "trial_converted" }],
+      }),
+    );
+    expect(result.triggers).toEqual([
+      expect.objectContaining({ event: "trial_started" }),
+    ]);
+    expect(result.exitConditions).toEqual([
+      {
+        source: "stripe",
+        event: "trial_converted",
+        label: "Trial converted to paid",
+        active: true,
+      },
+    ]);
+  });
+
+  it("validates exit conditions like triggers", async () => {
+    await expect(
+      create({
+        exitConditions: [{ source: "stripe", event: "trial_started" }],
+      }),
+    ).rejects.toThrow("Connect the Stripe integration");
+    connectStripe();
+    await expect(
+      create({ exitConditions: [{ source: "stripe", event: "nope" }] }),
+    ).rejects.toThrow('Unknown Stripe event "nope"');
+  });
+
+  it("replaces exit conditions on update without touching the triggers", async () => {
+    connectStripe();
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.updateWorkflow).mockResolvedValue(workflow as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
+
+    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+      exitConditions: [{ source: "stripe", event: "trial_converted" }],
+      updatedBy: 1,
+    });
+
+    expect(workflowRepo.replaceWorkflowTriggers).toHaveBeenCalledTimes(1);
+    expect(workflowRepo.replaceWorkflowTriggers).toHaveBeenCalledWith(
+      mockDb,
+      workflow,
+      "exit",
+      [{ source: "stripe", event: "trial_converted" }],
+    );
+  });
+
   it("shows triggers as inactive while their integration is disconnected", async () => {
     vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
       workflow as any,
     );
     vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
     vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([
-      { source: "stripe", event: "trial_started" },
+      { action: "start", source: "stripe", event: "trial_started" },
     ] as any);
     vi.mocked(workflowRunRepo.getWorkflowStepCounts).mockResolvedValue({
       sent: 0,

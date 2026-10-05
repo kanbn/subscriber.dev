@@ -157,6 +157,13 @@ export const workflowStepsRelations = relations(workflowSteps, ({ one }) => ({
   }),
 }));
 
+export const workflowTriggerActions = ["start", "exit"] as const;
+export type WorkflowTriggerAction = (typeof workflowTriggerActions)[number];
+export const workflowTriggerActionEnum = pgEnum(
+  "workflowTriggerAction",
+  workflowTriggerActions,
+);
+
 export const workflowTriggers = pgTable(
   "workflow_triggers",
   {
@@ -167,13 +174,15 @@ export const workflowTriggers = pgTable(
     environmentId: bigint("environmentId", { mode: "number" })
       .notNull()
       .references(() => environments.id, { onDelete: "cascade" }),
+    action: workflowTriggerActionEnum("action").notNull().default("start"),
     source: varchar("source", { length: 50 }).notNull(),
     event: varchar("event", { length: 255 }).notNull(),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
   },
   (table) => [
-    unique("workflow_triggers_workflow_source_event").on(
+    unique("workflow_triggers_workflow_action_source_event").on(
       table.workflowId,
+      table.action,
       table.source,
       table.event,
     ),

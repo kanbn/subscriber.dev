@@ -134,6 +134,13 @@
       "when": 1790870605417,
       "tag": "20261001160325_AddInboundEvents",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791031967105,
+      "tag": "20261003125247_AddWorkflowTriggerAction",
+      "breakpoints": true
     }
   ]
 }

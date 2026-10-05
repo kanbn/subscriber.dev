@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, ne, or } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import type { WorkflowRunStepStatus } from "@subscriber.dev/db/schema";
@@ -163,9 +163,28 @@ export const markRunStepBounced = async (
     .where(eq(workflowRunSteps.id, id));
 };
 
+export interface RunScope {
+  workflowId: number;
+  keepIdempotencyKey?: string;
+}
+
+const scopeFilters = (scope: RunScope | undefined) =>
+  scope
+    ? [
+        eq(workflowRuns.workflowId, scope.workflowId),
+        scope.keepIdempotencyKey === undefined
+          ? undefined
+          : or(
+              isNull(workflowRuns.idempotencyKey),
+              ne(workflowRuns.idempotencyKey, scope.keepIdempotencyKey),
+            ),
+      ]
+    : [];
+
 export const listPendingRunStepsForSubscriber = async (
   db: dbClient,
   subscriberId: number,
+  scope?: RunScope,
 ) => {
   return await db
     .select({
@@ -177,6 +196,7 @@ export const listPendingRunStepsForSubscriber = async (
     .where(
       and(
         eq(workflowRuns.subscriberId, subscriberId),
+        ...scopeFilters(scope),
         eq(workflowRuns.status, "active"),
         eq(workflowRunSteps.status, "pending"),
       ),
@@ -188,6 +208,7 @@ export const cancelPendingForSubscriber = async (
   subscriberId: number,
   runStepIds: number[],
   reason: string,
+  scope?: RunScope,
 ) => {
   if (runStepIds.length > 0) {
     await db
@@ -196,15 +217,18 @@ export const cancelPendingForSubscriber = async (
       .where(inArray(workflowRunSteps.id, runStepIds));
   }
 
-  await db
+  const cancelled = await db
     .update(workflowRuns)
     .set({ status: "cancelled", completedAt: new Date() })
     .where(
       and(
         eq(workflowRuns.subscriberId, subscriberId),
+        ...scopeFilters(scope),
         eq(workflowRuns.status, "active"),
       ),
-    );
+    )
+    .returning({ id: workflowRuns.id });
+  return cancelled.length;
 };
 
 export const getRunByIdempotencyKey = async (

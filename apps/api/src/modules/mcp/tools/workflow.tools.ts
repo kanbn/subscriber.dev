@@ -52,7 +52,7 @@ export class WorkflowTools {
   @Tool({
     name: "create_workflow",
     description:
-      "Create a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started.",
+      "Create a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started, and `exitConditions` stop a person's active run on others.",
     parameters: CreateWorkflowSchema.extend({ environmentId: z.string() }),
   })
   async createWorkflow(
@@ -75,6 +75,7 @@ export class WorkflowTools {
       type: args.type,
       steps: args.steps,
       triggers: args.triggers,
+      exitConditions: args.exitConditions,
       createdBy: user.id,
     });
   }
@@ -160,7 +161,7 @@ export class WorkflowTools {
   @Tool({
     name: "update_workflow",
     description:
-      "Update workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers`.",
+      "Update workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers` and `exitConditions`.",
     parameters: UpdateWorkflowSchema.extend({
       environmentId: z.string(),
       workflowId: z.string(),
@@ -193,6 +194,7 @@ export class WorkflowTools {
         status: args.status,
         steps: args.steps,
         triggers: args.triggers,
+        exitConditions: args.exitConditions,
         updatedBy: user.id,
       },
     );

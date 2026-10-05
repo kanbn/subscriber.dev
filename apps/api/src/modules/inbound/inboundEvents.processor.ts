@@ -17,6 +17,9 @@ import { WorkflowService } from "../workflow/workflow.service.js";
 import { INBOUND_EVENTS_QUEUE_NAME } from "./inbound.constants.js";
 import { INBOUND_SOURCES } from "./sources/index.js";
 
+const inboundIdempotencyKey = (eventId: number, workflowId: number) =>
+  `inbound:${eventId}:${workflowId}`;
+
 type Resolved =
   | { subscriber: { id: number; publicId: string } }
   | { skipReason: string };
@@ -67,18 +70,24 @@ export class InboundEventsProcessor extends WorkerHost {
       payload: row.payload,
     };
     const matchedEvents = source.match(event);
-    const triggered = await workflowRepo.listWorkflowsTriggeredBy(
-      db,
-      row.environmentId,
-      source.source,
-      [...matchedEvents, event.type],
+    const eventNames = [...matchedEvents, event.type];
+    const [triggered, exiting] = await Promise.all(
+      (["start", "exit"] as const).map((action) =>
+        workflowRepo.listWorkflowsTriggeredBy(
+          db,
+          row.environmentId,
+          source.source,
+          eventNames,
+          action,
+        ),
+      ),
     );
 
-    if (triggered.length === 0) {
+    if (triggered.length === 0 && exiting.length === 0) {
       await complete({
         status: "ignored",
         matchedEvents,
-        outcome: `No workflow is triggered by ${[...matchedEvents, event.type].join(" / ")}`,
+        outcome: `No workflow is triggered or exited by ${eventNames.join(" / ")}`,
       });
       return;
     }
@@ -99,6 +108,7 @@ export class InboundEventsProcessor extends WorkerHost {
       source,
       secret,
       personRef,
+      create: triggered.length > 0,
     });
     if ("skipReason" in resolved) {
       await complete({
@@ -109,14 +119,39 @@ export class InboundEventsProcessor extends WorkerHost {
       return;
     }
 
-    const payload = {
-      [source.source]: {
-        ...source.templateData(event, matchedEvents),
-        ...(await source.enrich?.(event, matchedEvents, secret)),
-      },
-    };
     const results: string[] = [];
-    let anyTriggered = false;
+    let anyChanged = false;
+
+    for (const workflow of exiting) {
+      const cancelled =
+        await this.workflowService.cancelPendingRunsForSubscriber(
+          db,
+          resolved.subscriber.id,
+          `Exited on ${source.name} ${eventNames.join(" / ")}`,
+          {
+            workflowId: workflow.id,
+            keepIdempotencyKey: inboundIdempotencyKey(row.id, workflow.id),
+          },
+        );
+      if (cancelled > 0) {
+        anyChanged = true;
+        results.push(
+          `Exited ${workflow.key} (${cancelled} run${cancelled === 1 ? "" : "s"})`,
+        );
+      } else {
+        results.push(`${workflow.key} had no active run to exit`);
+      }
+    }
+
+    const payload =
+      triggered.length > 0
+        ? {
+            [source.source]: {
+              ...source.templateData(event, matchedEvents),
+              ...(await source.enrich?.(event, matchedEvents, secret)),
+            },
+          }
+        : {};
     for (const workflow of triggered) {
       try {
         const result = await this.workflowService.triggerWorkflow(
@@ -127,11 +162,11 @@ export class InboundEventsProcessor extends WorkerHost {
             subscriber: { publicId: resolved.subscriber.publicId },
             payload,
             triggeredBy: null,
-            idempotencyKey: `inbound:${row.id}:${workflow.id}`,
+            idempotencyKey: inboundIdempotencyKey(row.id, workflow.id),
           },
         );
         if (result.triggered) {
-          anyTriggered = true;
+          anyChanged = true;
           results.push(`Triggered ${workflow.key}`);
         } else {
           results.push(`Didn't trigger ${workflow.key}: ${result.reason}`);
@@ -143,7 +178,7 @@ export class InboundEventsProcessor extends WorkerHost {
     }
 
     await complete({
-      status: anyTriggered ? "processed" : "ignored",
+      status: anyChanged ? "processed" : "ignored",
       matchedEvents,
       subscriberId: resolved.subscriber.id,
       outcome: results.join("; "),
@@ -157,6 +192,7 @@ export class InboundEventsProcessor extends WorkerHost {
       source: InboundSource<unknown>;
       secret: unknown;
       personRef: string;
+      create: boolean;
     },
   ): Promise<Resolved> {
     const { environmentId, source, personRef } = input;
@@ -188,6 +224,11 @@ export class InboundEventsProcessor extends WorkerHost {
       undefined;
 
     if (!subscriber) {
+      if (!input.create) {
+        return {
+          skipReason: `${source.source} person ${personRef} isn't a subscriber, so there's nothing to exit`,
+        };
+      }
       if (!email) {
         return {
           skipReason: `${source.source} person ${personRef} has no email and no matching subscriber`,

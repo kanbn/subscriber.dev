@@ -640,6 +640,20 @@ export type CreateWorkflowDtoTriggersItem = {
   event: string;
 };
 
+export type CreateWorkflowDtoExitConditionsItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+};
+
 export interface CreateWorkflowDto {
   /**
    * Stable identifier used to trigger this workflow, e.g. "user-signup". Unique within the environment.
@@ -666,6 +680,11 @@ export interface CreateWorkflowDto {
    * @maxItems 50
    */
   triggers?: CreateWorkflowDtoTriggersItem[];
+  /**
+   * Events from connected integrations that stop this workflow for the person they're about: their active runs are cancelled and unsent steps never send. Checked before triggers, so an event in both restarts the workflow. Automation workflows only; the integration must be connected first.
+   * @maxItems 50
+   */
+  exitConditions?: CreateWorkflowDtoExitConditionsItem[];
 }
 
 export type WorkflowResponseDtoStatus = typeof WorkflowResponseDtoStatus[keyof typeof WorkflowResponseDtoStatus];
@@ -711,7 +730,25 @@ export type WorkflowResponseDtoTriggersItem = {
   event: string;
   /** Human-readable name of the event. */
   label: string;
-  /** False while the source's integration is disconnected; the trigger resumes once it's reconnected. */
+  /** False while the source's integration is disconnected; it resumes once it's reconnected. */
+  active: boolean;
+};
+
+export type WorkflowResponseDtoExitConditionsItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+  /** Human-readable name of the event. */
+  label: string;
+  /** False while the source's integration is disconnected; it resumes once it's reconnected. */
   active: boolean;
 };
 
@@ -724,6 +761,7 @@ export interface WorkflowResponseDto {
   type: WorkflowResponseDtoType;
   steps: WorkflowResponseDtoStepsItem[];
   triggers: WorkflowResponseDtoTriggersItem[];
+  exitConditions: WorkflowResponseDtoExitConditionsItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -775,7 +813,25 @@ export type ListWorkflowsResponseDtoWorkflowsItemTriggersItem = {
   event: string;
   /** Human-readable name of the event. */
   label: string;
-  /** False while the source's integration is disconnected; the trigger resumes once it's reconnected. */
+  /** False while the source's integration is disconnected; it resumes once it's reconnected. */
+  active: boolean;
+};
+
+export type ListWorkflowsResponseDtoWorkflowsItemExitConditionsItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+  /** Human-readable name of the event. */
+  label: string;
+  /** False while the source's integration is disconnected; it resumes once it's reconnected. */
   active: boolean;
 };
 
@@ -788,6 +844,7 @@ export type ListWorkflowsResponseDtoWorkflowsItem = {
   type: ListWorkflowsResponseDtoWorkflowsItemType;
   steps: ListWorkflowsResponseDtoWorkflowsItemStepsItem[];
   triggers: ListWorkflowsResponseDtoWorkflowsItemTriggersItem[];
+  exitConditions: ListWorkflowsResponseDtoWorkflowsItemExitConditionsItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -936,7 +993,25 @@ export type WorkflowDetailResponseDtoTriggersItem = {
   event: string;
   /** Human-readable name of the event. */
   label: string;
-  /** False while the source's integration is disconnected; the trigger resumes once it's reconnected. */
+  /** False while the source's integration is disconnected; it resumes once it's reconnected. */
+  active: boolean;
+};
+
+export type WorkflowDetailResponseDtoExitConditionsItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+  /** Human-readable name of the event. */
+  label: string;
+  /** False while the source's integration is disconnected; it resumes once it's reconnected. */
   active: boolean;
 };
 
@@ -949,6 +1024,7 @@ export interface WorkflowDetailResponseDto {
   type: WorkflowDetailResponseDtoType;
   steps: WorkflowDetailResponseDtoStepsItem[];
   triggers: WorkflowDetailResponseDtoTriggersItem[];
+  exitConditions: WorkflowDetailResponseDtoExitConditionsItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
@@ -1025,6 +1101,20 @@ export type UpdateWorkflowDtoTriggersItem = {
   event: string;
 };
 
+export type UpdateWorkflowDtoExitConditionsItem = {
+  /**
+   * Connected integration that fires the trigger, e.g. "stripe".
+   * @minLength 1
+   */
+  source: string;
+  /**
+   * One of the source's events (see list_trigger_sources), e.g. "trial_started", or a raw event type such as "checkout.session.completed".
+   * @minLength 1
+   * @maxLength 255
+   */
+  event: string;
+};
+
 export interface UpdateWorkflowDto {
   /**
    * @minLength 1
@@ -1053,6 +1143,11 @@ export interface UpdateWorkflowDto {
    * @maxItems 50
    */
   triggers?: UpdateWorkflowDtoTriggersItem[];
+  /**
+   * If provided, replaces ALL existing exit conditions for this workflow. Each one's integration must be connected.
+   * @maxItems 50
+   */
+  exitConditions?: UpdateWorkflowDtoExitConditionsItem[];
 }
 
 export type ListRunsResponseDtoRunsItemStatus = typeof ListRunsResponseDtoRunsItemStatus[keyof typeof ListRunsResponseDtoRunsItemStatus];
@@ -3611,7 +3706,7 @@ export const useTriggerWorkflow = <TError = void,
     }
     
 /**
- * Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started.
+ * Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started, and `exitConditions` stop a person's active run on others.
  * @summary Create a new workflow
  */
 export type createWorkflowResponse201 = {
@@ -4109,7 +4204,7 @@ export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, 
 
 
 /**
- * Updates workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers`.
+ * Updates workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers` and `exitConditions`.
  * @summary Update a workflow
  */
 export type updateWorkflowResponse200 = {

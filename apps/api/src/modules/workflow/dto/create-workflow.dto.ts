@@ -64,6 +64,22 @@ export const workflowTriggersSchema = z
     "Events from connected integrations that start this workflow for the person they're about. Automation workflows only; the integration must be connected first.",
   );
 
+export const workflowExitConditionsSchema = z
+  .array(WorkflowTriggerSchema)
+  .max(50)
+  .describe(
+    "Events from connected integrations that stop this workflow for the person they're about: their active runs are cancelled and unsent steps never send. Checked before triggers, so an event in both restarts the workflow. Automation workflows only; the integration must be connected first.",
+  );
+
+const WorkflowTriggerResponseSchema = WorkflowTriggerSchema.extend({
+  label: z.string().describe("Human-readable name of the event."),
+  active: z
+    .boolean()
+    .describe(
+      "False while the source's integration is disconnected; it resumes once it's reconnected.",
+    ),
+});
+
 export const CreateWorkflowSchema = z.object({
   key: z
     .string()
@@ -82,6 +98,7 @@ export const CreateWorkflowSchema = z.object({
     ),
   steps: z.array(WorkflowStepSchema).min(1).max(50),
   triggers: workflowTriggersSchema.optional(),
+  exitConditions: workflowExitConditionsSchema.optional(),
 });
 
 export const WorkflowStepResponseSchema = z.object({
@@ -107,16 +124,8 @@ export const WorkflowSchema = z.object({
   status: z.enum(["active", "paused"]),
   type: z.enum(["automation", "broadcast"]),
   steps: z.array(WorkflowStepResponseSchema),
-  triggers: z.array(
-    WorkflowTriggerSchema.extend({
-      label: z.string().describe("Human-readable name of the event."),
-      active: z
-        .boolean()
-        .describe(
-          "False while the source's integration is disconnected; the trigger resumes once it's reconnected.",
-        ),
-    }),
-  ),
+  triggers: z.array(WorkflowTriggerResponseSchema),
+  exitConditions: z.array(WorkflowTriggerResponseSchema),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
