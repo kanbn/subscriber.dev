@@ -3529,7 +3529,16 @@
                     "body": {
                       "type": "string",
                       "minLength": 1,
-                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}."
+                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class=\"button\" to a link to render it as a call-to-action button."
+                    },
+                    "layout": {
+                      "default": "default",
+                      "description": "\"default\" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). \"none\" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is.",
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "none"
+                      ]
                     }
                   },
                   "required": [
@@ -3683,6 +3692,14 @@
                 },
                 "body": {
                   "type": "string"
+                },
+                "layout": {
+                  "description": "Email steps only. Steps saved before layouts existed have no value and use \"default\".",
+                  "type": "string",
+                  "enum": [
+                    "default",
+                    "none"
+                  ]
                 },
                 "url": {
                   "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
@@ -3847,6 +3864,14 @@
                       },
                       "body": {
                         "type": "string"
+                      },
+                      "layout": {
+                        "description": "Email steps only. Steps saved before layouts existed have no value and use \"default\".",
+                        "type": "string",
+                        "enum": [
+                          "default",
+                          "none"
+                        ]
                       },
                       "url": {
                         "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
@@ -4186,6 +4211,14 @@
                 "body": {
                   "type": "string"
                 },
+                "layout": {
+                  "description": "Email steps only. Steps saved before layouts existed have no value and use \"default\".",
+                  "type": "string",
+                  "enum": [
+                    "default",
+                    "none"
+                  ]
+                },
                 "url": {
                   "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
                   "type": "string"
@@ -4379,7 +4412,16 @@
                     "body": {
                       "type": "string",
                       "minLength": 1,
-                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}."
+                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class=\"button\" to a link to render it as a call-to-action button."
+                    },
+                    "layout": {
+                      "default": "default",
+                      "description": "\"default\" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). \"none\" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is.",
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "none"
+                      ]
                     }
                   },
                   "required": [

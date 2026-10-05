@@ -15,7 +15,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "dev": "tsc",
-    "run:dev": "email dev",
+    "run:dev": "email dev --dir src/templates",
     "export": "email export",
     "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
@@ -43,6 +43,7 @@
     "react-email": "^5.0.6"
   },
   "devDependencies": {
+    "@react-email/preview-server": "5.0.6",
     "@subscriber.dev/eslint-config": "workspace:*",
     "@subscriber.dev/prettier-config": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",

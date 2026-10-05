@@ -10,6 +10,16 @@ const delayMsSchema = z.coerce
     "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
   );
 
+export const emailLayouts = ["default", "none"] as const;
+export type EmailLayout = (typeof emailLayouts)[number];
+
+const emailLayoutSchema = z
+  .enum(emailLayouts)
+  .default("default")
+  .describe(
+    '"default" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). "none" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is.',
+  );
+
 const EmailWorkflowStepSchema = z.object({
   type: z.literal("email"),
   delayMs: delayMsSchema,
@@ -18,8 +28,9 @@ const EmailWorkflowStepSchema = z.object({
     .string()
     .min(1)
     .describe(
-      "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.",
+      'HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber\'s unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class="button" to a link to render it as a call-to-action button.',
     ),
+  layout: emailLayoutSchema,
 });
 
 const WebhookWorkflowStepSchema = z.object({
@@ -108,6 +119,12 @@ export const WorkflowStepResponseSchema = z.object({
   delayMs: z.number(),
   subject: z.string().optional(),
   body: z.string().optional(),
+  layout: z
+    .enum(emailLayouts)
+    .optional()
+    .describe(
+      'Email steps only. Steps saved before layouts existed have no value and use "default".',
+    ),
   url: z
     .string()
     .optional()

@@ -47,7 +47,8 @@ vi.mock("../../../common/encryption.js", () => ({
   decrypt: vi.fn(),
 }));
 
-vi.mock("@subscriber.dev/email", () => ({
+vi.mock("@subscriber.dev/email", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@subscriber.dev/email")>()),
   sendRawEmail: vi.fn(),
 }));
 
@@ -390,7 +391,8 @@ describe("process", () => {
     await processor.process(makeJob());
 
     const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
-    expect(html).toBe("Bye - https://example.com/unsubscribe?token=abc");
+    expect(html).toContain("Bye - https://example.com/unsubscribe?token=abc");
+    expect(html).not.toContain("Don&#x27;t want these emails?");
   });
 
   it("supports Liquid {% if %} conditionals, taking the truthy branch when the subscriber has a first name", async () => {
@@ -433,7 +435,50 @@ describe("process", () => {
     await processor.process(makeJob());
 
     const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
-    expect(html).toBe("Welcome Alice!");
+    expect(html).toContain("Welcome Alice!");
+    expect(html).not.toContain("Unsubscribe");
+  });
+
+  it("wraps the body in the default layout when the step has no layout set", async () => {
+    await processor.process(makeJob());
+
+    const [, , , html, options] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toMatch(/^<!DOCTYPE html/);
+    expect(html).toContain("max-width:600px");
+    expect(html).toContain("-apple-system");
+    expect(html).toContain('<div class="content"');
+    expect(options?.text).toBe(
+      "Welcome Alice!\n\nDon't want these emails? Unsubscribe [https://example.com/unsubscribe?token=abc]",
+    );
+  });
+
+  it('sends the body as-is with layout "none"', async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+      ...mockRunStep,
+      configSnapshot: { ...mockRunStep.configSnapshot, layout: "none" },
+    } as any);
+
+    await processor.process(makeJob());
+
+    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toBe(
+      'Welcome Alice!<p style="font-size:12px;color:#666;">Don\'t want these emails? <a href="https://example.com/unsubscribe?token=abc">Unsubscribe</a></p>',
+    );
+  });
+
+  it("skips the layout for a body that is already a full HTML document", async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+      ...mockRunStep,
+      configSnapshot: {
+        subject: "Hi",
+        body: "<html><body><p>Mine</p></body></html>",
+      },
+    } as any);
+
+    await processor.process(makeJob());
+
+    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toMatch(/^<html><body><p>Mine<\/p><\/body><\/html><p style=/);
   });
 
   it("skips sending and marks skipped when the subscriber opted out of email", async () => {

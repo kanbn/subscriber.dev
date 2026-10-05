@@ -568,6 +568,18 @@ export const CreateWorkflowDtoType = {
   broadcast: 'broadcast',
 } as const;
 
+/**
+ * "default" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). "none" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is.
+ */
+export type CreateWorkflowDtoStepsItemOneOfLayout = typeof CreateWorkflowDtoStepsItemOneOfLayout[keyof typeof CreateWorkflowDtoStepsItemOneOfLayout];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateWorkflowDtoStepsItemOneOfLayout = {
+  default: 'default',
+  none: 'none',
+} as const;
+
 export type CreateWorkflowDtoStepsItemOneOf = {
   type: 'email';
   /**
@@ -582,13 +594,15 @@ export type CreateWorkflowDtoStepsItemOneOf = {
    */
   subject: string;
   /**
-   * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.
+   * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class="button" to a link to render it as a call-to-action button.
    * @minLength 1
    */
   body: string;
+  /** "default" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). "none" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is. */
+  layout?: CreateWorkflowDtoStepsItemOneOfLayout;
 };
 
-export type CreateWorkflowDtoStepsItemOneOfTwo = {
+export type CreateWorkflowDtoStepsItemOneOfThree = {
   type: 'webhook';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
@@ -605,7 +619,7 @@ export type CreateWorkflowDtoStepsItemOneOfTwo = {
   body: string;
 };
 
-export type CreateWorkflowDtoStepsItem = CreateWorkflowDtoStepsItemOneOf | CreateWorkflowDtoStepsItemOneOfTwo;
+export type CreateWorkflowDtoStepsItem = CreateWorkflowDtoStepsItemOneOf | CreateWorkflowDtoStepsItemOneOfThree;
 
 export type CreateWorkflowDtoTriggersItem = {
   /**
@@ -686,6 +700,18 @@ export const WorkflowResponseDtoType = {
   broadcast: 'broadcast',
 } as const;
 
+/**
+ * Email steps only. Steps saved before layouts existed have no value and use "default".
+ */
+export type WorkflowResponseDtoStepsItemLayout = typeof WorkflowResponseDtoStepsItemLayout[keyof typeof WorkflowResponseDtoStepsItemLayout];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkflowResponseDtoStepsItemLayout = {
+  default: 'default',
+  none: 'none',
+} as const;
+
 export type WorkflowResponseDtoStepsItem = {
   publicId: string;
   stepOrder: number;
@@ -693,6 +719,8 @@ export type WorkflowResponseDtoStepsItem = {
   delayMs: number;
   subject?: string;
   body?: string;
+  /** Email steps only. Steps saved before layouts existed have no value and use "default". */
+  layout?: WorkflowResponseDtoStepsItemLayout;
   /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
@@ -769,6 +797,18 @@ export const ListWorkflowsResponseDtoWorkflowsItemType = {
   broadcast: 'broadcast',
 } as const;
 
+/**
+ * Email steps only. Steps saved before layouts existed have no value and use "default".
+ */
+export type ListWorkflowsResponseDtoWorkflowsItemStepsItemLayout = typeof ListWorkflowsResponseDtoWorkflowsItemStepsItemLayout[keyof typeof ListWorkflowsResponseDtoWorkflowsItemStepsItemLayout];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListWorkflowsResponseDtoWorkflowsItemStepsItemLayout = {
+  default: 'default',
+  none: 'none',
+} as const;
+
 export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
   publicId: string;
   stepOrder: number;
@@ -776,6 +816,8 @@ export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
   delayMs: number;
   subject?: string;
   body?: string;
+  /** Email steps only. Steps saved before layouts existed have no value and use "default". */
+  layout?: ListWorkflowsResponseDtoWorkflowsItemStepsItemLayout;
   /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
@@ -949,6 +991,18 @@ export const WorkflowDetailResponseDtoType = {
   broadcast: 'broadcast',
 } as const;
 
+/**
+ * Email steps only. Steps saved before layouts existed have no value and use "default".
+ */
+export type WorkflowDetailResponseDtoStepsItemLayout = typeof WorkflowDetailResponseDtoStepsItemLayout[keyof typeof WorkflowDetailResponseDtoStepsItemLayout];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkflowDetailResponseDtoStepsItemLayout = {
+  default: 'default',
+  none: 'none',
+} as const;
+
 export type WorkflowDetailResponseDtoStepsItem = {
   publicId: string;
   stepOrder: number;
@@ -956,6 +1010,8 @@ export type WorkflowDetailResponseDtoStepsItem = {
   delayMs: number;
   subject?: string;
   body?: string;
+  /** Email steps only. Steps saved before layouts existed have no value and use "default". */
+  layout?: WorkflowDetailResponseDtoStepsItemLayout;
   /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
@@ -1029,6 +1085,18 @@ export const UpdateWorkflowDtoStatus = {
   paused: 'paused',
 } as const;
 
+/**
+ * "default" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). "none" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is.
+ */
+export type UpdateWorkflowDtoStepsItemOneOfLayout = typeof UpdateWorkflowDtoStepsItemOneOfLayout[keyof typeof UpdateWorkflowDtoStepsItemOneOfLayout];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateWorkflowDtoStepsItemOneOfLayout = {
+  default: 'default',
+  none: 'none',
+} as const;
+
 export type UpdateWorkflowDtoStepsItemOneOf = {
   type: 'email';
   /**
@@ -1043,13 +1111,15 @@ export type UpdateWorkflowDtoStepsItemOneOf = {
    */
   subject: string;
   /**
-   * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}.
+   * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class="button" to a link to render it as a call-to-action button.
    * @minLength 1
    */
   body: string;
+  /** "default" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). "none" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is. */
+  layout?: UpdateWorkflowDtoStepsItemOneOfLayout;
 };
 
-export type UpdateWorkflowDtoStepsItemOneOfTwo = {
+export type UpdateWorkflowDtoStepsItemOneOfThree = {
   type: 'webhook';
   /**
    * Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.
@@ -1066,7 +1136,7 @@ export type UpdateWorkflowDtoStepsItemOneOfTwo = {
   body: string;
 };
 
-export type UpdateWorkflowDtoStepsItem = UpdateWorkflowDtoStepsItemOneOf | UpdateWorkflowDtoStepsItemOneOfTwo;
+export type UpdateWorkflowDtoStepsItem = UpdateWorkflowDtoStepsItemOneOf | UpdateWorkflowDtoStepsItemOneOfThree;
 
 export type UpdateWorkflowDtoTriggersItem = {
   /**

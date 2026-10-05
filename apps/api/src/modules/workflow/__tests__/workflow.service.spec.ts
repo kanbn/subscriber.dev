@@ -460,7 +460,15 @@ describe("createWorkflow", () => {
       key: "user-signup",
       name: "Signup",
       type: "automation",
-      steps: [{ type: "email", delayMs: 0, subject: "hi", body: "hi" }],
+      steps: [
+        {
+          type: "email",
+          delayMs: 0,
+          subject: "hi",
+          body: "hi",
+          layout: "default",
+        },
+      ],
       createdBy: 1,
     });
 
@@ -468,7 +476,11 @@ describe("createWorkflow", () => {
       mockDb,
       expect.objectContaining({
         steps: [
-          { type: "email", delayMs: 0, config: { subject: "hi", body: "hi" } },
+          {
+            type: "email",
+            delayMs: 0,
+            config: { subject: "hi", body: "hi", layout: "default" },
+          },
         ],
       }),
     );
@@ -547,7 +559,13 @@ describe("workflow triggers", () => {
     updatedAt: new Date(0),
   };
   const steps = [
-    { type: "email" as const, delayMs: 0, subject: "s", body: "b" },
+    {
+      type: "email" as const,
+      delayMs: 0,
+      subject: "s",
+      body: "b",
+      layout: "default" as const,
+    },
   ];
 
   function connectStripe() {
@@ -576,7 +594,10 @@ describe("workflow triggers", () => {
           steps: [],
           triggers: [
             ...(data.triggers ?? []).map((t) => ({ ...t, action: "start" })),
-            ...(data.exitConditions ?? []).map((t) => ({ ...t, action: "exit" })),
+            ...(data.exitConditions ?? []).map((t) => ({
+              ...t,
+              action: "exit",
+            })),
           ],
         }) as any,
     );
@@ -724,7 +745,10 @@ describe("workflow triggers", () => {
           steps: [],
           triggers: [
             ...(data.triggers ?? []).map((t) => ({ ...t, action: "start" })),
-            ...(data.exitConditions ?? []).map((t) => ({ ...t, action: "exit" })),
+            ...(data.exitConditions ?? []).map((t) => ({
+              ...t,
+              action: "exit",
+            })),
           ],
         }) as any,
     );
