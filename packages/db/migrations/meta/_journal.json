@@ -141,6 +141,13 @@
       "when": 1791031967105,
       "tag": "20261003125247_AddWorkflowTriggerAction",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1791373562230,
+      "tag": "20261007114602_AddDeviceCode",
+      "breakpoints": true
     }
   ]
 }

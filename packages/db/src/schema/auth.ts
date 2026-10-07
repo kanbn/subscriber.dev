@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  bigint,
   bigserial,
   boolean,
   integer,
@@ -83,3 +84,19 @@ export const apiKeyRelations = relations(apikey, ({ one }) => ({
     relationName: "apiKeyUser",
   }),
 }));
+
+// better-auth device-authorization plugin: `subscriber login` in the CLI.
+export const deviceCode = pgTable("deviceCode", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  deviceCode: text("deviceCode").notNull(),
+  userCode: text("userCode").notNull(),
+  userId: bigint("userId", { mode: "number" }).references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  expiresAt: timestamp("expiresAt").notNull(),
+  status: text("status").notNull(),
+  lastPolledAt: timestamp("lastPolledAt"),
+  pollingInterval: integer("pollingInterval"),
+  clientId: text("clientId"),
+  scope: text("scope"),
+}).enableRLS();

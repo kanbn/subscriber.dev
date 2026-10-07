@@ -5,10 +5,9 @@ import { stripe } from "@better-auth/stripe";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { createAuthEndpoint, createAuthMiddleware } from "better-auth/api";
-import { apiKey, genericOAuth } from "better-auth/plugins";
+import { createAuthMiddleware } from "better-auth/api";
+import { apiKey, bearer, deviceAuthorization } from "better-auth/plugins";
 import { magicLink } from "better-auth/plugins/magic-link";
-import { socialProviderList } from "better-auth/social-providers";
 import { env } from "next-runtime-env";
 
 import type { dbClient } from "@subscriber.dev/db/client";
@@ -17,110 +16,16 @@ import * as schema from "@subscriber.dev/db/schema";
 import { sendEmail } from "@subscriber.dev/email";
 import { createStripeClient } from "@subscriber.dev/stripe";
 
-export const configuredProviders = socialProviderList.reduce<
-  Record<
-    string,
-    {
-      clientId: string;
-      clientSecret: string;
-      appBundleIdentifier?: string;
-      tenantId?: string;
-      requireSelectAccount?: boolean;
-      clientKey?: string;
-      issuer?: string;
-      // Google-specific optional hints
-      hostedDomain?: string;
-      hd?: string;
-    }
-  >
->((acc, provider) => {
-  const id = process.env[`${provider.toUpperCase()}_CLIENT_ID`];
-  const secret = process.env[`${provider.toUpperCase()}_CLIENT_SECRET`];
-  if (id && id.length > 0 && secret && secret.length > 0) {
-    acc[provider] = { clientId: id, clientSecret: secret };
-  }
-  if (
-    provider === "apple" &&
-    Object.keys(acc).includes("apple") &&
-    acc[provider]
-  ) {
-    const bundleId =
-      process.env[`${provider.toUpperCase()}_APP_BUNDLE_IDENTIFIER`];
-    if (bundleId && bundleId.length > 0) {
-      acc[provider].appBundleIdentifier = bundleId;
-    }
-  }
-  if (
-    provider === "gitlab" &&
-    Object.keys(acc).includes("gitlab") &&
-    acc[provider]
-  ) {
-    const issuer = process.env[`${provider.toUpperCase()}_ISSUER`];
-    if (issuer && issuer.length > 0) {
-      acc[provider].issuer = issuer;
-    }
-  }
-  if (
-    provider === "microsoft" &&
-    Object.keys(acc).includes("microsoft") &&
-    acc[provider]
-  ) {
-    acc[provider].tenantId = "common";
-    acc[provider].requireSelectAccount = true;
-  }
-  // Add Google domain hint if allowed domains is configured
-  if (
-    provider === "google" &&
-    Object.keys(acc).includes("google") &&
-    acc[provider]
-  ) {
-    const allowed = process.env.BETTER_AUTH_ALLOWED_DOMAINS?.split(",")
-      .map((d) => d.trim().toLowerCase())
-      .filter(Boolean);
-    if (allowed && allowed.length > 0) {
-      // Use the first domain as an authorization hint
-      acc[provider].hostedDomain = allowed[0];
-      acc[provider].hd = allowed[0];
-    }
-  }
-  if (
-    provider === "tiktok" &&
-    Object.keys(acc).includes("tiktok") &&
-    acc[provider]
-  ) {
-    const key = process.env[`${provider.toUpperCase()}_CLIENT_KEY`];
-    if (key && key.length > 0) {
-      acc[provider].clientKey = key;
-    }
-  }
-  return acc;
-}, {});
-
-export const socialProvidersPlugin = () => ({
-  id: "social-providers-plugin",
-  endpoints: {
-    getSocialProviders: createAuthEndpoint(
-      "/social-providers",
-      {
-        method: "GET",
-      },
-      async (ctx) => {
-        const providers = ctx.context.socialProviders.map((p) =>
-          p.id.toLowerCase(),
-        );
-        // Add OIDC provider if configured
-        if (
-          process.env.OIDC_CLIENT_ID &&
-          process.env.OIDC_CLIENT_SECRET &&
-          process.env.OIDC_DISCOVERY_URL
-        ) {
-          providers.push("oidc");
-        }
-        return ctx.json(providers);
-      },
-    ),
-  },
-});
+// GitHub is the only social sign-in; everything else is an email link.
+export const configuredProviders =
+  process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+    ? {
+        github: {
+          clientId: process.env.GITHUB_CLIENT_ID,
+          clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        },
+      }
+    : {};
 
 export const initAuth = (db: dbClient) => {
   return betterAuth({
@@ -174,7 +79,16 @@ export const initAuth = (db: dbClient) => {
       },
     },
     plugins: [
-      socialProvidersPlugin(),
+      // `subscriber login`: the CLI gets a code, the user approves it on
+      // /auth, and the CLI swaps the session token (sent as a bearer) for an
+      // API key.
+      deviceAuthorization({
+        verificationUri: "/auth",
+        validateClient: (clientId) => clientId === "subscriber-cli",
+        // better-auth 1.4.6 validates `schema` as required; {} keeps the default.
+        schema: {},
+      }),
+      bearer(),
       apiKey({
         enableSessionForAPIKeys: true,
         rateLimit: {
@@ -202,25 +116,6 @@ export const initAuth = (db: dbClient) => {
           }
         },
       }),
-      // Generic OIDC provider
-      ...(process.env.OIDC_CLIENT_ID &&
-      process.env.OIDC_CLIENT_SECRET &&
-      process.env.OIDC_DISCOVERY_URL
-        ? [
-            genericOAuth({
-              config: [
-                {
-                  providerId: "oidc",
-                  clientId: process.env.OIDC_CLIENT_ID,
-                  clientSecret: process.env.OIDC_CLIENT_SECRET,
-                  discoveryUrl: process.env.OIDC_DISCOVERY_URL,
-                  scopes: ["openid", "email", "profile"],
-                  pkce: true,
-                },
-              ],
-            }),
-          ]
-        : []),
     ],
     advanced: {
       cookiePrefix: "subscriber.dev",
