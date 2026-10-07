@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import { env } from "next-runtime-env";
 import { useEffect, useRef, useState } from "react";
 
 import { PageHead } from "~/components/PageHead";
@@ -10,6 +11,10 @@ export const monoStack =
 
 export const GITHUB_URL = "https://github.com/kanbn/subscriber.dev";
 export const DOCS_URL = "https://docs.subscriber.dev";
+export const MCP_URL = "https://mcp.subscriber.dev";
+export const CONTACT_EMAIL = "hello@subscriber.dev";
+export const LOGIN_COMMAND = "npx @subscriber.dev/cli login";
+export const MCP_ADD_COMMAND = `claude mcp add --transport http subscriber ${MCP_URL}`;
 
 export function asciiTable(head: string[], rows: string[][], totalWidth = 0) {
   const widths = head.map((h, i) =>
@@ -77,27 +82,48 @@ export function FitTable({
   highlight?: number;
 }) {
   const [ref, columns] = useFitColumns<HTMLPreElement>();
+  const natural = asciiTable(head, rows).split("\n")[0]?.length ?? 0;
+  const stacked = columns > 0 && natural > columns;
+  const labelWidth = Math.max(...head.slice(1).map((h) => h.length));
+  const picked = "font-semibold text-emerald-600 dark:text-emerald-400";
 
   return (
     <pre
       ref={ref}
-      className="border-border bg-background-50 relative overflow-x-auto border p-4 leading-relaxed"
+      className={`border-border bg-background-50 relative overflow-x-auto border p-4 leading-relaxed ${stacked ? "whitespace-pre-wrap" : ""}`}
     >
-      {asciiTable(head, rows, columns)
-        .split("\n")
-        .map((line, i) => (
-          <span
-            key={i}
-            className={
-              highlight !== undefined && i === highlight + 3
-                ? "font-semibold text-emerald-600 dark:text-emerald-400"
-                : undefined
-            }
-          >
-            {line}
-            {"\n"}
-          </span>
-        ))}
+      {stacked
+        ? rows.map((row, i) => (
+            <span key={i} className={i === highlight ? picked : undefined}>
+              {i > 0 && "\n"}
+              <span className="font-semibold">{row[0]}</span>
+              {row.slice(1).map((cell, j) => (
+                <span key={j}>
+                  {"\n  "}
+                  <span className="text-muted-foreground">
+                    {(head[j + 1] ?? "").padEnd(labelWidth)}
+                  </span>
+                  {`  ${cell}`}
+                </span>
+              ))}
+              {"\n"}
+            </span>
+          ))
+        : asciiTable(head, rows, columns)
+            .split("\n")
+            .map((line, i) => (
+              <span
+                key={i}
+                className={
+                  highlight !== undefined && i === highlight + 3
+                    ? picked
+                    : undefined
+                }
+              >
+                {line}
+                {"\n"}
+              </span>
+            ))}
     </pre>
   );
 }
@@ -143,6 +169,34 @@ export const Ok = ({ children }: { children: ReactNode }) => (
   <span className="text-emerald-600 dark:text-emerald-400">{children}</span>
 );
 
+const FOOTER: [string, [string, string][]][] = [
+  [
+    "product",
+    [
+      ["pricing", "/#pricing"],
+      ["providers", "/providers"],
+      ["docs", DOCS_URL],
+      ["github", GITHUB_URL],
+    ],
+  ],
+  [
+    "compare",
+    [
+      ["vs customer.io", "/vs/customer-io"],
+      ["vs loops", "/vs/loops"],
+      ["vs brevo", "/vs/brevo"],
+    ],
+  ],
+  [
+    "legal",
+    [
+      ["terms", "/terms"],
+      ["privacy", "/privacy"],
+    ],
+  ],
+  ["contact", [[CONTACT_EMAIL, `mailto:${CONTACT_EMAIL}`]]],
+];
+
 export function MarketingLayout({
   title,
   description,
@@ -155,11 +209,22 @@ export function MarketingLayout({
   return (
     <div
       style={{ fontFamily: monoStack }}
-      className="bg-background text-foreground min-h-screen text-[13px] leading-relaxed"
+      className="bg-background text-foreground dark min-h-screen text-[13px] leading-relaxed [color-scheme:dark]"
     >
       <PageHead title={title} />
       <Head>
         <meta name="description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="subscriber.dev" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta
+          property="og:image"
+          content={`${env("NEXT_PUBLIC_BASE_URL") ?? ""}/og.png`}
+        />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
       <div className="border-border mx-auto flex min-h-screen max-w-[880px] flex-col border-x">
@@ -184,25 +249,92 @@ export function MarketingLayout({
           {children}
         </main>
 
-        <footer className="border-border text-muted-foreground flex flex-col gap-2 border-t px-4 py-6 sm:flex-row sm:justify-between sm:px-8">
-          <span>© {new Date().getFullYear()} Open Engineering</span>
-          <span className="flex gap-4">
-            <a href={GITHUB_URL} className="hover:text-foreground">
-              github
-            </a>
-            <a href={DOCS_URL} className="hover:text-foreground">
-              docs
-            </a>
-            <Link href="/terms" className="hover:text-foreground">
-              terms
-            </Link>
-            <Link href="/privacy" className="hover:text-foreground">
-              privacy
-            </Link>
-            <span>agpl-3.0</span>
-          </span>
+        <footer className="border-border text-muted-foreground border-t px-4 py-8 sm:px-8">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+            {FOOTER.map(([heading, links]) => (
+              <div key={heading} className="flex flex-col items-start gap-1">
+                <span className="opacity-60"># {heading}</span>
+                {links.map(([label, href]) =>
+                  href.startsWith("/") ? (
+                    <Link
+                      key={label}
+                      href={href}
+                      className="hover:text-foreground"
+                    >
+                      {label}
+                    </Link>
+                  ) : (
+                    <a
+                      key={label}
+                      href={href}
+                      className="hover:text-foreground"
+                    >
+                      {label}
+                    </a>
+                  ),
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 flex justify-between">
+            <span>© {new Date().getFullYear()} Open Engineering</span>
+            <span className="flex gap-4">
+              <a href="/llms.txt" className="hover:text-foreground">
+                llms.txt
+              </a>
+              <a
+                href={`${GITHUB_URL}/blob/main/LICENSE`}
+                className="hover:text-foreground"
+              >
+                agpl-3.0
+              </a>
+            </span>
+          </p>
         </footer>
       </div>
+    </div>
+  );
+}
+
+export function CopyCommand({ command }: { command: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="border-border bg-background-50 inline-flex max-w-full items-center gap-4 border px-4 py-2">
+      <code className="truncate">
+        <Prompt />
+        {command}
+      </code>
+      <button
+        type="button"
+        onClick={() => {
+          void navigator.clipboard.writeText(command).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          });
+        }}
+        className="text-muted-foreground hover:text-foreground shrink-0"
+      >
+        {copied ? "copied ✓" : "copy"}
+      </button>
+    </div>
+  );
+}
+
+export function Launched({ page }: { page: ReactNode }) {
+  return env("NEXT_PUBLIC_SHOW_MARKETING") === "true" ? page : <ComingSoon />;
+}
+
+function ComingSoon() {
+  return (
+    <div
+      style={{ fontFamily: monoStack }}
+      className="bg-background text-foreground dark flex min-h-screen items-center justify-center text-[13px] [color-scheme:dark]"
+    >
+      <PageHead title="subscriber.dev" />
+      <p>
+        <span className="font-semibold">subscriber.dev</span>{" "}
+        <span className="text-muted-foreground">(coming soon)</span>
+      </p>
     </div>
   );
 }

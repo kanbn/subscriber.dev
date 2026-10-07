@@ -24,7 +24,9 @@ export default function AuthPage() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const userCode =
-    typeof router.query.user_code === "string" ? router.query.user_code : "";
+    typeof router.query.user_code === "string"
+      ? router.query.user_code.replace(/^(\w{4})(\w{4})$/, "$1-$2")
+      : "";
   const next = safeNext(router.query.next);
 
   if (!session) {
@@ -112,7 +114,9 @@ function SignIn({ userCode }: { userCode: string }) {
         {userCode ? (
           <>
             sign in to connect your terminal. code{" "}
-            <span className="text-foreground font-semibold">{userCode}</span>
+            <span className="text-foreground whitespace-nowrap font-semibold">
+              {userCode}
+            </span>
           </>
         ) : (
           "sign in or create an account. no password needed."
