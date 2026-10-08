@@ -94,7 +94,12 @@ function SignIn({ userCode }: { userCode: string }) {
       provider: "github",
       callbackURL,
     });
-    if (error) setError("Couldn't sign in with GitHub. Try again.");
+    if (error)
+      setError(
+        error.code === "PROVIDER_NOT_FOUND"
+          ? "GitHub sign-in isn't set up on this server. Use an email link instead."
+          : "Couldn't sign in with GitHub. Try again.",
+      );
   };
 
   if (sentTo) {
