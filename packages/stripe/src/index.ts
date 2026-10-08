@@ -10,13 +10,13 @@ const createStripeClient = () => {
   }
 
   const stripe = new Stripe(stripeSecretKey, {
-    apiVersion: "2025-08-27.basil",
+    apiVersion: "2026-09-30.endive",
   });
 
   return stripe;
 };
 
 const createStripeClientForKey = (apiKey: string) =>
-  new Stripe(apiKey, { apiVersion: "2025-08-27.basil" });
+  new Stripe(apiKey, { apiVersion: "2026-09-30.endive" });
 
 export { createStripeClient, createStripeClientForKey, Stripe };

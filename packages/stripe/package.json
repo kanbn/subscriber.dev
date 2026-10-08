@@ -30,6 +30,6 @@
   },
   "prettier": "@subscriber.dev/prettier-config",
   "dependencies": {
-    "stripe": "^18.2.0"
+    "stripe": "^23.0.0"
   }
 }
