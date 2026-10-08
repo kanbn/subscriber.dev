@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import type { Screen } from "./navigation.js";
 import { AnalyticsScreen } from "./screens/AnalyticsScreen.js";
+import { BillingScreen } from "./screens/BillingScreen.js";
 import { BroadcastsScreen } from "./screens/BroadcastsScreen.js";
 import { EnvironmentsScreen } from "./screens/EnvironmentsScreen.js";
 import { IntegrationDetailScreen } from "./screens/IntegrationDetailScreen.js";
@@ -64,7 +65,14 @@ export function App() {
               environment,
             })
           }
+          onSelectBilling={() =>
+            push({ kind: "billing", workspace: screen.workspace })
+          }
         />
+      )}
+
+      {screen.kind === "billing" && (
+        <BillingScreen workspace={screen.workspace} />
       )}
 
       {screen.kind === "section" && (

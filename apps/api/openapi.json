@@ -278,6 +278,124 @@
         ]
       }
     },
+    "/workspaces/{workspaceId}/billing": {
+      "get": {
+        "operationId": "getBilling",
+        "summary": "Get a workspace's plan and usage",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/workspaces/{workspaceId}/billing/checkout": {
+      "post": {
+        "operationId": "createCheckoutLink",
+        "summary": "Get a link to start a paid plan (or the billing portal if the workspace already has one)",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingLinkResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/workspaces/{workspaceId}/billing/portal": {
+      "post": {
+        "operationId": "createBillingPortalLink",
+        "summary": "Get a link to manage or cancel the workspace's plan",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingLinkResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/environments/{environmentId}/subscribers": {
       "get": {
         "operationId": "listSubscribers",
@@ -2580,6 +2698,152 @@
           "slug"
         ]
       },
+      "BillingResponseDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "False when billing is off, e.g. on a self-hosted install."
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "starter",
+              "growth",
+              "scale",
+              "pro",
+              "business"
+            ],
+            "description": "The current plan, e.g. \"growth\"."
+          },
+          "interval": {
+            "type": "string",
+            "enum": [
+              "month",
+              "year"
+            ],
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Stripe subscription status, e.g. \"active\" or \"past_due\".",
+            "nullable": true
+          },
+          "currentPeriodEnd": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "nullable": true
+          },
+          "cancelAtPeriodEnd": {
+            "type": "boolean"
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "subscribers": {
+                "type": "number",
+                "description": "Subscribers billed on: opted-in subscribers in production, or distinct subscribers emailed this period if that's more."
+              },
+              "subscriberLimit": {
+                "type": "number"
+              },
+              "sendsThisMonth": {
+                "type": "number",
+                "description": "Email and webhook steps sent this calendar month (UTC)."
+              },
+              "sendLimit": {
+                "type": "number",
+                "description": "Monthly send limit; null when the plan doesn't limit sends.",
+                "nullable": true
+              }
+            },
+            "selfRequired": true
+          },
+          "overLimit": {
+            "type": "boolean"
+          },
+          "ceiling": {
+            "type": "number",
+            "description": "Sends to subscribers past this are held until an upgrade: the free plan's limit, or one plan up for paid plans."
+          },
+          "movesUpOn": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "description": "When an over-limit paid workspace moves up one plan (3 days after going over); null when not over.",
+            "nullable": true
+          },
+          "planAtRenewal": {
+            "type": "string",
+            "description": "The plan this workspace moves to at its next renewal, from its subscriber count; \"custom\" above the largest plan; null when it stays the same.",
+            "nullable": true
+          }
+        },
+        "required": [
+          "enabled",
+          "plan",
+          "interval",
+          "status",
+          "currentPeriodEnd",
+          "cancelAtPeriodEnd",
+          "usage",
+          "overLimit",
+          "ceiling",
+          "movesUpOn",
+          "planAtRenewal"
+        ]
+      },
+      "CreateCheckoutDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "starter",
+              "growth",
+              "scale",
+              "pro",
+              "business"
+            ],
+            "description": "A paid plan, e.g. \"growth\"."
+          },
+          "interval": {
+            "default": "month",
+            "type": "string",
+            "enum": [
+              "month",
+              "year"
+            ]
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      },
+      "BillingLinkResponseDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A Stripe page to open in the browser."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "checkout",
+              "portal",
+              "changed"
+            ],
+            "description": "checkout: open the URL to start a plan. changed: the existing plan was changed straight away, prorated. portal: open the URL to manage card, invoices or cancel."
+          }
+        },
+        "required": [
+          "url",
+          "kind"
+        ]
+      },
       "ListSubscribersResponseDto": {
         "type": "object",
         "properties": {
@@ -4790,6 +5054,10 @@
             "type": "number",
             "exclusiveMinimum": 0,
             "maximum": 168
+          },
+          "allowOverPlan": {
+            "description": "subscriber.dev cloud: confirm sending to more subscribers than the plan includes, which moves the workspace up one plan after 3 days. Without it, such a broadcast is refused with an explanation; ask the user before setting it.",
+            "type": "boolean"
           }
         },
         "required": [

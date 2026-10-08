@@ -115,6 +115,132 @@ export interface EnvironmentDto {
   slug: string;
 }
 
+/**
+ * The current plan, e.g. "growth".
+ */
+export type BillingResponseDtoPlan = typeof BillingResponseDtoPlan[keyof typeof BillingResponseDtoPlan];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BillingResponseDtoPlan = {
+  free: 'free',
+  starter: 'starter',
+  growth: 'growth',
+  scale: 'scale',
+  pro: 'pro',
+  business: 'business',
+} as const;
+
+/**
+ * @nullable
+ */
+export type BillingResponseDtoInterval = typeof BillingResponseDtoInterval[keyof typeof BillingResponseDtoInterval] | null;
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BillingResponseDtoInterval = {
+  month: 'month',
+  year: 'year',
+} as const;
+
+export type BillingResponseDtoUsage = {
+  /** Subscribers billed on: opted-in subscribers in production, or distinct subscribers emailed this period if that's more. */
+  subscribers?: number;
+  subscriberLimit?: number;
+  /** Email and webhook steps sent this calendar month (UTC). */
+  sendsThisMonth?: number;
+  /**
+   * Monthly send limit; null when the plan doesn't limit sends.
+   * @nullable
+   */
+  sendLimit?: number | null;
+};
+
+export interface BillingResponseDto {
+  /** False when billing is off, e.g. on a self-hosted install. */
+  enabled: boolean;
+  /** The current plan, e.g. "growth". */
+  plan: BillingResponseDtoPlan;
+  /** @nullable */
+  interval: BillingResponseDtoInterval;
+  /**
+   * Stripe subscription status, e.g. "active" or "past_due".
+   * @nullable
+   */
+  status: string | null;
+  /**
+   * @nullable
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  usage: BillingResponseDtoUsage;
+  overLimit: boolean;
+  /** Sends to subscribers past this are held until an upgrade: the free plan's limit, or one plan up for paid plans. */
+  ceiling: number;
+  /**
+   * When an over-limit paid workspace moves up one plan (3 days after going over); null when not over.
+   * @nullable
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  movesUpOn: string | null;
+  /**
+   * The plan this workspace moves to at its next renewal, from its subscriber count; "custom" above the largest plan; null when it stays the same.
+   * @nullable
+   */
+  planAtRenewal: string | null;
+}
+
+/**
+ * A paid plan, e.g. "growth".
+ */
+export type CreateCheckoutDtoPlan = typeof CreateCheckoutDtoPlan[keyof typeof CreateCheckoutDtoPlan];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateCheckoutDtoPlan = {
+  starter: 'starter',
+  growth: 'growth',
+  scale: 'scale',
+  pro: 'pro',
+  business: 'business',
+} as const;
+
+export type CreateCheckoutDtoInterval = typeof CreateCheckoutDtoInterval[keyof typeof CreateCheckoutDtoInterval];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateCheckoutDtoInterval = {
+  month: 'month',
+  year: 'year',
+} as const;
+
+export interface CreateCheckoutDto {
+  /** A paid plan, e.g. "growth". */
+  plan: CreateCheckoutDtoPlan;
+  interval?: CreateCheckoutDtoInterval;
+}
+
+/**
+ * checkout: open the URL to start a plan. changed: the existing plan was changed straight away, prorated. portal: open the URL to manage card, invoices or cancel.
+ */
+export type BillingLinkResponseDtoKind = typeof BillingLinkResponseDtoKind[keyof typeof BillingLinkResponseDtoKind];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const BillingLinkResponseDtoKind = {
+  checkout: 'checkout',
+  portal: 'portal',
+  changed: 'changed',
+} as const;
+
+export interface BillingLinkResponseDto {
+  /** A Stripe page to open in the browser. */
+  url: string;
+  /** checkout: open the URL to start a plan. changed: the existing plan was changed straight away, prorated. portal: open the URL to manage card, invoices or cancel. */
+  kind: BillingLinkResponseDtoKind;
+}
+
 export type ListSubscribersResponseDtoSubscribersItemEmail = string | null;
 
 export type ListSubscribersResponseDtoSubscribersItemPhone = string | null;
@@ -1341,6 +1467,8 @@ export interface TriggerBroadcastDto {
    * @maximum 168
    */
   sendOverHours?: number;
+  /** subscriber.dev cloud: confirm sending to more subscribers than the plan includes, which moves the workspace up one plan after 3 days. Without it, such a broadcast is refused with an explanation; ask the user before setting it. */
+  allowOverPlan?: boolean;
 }
 
 export interface PreviewBroadcastResponseDto {
@@ -1997,6 +2125,116 @@ export const createEnvironment = async (workspaceId: string,
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
       createEnvironmentDto,)
+  }
+);}
+
+
+
+/**
+ * @summary Get a workspace's plan and usage
+ */
+export type getBillingResponse200 = {
+  data: BillingResponseDto
+  status: 200
+}
+    
+export type getBillingResponseSuccess = (getBillingResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getBillingResponse = (getBillingResponseSuccess)
+
+export const getGetBillingUrl = (workspaceId: string,) => {
+
+
+  
+
+  return `/workspaces/${workspaceId}/billing`
+}
+
+export const getBilling = async (workspaceId: string, options?: RequestInit): Promise<getBillingResponse> => {
+  
+  return cliFetch<getBillingResponse>(getGetBillingUrl(workspaceId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+/**
+ * @summary Get a link to start a paid plan (or the billing portal if the workspace already has one)
+ */
+export type createCheckoutLinkResponse200 = {
+  data: BillingLinkResponseDto
+  status: 200
+}
+    
+export type createCheckoutLinkResponseSuccess = (createCheckoutLinkResponse200) & {
+  headers: Headers;
+};
+;
+
+export type createCheckoutLinkResponse = (createCheckoutLinkResponseSuccess)
+
+export const getCreateCheckoutLinkUrl = (workspaceId: string,) => {
+
+
+  
+
+  return `/workspaces/${workspaceId}/billing/checkout`
+}
+
+export const createCheckoutLink = async (workspaceId: string,
+    createCheckoutDto: CreateCheckoutDto, options?: RequestInit): Promise<createCheckoutLinkResponse> => {
+  
+  return cliFetch<createCheckoutLinkResponse>(getCreateCheckoutLinkUrl(workspaceId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCheckoutDto,)
+  }
+);}
+
+
+
+/**
+ * @summary Get a link to manage or cancel the workspace's plan
+ */
+export type createBillingPortalLinkResponse200 = {
+  data: BillingLinkResponseDto
+  status: 200
+}
+    
+export type createBillingPortalLinkResponseSuccess = (createBillingPortalLinkResponse200) & {
+  headers: Headers;
+};
+;
+
+export type createBillingPortalLinkResponse = (createBillingPortalLinkResponseSuccess)
+
+export const getCreateBillingPortalLinkUrl = (workspaceId: string,) => {
+
+
+  
+
+  return `/workspaces/${workspaceId}/billing/portal`
+}
+
+export const createBillingPortalLink = async (workspaceId: string, options?: RequestInit): Promise<createBillingPortalLinkResponse> => {
+  
+  return cliFetch<createBillingPortalLinkResponse>(getCreateBillingPortalLinkUrl(workspaceId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
   }
 );}
 

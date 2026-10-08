@@ -148,6 +148,20 @@
       "when": 1791373562230,
       "tag": "20261007114602_AddDeviceCode",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1791404599184,
+      "tag": "20261007202319_AddWorkspaceBilling",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1791458400331,
+      "tag": "20261008112000_AddBillingPeriodAndOverLimit",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import {
   createEnvironment,
+  getBilling,
   listEnvironments,
 } from "@subscriber.dev/api-client/cli";
 
@@ -15,13 +16,24 @@ import { useAsyncData } from "../useAsyncData.js";
 
 type Mode = "list" | "creating" | "submitting";
 
+const BILLING_VALUE = "__billing__";
+
 export function EnvironmentsScreen({
   workspace,
   onSelect,
+  onSelectBilling,
 }: {
   workspace: WorkspaceSummary;
   onSelect: (environment: EnvironmentSummary) => void;
+  onSelectBilling?: () => void;
 }) {
+  const billing = useAsyncData(async () => {
+    const response = await getBilling(workspace.publicId);
+    return (response.status as number) === 200;
+  }, [workspace.publicId]);
+  const hasBilling =
+    !!onSelectBilling && billing.status === "ready" && billing.data;
+
   const state = useAsyncData(async () => {
     const response = await listEnvironments(workspace.publicId);
     if (response.status !== 200) {
@@ -102,11 +114,17 @@ export function EnvironmentsScreen({
           ) : (
             <SelectInput
               limit={10}
-              items={environments.map((environment) => ({
-                label: `${environment.name}  (${environment.slug})`,
-                value: environment.publicId,
-              }))}
+              items={[
+                ...environments.map((environment) => ({
+                  label: `${environment.name}  (${environment.slug})`,
+                  value: environment.publicId,
+                })),
+                ...(hasBilling
+                  ? [{ label: "Billing", value: BILLING_VALUE }]
+                  : []),
+              ]}
               onSelect={(item) => {
+                if (item.value === BILLING_VALUE) return onSelectBilling?.();
                 const environment = environments.find(
                   (e) => e.publicId === item.value,
                 );

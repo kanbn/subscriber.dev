@@ -13,6 +13,7 @@ export interface EnvironmentSummary {
 export type Screen =
   | { kind: "workspaces" }
   | { kind: "users" }
+  | { kind: "billing"; workspace: WorkspaceSummary }
   | { kind: "environments"; workspace: WorkspaceSummary }
   | {
       kind: "section";

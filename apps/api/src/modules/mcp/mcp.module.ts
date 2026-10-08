@@ -3,6 +3,8 @@ import { McpModule, McpTransportType } from "@rekog/mcp-nest";
 
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { AnalyticsModule } from "../analytics/analytics.module.js";
+import { BillingModule } from "../billing/billing.module.js";
+import { billingEnabled } from "../billing/billing.service.js";
 import { InboundModule } from "../inbound/inbound.module.js";
 import { IntegrationsModule } from "../integrations/integrations.module.js";
 import { SubscriberModule } from "../subscriber/subscriber.module.js";
@@ -10,6 +12,7 @@ import { UserModule } from "../user/user.module.js";
 import { WorkflowModule } from "../workflow/workflow.module.js";
 import { WorkspaceModule } from "../workspace/workspace.module.js";
 import { AnalyticsTools } from "./tools/analytics.tools.js";
+import { BillingTools } from "./tools/billing.tools.js";
 import { InboundTools } from "./tools/inbound.tools.js";
 import { IntegrationsTools } from "./tools/integrations.tools.js";
 import { SubscriberTools } from "./tools/subscriber.tools.js";
@@ -27,6 +30,7 @@ const TOOL_PROVIDERS = [
   AnalyticsTools,
   InboundTools,
   WorkspaceTools,
+  ...(billingEnabled() ? [BillingTools] : []),
 ];
 
 @Module({
@@ -44,6 +48,7 @@ const TOOL_PROVIDERS = [
     AnalyticsModule,
     InboundModule,
     WorkspaceModule,
+    BillingModule,
   ],
   providers: TOOL_PROVIDERS,
 })

@@ -3,6 +3,7 @@ import { Command } from "commander";
 
 import { ensureLoggedIn } from "./auth.js";
 import { registerAnalyticsCommand } from "./commands/analytics.js";
+import { registerBillingCommand } from "./commands/billing.js";
 import { registerEnvironmentsCommand } from "./commands/environments.js";
 import { registerIntegrationsCommand } from "./commands/integrations.js";
 import { registerLoginCommand } from "./commands/login.js";
@@ -28,6 +29,7 @@ if (process.argv.length <= 2) {
   registerUsersCommand(program);
   registerIntegrationsCommand(program);
   registerAnalyticsCommand(program);
+  registerBillingCommand(program);
 
   program.parse();
 }

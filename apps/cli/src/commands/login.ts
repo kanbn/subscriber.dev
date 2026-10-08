@@ -70,7 +70,7 @@ async function postJson<T>(
   return { ok: res.ok, data: (await res.json()) as T };
 }
 
-function openBrowser(url: string): void {
+export function openBrowser(url: string): void {
   const [command, ...args] =
     process.platform === "darwin"
       ? ["open", url]
