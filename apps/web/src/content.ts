@@ -50,7 +50,7 @@ export const FAQS: [
   ],
   [
     "can I self-host it?",
-    "Yes. It's open source under AGPL-3.0 and runs with Docker Compose. Self-hosting is free and unlimited. A $499/yr Pro license removes our branding, and Enterprise licenses cover AGPL exemptions.",
+    "Yes. It's open source under AGPL-3.0 and runs with Docker Compose. Self-hosting is free and unlimited. A $999/yr self-hosted Business license removes our branding and includes priority support, and Enterprise licenses cover AGPL exemptions.",
   ],
   [
     "why did you build subscriber.dev?",

@@ -1030,8 +1030,7 @@ function Marketing() {
         </p>
         <Pricing />
         <p className="text-muted-foreground mt-3">
-          self-hosting: community (free) · pro ($499/yr, no branding) ·
-          enterprise (
+          self-hosting: community (free) · business ($999/yr) · enterprise (
           <a
             href={`mailto:${CONTACT_EMAIL}`}
             className="hover:text-foreground underline underline-offset-4"
