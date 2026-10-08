@@ -1,5 +1,4 @@
 import "~/styles/globals.css";
-import "~/utils/i18n";
 
 import type { NextPage, Viewport } from "next";
 import type { AppProps, AppType } from "next/app";
@@ -8,15 +7,6 @@ import { Figtree } from "next/font/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
-
-import { Toaster } from "~/components/ui/sonner";
-import { LinguiProviderWrapper } from "~/providers/lingui";
-
-export const metadata = {
-  title: "Subscriber.dev",
-  description: "The open source Customer.io alternative",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
-};
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -49,15 +39,12 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
           font-family: ${figtree.style.fontFamily};
         }
       `}</style>
-      <LinguiProviderWrapper>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <script src="/__ENV.js" />
-          <main className="font-sans">
-            {getLayout(<Component {...pageProps} />)}
-          </main>
-          <Toaster />
-        </ThemeProvider>
-      </LinguiProviderWrapper>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <script src="/__ENV.js" />
+        <main className="font-sans">
+          {getLayout(<Component {...pageProps} />)}
+        </main>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

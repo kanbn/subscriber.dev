@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { t } from "@lingui/core/macro";
-import { Trans } from "@lingui/react/macro";
 import { useEffect, useState } from "react";
 
 import { useUnsubscribe } from "@subscriber.dev/api-client/hooks";
@@ -24,7 +22,7 @@ export default function UnsubscribeView() {
 
   return (
     <>
-      <PageHead title={t`Unsubscribe | subscriber.dev`} />
+      <PageHead title="Unsubscribe | subscriber.dev" />
       <main
         style={{ fontFamily: monoStack }}
         className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center px-4 text-[13px] leading-relaxed"
@@ -41,29 +39,24 @@ export default function UnsubscribeView() {
             ) : !token ? (
               <p>
                 <span className="text-amber-600 dark:text-amber-400">✕ </span>
-                <Trans>This unsubscribe link is invalid.</Trans>
+                This unsubscribe link is invalid.
               </p>
             ) : isSuccess ? (
               <p>
                 <span className="text-emerald-600 dark:text-emerald-400">
                   ✓{" "}
                 </span>
-                <Trans>
-                  You've been unsubscribed. You won't receive any more emails
-                  from us.
-                </Trans>
+                You've been unsubscribed. You won't receive any more emails from us.
               </p>
             ) : isError ? (
               <p>
                 <span className="text-amber-600 dark:text-amber-400">✕ </span>
-                <Trans>This unsubscribe link is invalid or has expired.</Trans>
+                This unsubscribe link is invalid or has expired.
               </p>
             ) : (
               <>
                 <p className="text-muted-foreground mb-6">
-                  <Trans>
-                    Click the button below to stop receiving emails from us.
-                  </Trans>
+                  Click the button below to stop receiving emails from us.
                 </p>
                 <button
                   type="button"
@@ -71,7 +64,7 @@ export default function UnsubscribeView() {
                   disabled={isPending}
                   className="border-border hover:border-foreground border px-4 py-2 font-semibold disabled:opacity-50"
                 >
-                  {isPending ? t`Unsubscribing...` : t`Unsubscribe`}
+                  {isPending ? "Unsubscribing..." : "Unsubscribe"}
                 </button>
               </>
             )}

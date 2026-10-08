@@ -16,7 +16,7 @@ export const CONTACT_EMAIL = "hello@subscriber.dev";
 export const LOGIN_COMMAND = "npx @subscriber.dev/cli login";
 export const MCP_ADD_COMMAND = `claude mcp add --transport http subscriber ${MCP_URL}`;
 
-export function asciiTable(head: string[], rows: string[][], totalWidth = 0) {
+function asciiTable(head: string[], rows: string[][], totalWidth = 0) {
   const widths = head.map((h, i) =>
     Math.max(h.length, ...rows.map((r) => r[i]?.length ?? 0)),
   );
@@ -148,14 +148,6 @@ export function Section({
       </h2>
       {children}
     </section>
-  );
-}
-
-export function Block({ children }: { children: ReactNode }) {
-  return (
-    <pre className="border-border bg-background-50 overflow-x-auto border p-4 leading-relaxed">
-      {children}
-    </pre>
   );
 }
 

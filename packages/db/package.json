@@ -46,10 +46,7 @@
     "@electric-sql/pglite": "^0.3.7",
     "@subscriber.dev/shared": "workspace:^",
     "drizzle-orm": "^0.42.0",
-    "drizzle-zod": "^0.5.1",
-    "pg": "^8.11.3",
-    "uuid": "^11.1.0",
-    "zod": "catalog:"
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "@subscriber.dev/eslint-config": "workspace:*",

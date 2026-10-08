@@ -1,16 +1,12 @@
 import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
 
-import JoinWorkspaceTemplate from "./templates/join-workspace.js";
 import MagicLinkTemplate from "./templates/magic-link.js";
-import ResetPasswordTemplate from "./templates/reset-password.js";
 
-type Templates = "MAGIC_LINK" | "JOIN_WORKSPACE" | "RESET_PASSWORD";
+type Templates = "MAGIC_LINK";
 
 const emailTemplates: Record<Templates, React.FC> = {
   MAGIC_LINK: MagicLinkTemplate,
-  JOIN_WORKSPACE: JoinWorkspaceTemplate,
-  RESET_PASSWORD: ResetPasswordTemplate,
 };
 
 const transporter = nodemailer.createTransport({

@@ -18,7 +18,6 @@ export interface UserResponseDto {
   name: string[];
   email: string;
   image: string[];
-  stripeCustomerId: string[];
   apiKeys: UserResponseDtoApiKeysItem[];
 }
 
@@ -31,28 +30,6 @@ export interface UpdateUserResponseDto {
   publicId: string;
   name: string[];
   image: string[];
-  stripeCustomerId: string[];
-}
-
-export type TestResponseDtoEcho = {
-  /** Test name */
-  name?: string;
-  /** Optional message */
-  message?: string;
-};
-
-export interface TestResponseDto {
-  message: string;
-  timestamp: string;
-  success: boolean;
-  echo: TestResponseDtoEcho;
-}
-
-export interface TestRequestDto {
-  /** Test name */
-  name: string;
-  /** Optional message */
-  message?: string;
 }
 
 export interface WorkspaceDto {
@@ -1891,79 +1868,6 @@ export const updateCurrentUser = async (updateUserDto: UpdateUserDto, options?: 
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
       updateUserDto,)
-  }
-);}
-
-
-
-/**
- * @summary Get test message
- */
-export type getTestResponse200 = {
-  data: TestResponseDto
-  status: 200
-}
-    
-export type getTestResponseSuccess = (getTestResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getTestResponse = (getTestResponseSuccess)
-
-export const getGetTestUrl = () => {
-
-
-  
-
-  return `/test`
-}
-
-export const getTest = async ( options?: RequestInit): Promise<getTestResponse> => {
-  
-  return cliFetch<getTestResponse>(getGetTestUrl(),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-/**
- * @summary Post test data
- */
-export type createTestResponse200 = {
-  data: TestResponseDto
-  status: 200
-}
-    
-export type createTestResponseSuccess = (createTestResponse200) & {
-  headers: Headers;
-};
-;
-
-export type createTestResponse = (createTestResponseSuccess)
-
-export const getCreateTestUrl = () => {
-
-
-  
-
-  return `/test`
-}
-
-export const createTest = async (testRequestDto: TestRequestDto, options?: RequestInit): Promise<createTestResponse> => {
-  
-  return cliFetch<createTestResponse>(getCreateTestUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      testRequestDto,)
   }
 );}
 

@@ -16,7 +16,6 @@ export const UserResponseSchema = z.object({
   name: z.string().nullable(),
   email: z.string(),
   image: z.string().nullable(),
-  stripeCustomerId: z.string().nullable(),
   apiKeys: z.array(UserApiKeySchema),
 });
 
@@ -24,7 +23,6 @@ export const UpdateUserResponseSchema = z.object({
   publicId: z.string(),
   name: z.string().nullable(),
   image: z.string().nullable(),
-  stripeCustomerId: z.string().nullable(),
 });
 
 export class UpdateUserDto extends createZodDto(UpdateUserSchema) {}

@@ -40,15 +40,9 @@
   },
   "prettier": "@subscriber.dev/prettier-config",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.802.0",
-    "@better-auth/stripe": "^1.4.6",
-    "@novu/api": "^3.11.0",
     "@subscriber.dev/db": "workspace:*",
     "@subscriber.dev/email": "workspace:*",
-    "@subscriber.dev/shared": "workspace:*",
-    "@subscriber.dev/stripe": "workspace:*",
     "better-auth": "^1.4.6",
-    "next-runtime-env": "^1.7.2",
-    "stripe": "^18.2.0"
+    "next-runtime-env": "^1.7.2"
   }
 }

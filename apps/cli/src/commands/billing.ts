@@ -18,7 +18,7 @@ import { run } from "../run.js";
 import { openBrowser } from "./login.js";
 
 const n = (value: number) => value.toLocaleString("en-US");
-export const price = (key: string) => `$${planByKey(key)?.monthly ?? 0}/mo`;
+const price = (key: string) => `$${planByKey(key)?.monthly ?? 0}/mo`;
 
 const isCloud = () =>
   (readCliConfig().apiBaseUrl ?? "https://api.subscriber.dev").includes(

@@ -54,3 +54,5 @@ i18n.cache
 
 # pgdata
 /apps/api/pgdata
+
+.react-email

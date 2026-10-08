@@ -93,7 +93,7 @@ interface WorkflowStepRow {
   config: Record<string, unknown>;
 }
 
-export const redactWebhookUrl = (url: string) => {
+const redactWebhookUrl = (url: string) => {
   try {
     return `${new URL(url).origin}/***${url.slice(-4)}`;
   } catch {

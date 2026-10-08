@@ -33,7 +33,7 @@ const startOfMonthUtc = (now = new Date()) =>
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const MOVE_UP_AFTER_MS = 3 * DAY_MS;
 
-export const nextPlan = (plan: Plan): Plan | null =>
+const nextPlan = (plan: Plan): Plan | null =>
   PLANS[PLANS.indexOf(plan) + 1] ?? null;
 
 export const ceilingFor = (plan: Plan): number =>

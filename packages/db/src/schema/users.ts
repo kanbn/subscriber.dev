@@ -25,7 +25,6 @@ export const users = pgTable("users", {
   image: varchar("image", { length: 255 }),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

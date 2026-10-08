@@ -162,6 +162,13 @@
       "when": 1791458400331,
       "tag": "20261008112000_AddBillingPeriodAndOverLimit",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791475480034,
+      "tag": "20261008160440_DropInvitationsAndUserStripeCustomer",
+      "breakpoints": true
     }
   ]
 }

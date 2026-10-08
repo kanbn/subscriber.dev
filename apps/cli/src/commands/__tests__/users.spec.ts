@@ -23,7 +23,6 @@ const testUser = {
   name: "Test User",
   email: "test@example.com",
   image: null,
-  stripeCustomerId: null,
   apiKeys: [],
 };
 

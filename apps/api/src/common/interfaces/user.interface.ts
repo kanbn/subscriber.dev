@@ -7,5 +7,4 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   image?: string | null | undefined;
-  stripeCustomerId?: string | null | undefined;
 }

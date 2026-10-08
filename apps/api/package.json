@@ -3,12 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./src/index.ts"
-    }
-  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
@@ -22,8 +16,6 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.802.0",
-    "@aws-sdk/s3-request-presigner": "^3.812.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^10.4.0",

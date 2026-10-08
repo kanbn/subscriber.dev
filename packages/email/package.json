@@ -24,10 +24,8 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@novu/api": "^3.11.0",
     "@react-email/body": "0.2.0",
     "@react-email/button": "0.2.0",
-    "@react-email/components": "^1.0.1",
     "@react-email/container": "0.0.15",
     "@react-email/head": "0.0.12",
     "@react-email/heading": "0.0.15",

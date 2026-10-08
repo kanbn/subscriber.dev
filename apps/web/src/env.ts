@@ -14,7 +14,6 @@ export const env = createEnv({
    * This way you can ensure the app isn't built with invalid env vars.
    */
   server: {
-    SUBSCRIBER_ADMIN_API_KEY: z.string().optional(),
     BETTER_AUTH_SECRET: z.string(),
     BETTER_AUTH_TRUSTED_ORIGINS: z
       .string()
@@ -26,15 +25,9 @@ export const env = createEnv({
       )
       .optional(),
     POSTGRES_URL: z.string().url().optional().or(z.literal("")),
-    STRIPE_SECRET_KEY: z.string().optional(),
     GITHUB_CLIENT_ID: z.string().optional(),
     GITHUB_CLIENT_SECRET: z.string().optional(),
     EMAIL_UNSUBSCRIBE_SECRET: z.string().optional(),
-    S3_ACCESS_KEY_ID: z.string().optional(),
-    S3_SECRET_ACCESS_KEY: z.string().optional(),
-    S3_REGION: z.string().optional(),
-    S3_ENDPOINT: z.string().optional(),
-    S3_FORCE_PATH_STYLE: z.string().optional(),
     EMAIL_FROM: z.string().optional(),
   },
 
@@ -43,60 +36,18 @@ export const env = createEnv({
    * For them to be exposed to the client, prefix them with `NEXT_PUBLIC_`.
    */
   client: {
-    NEXT_PUBLIC_SUBSCRIBER_ENV: z.string().optional(),
-    NEXT_PUBLIC_UMAMI_ID: z.string().optional(),
-    NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
-    NEXT_PUBLIC_POSTHOG_HOST: z.string().optional(),
     NEXT_PUBLIC_USE_STANDALONE_OUTPUT: z.string().optional(),
     NEXT_PUBLIC_BASE_URL: z.string().url().optional(),
-    NEXT_PUBLIC_STORAGE_URL: z.string().url().optional().or(z.literal("")),
-    NEXT_PUBLIC_AVATAR_BUCKET_NAME: z.string().optional(),
-    NEXT_PUBLIC_ATTACHMENTS_BUCKET_NAME: z.string().optional(),
-    NEXT_PUBLIC_STORAGE_DOMAIN: z.string().optional(),
-    NEXT_PUBLIC_ALLOW_CREDENTIALS: z
-      .string()
-      .transform((s) => (s === "" ? undefined : s))
-      .refine(
-        (s) => !s || s.toLowerCase() === "true" || s.toLowerCase() === "false",
-      )
-      .optional(),
-    NEXT_PUBLIC_DISABLE_SIGN_UP: z
-      .string()
-      .transform((s) => (s === "" ? undefined : s))
-      .refine(
-        (s) => !s || s.toLowerCase() === "true" || s.toLowerCase() === "false",
-      )
-      .optional(),
     NEXT_PUBLIC_SHOW_MARKETING: z.enum(["true", "false"]).optional(),
-    NEXT_PUBLIC_WHITE_LABEL_HIDE_POWERED_BY: z
-      .string()
-      .transform((s) => (s === "" ? undefined : s))
-      .refine(
-        (s) => !s || s.toLowerCase() === "true" || s.toLowerCase() === "false",
-      )
-      .optional(),
   },
   /**
    * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
    */
   experimental__runtimeEnv: {
-    NEXT_PUBLIC_SUBSCRIBER_ENV: process.env.NEXT_PUBLIC_SUBSCRIBER_ENV,
     NODE_ENV: process.env.NODE_ENV,
-    NEXT_PUBLIC_UMAMI_ID: process.env.NEXT_PUBLIC_UMAMI_ID,
-    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
-    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-    NEXT_PUBLIC_STORAGE_URL: process.env.NEXT_PUBLIC_STORAGE_URL,
-    NEXT_PUBLIC_AVATAR_BUCKET_NAME: process.env.NEXT_PUBLIC_AVATAR_BUCKET_NAME,
-    NEXT_PUBLIC_ATTACHMENTS_BUCKET_NAME:
-      process.env.NEXT_PUBLIC_ATTACHMENTS_BUCKET_NAME,
-    NEXT_PUBLIC_STORAGE_DOMAIN: process.env.NEXT_PUBLIC_STORAGE_DOMAIN,
-    NEXT_PUBLIC_ALLOW_CREDENTIALS: process.env.NEXT_PUBLIC_ALLOW_CREDENTIALS,
-    NEXT_PUBLIC_DISABLE_SIGN_UP: process.env.NEXT_PUBLIC_DISABLE_SIGN_UP,
     NEXT_PUBLIC_USE_STANDALONE_OUTPUT:
       process.env.NEXT_PUBLIC_USE_STANDALONE_OUTPUT,
-    NEXT_PUBLIC_WHITE_LABEL_HIDE_POWERED_BY:
-      process.env.NEXT_PUBLIC_WHITE_LABEL_HIDE_POWERED_BY,
     NEXT_PUBLIC_SHOW_MARKETING: process.env.NEXT_PUBLIC_SHOW_MARKETING,
   },
   skipValidation:
