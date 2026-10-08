@@ -9,6 +9,7 @@ import {
   createOneClickUnsubscribeUrl,
 } from "@subscriber.dev/shared/utils";
 
+import type { BillingService } from "../../billing/billing.service.js";
 import { decrypt } from "../../../common/encryption.js";
 import { WorkflowProcessor } from "../workflow.processor.js";
 
@@ -81,7 +82,9 @@ let processor: WorkflowProcessor;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  processor = new WorkflowProcessor();
+  processor = new WorkflowProcessor({
+    skipSendReason: () => Promise.resolve(null),
+  } as unknown as BillingService);
   vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue(
     mockRunStep as any,
   );
@@ -495,6 +498,25 @@ describe("process", () => {
       "skipped",
       "Subscriber opted out of email",
     );
+  });
+
+  it("skips sending when billing says the workspace is over its plan", async () => {
+    const reason =
+      "Not sent: over the free plan's 1,000 subscribers. Upgrade to send to new subscribers.";
+    const overPlan = new WorkflowProcessor({
+      skipSendReason: () => Promise.resolve(reason),
+    } as unknown as BillingService);
+
+    await overPlan.process(makeJob());
+
+    expect(sendRawEmail).not.toHaveBeenCalled();
+    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      1,
+      "skipped",
+      reason,
+    );
+    expect(workflowRunRepo.completeRunIfAllStepsTerminal).toHaveBeenCalled();
   });
 
   it("skips sending and marks skipped when the subscriber has no email address", async () => {

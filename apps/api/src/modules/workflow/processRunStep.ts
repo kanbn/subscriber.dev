@@ -8,9 +8,15 @@ import type { WorkflowStepJobData } from "./workflow.constants.js";
 import { sendEmailStep } from "./sendEmailStep.js";
 import { renderTemplate } from "./workflow.template.js";
 
+export type SkipSendReason = (
+  environmentId: number,
+  subscriberId: number,
+) => Promise<string | null>;
+
 export async function processRunStepJob(
   db: dbClient,
   runStepId: number,
+  skipSendReason?: SkipSendReason,
 ): Promise<void> {
   const runStep = await workflowRunRepo.getRunStepById(db, runStepId);
   if (!runStep || runStep.status !== "pending") return;
@@ -37,6 +43,18 @@ export async function processRunStepJob(
       "skipped",
       "Subscriber not found",
     );
+    return;
+  }
+
+  const skipReason = await skipSendReason?.(run.environmentId, subscriber.id);
+  if (skipReason) {
+    await workflowRunRepo.updateRunStepStatus(
+      db,
+      runStep.id,
+      "skipped",
+      skipReason,
+    );
+    await workflowRunRepo.completeRunIfAllStepsTerminal(db, run.id);
     return;
   }
 

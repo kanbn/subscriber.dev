@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBroadcast.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
+import type { BillingService } from "../../billing/billing.service.js";
 import { BroadcastStepsProcessor } from "../broadcastSteps.processor.js";
 import {
   handleRunStepJobFailed,
@@ -33,7 +34,9 @@ let processor: BroadcastStepsProcessor;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  processor = new BroadcastStepsProcessor();
+  processor = new BroadcastStepsProcessor({
+    skipSendReason: () => Promise.resolve(null),
+  } as unknown as BillingService);
 });
 
 describe("process", () => {
@@ -45,7 +48,11 @@ describe("process", () => {
 
     await processor.process({ data: { runStepId: 42 } } as any);
 
-    expect(processRunStepJob).toHaveBeenCalledWith({}, 42);
+    expect(processRunStepJob).toHaveBeenCalledWith(
+      {},
+      42,
+      expect.any(Function),
+    );
   });
 
   it("re-delays the job without sending while the broadcast is paused", async () => {
@@ -133,7 +140,11 @@ describe("process before the scheduled time", () => {
 
     await processor.process({ data: { runStepId: 42 } } as any);
 
-    expect(processRunStepJob).toHaveBeenCalledWith({}, 42);
+    expect(processRunStepJob).toHaveBeenCalledWith(
+      {},
+      42,
+      expect.any(Function),
+    );
   });
 });
 

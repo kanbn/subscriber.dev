@@ -26,6 +26,7 @@ import type {
   BroadcastResumeJobData,
 } from "./workflow.constants.js";
 import { isUniqueViolation } from "../../common/isUniqueViolation.js";
+import { BillingService } from "../billing/billing.service.js";
 import { isTriggerEvent } from "../inbound/inboundSource.js";
 import { INBOUND_SOURCES } from "../inbound/sources/index.js";
 import { resolveAudienceSubscriberIds } from "./audienceQuery.js";
@@ -110,6 +111,7 @@ export class WorkflowService {
     private readonly bounceEventsQueue: Queue,
     @InjectQueue(BROADCAST_RESUME_QUEUE_NAME)
     private readonly broadcastResumeQueue: Queue,
+    private readonly billing: BillingService,
   ) {}
 
   private toWorkflowDto(
@@ -875,13 +877,24 @@ export class WorkflowService {
     workflowPublicId: string,
     audience: AudienceCondition,
     triggeredBy: number,
-    opts: { sendOverHours?: number } = {},
+    opts: { sendOverHours?: number; allowOverPlan?: boolean } = {},
   ) {
     const workflow = await this.getWorkflowReadyForBroadcast(
       db,
       environmentId,
       workflowPublicId,
     );
+    if (this.billing.isEnabled()) {
+      const audienceSize = (
+        await resolveAudienceSubscriberIds(db, environmentId, audience)
+      ).length;
+      await this.billing.checkBroadcast(
+        db,
+        environmentId,
+        audienceSize,
+        opts.allowOverPlan ?? false,
+      );
+    }
 
     const broadcast = await workflowBroadcastRepo.createBroadcast(db, {
       workflowId: workflow.id,

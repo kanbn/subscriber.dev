@@ -364,6 +364,10 @@ export function registerWorkflowsCommand(program: Command): void {
       "spread sends evenly over this many hours (max 168) instead of sending immediately",
     )
     .option(
+      "--allow-over-plan",
+      "subscriber.dev cloud: send even if it reaches more subscribers than your plan includes (moves you up a plan after 3 days)",
+    )
+    .option(
       "--environment <environmentId>",
       "environment public ID (defaults to the current environment)",
     )
@@ -375,6 +379,7 @@ export function registerWorkflowsCommand(program: Command): void {
           opts: {
             audience: string;
             sendOverHours?: string;
+            allowOverPlan?: boolean;
             environment?: string;
             json?: boolean;
           },
@@ -405,6 +410,7 @@ export function registerWorkflowsCommand(program: Command): void {
           const response = await triggerBroadcast(environmentId, workflowId, {
             audience: result.data,
             sendOverHours,
+            allowOverPlan: opts.allowOverPlan,
           } as TriggerBroadcastDto);
           if (response.status === 400) {
             console.error("Workflow is paused or has no steps.");
@@ -413,6 +419,16 @@ export function registerWorkflowsCommand(program: Command): void {
           }
           if (response.status === 404) {
             console.error("Workflow not found.");
+            process.exitCode = 1;
+            return;
+          }
+          if ((response.status as number) === 409) {
+            const message = (response.data as { message?: unknown }).message;
+            console.error(
+              typeof message === "string"
+                ? message.replace("allowOverPlan: true", "--allow-over-plan")
+                : "This broadcast is over your plan.",
+            );
             process.exitCode = 1;
             return;
           }

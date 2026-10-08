@@ -76,7 +76,9 @@ describe("pollBounces", () => {
 
     await pollBounces(mockDb);
 
-    expect(workflowRunRepo.getRunStepByProviderMessageId).not.toHaveBeenCalled();
+    expect(
+      workflowRunRepo.getRunStepByProviderMessageId,
+    ).not.toHaveBeenCalled();
   });
 
   it("skips integrations with no encrypted secret", async () => {
@@ -101,9 +103,9 @@ describe("pollBounces", () => {
         occurredAt: new Date("2026-08-24T10:00:00Z"),
       },
     ]);
-    vi.mocked(workflowRunRepo.getRunStepByProviderMessageId).mockResolvedValue(
-      { id: 4 } as any,
-    );
+    vi.mocked(workflowRunRepo.getRunStepByProviderMessageId).mockResolvedValue({
+      id: 4,
+    } as any);
 
     await pollBounces(mockDb);
 
@@ -140,7 +142,11 @@ describe("pollBounces", () => {
   });
 
   it("continues processing other integrations when one throws", async () => {
-    const otherFakeIntegration = { ...fakeIntegration, id: 3, environmentId: 6 };
+    const otherFakeIntegration = {
+      ...fakeIntegration,
+      id: 3,
+      environmentId: 6,
+    };
     vi.mocked(environmentIntegrationsRepo.listAll).mockResolvedValue([
       fakeIntegration,
       otherFakeIntegration,
@@ -155,9 +161,9 @@ describe("pollBounces", () => {
           occurredAt: new Date("2026-08-24T10:00:00Z"),
         },
       ]);
-    vi.mocked(workflowRunRepo.getRunStepByProviderMessageId).mockResolvedValue(
-      { id: 4 } as any,
-    );
+    vi.mocked(workflowRunRepo.getRunStepByProviderMessageId).mockResolvedValue({
+      id: 4,
+    } as any);
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     await pollBounces(mockDb);
@@ -233,7 +239,9 @@ describe("pollBounces", () => {
     expect(
       environmentIntegrationsRepo.updateLastBounceCheckAt,
     ).not.toHaveBeenCalled();
-    expect(workflowRunRepo.getRunStepByProviderMessageId).not.toHaveBeenCalled();
+    expect(
+      workflowRunRepo.getRunStepByProviderMessageId,
+    ).not.toHaveBeenCalled();
   });
 
   it("does not move the cursor when the poll itself fails", async () => {

@@ -40,7 +40,7 @@ export const BillingResponseSchema = z.object({
   ceiling: z
     .number()
     .describe(
-      "Sends to subscribers past this are held until an upgrade: the free plan's limit, or one plan up for paid plans.",
+      "Sends to subscribers past this aren't sent until an upgrade: the free plan's limit, or one plan up for paid plans.",
     ),
   movesUpOn: z.iso
     .datetime()

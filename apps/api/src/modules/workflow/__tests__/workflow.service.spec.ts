@@ -100,6 +100,7 @@ beforeEach(() => {
     mockBroadcastDispatchQueue as any,
     mockBounceEventsQueue as any,
     mockBroadcastResumeQueue as any,
+    { isEnabled: () => false } as any,
   );
 });
 

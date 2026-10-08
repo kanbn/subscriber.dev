@@ -27,12 +27,11 @@ const FREE_PLAN = PLANS[0];
 const CHEAPEST_PAID = PLANS[1];
 const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
-const startOfMonthUtc = (now = new Date(), months = 0) =>
-  new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + months, 1));
+const startOfMonthUtc = (now = new Date()) =>
+  new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const MOVE_UP_AFTER_MS = 3 * DAY_MS;
-const HOLD_RETRY_MS = 6 * 60 * 60 * 1000;
 
 export const nextPlan = (plan: Plan): Plan | null =>
   PLANS[PLANS.indexOf(plan) + 1] ?? null;
@@ -431,34 +430,37 @@ export class BillingService {
     }
   }
 
-  async holdSendUntil(
+  async skipSendReason(
     db: dbClient,
     environmentId: number,
     subscriberId: number,
     now = new Date(),
-  ): Promise<Date | null> {
+  ): Promise<string | null> {
     if (!this.isEnabled()) return null;
     const environment = await billingRepo.getEnvironmentById(db, environmentId);
     if (!environment || environment.slug !== "prod") return null;
     const { plan } = this.activePlan(
       await billingRepo.getBillingForWorkspace(db, environment.workspaceId),
     );
+    const n = (value: number) => value.toLocaleString("en-US");
     if (plan.monthly === 0) {
       const sent = await billingRepo.countSendsSince(
         db,
         environmentId,
         startOfMonthUtc(now),
       );
-      if (sent >= FREE_SENDS_PER_MONTH) return startOfMonthUtc(now, 1);
+      if (sent >= FREE_SENDS_PER_MONTH)
+        return `Not sent: the free plan's ${n(FREE_SENDS_PER_MONTH)} sends this month are used up. Upgrade to keep sending.`;
     }
     const position = await billingRepo.subscriberPosition(
       db,
       environmentId,
       subscriberId,
     );
-    return position > ceilingFor(plan)
-      ? new Date(now.getTime() + HOLD_RETRY_MS)
-      : null;
+    if (position <= ceilingFor(plan)) return null;
+    return plan.monthly === 0
+      ? `Not sent: over the free plan's ${n(plan.subscribers)} subscribers. Upgrade to send to new subscribers.`
+      : `Not sent: more than one plan past ${plan.key}'s ${n(plan.subscribers)} subscribers. Upgrade to send to new subscribers.`;
   }
 
   async checkBroadcast(

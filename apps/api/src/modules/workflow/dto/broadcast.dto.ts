@@ -15,6 +15,12 @@ export const TriggerBroadcastSchema = z.object({
     .describe(
       "Spread sends evenly over this many hours (max 168) instead of sending as fast as possible. Gentler on sender reputation for large audiences, and leaves time to pause or cancel.",
     ),
+  allowOverPlan: z
+    .boolean()
+    .optional()
+    .describe(
+      "subscriber.dev cloud: confirm sending to more subscribers than the plan includes, which moves the workspace up one plan after 3 days. Without it, such a broadcast is refused with an explanation; ask the user before setting it.",
+    ),
 });
 
 export const TriggerBroadcastResponseSchema = z.object({

@@ -5,6 +5,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 import type { WorkflowStepJobData } from "./workflow.constants.js";
+import { BillingService } from "../billing/billing.service.js";
 import { handleRunStepJobFailed, processRunStepJob } from "./processRunStep.js";
 import { WORKFLOW_QUEUE_NAME } from "./workflow.constants.js";
 
@@ -13,9 +14,18 @@ import { WORKFLOW_QUEUE_NAME } from "./workflow.constants.js";
 export class WorkflowProcessor extends WorkerHost {
   private readonly logger = new Logger(WorkflowProcessor.name);
 
+  constructor(private readonly billing: BillingService) {
+    super();
+  }
+
   async process(job: Job<WorkflowStepJobData>): Promise<void> {
     const db = createDrizzleClient();
-    await processRunStepJob(db, job.data.runStepId);
+    await processRunStepJob(
+      db,
+      job.data.runStepId,
+      (environmentId, subscriberId) =>
+        this.billing.skipSendReason(db, environmentId, subscriberId),
+    );
   }
 
   @OnWorkerEvent("failed")

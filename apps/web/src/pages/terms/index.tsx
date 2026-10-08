@@ -43,7 +43,10 @@ const SECTIONS: LegalSection[] = [
     paragraphs: [
       "The free plan and paid plans are described on our pricing page. Paid plans are billed in advance, monthly or yearly, through Stripe, and renew automatically until cancelled.",
       "You can cancel at any time; your plan stays active until the end of the period you've paid for. Fees are non-refundable except where the law requires otherwise.",
-      "If you go over your plan's subscriber limit, we'll give you a grace period and ask you to upgrade rather than stop your email. The free plan includes 10,000 sends a month, where a send is each email or webhook step we run, including broadcasts. Paid plans don't limit sends, subject to reasonable use. Your email provider bills you separately for sending.",
+      "Plans are priced by subscribers: the opted-in subscribers in your production environment, or the distinct subscribers you emailed in the billing period if that's more.",
+      "If a paid plan stays over its subscriber limit for 3 days, we move you up one plan and charge the difference for the rest of the period: on your next invoice for monthly plans, or straight away for yearly plans. We warn you before this happens. You can change plan yourself at any time, charged or credited pro rata, and at each renewal your plan adjusts to the one that fits.",
+      "We only move you up one plan automatically. Beyond that, emails to newer subscribers aren't sent until you upgrade, and broadcasts that would reach past it are refused.",
+      "The free plan includes 1,000 subscribers and 10,000 sends a month, where a send is each email or webhook step we run, including broadcasts. Past those limits, further emails aren't sent until the next month or an upgrade. Paid plans don't limit sends, subject to reasonable use. Your email provider bills you separately for sending.",
       "We may change our prices with at least 30 days' notice. Customers on launch pricing keep their price.",
     ],
   },
@@ -95,7 +98,7 @@ export default function Terms() {
     <LegalPage
       title="Terms of Service"
       description="The terms for using subscriber.dev."
-      updated="7 October 2026"
+      updated="8 October 2026"
       intro="These terms cover how you can use subscriber.dev and what you can expect from us. We've tried to keep them short and in plain English."
       sections={SECTIONS}
     />

@@ -8,6 +8,7 @@ import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBr
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
 import type { WorkflowStepJobData } from "./workflow.constants.js";
+import { BillingService } from "../billing/billing.service.js";
 import { handleRunStepJobFailed, processRunStepJob } from "./processRunStep.js";
 import { BROADCAST_STEPS_QUEUE_NAME } from "./workflow.constants.js";
 
@@ -22,6 +23,10 @@ const EARLY_TOLERANCE_MS = 1000;
 @Injectable()
 export class BroadcastStepsProcessor extends WorkerHost {
   private readonly logger = new Logger(BroadcastStepsProcessor.name);
+
+  constructor(private readonly billing: BillingService) {
+    super();
+  }
 
   async process(job: Job<WorkflowStepJobData>, token?: string): Promise<void> {
     const db = createDrizzleClient();
@@ -67,7 +72,9 @@ export class BroadcastStepsProcessor extends WorkerHost {
       throw new DelayedError();
     }
 
-    await processRunStepJob(db, runStepId);
+    await processRunStepJob(db, runStepId, (environmentId, subscriberId) =>
+      this.billing.skipSendReason(db, environmentId, subscriberId),
+    );
   }
 
   @OnWorkerEvent("failed")

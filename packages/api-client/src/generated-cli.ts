@@ -176,7 +176,7 @@ export interface BillingResponseDto {
   cancelAtPeriodEnd: boolean;
   usage: BillingResponseDtoUsage;
   overLimit: boolean;
-  /** Sends to subscribers past this are held until an upgrade: the free plan's limit, or one plan up for paid plans. */
+  /** Sends to subscribers past this aren't sent until an upgrade: the free plan's limit, or one plan up for paid plans. */
   ceiling: number;
   /**
    * When an over-limit paid workspace moves up one plan (3 days after going over); null when not over.

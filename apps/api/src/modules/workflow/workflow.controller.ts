@@ -346,7 +346,10 @@ export class WorkflowController {
       workflowId,
       input.audience,
       user.id,
-      { sendOverHours: input.sendOverHours },
+      {
+        sendOverHours: input.sendOverHours,
+        allowOverPlan: input.allowOverPlan,
+      },
     );
   }
 

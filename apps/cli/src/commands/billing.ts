@@ -63,8 +63,8 @@ export function billingLines(data: BillingResponseDto): [string, string][] {
     ]);
   if ((data.usage.subscribers ?? 0) > data.ceiling)
     lines.push([
-      "held",
-      `sends past ${n(data.ceiling)} subscribers wait for an upgrade`,
+      "not sending",
+      `to subscribers past ${n(data.ceiling)} until you upgrade`,
     ]);
   return lines;
 }

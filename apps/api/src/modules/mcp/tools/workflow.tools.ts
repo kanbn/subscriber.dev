@@ -326,7 +326,7 @@ export class WorkflowTools {
       args.workflowId,
       args.audience,
       user.id,
-      { sendOverHours: args.sendOverHours },
+      { sendOverHours: args.sendOverHours, allowOverPlan: args.allowOverPlan },
     );
   }
 

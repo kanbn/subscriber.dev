@@ -1,6 +1,7 @@
 import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 
+import { BillingModule } from "../billing/billing.module.js";
 import { BounceEventsProcessor } from "./bounceEvents.processor.js";
 import { BouncePollProcessor } from "./bouncePoll.processor.js";
 import { BouncesController } from "./bounces.controller.js";
@@ -23,6 +24,7 @@ import { WorkflowService } from "./workflow.service.js";
 
 @Module({
   imports: [
+    BillingModule,
     BullModule.registerQueue(
       { name: WORKFLOW_QUEUE_NAME },
       { name: BROADCAST_DISPATCH_QUEUE_NAME },
