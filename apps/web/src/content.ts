@@ -1,3 +1,5 @@
+import { PLANS as SHARED_PLANS } from "@subscriber.dev/shared/plans";
+
 export const STRIPE_EVENTS = [
   "trial_started",
   "trial_ending",
@@ -9,14 +11,8 @@ export const STRIPE_EVENTS = [
   "payment_failed",
 ];
 
-export const PLANS: [limit: number, name: string, price: number][] = [
-  [1_000, "free", 0],
-  [5_000, "starter", 19],
-  [10_000, "growth", 39],
-  [25_000, "scale", 79],
-  [50_000, "pro", 159],
-  [100_000, "business", 279],
-];
+export const PLANS: [limit: number, name: string, price: number][] =
+  SHARED_PLANS.map((plan) => [plan.subscribers, plan.key, plan.monthly]);
 
 export const FAQS: [
   question: string,

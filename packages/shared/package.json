@@ -18,6 +18,11 @@
       "types": "./dist/constants/index.d.ts",
       "import": "./dist/constants/index.js",
       "default": "./src/constants/index.ts"
+    },
+    "./plans": {
+      "types": "./dist/plans.d.ts",
+      "import": "./dist/plans.js",
+      "default": "./src/plans.ts"
     }
   },
   "license": "GPL-3.0",
