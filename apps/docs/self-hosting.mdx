@@ -1,0 +1,60 @@
+---
+title: Self-hosting
+description: "Run the open source community edition on your own servers."
+---
+
+These docs are written for [subscriber.dev cloud](https://subscriber.dev). If you'd rather run the open source community edition yourself, it's free and has no limits. It's licensed under AGPL-3.0.
+
+## What you'll run
+
+| Service | Purpose |
+| --- | --- |
+| `web` | Sign-in, unsubscribe pages and the website |
+| `api` | REST API, MCP server and background jobs |
+| `postgres` | Database |
+| `redis` | Job queue for workflow steps and broadcasts |
+
+## Run it with Docker Compose
+
+```bash
+git clone https://github.com/kanbn/subscriber.dev.git
+cd subscriber.dev
+cp .env.example .env
+```
+
+Fill in `.env`, then start everything:
+
+```bash
+docker compose up -d
+```
+
+The web container runs database migrations when it starts.
+
+## Configuration
+
+These settings go in `.env`.
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_BASE_URL` | Yes | Public URL of the web app |
+| `NEXT_PUBLIC_API_BASE_URL` | Yes | Public URL of the API |
+| `BETTER_AUTH_SECRET` | Yes | Random secret for sessions. Generate with `openssl rand -base64 32` |
+| `EMAIL_UNSUBSCRIBE_SECRET` | Yes | Random secret that signs unsubscribe links |
+| `INTEGRATIONS_ENCRYPTION_KEY` | Yes | Encrypts provider credentials at rest. Generate with `openssl rand -base64 32` |
+| `POSTGRES_PASSWORD` | With Compose | Password for the bundled Postgres |
+| `POSTGRES_URL` | With your own database | Connection string for an external Postgres |
+| `REDIS_HOST`, `REDIS_PASSWORD` | Yes | Redis connection |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` | For sign-in | Sends sign-in links. This is separate from the providers your workflows send through |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | No | Enables GitHub sign-in |
+
+## Point the CLI and MCP at your server
+
+```bash
+subscriber login --base-url https://api.yourdomain.com --app-url https://yourdomain.com
+```
+
+For MCP, use `https://api.yourdomain.com/mcp` as the server URL.
+
+## Business license
+
+A self-hosted Business license removes subscriber.dev branding and includes priority support. Enterprise licenses cover AGPL exemptions. Email [sales@subscriber.dev](mailto:sales@subscriber.dev).
