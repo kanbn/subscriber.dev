@@ -1,0 +1,149 @@
+---
+title: Subscribers
+description: "The people you email: their details, tags, and whether they've opted in."
+---
+
+A subscriber is someone you email, usually one of your users. Workflows and broadcasts always send to subscribers, so anyone you want to email needs to be one first.
+
+Subscribers belong to an environment, so production and staging each have their own.
+
+## What a subscriber has
+
+| Field | Description |
+| --- | --- |
+| `email` | Where emails go. A subscriber without one is skipped. |
+| `externalId` | Your own ID for them, such as the user ID in your database. Use it to find them without storing ours. |
+| `publicId` | Subscriber.dev's ID for them. Generated for you, or set your own when you create them. |
+| `firstName`, `lastName`, `name` | Their name, for [templates](/templates). |
+| `phone` | Stored for your reference. |
+| `attributes` | Anything else you want to use in emails or audiences, such as `{"plan": "pro", "company": "Acme"}`. |
+
+You need at least one of `email`, `externalId` or `publicId` to find a subscriber again. Anywhere that takes a subscriber, such as triggering a workflow, accepts any of the three.
+
+## Add and update subscribers
+
+Or ask [your agent](/mcp): "Add jane@acme.com, first name Jane, plan pro."
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber subscribers create --email jane@acme.com --first-name Jane --external-id user_123
+    subscriber subscribers update <subscriberId> --last-name Doe
+    subscriber subscribers list --search acme
+    ```
+
+    The CLI can't set `attributes` on a single subscriber. Use [`bulk`](#import-subscribers) with one row, or the API.
+  </Tab>
+  <Tab title="TUI">
+    Open **Subscribers** and press `n` to add someone. Choose a subscriber and press `e` to edit them.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X POST https://api.subscriber.dev/environments/$ENV/subscribers \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"email": "jane@acme.com", "firstName": "Jane", "externalId": "user_123", "attributes": {"plan": "pro"}}'
+    ```
+
+    Update with `PATCH /environments/$ENV/subscribers/$SUBSCRIBER`. Only the fields you send change.
+  </Tab>
+</Tabs>
+
+Creating a subscriber that already exists fails. To create or update in one go, use bulk import.
+
+Subscribers can also be added for you: a [Stripe trigger](/integrations/stripe) adds the customer if they aren't a subscriber yet.
+
+## Import subscribers
+
+Bulk import creates new subscribers and updates existing ones, up to 500 per request. Each row is matched by `publicId`, then `externalId`, then `email`; if nothing matches, it's created. One bad row doesn't stop the rest.
+
+```json subscribers.json
+[
+  { "email": "jane@acme.com", "firstName": "Jane", "attributes": { "plan": "pro" } },
+  { "email": "sam@acme.com", "externalId": "user_456" }
+]
+```
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber subscribers bulk --file subscribers.json
+    ```
+
+    The file can be a bare array or `{"subscribers": [...]}`. Use `--file -` to read from stdin.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X POST https://api.subscriber.dev/environments/$ENV/subscribers/bulk \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"subscribers": [{"email": "jane@acme.com", "firstName": "Jane"}]}'
+    ```
+
+    The response has a result for each row (`created`, `updated` or `error`) and a summary count.
+  </Tab>
+</Tabs>
+
+For more than 500, split the list into batches. Your agent can do this for you: give it a CSV export and ask it to import it.
+
+## Tags
+
+Tags are labels, such as `beta` or `vip`, that you use to pick who gets a [broadcast](/broadcasts#audiences).
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber subscribers tag <subscriberId> --add beta
+    subscriber subscribers tag <subscriberId> --remove beta
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Choose a subscriber and press `t`.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X POST https://api.subscriber.dev/environments/$ENV/subscribers/$SUBSCRIBER/tags \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"tag": "beta"}'
+    ```
+
+    Remove one with `DELETE .../tags/beta`. `GET /environments/$ENV/subscribers/tags` lists every tag in use.
+  </Tab>
+</Tabs>
+
+## Opting in and out
+
+Each subscriber is either opted in to email or opted out. New subscribers are opted in unless you say otherwise. Opted-out subscribers are never emailed: their email steps are skipped, and webhook steps still run.
+
+People opt out when they:
+
+- click the unsubscribe link in any email,
+- use their email client's unsubscribe button, or
+- hard bounce, meaning their address doesn't exist. See [Bounces](/sending#bounces).
+
+You can also change it yourself, for example to respect an opt-out from your own app:
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber subscribers update-preferences <subscriberId> --opted-out
+    subscriber subscribers list --opted-out
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Choose a subscriber and press `p`.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X PATCH https://api.subscriber.dev/environments/$ENV/subscribers/$SUBSCRIBER/preferences \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"email": false}'
+    ```
+  </Tab>
+</Tabs>
+
+Every change is kept as a new record, so you have a history of when someone opted in or out.
+
+## Delete a subscriber
+
+Deleting removes the subscriber from lists and audiences, and any emails still waiting to send to them are skipped. The record is kept, not erased.
+
+Use `subscriber subscribers delete <subscriberId>`, or press `d` on a subscriber in the TUI.

@@ -1,0 +1,57 @@
+---
+title: Environments
+description: "Keep testing separate from the emails your real users get."
+---
+
+An environment is a separate set of subscribers, workflows and integrations inside a workspace. Use one for testing so you never email real people by accident.
+
+Every workspace starts with **Production**. Add as many others as you like, such as staging or one per developer. Only production counts towards [your plan](/plans).
+
+## Create and switch environments
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber environments create Staging
+    subscriber environments list
+    subscriber environments use <environmentId>
+    ```
+
+    Every command runs against the current environment. To run one command against another, add `--environment <environmentId>`.
+  </Tab>
+  <Tab title="TUI">
+    Choose a workspace, then pick an environment, or press `n` to create one.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X POST https://api.subscriber.dev/workspaces/$WORKSPACE/environments \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"name": "Staging"}'
+    ```
+
+    Every endpoint takes the environment's ID in its path.
+  </Tab>
+</Tabs>
+
+Tell your [agent](/mcp) which environment to use, such as "use staging".
+
+## What's separate
+
+Nothing is shared between environments. A new environment starts empty, with no subscribers, workflows or integrations.
+
+| Each environment has its own | So in a new one |
+| --- | --- |
+| Subscribers | Add test subscribers, such as your own email. |
+| Workflows | Create the workflows you want to test. |
+| Integrations | Connect an email provider. A test inbox like Mailtrap works over [SMTP](/integrations/smtp). For [Stripe](/integrations/stripe), use a test-mode key and webhook. |
+
+## Moving from staging to production
+
+Nothing copies workflows between environments, so keep each workflow's JSON in your repo and create it in each environment:
+
+```bash
+subscriber workflows create --file welcome.json --environment <stagingId>
+subscriber workflows create --file welcome.json --environment <productionId>
+```
+
+After a change, run `workflows update <workflowId> --file welcome.json` in each environment. Your agent can do the same: "Copy the welcome workflow from staging to production."

@@ -1,0 +1,44 @@
+---
+title: Templates
+description: "Personalise subjects and bodies with Liquid variables, conditions and layouts."
+---
+
+Templates let one email say something different to each person, such as their first name or the plan they're on. Subjects, email bodies and webhook bodies are written in [Liquid](https://liquidjs.com), where anything in `{{ }}` is filled in when the email sends.
+
+## Variables
+
+Variables are the values you can drop into an email.
+
+| Variable | Value |
+| --- | --- |
+| `{{ subscriber.email }}` | The subscriber's email |
+| `{{ subscriber.firstName }}`, `{{ subscriber.lastName }}`, `{{ subscriber.name }}` | Their name fields |
+| `{{ subscriber.<attribute> }}` | Any custom attribute, such as `{{ subscriber.company }}` |
+| `{{ <payload field> }}` | Any field from the trigger's `payload`, such as `{{ plan }}` |
+| `{{ unsubscribeUrl }}` | This subscriber's unsubscribe link (email steps only) |
+
+Custom attributes sit directly on `subscriber`, so an attribute called `company` is `{{ subscriber.company }}`. Payload fields sit at the top level.
+
+## Conditions and fallbacks
+
+Conditions show text only when something is true. Fallbacks fill in a value when one is missing. Both lines below say "Hey Jane", or "Hey there" if there's no first name:
+
+```liquid
+{% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}
+
+Hey {{ subscriber.firstName | default: "there" }}
+```
+
+All of Liquid's tags and filters work, including `if`, `unless`, `for`, `date`, `upcase` and `default`.
+
+## Layouts
+
+The layout is the frame around your email. With the `default` layout, write only the content (`<p>`, `<h1>`, `<a>`, `<ul>`, `<img>` and so on) and subscriber.dev wraps it in a centred 600px column with a system font and an unsubscribe footer.
+
+Add `class="button"` to a link to show it as a button:
+
+```html
+<a class="button" href="https://acme.com/start">Get started</a>
+```
+
+To use your own full template, set `"layout": "none"`. A body that's already a full HTML document, with `<html>` or `<body>`, is always sent as-is. Include `{{unsubscribeUrl}}` in your own template, written without spaces, or a second unsubscribe link is added at the bottom.

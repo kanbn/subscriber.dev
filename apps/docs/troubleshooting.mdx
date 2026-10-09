@@ -1,0 +1,115 @@
+---
+title: Troubleshooting
+description: "Find out why an email didn't send, a trigger didn't fire, or an email went to spam."
+---
+
+When something doesn't send, subscriber.dev records why. Start by looking at the run.
+
+## Find out what happened
+
+Every time a workflow is triggered, it creates a run. Each step in the run has a status and, if it didn't send, a reason.
+
+Or ask [your agent](/mcp): "Why didn't jane@acme.com get the welcome email?"
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber workflows run-history
+    subscriber workflows runs <workflowId> --json
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Run History**, or choose a workflow and press `r`.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl https://api.subscriber.dev/environments/$ENV/workflows/runs -H "x-api-key: $KEY"
+    ```
+
+    Each step has a `status` and an `errorMessage`.
+  </Tab>
+</Tabs>
+
+| Status | Meaning |
+| --- | --- |
+| `pending` | Waiting for its delay, or about to send. |
+| `sent` | Handed to your email provider, or the webhook returned a 2xx. |
+| `skipped` | Deliberately not sent. The reason says why. |
+| `failed` | Tried and failed three times. The reason has the error. |
+| `bounced` | Sent, but the provider reported it couldn't be delivered. |
+| `cancelled` | Stopped by an [exit condition](/integrations/stripe) or a cancelled broadcast. |
+
+## Skipped steps
+
+| Reason | What to do |
+| --- | --- |
+| Subscriber opted out of email | They unsubscribed or hard bounced. Nothing to fix; they asked not to be emailed. See [Opting in and out](/subscribers#opting-in-and-out). |
+| Subscriber has no email address | Add an `email` to the subscriber. |
+| Subscriber not found | The subscriber was deleted after the run started. |
+| Not sent: the free plan's 10,000 sends this month are used up | Upgrade, or wait until next month. See [Plans and limits](/plans). |
+| Not sent: over the free plan's 1,000 subscribers | Upgrade to email new subscribers. |
+| Not sent: more than one plan past ... | Upgrade to the plan that fits your subscribers. |
+
+A skipped step doesn't stop the run; later steps still run.
+
+## Failed steps
+
+Failed steps are retried twice, after one minute and then two, before they're marked `failed`.
+
+| Reason | What to do |
+| --- | --- |
+| No email integration configured for this environment | [Connect an email provider](/sending#connect-a-provider). Each environment needs its own. |
+| An error from your provider, such as an authentication or rate-limit error | Check the provider's settings and dashboard. If you've connected more than one provider, the others were tried first. |
+| Webhook responded with 4xx or 5xx | The URL rejected the request. Check the URL, and that the body is valid JSON. |
+
+## Nothing happened when I triggered a workflow
+
+If no run appears, the trigger itself didn't start one:
+
+| Response | What to do |
+| --- | --- |
+| `{"triggered": false, "reason": "workflow_paused"}` | The workflow is paused. Set its `status` to `active`. |
+| `{"triggered": false, "reason": "workflow_has_no_steps"}` | Add at least one step. |
+| `404 Workflow not found` | Check the `key`, and that you're using the right environment. |
+| `404 Subscriber not found` | Create the subscriber first, or check you're identifying them by the right field. |
+
+A common cause is using the wrong environment: workflows, subscribers and integrations in staging aren't visible in production. Run `subscriber whoami` to see which one the CLI is using.
+
+## A Stripe event didn't start a workflow
+
+Subscriber.dev keeps every event Stripe sends it, and what it did with it.
+
+<Tabs>
+  <Tab title="CLI">
+    There's no CLI command yet. Use the TUI, your agent, or the API.
+  </Tab>
+  <Tab title="TUI">
+    Open **Integrations** and choose **Stripe**. **Recent events** lists what arrived.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl https://api.subscriber.dev/environments/$ENV/inbound-events -H "x-api-key: $KEY"
+    ```
+  </Tab>
+</Tabs>
+
+Or ask [your agent](/mcp): "Show me the last Stripe events and what happened to them."
+
+| What you see | What to do |
+| --- | --- |
+| No events at all | Stripe isn't sending them. Check the webhook endpoint's URL in Stripe, and that the events are enabled. See [Connect Stripe](/integrations/stripe#connect-stripe). |
+| No workflow is triggered or exited by ... | Add that event as a trigger on a workflow. |
+| Event isn't about a person | The event has no customer, so there's no one to email. |
+| Customer ... doesn't exist in Stripe, or was deleted | Check the Stripe API key belongs to the same account, and live or test mode, as the webhook. |
+| Stripe integration no longer configured | Reconnect Stripe. |
+
+## Emails are going to spam
+
+1. Check that your sending domain has SPF, DKIM and DMARC set up with your provider. See [Avoid the spam folder](/sending#avoid-the-spam-folder).
+2. Make sure `fromEmail` is on the domain you verified.
+3. Look at your bounce rate with `subscriber analytics`. A high one hurts your reputation; remove addresses that bounce.
+4. Spread big broadcasts out with `--send-over-hours`, especially from a new domain.
+
+## Still stuck?
+
+Email [support@subscriber.dev](mailto:support@subscriber.dev) with the run or broadcast ID.

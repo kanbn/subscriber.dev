@@ -1,0 +1,70 @@
+---
+title: Plans and limits
+description: "What each plan includes, how subscribers are counted, and what happens when you go over."
+---
+
+Plans are priced by how many subscribers you have. Every plan has every feature; you only pay for more people. Plans are per workspace.
+
+## Plans
+
+| Plan | Subscribers | Monthly | Yearly |
+| --- | --- | --- | --- |
+| Free | 1,000 | $0 | $0 |
+| Starter | 5,000 | $19 | $190 |
+| Growth | 10,000 | $39 | $390 |
+| Scale | 25,000 | $79 | $790 |
+| Pro | 50,000 | $159 | $1,590 |
+| Business | 100,000 | $279 | $2,790 |
+
+Paying yearly gets you two months free. Paid plans have unlimited sends. The free plan includes 10,000 sends a month.
+
+For more than 100,000 subscribers, email [sales@subscriber.dev](mailto:sales@subscriber.dev).
+
+## How subscribers are counted
+
+Only your **Production** environment counts. Staging and any other environments are free, so test as much as you like.
+
+Your count is whichever is higher:
+
+- subscribers who are opted in to email, or
+- people you've emailed this billing period.
+
+Opted-out and deleted subscribers don't count, unless you emailed them earlier in the period.
+
+## Going over your plan
+
+**On the free plan**, emails stop when you reach a limit, and the run records why:
+
+- Past 1,000 subscribers, your newest subscribers aren't emailed. Everyone else still is.
+- Past 10,000 sends in a month, nothing more sends until the next month.
+
+**On a paid plan**, nothing stops straight away. You can grow up to the next plan's limit, and after 3 days over, you're moved up to the next plan automatically and charged the difference. If you drop back under within 3 days, nothing changes. Past the next plan's limit, your newest subscribers aren't emailed until you upgrade.
+
+**Broadcasts** check first. If a broadcast would take you over your plan, it asks you to confirm with `--allow-over-plan` (or `allowOverPlan: true` in the API). A broadcast that would go past the next plan's limit is refused until you upgrade.
+
+At renewal, you move to the paid plan that fits your opted-in subscribers, so if your list shrinks, so does your bill. You stay on at least Starter until you cancel.
+
+## Check your usage and upgrade
+
+Or ask [your agent](/mcp): "How close am I to my plan's limit?"
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber billing
+    subscriber billing upgrade growth --annual
+    subscriber billing portal
+    ```
+
+    `billing` shows your plan, subscriber count, sends this month and, if you're over, when you'll move up. `upgrade` opens Stripe Checkout. `portal` opens Stripe to change your card, see invoices or cancel.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl https://api.subscriber.dev/workspaces/$WORKSPACE/billing -H "x-api-key: $KEY"
+    ```
+
+    `POST .../billing/checkout` and `POST .../billing/portal` return a link to open.
+  </Tab>
+</Tabs>
+
+Self-hosting has no plans or limits. See [Self-hosting](/self-hosting).

@@ -1,0 +1,91 @@
+---
+title: Broadcasts
+description: "Send a workflow to everyone in an audience, all at once or spread out."
+---
+
+A broadcast sends a workflow to everyone who matches an audience, such as all opted-in subscribers, rather than one person at a time. You can send it all at once or spread it over up to a week.
+
+## Send a broadcast
+
+Pick a workflow and an audience. Spreading the send over a few hours or days is gentler on your email provider and your sending reputation.
+
+Or ask [your agent](/mcp): "How many opted-in subscribers would the changelog broadcast reach? Send it to them over the next 48 hours." It previews the audience before it sends.
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    echo '{"type": "optedIn"}' > audience.json
+    subscriber workflows broadcast <workflowId> --audience audience.json --send-over-hours 48
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Broadcasts**, choose the workflow, press `b` and choose an audience.
+  </Tab>
+  <Tab title="API">
+    Preview the audience, then send:
+
+    ```bash
+    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW/broadcast/preview \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"audience": {"type": "optedIn"}}'
+
+    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW/broadcast \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"audience": {"type": "optedIn"}, "sendOverHours": 48}'
+    ```
+  </Tab>
+</Tabs>
+
+## Pause, resume or cancel
+
+While a broadcast is still sending, you can pause it, carry on later, or stop it for good. Emails that already went out stay sent.
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber workflows broadcasts <workflowId>
+    subscriber workflows broadcast-pause <workflowId> <broadcastId>
+    subscriber workflows broadcast-resume <workflowId> <broadcastId>
+    subscriber workflows broadcast-cancel <workflowId> <broadcastId>
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Broadcasts**, choose the workflow and press `h` for its broadcasts. On a broadcast, press `p` to pause, `r` to resume or `c` to cancel.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW/broadcasts/$BROADCAST/pause \
+      -H "x-api-key: $KEY"
+    ```
+
+    Use `/resume` or `/cancel` the same way.
+  </Tab>
+</Tabs>
+
+## Audiences
+
+An audience is who the broadcast goes to. It's a filter over your subscribers:
+
+| Filter | Matches |
+| --- | --- |
+| `{"type": "optedIn"}` | Everyone opted in to email |
+| `{"type": "tag", "tag": "beta"}` | Subscribers with a tag |
+| `{"type": "attribute", "field": "plan", "op": "equals", "value": "pro"}` | A custom attribute that `equals` or `contains` a value, or `exists` |
+| `{"type": "and", "clauses": [...]}` | All of the filters |
+| `{"type": "or", "clauses": [...]}` | Any of the filters |
+| `{"type": "not", "clause": {...}}` | Everyone the filter doesn't match |
+
+For example, opted-in subscribers on the pro plan who aren't tagged `beta`:
+
+```json
+{
+  "type": "and",
+  "clauses": [
+    { "type": "optedIn" },
+    { "type": "attribute", "field": "plan", "op": "equals", "value": "pro" },
+    { "type": "not", "clause": { "type": "tag", "tag": "beta" } }
+  ]
+}
+```
+
+Unsubscribed people are never emailed, whatever the audience says.

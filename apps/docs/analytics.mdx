@@ -1,0 +1,50 @@
+---
+title: Analytics
+description: "How many subscribers you have, and how your emails are doing."
+---
+
+Analytics gives a quick health check for an environment: how your list is growing, how many people opted out, and how many emails sent, failed or bounced.
+
+Or ask [your agent](/mcp): "How did sending go this month?"
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber analytics
+    subscriber analytics --days 7
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Analytics**. It shows the last 30 days.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl "https://api.subscriber.dev/environments/$ENV/analytics?days=7" -H "x-api-key: $KEY"
+    ```
+  </Tab>
+</Tabs>
+
+## What the numbers mean
+
+`--days` (1 to 365, default 30) only changes the two "in period" counts. Everything else is all-time.
+
+| Number | Meaning |
+| --- | --- |
+| Subscribers | Everyone in the environment, opted in or not. |
+| New in period | Subscribers added in the last `days` days. |
+| Opted out | Subscribers who are opted out of email. |
+| Opted out in period | Subscribers who opted out in the last `days` days. |
+| Sent | Emails and webhooks handed off successfully. |
+| Failed | Steps that failed after three tries. See [Troubleshooting](/troubleshooting#failed-steps). |
+| Skipped | Steps deliberately not sent, such as to opted-out subscribers. See [Troubleshooting](/troubleshooting#skipped-steps). |
+| Pending | Steps waiting for their delay. |
+| Bounced | Emails your provider couldn't deliver, split into hard and soft. |
+| Success rate | Sent ÷ (sent + failed). Skipped steps don't count against it. |
+
+## What to watch
+
+- **Bounces:** a hard bounce rate above about 2% hurts your sending reputation. Clean your list, and use a provider that [suppresses bounces](/sending#bounces) automatically.
+- **Opt-outs in period:** a jump after a broadcast means it went to people who didn't expect it.
+- **Failed:** anything above zero usually means a provider problem. Check the run's reason.
+
+Analytics doesn't track opens or clicks.

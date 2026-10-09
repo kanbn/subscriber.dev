@@ -1,0 +1,137 @@
+---
+title: Workflows
+description: "Steps, delays, and triggering a workflow for a subscriber."
+---
+
+A workflow is a sequence of emails that goes out automatically to one person, such as a welcome email now and a follow-up two days later. Each step is an email or a webhook, with an optional wait before it.
+
+You describe a workflow as JSON:
+
+```json
+{
+  "key": "trial",
+  "name": "Trial onboarding",
+  "description": "Nudges people through their trial",
+  "type": "automation",
+  "steps": [
+    {
+      "type": "email",
+      "subject": "Your trial has started",
+      "body": "<p>Hey {{ subscriber.firstName | default: \"there\" }}, you have 14 days of Pro.</p>"
+    },
+    {
+      "type": "email",
+      "delayMs": 259200000,
+      "subject": "Three things to try",
+      "body": "<ul><li>…</li></ul>"
+    }
+  ],
+  "triggers": [{ "source": "stripe", "event": "trial_started" }],
+  "exitConditions": [{ "source": "stripe", "event": "trial_converted" }]
+}
+```
+
+| Field | Description |
+| --- | --- |
+| `key` | Stable identifier you trigger the workflow by, such as `welcome`. Unique within the environment. |
+| `name`, `description` | For you and your agent. |
+| `type` | `automation` (triggered per subscriber, the default) or `broadcast` (sent to everyone). This only organises your workflows; either type can be used either way. |
+| `steps` | 1 to 50 email or webhook steps. |
+| `triggers`, `exitConditions` | Events from connected integrations that start or stop the workflow. See [Stripe triggers](/integrations/stripe). |
+
+## Creating a workflow
+
+Write the JSON yourself, or let your agent or the TUI build it for you.
+
+Or ask [your agent](/mcp): "Create a trial onboarding workflow: an email when the trial starts, three tips three days later, and stop it when they convert." It writes the steps and templates for you.
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber workflows create --file trial.json
+    subscriber workflows update <workflowId> --file trial.json
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Workflows** and press `n`. On a workflow, press `e` to edit it or `g` to edit its triggers and exit conditions.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d @trial.json
+    ```
+  </Tab>
+</Tabs>
+
+## Steps
+
+A step is one thing the workflow does: send an email or call a URL.
+
+### Email
+
+Sends an email to the subscriber.
+
+| Field | Description |
+| --- | --- |
+| `subject` | Up to 500 characters. Supports templates. |
+| `body` | HTML or plain text. Supports templates. |
+| `layout` | `default` or `none`. See [Layouts](/templates#layouts). |
+| `delayMs` | How long to wait after the previous step, or after the trigger for the first step. Defaults to `0`. |
+
+[Opted-out subscribers](/subscribers#opting-in-and-out) are never emailed. Every email includes one-click unsubscribe headers, which Gmail and Yahoo require from bulk senders.
+
+### Webhook
+
+Posts JSON to an HTTPS URL, for example to tell your team in Slack or Discord when someone signs up.
+
+```json
+{
+  "type": "webhook",
+  "url": "https://discord.com/api/webhooks/…",
+  "body": "{\"content\": {{ subscriber.email | append: \" just signed up\" | json }}}"
+}
+```
+
+`body` is rendered as a [template](/templates) and sent as-is with `Content-Type: application/json`. Wrap values in the `json` filter so the result stays valid JSON.
+
+### Delays
+
+A delay is how long to wait before a step. `delayMs` is in milliseconds:
+
+| Delay | `delayMs` |
+| --- | --- |
+| 1 hour | `3600000` |
+| 1 day | `86400000` |
+| 3 days | `259200000` |
+| 1 week | `604800000` |
+
+Delays add up: a step with a one-day delay after a step with a two-day delay sends three days after the trigger.
+
+## Triggering a workflow
+
+Triggering a workflow starts it for one subscriber. Workflows run for one subscriber at a time. Usually your app triggers them, but you can also trigger them by hand:
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber workflows trigger welcome --email jane@acme.com --payload '{"plan": "pro"}'
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Workflows**, choose the workflow, press `t` and enter the subscriber's email.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows/trigger \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"key": "welcome", "subscriber": {"email": "jane@acme.com"}, "payload": {"plan": "pro"}}'
+    ```
+  </Tab>
+</Tabs>
+
+Identify the subscriber by `email`, `externalId` or `publicId`. They have to exist already.
+
+If the workflow is paused, the trigger returns `{"triggered": false, "reason": "workflow_paused"}` and nothing sends.
+
+To start workflows automatically from events in your other tools, see [Stripe triggers](/integrations/stripe). To send a workflow to everyone at once, see [Broadcasts](/broadcasts).
