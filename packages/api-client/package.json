@@ -49,15 +49,15 @@
   "dependencies": {
     "@subscriber.dev/shared": "workspace:^",
     "@tanstack/react-query": "catalog:",
-    "next-runtime-env": "^1.7.2"
+    "next-runtime-env": "^1.8.0"
   },
   "devDependencies": {
     "@subscriber.dev/eslint-config": "workspace:*",
     "@subscriber.dev/prettier-config": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",
-    "dotenv": "^16.0.0",
+    "dotenv": "^18.0.6",
     "eslint": "catalog:",
-    "orval": "^7.17.2",
+    "orval": "^8.40.0",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },

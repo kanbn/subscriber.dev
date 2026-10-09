@@ -11,7 +11,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "mintlify": "^3.0.0"
+    "mintlify": "^4.2.992"
   },
   "prettier": "@subscriber.dev/prettier-config"
 }

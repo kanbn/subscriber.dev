@@ -14,19 +14,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@eslint/compat": "^1.2.3",
-    "@next/eslint-plugin-next": "^14.2.15",
-    "eslint-plugin-import": "^2.31.0",
+    "@eslint/compat": "^2.1.1",
+    "@next/eslint-plugin-next": "^16.4.0",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-turbo": "^2.3.1",
-    "typescript-eslint": "^8.15.0"
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-turbo": "^2.11.7",
+    "typescript-eslint": "^8.71.1"
   },
   "devDependencies": {
     "@subscriber.dev/prettier-config": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",
-    "@types/eslint__js": "8.42.3",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"

@@ -1,9 +1,8 @@
 {
   "extends": "@subscriber.dev/tsconfig/internal-package.json",
-  "include": ["packages/**/*", "src"],
+  "include": ["src"],
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "baseUrl": ".",
     "emitDeclarationOnly": false,
     "paths": {
       "~/*": ["./src/*"]

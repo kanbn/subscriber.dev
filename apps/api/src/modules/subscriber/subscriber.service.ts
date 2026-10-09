@@ -218,7 +218,7 @@ export class SubscriberService {
     const results: {
       index: number;
       status: "created" | "updated" | "error";
-      subscriber?: Awaited<ReturnType<typeof this.toSubscriberDto>>;
+      subscriber?: Awaited<ReturnType<SubscriberService["toSubscriberDto"]>>;
       preferences?: {
         publicId: string;
         email: boolean;

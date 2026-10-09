@@ -33,16 +33,17 @@
     "@subscriber.dev/eslint-config": "workspace:*",
     "@subscriber.dev/prettier-config": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",
-    "@types/node": "^20.17.7",
+    "@types/node": "^22.20.5",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
   "prettier": "@subscriber.dev/prettier-config",
   "dependencies": {
+    "@better-auth/api-key": "^1.7.7",
     "@subscriber.dev/db": "workspace:*",
     "@subscriber.dev/email": "workspace:*",
-    "better-auth": "^1.4.6",
-    "next-runtime-env": "^1.7.2"
+    "better-auth": "^1.7.7",
+    "next-runtime-env": "^1.8.0"
   }
 }

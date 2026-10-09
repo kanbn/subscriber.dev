@@ -6,6 +6,7 @@ export default defineConfig({
     jsxImportSource: "react",
   },
   test: {
+    include: ["src/**/*.spec.{ts,tsx}"],
     globals: true,
     clearMocks: true,
   },

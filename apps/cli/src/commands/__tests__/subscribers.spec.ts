@@ -89,7 +89,7 @@ describe("subscribers list", () => {
     expect(listSubscribers).toHaveBeenCalledWith("test-environment-1", {
       email: "test@example.com",
       externalId: undefined,
-      emailOptedIn: true,
+      emailOptedIn: "true",
       limit: 10,
       offset: undefined,
     });
@@ -128,7 +128,7 @@ describe("subscribers list", () => {
 
     expect(listSubscribers).toHaveBeenCalledWith(
       "test-environment-1",
-      expect.objectContaining({ emailOptedIn: false }),
+      expect.objectContaining({ emailOptedIn: "false" }),
     );
   });
 

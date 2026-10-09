@@ -22,11 +22,14 @@ export class BillingProcessor extends WorkerHost implements OnModuleInit {
   }
 
   async onModuleInit(): Promise<void> {
+    for (const scheduler of await this.queue.getJobSchedulers())
+      if (scheduler.key !== ENFORCE_JOB_NAME)
+        await this.queue.removeJobScheduler(scheduler.key);
     if (!this.billingService.isEnabled()) return;
-    await this.queue.add(
+    await this.queue.upsertJobScheduler(
       ENFORCE_JOB_NAME,
-      {},
-      { repeat: { every: ENFORCE_EVERY_MS }, jobId: ENFORCE_JOB_NAME },
+      { every: ENFORCE_EVERY_MS },
+      { name: ENFORCE_JOB_NAME },
     );
   }
 

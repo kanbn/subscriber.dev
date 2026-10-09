@@ -27,11 +27,11 @@ function makeUpdateChain(value: unknown) {
 
 function makeMockDb(
   overrides: Partial<{
-    findFirst: ReturnType<typeof vi.fn>;
-    findMany: ReturnType<typeof vi.fn>;
-    insertChain: { values: ReturnType<typeof vi.fn> };
+    findFirst: () => unknown;
+    findMany: () => unknown;
+    insertChain: { values: () => unknown };
     updateChain: ReturnType<typeof makeUpdateChain>;
-    groupByResult: ReturnType<typeof vi.fn>;
+    groupByResult: () => unknown;
   }> = {},
 ) {
   const findFirst = overrides.findFirst ?? vi.fn();

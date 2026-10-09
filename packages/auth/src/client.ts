@@ -1,5 +1,5 @@
+import { apiKeyClient } from "@better-auth/api-key/client";
 import {
-  apiKeyClient,
   deviceAuthorizationClient,
   magicLinkClient,
 } from "better-auth/client/plugins";

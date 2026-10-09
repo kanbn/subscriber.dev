@@ -1,0 +1,40 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "subscriber.dev",
+  "colors": {
+    "primary": "#000000",
+    "light": "#EDEDED",
+    "dark": "#161616"
+  },
+  "favicon": "./favicon.png",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction"
+        ]
+      },
+      {
+        "group": "API Documentation",
+        "pages": [
+          "api-reference/introduction"
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Sign in",
+        "href": "https://subscriber.dev/login"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Go to dashboard",
+      "href": "https://subscriber.dev/dashboard"
+    }
+  }
+}

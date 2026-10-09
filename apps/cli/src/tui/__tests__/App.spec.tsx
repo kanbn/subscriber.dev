@@ -136,9 +136,9 @@ describe("App navigation", () => {
     // Escape pops back one level, to the subscribers list
     stdin.write("\u001B");
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain("test@example.com");
+      expect(lastFrame()).not.toContain("publicId: test-subscriber-1");
     });
-    expect(lastFrame()).not.toContain("publicId: test-subscriber-1");
+    expect(lastFrame()).toContain("test@example.com");
   });
 
   it("sets up a disconnected trigger source from a workflow's triggers, then returns to pick its events", async () => {

@@ -18,6 +18,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ZodValidationPipe());
 
   const config = new DocumentBuilder()
+    .setOpenAPIVersion("3.1.0")
     .setTitle("Subscriber API")
     .setDescription("REST API for Subscriber - Customer.io alternative")
     .setVersion("1.0")

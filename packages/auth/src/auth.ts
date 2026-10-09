@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { apiKey, bearer, deviceAuthorization } from "better-auth/plugins";
+import { apiKey } from "@better-auth/api-key";
+import { bearer, deviceAuthorization } from "better-auth/plugins";
 import { magicLink } from "better-auth/plugins/magic-link";
 import { env } from "next-runtime-env";
 

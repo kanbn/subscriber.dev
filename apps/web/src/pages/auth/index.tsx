@@ -10,7 +10,7 @@ import { Comment, MarketingLayout, Ok, Prompt } from "~/components/Marketing";
 // (via ?next=) send people to sign in. Signing in creates the account.
 
 const input =
-  "border-border bg-background focus:border-foreground w-full border px-3 py-2 outline-none";
+  "border-border bg-background focus:border-foreground w-full border px-3 py-2 outline-hidden";
 const button =
   "border-border hover:bg-background-50 border px-3 py-2 disabled:opacity-50";
 

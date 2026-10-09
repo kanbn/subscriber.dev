@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import { vi } from "vitest";
 
 import type { InboundSource } from "../inboundSource.js";
@@ -7,10 +8,10 @@ export const fakeSource = {
   name: "Fake",
   events: [{ name: "signed_up", label: "Signed up" }],
   eventsToEnable: ["user.created"],
-  verifyWebhook: vi.fn(),
-  match: vi.fn(),
-  personRef: vi.fn(),
-  fetchPerson: vi.fn(),
-  templateData: vi.fn(),
-  enrich: vi.fn(),
+  verifyWebhook: vi.fn() as Mock,
+  match: vi.fn() as Mock,
+  personRef: vi.fn() as Mock,
+  fetchPerson: vi.fn() as Mock,
+  templateData: vi.fn() as Mock,
+  enrich: vi.fn() as Mock,
 } satisfies InboundSource<unknown>;

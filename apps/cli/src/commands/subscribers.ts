@@ -88,9 +88,9 @@ export function registerSubscribersCommand(program: Command): void {
           ensureLoggedIn();
           const environmentId = requireEnvironmentId(opts);
           const emailOptedIn = opts.optedIn
-            ? true
+            ? "true"
             : opts.optedOut
-              ? false
+              ? "false"
               : undefined;
 
           const response = await listSubscribers(environmentId, {

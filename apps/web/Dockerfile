@@ -1,4 +1,4 @@
-ARG NODE_VERSION=20
+ARG NODE_VERSION=24
 ARG APP_DIRNAME=web
 ARG PROJECT=@subscriber.dev/web
 
@@ -10,10 +10,8 @@ RUN apk update && \
 
 # Setup pnpm and turbo on the alpine base
 FROM alpine AS base
-RUN corepack enable && corepack prepare pnpm@9.14.2 --activate
-# Replace <your-major-version> with the major version installed in your repository. For example:
-# RUN npm install turbo@2.1.3 --global
-RUN npm install turbo@2.3.1 --global
+RUN corepack enable && corepack prepare pnpm@12.10.1 --activate
+RUN npm install turbo@2.11.7 --global
 
 RUN pnpm config set store-dir ~/.pnpm-store
 

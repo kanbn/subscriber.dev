@@ -1,10 +1,9 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.1.0",
   "paths": {
     "/users/me": {
       "get": {
         "operationId": "getCurrentUser",
-        "summary": "Get current user",
         "parameters": [],
         "responses": {
           "200": {
@@ -18,20 +17,20 @@
             }
           }
         },
-        "tags": [
-          "Users"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get current user",
+        "tags": [
+          "Users"
         ]
       }
     },
     "/users": {
       "put": {
         "operationId": "updateCurrentUser",
-        "summary": "Update current user",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -55,20 +54,20 @@
             }
           }
         },
-        "tags": [
-          "Users"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update current user",
+        "tags": [
+          "Users"
         ]
       }
     },
     "/workspaces": {
       "get": {
         "operationId": "getWorkspaces",
-        "summary": "Get user's workspaces",
         "parameters": [],
         "responses": {
           "200": {
@@ -85,18 +84,18 @@
             }
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get user's workspaces",
+        "tags": [
+          "Workspaces"
         ]
       },
       "post": {
         "operationId": "createWorkspace",
-        "summary": "Create a new workspace",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -120,20 +119,20 @@
             }
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create a new workspace",
+        "tags": [
+          "Workspaces"
         ]
       }
     },
     "/workspaces/{workspaceId}/environments": {
       "get": {
         "operationId": "listEnvironments",
-        "summary": "List a workspace's environments",
         "parameters": [
           {
             "name": "workspaceId",
@@ -159,18 +158,18 @@
             "description": "Workspace not found"
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List a workspace's environments",
+        "tags": [
+          "Workspaces"
         ]
       },
       "post": {
         "operationId": "createEnvironment",
-        "summary": "Create a new environment in a workspace",
         "parameters": [
           {
             "name": "workspaceId",
@@ -206,20 +205,20 @@
             "description": "Workspace not found"
           }
         },
-        "tags": [
-          "Workspaces"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create a new environment in a workspace",
+        "tags": [
+          "Workspaces"
         ]
       }
     },
     "/workspaces/{workspaceId}/billing": {
       "get": {
         "operationId": "getBilling",
-        "summary": "Get a workspace's plan and usage",
         "parameters": [
           {
             "name": "workspaceId",
@@ -242,20 +241,20 @@
             }
           }
         },
-        "tags": [
-          "Billing"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get a workspace's plan and usage",
+        "tags": [
+          "Billing"
         ]
       }
     },
     "/workspaces/{workspaceId}/billing/checkout": {
       "post": {
         "operationId": "createCheckoutLink",
-        "summary": "Get a link to start a paid plan (or the billing portal if the workspace already has one)",
         "parameters": [
           {
             "name": "workspaceId",
@@ -288,20 +287,20 @@
             }
           }
         },
-        "tags": [
-          "Billing"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get a link to start a paid plan (or the billing portal if the workspace already has one)",
+        "tags": [
+          "Billing"
         ]
       }
     },
     "/workspaces/{workspaceId}/billing/portal": {
       "post": {
         "operationId": "createBillingPortalLink",
-        "summary": "Get a link to manage or cancel the workspace's plan",
         "parameters": [
           {
             "name": "workspaceId",
@@ -324,21 +323,21 @@
             }
           }
         },
-        "tags": [
-          "Billing"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get a link to manage or cancel the workspace's plan",
+        "tags": [
+          "Billing"
         ]
       }
     },
     "/environments/{environmentId}/subscribers": {
       "get": {
-        "operationId": "listSubscribers",
-        "summary": "List subscribers",
         "description": "Returns a paginated list of active subscribers in the environment",
+        "operationId": "listSubscribers",
         "parameters": [
           {
             "name": "limit",
@@ -398,11 +397,11 @@
             "in": "query",
             "description": "Filter by the subscriber's latest email preference (true = opted in, false = opted out)",
             "schema": {
+              "type": "boolean",
               "enum": [
                 "true",
                 "false"
-              ],
-              "type": "boolean"
+              ]
             }
           },
           {
@@ -429,19 +428,19 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List subscribers",
+        "tags": [
+          "Subscribers"
         ]
       },
       "post": {
-        "operationId": "createSubscriber",
-        "summary": "Create a new subscriber",
         "description": "Creates a new subscriber in the specified environment and initialises their preferences",
+        "operationId": "createSubscriber",
         "parameters": [
           {
             "name": "environmentId",
@@ -480,21 +479,21 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create a new subscriber",
+        "tags": [
+          "Subscribers"
         ]
       }
     },
     "/environments/{environmentId}/subscribers/tags": {
       "get": {
-        "operationId": "listTags",
-        "summary": "List distinct tags",
         "description": "Returns every distinct tag currently in use across subscribers in the environment",
+        "operationId": "listTags",
         "parameters": [
           {
             "name": "environmentId",
@@ -520,21 +519,21 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List distinct tags",
+        "tags": [
+          "Subscribers"
         ]
       }
     },
     "/environments/{environmentId}/subscribers/{subscriberId}": {
       "get": {
-        "operationId": "getSubscriber",
-        "summary": "Get a subscriber",
         "description": "Returns a single subscriber with their latest preferences",
+        "operationId": "getSubscriber",
         "parameters": [
           {
             "name": "subscriberId",
@@ -568,19 +567,19 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get a subscriber",
+        "tags": [
+          "Subscribers"
         ]
       },
       "patch": {
-        "operationId": "updateSubscriber",
-        "summary": "Update a subscriber",
         "description": "Updates subscriber fields. All fields are optional.",
+        "operationId": "updateSubscriber",
         "parameters": [
           {
             "name": "subscriberId",
@@ -624,19 +623,19 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update a subscriber",
+        "tags": [
+          "Subscribers"
         ]
       },
       "delete": {
-        "operationId": "deleteSubscriber",
-        "summary": "Delete a subscriber",
         "description": "Soft-deletes a subscriber. The record is retained but excluded from all queries.",
+        "operationId": "deleteSubscriber",
         "parameters": [
           {
             "name": "subscriberId",
@@ -663,21 +662,21 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete a subscriber",
+        "tags": [
+          "Subscribers"
         ]
       }
     },
     "/environments/{environmentId}/subscribers/bulk": {
       "post": {
-        "operationId": "bulkUpsertSubscribers",
-        "summary": "Bulk create or update subscribers",
         "description": "Upserts up to 500 subscribers per request. Each row is matched to an existing subscriber by publicId, then externalId, then email (in that order); if none match, a new subscriber is created. Rows are processed independently, so one failing row does not fail the batch.",
+        "operationId": "bulkUpsertSubscribers",
         "parameters": [
           {
             "name": "environmentId",
@@ -713,21 +712,21 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Bulk create or update subscribers",
+        "tags": [
+          "Subscribers"
         ]
       }
     },
     "/environments/{environmentId}/subscribers/{subscriberId}/preferences": {
       "patch": {
-        "operationId": "updateSubscriberPreferences",
-        "summary": "Update subscriber preferences",
         "description": "Creates a new preference record with updated values (immutable pattern)",
+        "operationId": "updateSubscriberPreferences",
         "parameters": [
           {
             "name": "subscriberId",
@@ -771,21 +770,21 @@
             "description": "Subscriber or preferences not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update subscriber preferences",
+        "tags": [
+          "Subscribers"
         ]
       }
     },
     "/environments/{environmentId}/subscribers/{subscriberId}/tags": {
       "post": {
-        "operationId": "addSubscriberTag",
-        "summary": "Add a tag to a subscriber",
         "description": "Adds a tag to the subscriber. Adding a tag that's already present is a no-op.",
+        "operationId": "addSubscriberTag",
         "parameters": [
           {
             "name": "subscriberId",
@@ -829,20 +828,20 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Add a tag to a subscriber",
+        "tags": [
+          "Subscribers"
         ]
       }
     },
     "/environments/{environmentId}/subscribers/{subscriberId}/tags/{tag}": {
       "delete": {
         "operationId": "removeSubscriberTag",
-        "summary": "Remove a tag from a subscriber",
         "parameters": [
           {
             "name": "subscriberId",
@@ -877,21 +876,21 @@
             "description": "Subscriber not found"
           }
         },
-        "tags": [
-          "Subscribers"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Remove a tag from a subscriber",
+        "tags": [
+          "Subscribers"
         ]
       }
     },
     "/unsubscribe": {
       "post": {
-        "operationId": "unsubscribe",
-        "summary": "Unsubscribe",
         "description": "Called from the unsubscribe confirmation page linked from emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.",
+        "operationId": "unsubscribe",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -918,6 +917,7 @@
             "description": "Invalid or expired unsubscribe link"
           }
         },
+        "summary": "Unsubscribe",
         "tags": [
           "Unsubscribe"
         ]
@@ -925,9 +925,8 @@
     },
     "/environments/{environmentId}/workflows/trigger": {
       "post": {
-        "operationId": "triggerWorkflow",
-        "summary": "Trigger a workflow",
         "description": "Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.",
+        "operationId": "triggerWorkflow",
         "parameters": [
           {
             "name": "environmentId",
@@ -963,21 +962,21 @@
             "description": "Environment, workflow, or subscriber not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Trigger a workflow",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows": {
       "post": {
-        "operationId": "createWorkflow",
-        "summary": "Create a new workflow",
         "description": "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started, and `exitConditions` stop a person's active run on others.",
+        "operationId": "createWorkflow",
         "parameters": [
           {
             "name": "environmentId",
@@ -1013,19 +1012,19 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Create a new workflow",
+        "tags": [
+          "Workflows"
         ]
       },
       "get": {
-        "operationId": "listWorkflows",
-        "summary": "List workflows",
         "description": "Returns a paginated list of workflows in the environment",
+        "operationId": "listWorkflows",
         "parameters": [
           {
             "name": "limit",
@@ -1085,21 +1084,21 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List workflows",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/runs": {
       "get": {
-        "operationId": "listEnvironmentRuns",
-        "summary": "List all workflow runs",
         "description": "Returns a paginated list of trigger runs across every workflow in the environment, most recent first",
+        "operationId": "listEnvironmentRuns",
         "parameters": [
           {
             "name": "limit",
@@ -1147,21 +1146,21 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List all workflow runs",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}": {
       "get": {
-        "operationId": "getWorkflow",
-        "summary": "Get a workflow",
         "description": "Returns a single workflow with its steps",
+        "operationId": "getWorkflow",
         "parameters": [
           {
             "name": "workflowId",
@@ -1195,19 +1194,19 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get a workflow",
+        "tags": [
+          "Workflows"
         ]
       },
       "patch": {
-        "operationId": "updateWorkflow",
-        "summary": "Update a workflow",
         "description": "Updates workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers` and `exitConditions`.",
+        "operationId": "updateWorkflow",
         "parameters": [
           {
             "name": "workflowId",
@@ -1251,19 +1250,19 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Update a workflow",
+        "tags": [
+          "Workflows"
         ]
       },
       "delete": {
-        "operationId": "deleteWorkflow",
-        "summary": "Delete a workflow",
         "description": "Soft-deletes a workflow. Existing in-flight runs are unaffected.",
+        "operationId": "deleteWorkflow",
         "parameters": [
           {
             "name": "workflowId",
@@ -1290,21 +1289,21 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Delete a workflow",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/runs": {
       "get": {
-        "operationId": "listWorkflowRuns",
-        "summary": "List runs for a workflow",
         "description": "Returns a paginated list of trigger runs for this workflow, most recent first",
+        "operationId": "listWorkflowRuns",
         "parameters": [
           {
             "name": "workflowId",
@@ -1360,21 +1359,21 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List runs for a workflow",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/broadcast/preview": {
       "post": {
-        "operationId": "previewBroadcast",
-        "summary": "Preview a broadcast's audience size",
         "description": "Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.",
+        "operationId": "previewBroadcast",
         "parameters": [
           {
             "name": "workflowId",
@@ -1421,21 +1420,21 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Preview a broadcast's audience size",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/broadcast": {
       "post": {
-        "operationId": "triggerBroadcast",
-        "summary": "Trigger a broadcast",
         "description": "Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.",
+        "operationId": "triggerBroadcast",
         "parameters": [
           {
             "name": "workflowId",
@@ -1482,21 +1481,21 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Trigger a broadcast",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/broadcasts": {
       "get": {
-        "operationId": "listBroadcasts",
-        "summary": "List broadcasts for a workflow",
         "description": "Returns a paginated list of broadcasts triggered for this workflow, most recent first",
+        "operationId": "listBroadcasts",
         "parameters": [
           {
             "name": "workflowId",
@@ -1552,21 +1551,21 @@
             "description": "Workflow not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List broadcasts for a workflow",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}": {
       "get": {
-        "operationId": "getBroadcast",
-        "summary": "Get a broadcast",
         "description": "Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)",
+        "operationId": "getBroadcast",
         "parameters": [
           {
             "name": "workflowId",
@@ -1608,21 +1607,21 @@
             "description": "Workflow or broadcast not found"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get a broadcast",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/pause": {
       "post": {
-        "operationId": "pauseBroadcast",
-        "summary": "Pause a broadcast",
         "description": "Holds every send that hasn't gone out yet until the broadcast is resumed. Already-sent emails are unaffected.",
+        "operationId": "pauseBroadcast",
         "parameters": [
           {
             "name": "workflowId",
@@ -1667,21 +1666,21 @@
             "description": "Broadcast isn't pending or queued"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Pause a broadcast",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/resume": {
       "post": {
-        "operationId": "resumeBroadcast",
-        "summary": "Resume a paused broadcast",
         "description": "Lets a paused broadcast carry on sending. The remaining sends keep their original spacing, pushed back by however long it was paused.",
+        "operationId": "resumeBroadcast",
         "parameters": [
           {
             "name": "workflowId",
@@ -1726,21 +1725,21 @@
             "description": "Broadcast isn't paused"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Resume a paused broadcast",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/cancel": {
       "post": {
-        "operationId": "cancelBroadcast",
-        "summary": "Cancel a broadcast",
         "description": "Permanently stops a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone.",
+        "operationId": "cancelBroadcast",
         "parameters": [
           {
             "name": "workflowId",
@@ -1785,21 +1784,21 @@
             "description": "Broadcast isn't pending, queued or paused"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Cancel a broadcast",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/redispatch": {
       "post": {
-        "operationId": "redispatchBroadcast",
-        "summary": "Re-dispatch a broadcast",
         "description": "Re-runs setup for every matching subscriber who hasn't been set up yet (for example after setup jobs failed), spread over a fresh send window. Subscribers already set up are skipped, so nobody receives the email twice.",
+        "operationId": "redispatchBroadcast",
         "parameters": [
           {
             "name": "workflowId",
@@ -1844,21 +1843,21 @@
             "description": "Broadcast isn't queued"
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Re-dispatch a broadcast",
+        "tags": [
+          "Workflows"
         ]
       }
     },
     "/bounces/inbound": {
       "post": {
-        "operationId": "recordInboundBounce",
-        "summary": "Record an inbound bounce event",
         "description": "Generic bounce-recording endpoint, identified by the run step's publicId - callers are expected to have that publicId available via whatever mechanism they use to learn about the bounce (e.g. a provider's native webhook echoing back metadata set at send time). Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.",
+        "operationId": "recordInboundBounce",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1881,6 +1880,7 @@
             "description": "Run step not found"
           }
         },
+        "summary": "Record an inbound bounce event",
         "tags": [
           "Bounces"
         ]
@@ -1888,9 +1888,8 @@
     },
     "/environments/{environmentId}/integrations/{type}": {
       "patch": {
-        "operationId": "upsertIntegration",
-        "summary": "Configure an integration",
         "description": "Creates or updates the integration of the given type for this environment (e.g. \"smtp\"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full.",
+        "operationId": "upsertIntegration",
         "parameters": [
           {
             "name": "type",
@@ -1937,19 +1936,19 @@
             "description": "Environment or integration type not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Configure an integration",
+        "tags": [
+          "Integrations"
         ]
       },
       "get": {
-        "operationId": "getIntegration",
-        "summary": "Get an integration",
         "description": "Returns the sanitized config for a single integration type (no secrets).",
+        "operationId": "getIntegration",
         "parameters": [
           {
             "name": "type",
@@ -1983,18 +1982,18 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get an integration",
+        "tags": [
+          "Integrations"
         ]
       },
       "delete": {
         "operationId": "deleteIntegration",
-        "summary": "Remove an integration",
         "parameters": [
           {
             "name": "type",
@@ -2021,21 +2020,21 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Remove an integration",
+        "tags": [
+          "Integrations"
         ]
       }
     },
     "/environments/{environmentId}/integrations/{type}/primary": {
       "patch": {
-        "operationId": "setPrimaryIntegration",
-        "summary": "Set an integration as primary",
         "description": "Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.",
+        "operationId": "setPrimaryIntegration",
         "parameters": [
           {
             "name": "type",
@@ -2069,21 +2068,21 @@
             "description": "Environment or integration not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Set an integration as primary",
+        "tags": [
+          "Integrations"
         ]
       }
     },
     "/environments/{environmentId}/integrations": {
       "get": {
-        "operationId": "listIntegrations",
-        "summary": "List configured integrations",
         "description": "Returns every integration configured for this environment, sanitized (no secrets).",
+        "operationId": "listIntegrations",
         "parameters": [
           {
             "name": "environmentId",
@@ -2109,21 +2108,21 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Integrations"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List configured integrations",
+        "tags": [
+          "Integrations"
         ]
       }
     },
     "/environments/{environmentId}/analytics": {
       "get": {
-        "operationId": "getAnalytics",
-        "summary": "Get environment-wide analytics",
         "description": "Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.",
+        "operationId": "getAnalytics",
         "parameters": [
           {
             "name": "days",
@@ -2160,21 +2159,21 @@
             "description": "Environment not found"
           }
         },
-        "tags": [
-          "Analytics"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "Get environment-wide analytics",
+        "tags": [
+          "Analytics"
         ]
       }
     },
     "/environments/{environmentId}/inbound-events": {
       "get": {
-        "operationId": "listInboundEvents",
-        "summary": "List inbound webhook events",
         "description": "Webhook events received from inbound sources (e.g. Stripe) for this environment, most recent first, with the events they matched and what happened (workflow triggered, no workflow triggered by it, person not found, etc.).",
+        "operationId": "listInboundEvents",
         "parameters": [
           {
             "name": "source",
@@ -2228,21 +2227,21 @@
             }
           }
         },
-        "tags": [
-          "Inbound events"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List inbound webhook events",
+        "tags": [
+          "Inbound events"
         ]
       }
     },
     "/environments/{environmentId}/trigger-sources": {
       "get": {
-        "operationId": "listTriggerSources",
-        "summary": "List workflow trigger sources",
         "description": "Integrations whose events can trigger workflows (e.g. Stripe), whether each is connected in this environment, and the events each offers.",
+        "operationId": "listTriggerSources",
         "parameters": [
           {
             "name": "environmentId",
@@ -2265,13 +2264,14 @@
             }
           }
         },
-        "tags": [
-          "Workflows"
-        ],
         "security": [
           {
             "bearer": []
           }
+        ],
+        "summary": "List workflow trigger sources",
+        "tags": [
+          "Workflows"
         ]
       }
     },
@@ -2283,7 +2283,10 @@
           "201": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "StreamableHttp"
+        ]
       },
       "get": {
         "operationId": "StreamableHttpController_handleGetRequest",
@@ -2292,7 +2295,10 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "StreamableHttp"
+        ]
       },
       "delete": {
         "operationId": "StreamableHttpController_handleDeleteRequest",
@@ -2301,7 +2307,10 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "StreamableHttp"
+        ]
       }
     }
   },
@@ -2341,19 +2350,27 @@
             "type": "string"
           },
           "name": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "email": {
             "type": "string"
           },
           "image": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "apiKeys": {
             "type": "array",
@@ -2403,16 +2420,24 @@
             "type": "string"
           },
           "name": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "image": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -2476,7 +2501,12 @@
                 "type": "string"
               }
             },
-            "selfRequired": true
+            "required": [
+              "id",
+              "publicId",
+              "name",
+              "slug"
+            ]
           },
           "environment": {
             "type": "object",
@@ -2494,7 +2524,12 @@
                 "type": "string"
               }
             },
-            "selfRequired": true
+            "required": [
+              "id",
+              "publicId",
+              "name",
+              "slug"
+            ]
           }
         },
         "required": [
@@ -2592,23 +2627,41 @@
             "description": "The current plan, e.g. \"growth\"."
           },
           "interval": {
-            "type": "string",
-            "enum": [
-              "month",
-              "year"
-            ],
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "month",
+                  "year"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "status": {
-            "type": "string",
-            "description": "Stripe subscription status, e.g. \"active\" or \"past_due\".",
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Stripe subscription status, e.g. \"active\" or \"past_due\"."
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "currentPeriodEnd": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "cancelAtPeriodEnd": {
             "type": "boolean"
@@ -2628,12 +2681,23 @@
                 "description": "Email and webhook steps sent this calendar month (UTC)."
               },
               "sendLimit": {
-                "type": "number",
-                "description": "Monthly send limit; null when the plan doesn't limit sends.",
-                "nullable": true
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "description": "Monthly send limit; null when the plan doesn't limit sends."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
-            "selfRequired": true
+            "required": [
+              "subscribers",
+              "subscriberLimit",
+              "sendsThisMonth",
+              "sendLimit"
+            ]
           },
           "overLimit": {
             "type": "boolean"
@@ -2643,16 +2707,28 @@
             "description": "Sends to subscribers past this aren't sent until an upgrade: the free plan's limit, or one plan up for paid plans."
           },
           "movesUpOn": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-            "description": "When an over-limit paid workspace moves up one plan (3 days after going over); null when not over.",
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                "description": "When an over-limit paid workspace moves up one plan (3 days after going over); null when not over."
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "planAtRenewal": {
-            "type": "string",
-            "description": "The plan this workspace moves to at its next renewal, from its subscriber count; \"custom\" above the largest plan; null when it stays the same.",
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "The plan this workspace moves to at its next renewal, from its subscriber count; \"custom\" above the largest plan; null when it stays the same."
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -2766,12 +2842,18 @@
                   ]
                 },
                 "attributes": {
-                  "type": "object",
-                  "propertyNames": {
-                    "type": "string"
-                  },
-                  "additionalProperties": {},
-                  "nullable": true
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "createdVia": {
                   "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
@@ -2879,12 +2961,18 @@
                 ]
               },
               "attributes": {
-                "type": "object",
-                "propertyNames": {
-                  "type": "string"
-                },
-                "additionalProperties": {},
-                "nullable": true
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "createdVia": {
                 "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
@@ -2916,33 +3004,53 @@
                 }
               }
             },
-            "selfRequired": true
-          },
-          "preferences": {
-            "type": "object",
-            "properties": {
-              "publicId": {
-                "type": "string"
-              },
-              "email": {
-                "type": "boolean"
-              },
-              "version": {
-                "type": "number"
-              },
-              "createdAt": {
-                "type": "string",
-                "format": "date-time",
-                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-              }
-            },
             "required": [
               "publicId",
               "email",
-              "version",
-              "createdAt"
-            ],
-            "nullable": true
+              "phone",
+              "externalId",
+              "firstName",
+              "lastName",
+              "name",
+              "attributes",
+              "createdVia",
+              "createdAt",
+              "updatedAt",
+              "unsubscribeUrl",
+              "tags"
+            ]
+          },
+          "preferences": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "publicId": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "boolean"
+                  },
+                  "version": {
+                    "type": "number"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  }
+                },
+                "required": [
+                  "publicId",
+                  "email",
+                  "version",
+                  "createdAt"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -2984,8 +3092,7 @@
             "propertyNames": {
               "type": "string"
             },
-            "additionalProperties": {},
-            "selfRequired": false
+            "additionalProperties": {}
           },
           "preferences": {
             "default": {
@@ -2997,14 +3104,9 @@
                 "default": true,
                 "type": "boolean"
               }
-            },
-            "selfRequired": false
+            }
           }
-        },
-        "required": [
-          "attributes",
-          "preferences"
-        ]
+        }
       },
       "CreateSubscriberResponseDto": {
         "type": "object",
@@ -3052,12 +3154,18 @@
                 ]
               },
               "attributes": {
-                "type": "object",
-                "propertyNames": {
-                  "type": "string"
-                },
-                "additionalProperties": {},
-                "nullable": true
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "createdVia": {
                 "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
@@ -3083,7 +3191,20 @@
                 ]
               }
             },
-            "selfRequired": true
+            "required": [
+              "publicId",
+              "email",
+              "phone",
+              "externalId",
+              "firstName",
+              "lastName",
+              "name",
+              "attributes",
+              "createdVia",
+              "createdAt",
+              "updatedAt",
+              "unsubscribeUrl"
+            ]
           },
           "preferences": {
             "type": "object",
@@ -3103,7 +3224,12 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               }
             },
-            "selfRequired": true
+            "required": [
+              "publicId",
+              "email",
+              "version",
+              "createdAt"
+            ]
           }
         },
         "required": [
@@ -3233,12 +3359,18 @@
                       ]
                     },
                     "attributes": {
-                      "type": "object",
-                      "propertyNames": {
-                        "type": "string"
-                      },
-                      "additionalProperties": {},
-                      "nullable": true
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {}
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "createdVia": {
                       "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
@@ -3327,7 +3459,11 @@
                 "type": "number"
               }
             },
-            "selfRequired": true
+            "required": [
+              "created",
+              "updated",
+              "errored"
+            ]
           }
         },
         "required": [
@@ -3339,48 +3475,80 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "format": "email",
-            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "phone": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "externalId": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "firstName": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "lastName": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "name": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "attributes": {
-            "type": "object",
-            "propertyNames": {
-              "type": "string"
-            },
-            "additionalProperties": {},
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
@@ -3430,12 +3598,18 @@
                 ]
               },
               "attributes": {
-                "type": "object",
-                "propertyNames": {
-                  "type": "string"
-                },
-                "additionalProperties": {},
-                "nullable": true
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "createdVia": {
                 "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
@@ -3461,7 +3635,20 @@
                 ]
               }
             },
-            "selfRequired": true
+            "required": [
+              "publicId",
+              "email",
+              "phone",
+              "externalId",
+              "firstName",
+              "lastName",
+              "name",
+              "attributes",
+              "createdVia",
+              "createdAt",
+              "updatedAt",
+              "unsubscribeUrl"
+            ]
           }
         },
         "required": [
@@ -3500,7 +3687,13 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
               }
             },
-            "selfRequired": true
+            "required": [
+              "publicId",
+              "subscriberPublicId",
+              "email",
+              "version",
+              "createdAt"
+            ]
           }
         },
         "required": [
@@ -3576,8 +3769,7 @@
                 "format": "email",
                 "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
               }
-            },
-            "selfRequired": true
+            }
           },
           "payload": {
             "description": "Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.",
@@ -3585,14 +3777,12 @@
             "propertyNames": {
               "type": "string"
             },
-            "additionalProperties": {},
-            "selfRequired": false
+            "additionalProperties": {}
           }
         },
         "required": [
           "key",
-          "subscriber",
-          "payload"
+          "subscriber"
         ]
       },
       "TriggerWorkflowResponseDto": {
@@ -3789,10 +3979,14 @@
             "type": "string"
           },
           "description": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "status": {
             "type": "string",
@@ -4154,10 +4348,16 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 },
                 "completedAt": {
-                  "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                  "nullable": true
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "subscriber": {
                   "type": "object",
@@ -4219,10 +4419,16 @@
                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                       },
                       "sentAt": {
-                        "type": "string",
-                        "format": "date-time",
-                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                        "nullable": true
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "errorMessage": {
                         "type": [
@@ -4231,12 +4437,18 @@
                         ]
                       },
                       "bounceType": {
-                        "type": "string",
-                        "enum": [
-                          "hard",
-                          "soft"
-                        ],
-                        "nullable": true
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "hard",
+                              "soft"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "required": [
@@ -4307,10 +4519,14 @@
             "type": "string"
           },
           "description": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "status": {
             "type": "string",
@@ -4468,10 +4684,14 @@
             "type": "number"
           },
           "successRate": {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -4510,9 +4730,15 @@
             "maxLength": 255
           },
           "description": {
-            "type": "string",
-            "maxLength": 2000,
-            "nullable": true
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "status": {
             "type": "string",
@@ -4679,10 +4905,16 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 },
                 "completedAt": {
-                  "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                  "nullable": true
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "subscriber": {
                   "type": "object",
@@ -4744,10 +4976,16 @@
                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                       },
                       "sentAt": {
-                        "type": "string",
-                        "format": "date-time",
-                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                        "nullable": true
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "errorMessage": {
                         "type": [
@@ -4756,12 +4994,18 @@
                         ]
                       },
                       "bounceType": {
-                        "type": "string",
-                        "enum": [
-                          "hard",
-                          "soft"
-                        ],
-                        "nullable": true
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "hard",
+                              "soft"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "required": [
@@ -5049,16 +5293,24 @@
             ]
           },
           "matchedCount": {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "sendOverHours": {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -5087,10 +5339,14 @@
             "type": "number"
           },
           "successRate": {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -5126,16 +5382,24 @@
             ]
           },
           "matchedCount": {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "sendOverHours": {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -5180,8 +5444,7 @@
       "UpsertIntegrationDto": {
         "type": "object",
         "properties": {},
-        "additionalProperties": {},
-        "selfRequired": false
+        "additionalProperties": {}
       },
       "IntegrationResponseDto": {
         "type": "object",
@@ -5259,7 +5522,12 @@
                 "type": "number"
               }
             },
-            "selfRequired": true
+            "required": [
+              "total",
+              "newInPeriod",
+              "optedOut",
+              "optedOutInPeriod"
+            ]
           },
           "sends": {
             "type": "object",
@@ -5286,7 +5554,14 @@
                 ]
               }
             },
-            "selfRequired": true
+            "required": [
+              "sent",
+              "failed",
+              "skipped",
+              "pending",
+              "bounced",
+              "successRate"
+            ]
           },
           "bounces": {
             "type": "object",
@@ -5298,7 +5573,10 @@
                 "type": "number"
               }
             },
-            "selfRequired": true
+            "required": [
+              "hard",
+              "soft"
+            ]
           }
         },
         "required": [
@@ -5335,11 +5613,17 @@
                   ]
                 },
                 "matchedEvents": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "nullable": true
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "outcome": {
                   "type": [
@@ -5365,10 +5649,16 @@
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 },
                 "processedAt": {
-                  "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
-                  "nullable": true
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [

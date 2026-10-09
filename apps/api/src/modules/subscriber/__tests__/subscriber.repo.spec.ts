@@ -51,8 +51,8 @@ function makeSelectChain(resolvedValueQueue: unknown[][] = []) {
 
 function makeMockDb(
   overrides: Partial<{
-    findFirst: ReturnType<typeof vi.fn>;
-    findMany: ReturnType<typeof vi.fn>;
+    findFirst: () => unknown;
+    findMany: () => unknown;
     updateChain: ReturnType<typeof makeReturning>;
     select: ReturnType<typeof makeSelectChain>;
   }> = {},

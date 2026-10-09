@@ -6,7 +6,7 @@ import {
   getEnvironmentStepCounts,
 } from "@subscriber.dev/db/repository/analytics.repo";
 
-function makeMockDb(groupByResult: ReturnType<typeof vi.fn>) {
+function makeMockDb(groupByResult: () => unknown) {
   const groupBy = vi.fn().mockImplementation(() => groupByResult());
   const where = vi.fn().mockReturnValue({ groupBy });
   const innerJoin = vi.fn().mockReturnValue({ where });

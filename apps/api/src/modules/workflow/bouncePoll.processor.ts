@@ -22,13 +22,13 @@ export class BouncePollProcessor extends WorkerHost implements OnModuleInit {
   }
 
   async onModuleInit(): Promise<void> {
-    await this.queue.add(
+    for (const scheduler of await this.queue.getJobSchedulers())
+      if (scheduler.key !== BOUNCE_POLL_JOB_NAME)
+        await this.queue.removeJobScheduler(scheduler.key);
+    await this.queue.upsertJobScheduler(
       BOUNCE_POLL_JOB_NAME,
-      {},
-      {
-        repeat: { every: BOUNCE_POLL_INTERVAL_MS },
-        jobId: BOUNCE_POLL_JOB_NAME,
-      },
+      { every: BOUNCE_POLL_INTERVAL_MS },
+      { name: BOUNCE_POLL_JOB_NAME },
     );
   }
 

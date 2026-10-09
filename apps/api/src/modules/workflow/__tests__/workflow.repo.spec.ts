@@ -34,9 +34,9 @@ function makeDeleteChain() {
 
 function makeMockDb(
   overrides: Partial<{
-    findFirst: ReturnType<typeof vi.fn>;
-    findMany: ReturnType<typeof vi.fn>;
-    insertChain: { values: ReturnType<typeof vi.fn> };
+    findFirst: () => unknown;
+    findMany: () => unknown;
+    insertChain: { values: () => unknown };
     updateChain: ReturnType<typeof makeUpdateChain>;
     deleteChain: ReturnType<typeof makeDeleteChain>;
   }> = {},

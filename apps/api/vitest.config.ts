@@ -12,6 +12,7 @@ export default defineConfig({
     }),
   ],
   test: {
+    include: ["src/**/*.spec.{ts,tsx}"],
     globals: true,
   },
 });

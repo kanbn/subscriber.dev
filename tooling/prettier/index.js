@@ -10,10 +10,9 @@ const config = {
     "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss",
   ],
-  tailwindConfig: fileURLToPath(
-    new URL("../../tooling/tailwind/web.ts", import.meta.url),
+  tailwindStylesheet: fileURLToPath(
+    new URL("../../apps/web/src/styles/globals.css", import.meta.url),
   ),
-  tailwindFunctions: ["cn", "cva"],
   importOrder: [
     "<TYPES>",
     "^(next/(.*)$)|^(next$)",
@@ -29,20 +28,6 @@ const config = {
   ],
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
   importOrderTypeScriptVersion: "4.4.0",
-  overrides: [
-    {
-      files: "*.json.hbs",
-      options: {
-        parser: "json",
-      },
-    },
-    {
-      files: "*.js.hbs",
-      options: {
-        parser: "babel",
-      },
-    },
-  ],
 };
 
 export default config;

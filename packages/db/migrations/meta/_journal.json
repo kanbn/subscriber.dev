@@ -169,6 +169,13 @@
       "when": 1791475480034,
       "tag": "20261008160440_DropInvitationsAndUserStripeCustomer",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791491767837,
+      "tag": "20261008203607_RenameApiKeyUserIdToReferenceId",
+      "breakpoints": true
     }
   ]
 }

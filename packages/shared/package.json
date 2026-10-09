@@ -38,14 +38,14 @@
     "@subscriber.dev/eslint-config": "workspace:*",
     "@subscriber.dev/prettier-config": "workspace:*",
     "@subscriber.dev/tsconfig": "workspace:*",
-    "@types/node": "^20.17.7",
+    "@types/node": "^22.20.5",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
   "prettier": "@subscriber.dev/prettier-config",
   "dependencies": {
-    "jose": "^6.1.2",
-    "nanoid": "^5.0.9"
+    "jose": "^6.2.12",
+    "nanoid": "^6.0.2"
   }
 }

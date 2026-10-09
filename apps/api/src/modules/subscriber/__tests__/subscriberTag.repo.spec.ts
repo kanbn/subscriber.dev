@@ -10,10 +10,10 @@ import {
 
 function makeMockDb(
   overrides: Partial<{
-    findMany: ReturnType<typeof vi.fn>;
-    insertReturning: ReturnType<typeof vi.fn>;
-    deleteReturning: ReturnType<typeof vi.fn>;
-    orderBy: ReturnType<typeof vi.fn>;
+    findMany: () => unknown;
+    insertReturning: () => unknown;
+    deleteReturning: () => unknown;
+    orderBy: () => unknown;
   }> = {},
 ) {
   const findMany = overrides.findMany ?? vi.fn();

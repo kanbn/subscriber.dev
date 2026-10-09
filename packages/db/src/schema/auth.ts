@@ -57,7 +57,8 @@ export const apikey = pgTable("apiKey", {
   start: text("start"),
   prefix: text("prefix"),
   key: text("key").notNull(),
-  userId: bigserial("userId", { mode: "number" })
+  configId: text("configId").notNull().default("default"),
+  referenceId: bigserial("referenceId", { mode: "number" })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   refillInterval: integer("refillInterval"),
@@ -79,7 +80,7 @@ export const apikey = pgTable("apiKey", {
 
 export const apiKeyRelations = relations(apikey, ({ one }) => ({
   user: one(users, {
-    fields: [apikey.userId],
+    fields: [apikey.referenceId],
     references: [users.id],
     relationName: "apiKeyUser",
   }),
