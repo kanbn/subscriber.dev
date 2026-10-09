@@ -549,7 +549,7 @@ export type TriggerWorkflowDtoSubscriber = {
 };
 
 /**
- * Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.
+ * Data for the templates, available as top-level variables: {"plan": "pro"} is {{ plan }}.
  */
 export type TriggerWorkflowDtoPayload = {[key: string]: unknown};
 
@@ -560,7 +560,7 @@ export interface TriggerWorkflowDto {
      */
   key: string;
   subscriber: TriggerWorkflowDtoSubscriber;
-  /** Arbitrary data merged into {{variable}} interpolation alongside subscriber fields. */
+  /** Data for the templates, available as top-level variables: {"plan": "pro"} is {{ plan }}. */
   payload?: TriggerWorkflowDtoPayload;
 }
 
@@ -595,7 +595,7 @@ export type CreateWorkflowDtoStepsItem = {
      */
   subject: string;
   /**
-     * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class="button" to a link to render it as a call-to-action button.
+     * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields and custom attributes (an attribute called company is {{ subscriber.company }}), and trigger payload fields at the top level (payload {"plan": "pro"} is {{ plan }}), plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class="button" to a link to render it as a call-to-action button.
      * @minLength 1
      */
   body: string;
@@ -1066,7 +1066,7 @@ export type UpdateWorkflowDtoStepsItem = {
      */
   subject: string;
   /**
-     * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class="button" to a link to render it as a call-to-action button.
+     * HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields and custom attributes (an attribute called company is {{ subscriber.company }}), and trigger payload fields at the top level (payload {"plan": "pro"} is {{ plan }}), plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class="button" to a link to render it as a call-to-action button.
      * @minLength 1
      */
   body: string;

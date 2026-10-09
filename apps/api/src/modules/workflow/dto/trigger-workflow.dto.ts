@@ -13,7 +13,7 @@ export const TriggerWorkflowSchema = z
       .record(z.string(), z.unknown())
       .optional()
       .describe(
-        "Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.",
+        'Data for the templates, available as top-level variables: {"plan": "pro"} is {{ plan }}.',
       ),
   })
   .refine(
