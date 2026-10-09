@@ -1,11 +1,5 @@
-import { Body } from "@react-email/body";
-import { Container } from "@react-email/container";
-import { Head } from "@react-email/head";
-import { Html } from "@react-email/html";
-import { Link } from "@react-email/link";
-import { render } from "@react-email/render";
-import { Text } from "@react-email/text";
 import * as React from "react";
+import { Body, Container, Head, Html, Link, render, Text } from "react-email";
 
 export interface SubscriberLayoutTheme {
   fontFamily: string;

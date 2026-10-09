@@ -1,5 +1,5 @@
-import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
+import { render } from "react-email";
 
 import MagicLinkTemplate from "./templates/magic-link.js";
 

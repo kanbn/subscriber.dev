@@ -24,17 +24,6 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@react-email/body": "^0.3.0",
-    "@react-email/button": "^0.2.1",
-    "@react-email/container": "^0.0.16",
-    "@react-email/head": "^0.0.13",
-    "@react-email/heading": "^0.0.16",
-    "@react-email/hr": "^0.0.12",
-    "@react-email/html": "^0.0.12",
-    "@react-email/link": "^0.0.13",
-    "@react-email/preview": "^0.0.14",
-    "@react-email/render": "^2.1.0",
-    "@react-email/text": "^0.1.6",
     "next-runtime-env": "^1.8.0",
     "nodemailer": "^10.0.16",
     "react": "catalog:react19",
