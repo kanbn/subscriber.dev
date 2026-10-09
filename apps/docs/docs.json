@@ -7,19 +7,63 @@
     "light": "#EDEDED",
     "dark": "#161616"
   },
-  "favicon": "./favicon.png",
+  "logo": {
+    "light": "/logo-light.svg",
+    "dark": "/logo-dark.svg",
+    "href": "https://subscriber.dev"
+  },
+  "favicon": "/favicon.svg",
   "navigation": {
     "groups": [
       {
-        "group": "Get Started",
+        "group": "Get started",
         "pages": [
-          "introduction"
+          "introduction",
+          "quickstart"
         ]
       },
       {
-        "group": "API Documentation",
+        "group": "Tools",
+        "pages": [
+          "mcp",
+          "cli",
+          "tui"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "environments",
+          "subscribers",
+          "sending",
+          "workflows",
+          "templates",
+          "broadcasts",
+          "plans",
+          "analytics",
+          "troubleshooting"
+        ]
+      },
+      {
+        "group": "Integrations",
+        "pages": [
+          "integrations/overview",
+          "integrations/smtp",
+          "integrations/cloudflare",
+          "integrations/stripe"
+        ]
+      },
+      {
+        "group": "API reference",
         "pages": [
           "api-reference/introduction"
+        ],
+        "openapi": "openapi.json"
+      },
+      {
+        "group": "Self-hosting",
+        "pages": [
+          "self-hosting"
         ]
       }
     ]
@@ -27,14 +71,14 @@
   "navbar": {
     "links": [
       {
-        "label": "Sign in",
-        "href": "https://subscriber.dev/login"
+        "label": "GitHub",
+        "href": "https://github.com/kanbn/subscriber.dev"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Go to dashboard",
-      "href": "https://subscriber.dev/dashboard"
+      "label": "Sign in",
+      "href": "https://subscriber.dev/auth"
     }
   }
 }

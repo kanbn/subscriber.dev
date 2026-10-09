@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A 7x7 terminal-font @, drawn as pixel blocks. -->
+  <rect width="32" height="32" rx="7" fill="#0a0a0b"/>
+  <rect x="9.57" y="7.00" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="12.14" y="7.00" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="14.71" y="7.00" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="17.29" y="7.00" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="19.86" y="7.00" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="7.00" y="9.57" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="22.43" y="9.57" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="7.00" y="12.14" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="12.14" y="12.14" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="14.71" y="12.14" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="17.29" y="12.14" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="22.43" y="12.14" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="7.00" y="14.71" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="12.14" y="14.71" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="17.29" y="14.71" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="22.43" y="14.71" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="7.00" y="17.29" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="12.14" y="17.29" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="14.71" y="17.29" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="17.29" y="17.29" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="19.86" y="17.29" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="7.00" y="19.86" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="9.57" y="22.43" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="12.14" y="22.43" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="14.71" y="22.43" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="17.29" y="22.43" width="2.16" height="2.16" fill="#f4f4f5"/>
+  <rect x="19.86" y="22.43" width="2.16" height="2.16" fill="#f4f4f5"/>
+</svg>
