@@ -1,0 +1,57 @@
+---
+title: Overview
+description: "Connect the services subscriber.dev sends through and listens to."
+---
+
+Integrations connect an environment to your other services. There are two kinds:
+
+- **Email providers** send your emails. Each environment needs at least one.
+- **Event sources** start and stop workflows when something happens, such as a Stripe trial starting.
+
+<CardGroup cols={3}>
+  <Card title="SMTP" icon="envelope" href="/integrations/smtp">
+    Send through any SMTP provider.
+  </Card>
+  <Card title="Cloudflare Email" icon="cloud" href="/integrations/cloudflare">
+    Cloudflare's email sending API, with automatic bounce handling.
+  </Card>
+  <Card title="Stripe" icon="stripe" href="/integrations/stripe">
+    Start workflows from trials, subscriptions and failed payments.
+  </Card>
+</CardGroup>
+
+## Manage integrations
+
+Or ask [your agent](/mcp): "Which integrations are connected to production?"
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber integrations list
+    subscriber integrations get smtp
+    subscriber integrations remove smtp
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Integrations**. Press `n` to connect one, or choose one to change or remove it.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl https://api.subscriber.dev/environments/$ENV/integrations -H "x-api-key: $KEY"
+    ```
+
+    Connect or update one with `PATCH .../integrations/<type>`, and remove it with `DELETE`.
+  </Tab>
+</Tabs>
+
+Each environment has its own integrations, so staging can send through a test provider while production uses your real one.
+
+Settings are checked before they're saved, so a wrong password fails straight away. Passwords, tokens and keys are encrypted and never shown again. To change a setting, send all the settings again; leave out the secret to keep the saved one.
+
+## More than one email provider
+
+If sending through one provider fails, subscriber.dev tries the next, so an outage doesn't stop your emails. The first one you connect is tried first. To change the order:
+
+```bash
+subscriber integrations set-primary cloudflare
+```

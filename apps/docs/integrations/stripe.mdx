@@ -1,0 +1,84 @@
+---
+title: Stripe
+description: "Start and stop workflows from Stripe trial and subscription events."
+---
+
+Workflows can start and stop on their own from events in your other tools. Stripe is supported today.
+
+- **Triggers** start the workflow for the person the event is about. If they aren't a subscriber yet, they're added using the email on their Stripe customer.
+- **Exit conditions** stop the workflow for that person. Their active runs are cancelled and steps that haven't sent never will. Exit conditions are checked before triggers, so an event in both restarts the workflow.
+
+Add them to an automation workflow, or ask [your agent](/mcp) to "start the trial workflow when a Stripe trial starts, and stop it when they convert":
+
+<Tabs>
+  <Tab title="CLI">
+    Add `triggers` and `exitConditions` to the workflow's JSON file, then run `subscriber workflows update <workflowId> --file trial.json`:
+
+    ```json
+    {
+      "triggers": [{ "source": "stripe", "event": "trial_started" }],
+      "exitConditions": [{ "source": "stripe", "event": "trial_converted" }]
+    }
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Workflows**, choose the workflow and press `g`. Choose **+ Add trigger** or **+ Add exit condition**, then pick the events.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X PATCH https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"triggers": [{"source": "stripe", "event": "trial_started"}], "exitConditions": [{"source": "stripe", "event": "trial_converted"}]}'
+    ```
+  </Tab>
+</Tabs>
+
+Connect Stripe first; triggers only run while the integration is connected.
+
+## Events
+
+These are the moments in Stripe you can start or stop a workflow on.
+
+| Event | When it fires |
+| --- | --- |
+| `trial_started` | Trial started |
+| `trial_ending` | Trial ending (3 days before) |
+| `trial_converted` | Trial converted to paid |
+| `trial_payment_failed` | Trial ended, payment failed (Stripe retries it) |
+| `trial_expired` | Trial expired unpaid |
+| `subscription_started` | Subscription started (paid) |
+| `subscription_canceled` | Subscription canceled |
+| `payment_failed` | Renewal payment failed |
+
+You can also use a raw Stripe event type, such as `checkout.session.completed`.
+
+## Connect Stripe
+
+Connecting lets subscriber.dev look up who each Stripe event is about, and lets Stripe tell subscriber.dev when something happens.
+
+1. In Stripe, create a restricted API key with read access to Customers.
+2. Connect it to subscriber.dev:
+
+   <Tabs>
+     <Tab title="CLI">
+       ```bash
+       subscriber integrations set stripe --body '{"apiKey": "rk_live_..."}'
+       ```
+     </Tab>
+     <Tab title="TUI">
+       Open **Integrations**, press `n` and choose **Stripe (trigger workflows)**.
+     </Tab>
+     <Tab title="API">
+       ```bash
+       curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/stripe \
+         -H "x-api-key: $KEY" -H "content-type: application/json" \
+         -d '{"apiKey": "rk_live_..."}'
+       ```
+     </Tab>
+   </Tabs>
+
+   You get back a webhook URL and the Stripe events to enable.
+3. In Stripe, add a webhook endpoint with that URL and those events.
+4. Give subscriber.dev the endpoint's signing secret (`whsec_...`) the same way. Your API key is kept, so send only `{"webhookSecret": "whsec_..."}`.
+
+To see the webhook URL again, ask your agent, run `subscriber integrations get stripe`, or open Stripe under **Integrations** in the TUI.

@@ -1,0 +1,48 @@
+---
+title: Cloudflare Email
+description: "Send through Cloudflare's email sending API."
+---
+
+Cloudflare Email sends through Cloudflare's email sending API instead of SMTP. Use it if your domain is already on Cloudflare. It's the one provider subscriber.dev can pick up bounces from automatically.
+
+## Connect
+
+Or ask [your agent](/mcp): "Connect Cloudflare Email, sending from hello@acme.com."
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber integrations set cloudflare --body '{
+      "accountId": "<account ID>",
+      "zoneId": "<zone ID>",
+      "apiToken": "<API token>",
+      "fromEmail": "hello@acme.com",
+      "fromName": "Acme"
+    }'
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Integrations**, press `n` and choose **Cloudflare Email**.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/cloudflare \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"accountId": "<account ID>", "zoneId": "<zone ID>", "apiToken": "<API token>", "fromEmail": "hello@acme.com", "fromName": "Acme"}'
+    ```
+  </Tab>
+</Tabs>
+
+## Settings
+
+| Field | Description |
+| --- | --- |
+| `accountId` | Your Cloudflare account ID. |
+| `apiToken` | An API token that can send email for that account. |
+| `fromEmail`, `fromName` | Who the email is from. |
+| `replyTo` | Where replies go, if not `fromEmail`. |
+| `zoneId` | Optional. The zone you send from, so bounces can be picked up. |
+
+## Bounces
+
+With `zoneId` set and **Zone > Analytics > Read** added to the token, subscriber.dev checks Cloudflare for bounces regularly. Hard bounces [opt the subscriber out](/subscribers#opting-in-and-out). Without them, emails still send but bounces aren't picked up.

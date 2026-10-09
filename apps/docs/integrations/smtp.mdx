@@ -1,0 +1,66 @@
+---
+title: SMTP
+description: "Send through any SMTP provider."
+---
+
+SMTP is the standard way email servers accept mail, and almost every email provider supports it. Connect yours with its SMTP settings.
+
+<Warning>
+  Bounced addresses aren't suppressed automatically with SMTP. SMTP has no standard way to report bounces, so subscriber.dev keeps emailing an address that doesn't exist until you opt it out. See [Bounces](#bounces). Use a native email integration, like [Cloudflare Email](/integrations/cloudflare), to suppress them for you.
+</Warning>
+
+## Connect
+
+Or ask [your agent](/mcp): "Connect my Postmark account over SMTP, sending from hello@acme.com."
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber integrations set smtp --body '{
+      "host": "smtp.postmarkapp.com",
+      "port": 587,
+      "secure": false,
+      "fromEmail": "hello@acme.com",
+      "fromName": "Acme",
+      "user": "<server token>",
+      "password": "<server token>"
+    }'
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Integrations**, press `n` and choose **SMTP**.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/smtp \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"host": "smtp.postmarkapp.com", "port": 587, "secure": false, "fromEmail": "hello@acme.com", "user": "<server token>", "password": "<server token>"}'
+    ```
+  </Tab>
+</Tabs>
+
+## Settings
+
+| Field | Description |
+| --- | --- |
+| `host`, `port` | Your provider's SMTP server. |
+| `secure` | `true` for port 465. `false` for 587, which upgrades to TLS once connected. Defaults to `true`. |
+| `user`, `password` | Your SMTP login. Some providers use an API key for both. |
+| `fromEmail`, `fromName` | Who the email is from. |
+| `replyTo` | Where replies go, if not `fromEmail`. Useful when you send from a subdomain with no inbox. |
+
+## Provider settings
+
+| Provider | Host | Port and `secure` | `user` |
+| --- | --- | --- | --- |
+| Resend | `smtp.resend.com` | 465, `true` | `resend` |
+| Amazon SES | `email-smtp.<region>.amazonaws.com` | 465, `true` | Your SES SMTP username |
+| Postmark | `smtp.postmarkapp.com` | 587, `false` | Your server token |
+| Mailgun | `smtp.mailgun.org` | 465, `true` | Your domain's SMTP login |
+| SendGrid | `smtp.sendgrid.net` | 465, `true` | `apikey` |
+
+The password is the API key or SMTP password from your provider.
+
+## Bounces
+
+Check bounces in your provider's dashboard, and opt out dead addresses with `subscriber subscribers update-preferences <subscriberId> --opted-out`. Opted-out subscribers are never emailed.
