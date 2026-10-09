@@ -14,6 +14,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -34,6 +35,7 @@ import { IntegrationsService } from "./integrations.service.js";
 
 @ApiTags("Integrations")
 @ApiBearerAuth("bearer")
+@ApiSecurity("api-key")
 @Controller("environments/:environmentId/integrations")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class IntegrationsController {

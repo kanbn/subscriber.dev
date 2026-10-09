@@ -17,6 +17,7 @@ import {
   ApiParam,
   ApiQuery,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -60,6 +61,7 @@ import { WorkflowService } from "./workflow.service.js";
 
 @ApiTags("Workflows")
 @ApiBearerAuth("bearer")
+@ApiSecurity("api-key")
 @Controller("environments/:environmentId/workflows")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class WorkflowController {

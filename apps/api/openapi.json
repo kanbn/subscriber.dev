@@ -19,6 +19,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -56,6 +59,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -85,6 +91,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -120,6 +129,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -159,6 +171,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -207,6 +222,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -242,6 +260,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -289,6 +310,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -324,6 +348,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -430,6 +457,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -481,6 +511,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -520,6 +553,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -568,6 +604,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -625,6 +664,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -663,6 +705,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -713,6 +758,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -772,6 +820,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -830,6 +881,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -878,6 +932,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -920,7 +977,8 @@
         "summary": "Unsubscribe",
         "tags": [
           "Unsubscribe"
-        ]
+        ],
+        "x-excluded": true
       }
     },
     "/environments/{environmentId}/workflows/trigger": {
@@ -963,6 +1021,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -1013,6 +1074,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -1086,6 +1150,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1148,6 +1215,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1195,6 +1265,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -1252,6 +1325,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1290,6 +1366,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -1361,6 +1440,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1422,6 +1504,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1482,6 +1567,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -1553,6 +1641,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1608,6 +1699,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -1668,6 +1762,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1726,6 +1823,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -1786,6 +1886,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1845,6 +1948,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1883,7 +1989,8 @@
         "summary": "Record an inbound bounce event",
         "tags": [
           "Bounces"
-        ]
+        ],
+        "x-excluded": true
       }
     },
     "/environments/{environmentId}/integrations/{type}": {
@@ -1938,6 +2045,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -1984,6 +2094,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -2021,6 +2134,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -2070,6 +2186,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -2109,6 +2228,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -2160,6 +2282,9 @@
           }
         },
         "security": [
+          {
+            "api-key": []
+          },
           {
             "bearer": []
           }
@@ -2229,6 +2354,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -2266,6 +2394,9 @@
         },
         "security": [
           {
+            "api-key": []
+          },
+          {
             "bearer": []
           }
         ],
@@ -2286,7 +2417,8 @@
         },
         "tags": [
           "StreamableHttp"
-        ]
+        ],
+        "x-excluded": true
       },
       "get": {
         "operationId": "StreamableHttpController_handleGetRequest",
@@ -2298,7 +2430,8 @@
         },
         "tags": [
           "StreamableHttp"
-        ]
+        ],
+        "x-excluded": true
       },
       "delete": {
         "operationId": "StreamableHttpController_handleDeleteRequest",
@@ -2310,7 +2443,8 @@
         },
         "tags": [
           "StreamableHttp"
-        ]
+        ],
+        "x-excluded": true
       }
     }
   },
@@ -2323,8 +2457,8 @@
   "tags": [],
   "servers": [
     {
-      "url": "http://localhost:4001",
-      "description": "Development"
+      "url": "https://api.subscriber.dev",
+      "description": "Cloud"
     }
   ],
   "components": {

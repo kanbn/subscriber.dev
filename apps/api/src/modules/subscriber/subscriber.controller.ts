@@ -18,6 +18,7 @@ import {
   ApiParam,
   ApiQuery,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -60,6 +61,7 @@ import { SubscriberService } from "./subscriber.service.js";
 
 @ApiTags("Subscribers")
 @ApiBearerAuth("bearer")
+@ApiSecurity("api-key")
 @Controller("environments/:environmentId/subscribers")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class SubscriberController {

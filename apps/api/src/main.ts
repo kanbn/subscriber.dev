@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { writeFileSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { cleanupOpenApiDoc, ZodValidationPipe } from "nestjs-zod";
@@ -40,10 +40,7 @@ async function bootstrap() {
       },
       "api-key",
     )
-    .addServer(
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000",
-      "Development",
-    )
+    .addServer("https://api.subscriber.dev", "Cloud")
     .build();
 
   // Required by nestjs-zod: hoists recursive/nested schemas (e.g. the
@@ -52,7 +49,13 @@ async function bootstrap() {
   // like orval can't resolve the raw document's local $defs refs.
   const document = cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
 
-  writeFileSync("./openapi.json", JSON.stringify(document, null, 2));
+  for (const path of ["/mcp", "/unsubscribe", "/bounces/inbound"])
+    for (const operation of Object.values(document.paths[path] ?? {}))
+      Object.assign(operation, { "x-excluded": true });
+
+  const spec = JSON.stringify(document, null, 2);
+  writeFileSync("./openapi.json", spec);
+  if (existsSync("../docs")) writeFileSync("../docs/openapi.json", spec);
   console.log("📄 OpenAPI spec written to openapi.json");
 
   app.getHttpAdapter().get("/openapi.json", (req, res) => {

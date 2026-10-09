@@ -20,6 +20,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -38,6 +39,7 @@ import {
 
 @ApiTags("Billing")
 @ApiBearerAuth("bearer")
+@ApiSecurity("api-key")
 @Controller("workspaces/:workspaceId/billing")
 @UseGuards(AuthGuard)
 export class BillingController {

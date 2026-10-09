@@ -1,0 +1,5879 @@
+{
+  "openapi": "3.1.0",
+  "paths": {
+    "/users/me": {
+      "get": {
+        "operationId": "getCurrentUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users": {
+      "put": {
+        "operationId": "updateCurrentUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update current user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/workspaces": {
+      "get": {
+        "operationId": "getWorkspaces",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkspaceDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user's workspaces",
+        "tags": [
+          "Workspaces"
+        ]
+      },
+      "post": {
+        "operationId": "createWorkspace",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkspaceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateWorkspaceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new workspace",
+        "tags": [
+          "Workspaces"
+        ]
+      }
+    },
+    "/workspaces/{workspaceId}/environments": {
+      "get": {
+        "operationId": "listEnvironments",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListEnvironmentsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List a workspace's environments",
+        "tags": [
+          "Workspaces"
+        ]
+      },
+      "post": {
+        "operationId": "createEnvironment",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnvironmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvironmentDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new environment in a workspace",
+        "tags": [
+          "Workspaces"
+        ]
+      }
+    },
+    "/workspaces/{workspaceId}/billing": {
+      "get": {
+        "operationId": "getBilling",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a workspace's plan and usage",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/workspaces/{workspaceId}/billing/checkout": {
+      "post": {
+        "operationId": "createCheckoutLink",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingLinkResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a link to start a paid plan (or the billing portal if the workspace already has one)",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/workspaces/{workspaceId}/billing/portal": {
+      "post": {
+        "operationId": "createBillingPortalLink",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingLinkResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a link to manage or cancel the workspace's plan",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers": {
+      "get": {
+        "description": "Returns a paginated list of active subscribers in the environment",
+        "operationId": "listSubscribers",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "description": "Filter to the subscriber with this exact email address",
+            "schema": {
+              "format": "email",
+              "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "externalId",
+            "required": false,
+            "in": "query",
+            "description": "Filter to the subscriber with this exact external ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Case-insensitive partial match across email, phone, externalId, firstName, lastName, and name",
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "name": "emailOptedIn",
+            "required": false,
+            "in": "query",
+            "description": "Filter by the subscriber's latest email preference (true = opted in, false = opted out)",
+            "schema": {
+              "type": "boolean",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListSubscribersResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List subscribers",
+        "tags": [
+          "Subscribers"
+        ]
+      },
+      "post": {
+        "description": "Creates a new subscriber in the specified environment and initialises their preferences",
+        "operationId": "createSubscriber",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscriberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Subscriber created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSubscriberResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error or duplicate subscriber"
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new subscriber",
+        "tags": [
+          "Subscribers"
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/tags": {
+      "get": {
+        "description": "Returns every distinct tag currently in use across subscribers in the environment",
+        "operationId": "listTags",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTagsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List distinct tags",
+        "tags": [
+          "Subscribers"
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/{subscriberId}": {
+      "get": {
+        "description": "Returns a single subscriber with their latest preferences",
+        "operationId": "getSubscriber",
+        "parameters": [
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSubscriberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a subscriber",
+        "tags": [
+          "Subscribers"
+        ]
+      },
+      "patch": {
+        "description": "Updates subscriber fields. All fields are optional.",
+        "operationId": "updateSubscriber",
+        "parameters": [
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscriberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSubscriberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a subscriber",
+        "tags": [
+          "Subscribers"
+        ]
+      },
+      "delete": {
+        "description": "Soft-deletes a subscriber. The record is retained but excluded from all queries.",
+        "operationId": "deleteSubscriber",
+        "parameters": [
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Subscriber deleted"
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a subscriber",
+        "tags": [
+          "Subscribers"
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/bulk": {
+      "post": {
+        "description": "Upserts up to 500 subscribers per request. Each row is matched to an existing subscriber by publicId, then externalId, then email (in that order); if none match, a new subscriber is created. Rows are processed independently, so one failing row does not fail the batch.",
+        "operationId": "bulkUpsertSubscribers",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkUpsertSubscribersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkUpsertSubscribersResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Bulk create or update subscribers",
+        "tags": [
+          "Subscribers"
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/{subscriberId}/preferences": {
+      "patch": {
+        "description": "Creates a new preference record with updated values (immutable pattern)",
+        "operationId": "updateSubscriberPreferences",
+        "parameters": [
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePreferencesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferences updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdatePreferencesResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscriber or preferences not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update subscriber preferences",
+        "tags": [
+          "Subscribers"
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/{subscriberId}/tags": {
+      "post": {
+        "description": "Adds a tag to the subscriber. Adding a tag that's already present is a no-op.",
+        "operationId": "addSubscriberTag",
+        "parameters": [
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a tag to a subscriber",
+        "tags": [
+          "Subscribers"
+        ]
+      }
+    },
+    "/environments/{environmentId}/subscribers/{subscriberId}/tags/{tag}": {
+      "delete": {
+        "operationId": "removeSubscriberTag",
+        "parameters": [
+          {
+            "name": "subscriberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tag",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tag removed"
+          },
+          "404": {
+            "description": "Subscriber not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a tag from a subscriber",
+        "tags": [
+          "Subscribers"
+        ]
+      }
+    },
+    "/unsubscribe": {
+      "post": {
+        "description": "Called from the unsubscribe confirmation page linked from emails. Verifies the signed token and turns off email notifications for the subscriber it identifies. No API key required.",
+        "operationId": "unsubscribe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsubscribeBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsubscribeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid or expired unsubscribe link"
+          }
+        },
+        "summary": "Unsubscribe",
+        "tags": [
+          "Unsubscribe"
+        ],
+        "x-excluded": true
+      }
+    },
+    "/environments/{environmentId}/workflows/trigger": {
+      "post": {
+        "description": "Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.",
+        "operationId": "triggerWorkflow",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerWorkflowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriggerWorkflowResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment, workflow, or subscriber not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Trigger a workflow",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows": {
+      "post": {
+        "description": "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started, and `exitConditions` stop a person's active run on others.",
+        "operationId": "createWorkflow",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkflowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new workflow",
+        "tags": [
+          "Workflows"
+        ]
+      },
+      "get": {
+        "description": "Returns a paginated list of workflows in the environment",
+        "operationId": "listWorkflows",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "automation",
+                "broadcast"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListWorkflowsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List workflows",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/runs": {
+      "get": {
+        "description": "Returns a paginated list of trigger runs across every workflow in the environment, most recent first",
+        "operationId": "listEnvironmentRuns",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListEnvironmentRunsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all workflow runs",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}": {
+      "get": {
+        "description": "Returns a single workflow with its steps",
+        "operationId": "getWorkflow",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowDetailResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a workflow",
+        "tags": [
+          "Workflows"
+        ]
+      },
+      "patch": {
+        "description": "Updates workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers` and `exitConditions`.",
+        "operationId": "updateWorkflow",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkflowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a workflow",
+        "tags": [
+          "Workflows"
+        ]
+      },
+      "delete": {
+        "description": "Soft-deletes a workflow. Existing in-flight runs are unaffected.",
+        "operationId": "deleteWorkflow",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workflow deleted"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a workflow",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/runs": {
+      "get": {
+        "description": "Returns a paginated list of trigger runs for this workflow, most recent first",
+        "operationId": "listWorkflowRuns",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListRunsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List runs for a workflow",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcast/preview": {
+      "post": {
+        "description": "Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.",
+        "operationId": "previewBroadcast",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerBroadcastDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewBroadcastResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Workflow is paused or has no steps"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Preview a broadcast's audience size",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcast": {
+      "post": {
+        "description": "Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.",
+        "operationId": "triggerBroadcast",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerBroadcastDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriggerBroadcastResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Workflow is paused or has no steps"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Trigger a broadcast",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts": {
+      "get": {
+        "description": "Returns a paginated list of broadcasts triggered for this workflow, most recent first",
+        "operationId": "listBroadcasts",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListBroadcastsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List broadcasts for a workflow",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}": {
+      "get": {
+        "description": "Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)",
+        "operationId": "getBroadcast",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastDetailResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a broadcast",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/pause": {
+      "post": {
+        "description": "Holds every send that hasn't gone out yet until the broadcast is resumed. Already-sent emails are unaffected.",
+        "operationId": "pauseBroadcast",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          },
+          "409": {
+            "description": "Broadcast isn't pending or queued"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Pause a broadcast",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/resume": {
+      "post": {
+        "description": "Lets a paused broadcast carry on sending. The remaining sends keep their original spacing, pushed back by however long it was paused.",
+        "operationId": "resumeBroadcast",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          },
+          "409": {
+            "description": "Broadcast isn't paused"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resume a paused broadcast",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/cancel": {
+      "post": {
+        "description": "Permanently stops a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone.",
+        "operationId": "cancelBroadcast",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          },
+          "409": {
+            "description": "Broadcast isn't pending, queued or paused"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel a broadcast",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/redispatch": {
+      "post": {
+        "description": "Re-runs setup for every matching subscriber who hasn't been set up yet (for example after setup jobs failed), spread over a fresh send window. Subscribers already set up are skipped, so nobody receives the email twice.",
+        "operationId": "redispatchBroadcast",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "broadcastId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workflow or broadcast not found"
+          },
+          "409": {
+            "description": "Broadcast isn't queued"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Re-dispatch a broadcast",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/bounces/inbound": {
+      "post": {
+        "description": "Generic bounce-recording endpoint, identified by the run step's publicId - callers are expected to have that publicId available via whatever mechanism they use to learn about the bounce (e.g. a provider's native webhook echoing back metadata set at send time). Authenticated with a shared bearer secret (BOUNCE_WEBHOOK_SECRET), not an API key. Enqueues the bounce for async processing and returns immediately.",
+        "operationId": "recordInboundBounce",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BounceWebhookBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Bounce event enqueued"
+          },
+          "401": {
+            "description": "Invalid or missing shared secret"
+          },
+          "404": {
+            "description": "Run step not found"
+          }
+        },
+        "summary": "Record an inbound bounce event",
+        "tags": [
+          "Bounces"
+        ],
+        "x-excluded": true
+      }
+    },
+    "/environments/{environmentId}/integrations/{type}": {
+      "patch": {
+        "description": "Creates or updates the integration of the given type for this environment (e.g. \"smtp\"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full.",
+        "operationId": "upsertIntegration",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertIntegrationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Integration saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid config or failed verification"
+          },
+          "404": {
+            "description": "Environment or integration type not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Configure an integration",
+        "tags": [
+          "Integrations"
+        ]
+      },
+      "get": {
+        "description": "Returns the sanitized config for a single integration type (no secrets).",
+        "operationId": "getIntegration",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment or integration not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get an integration",
+        "tags": [
+          "Integrations"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteIntegration",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Integration deleted"
+          },
+          "404": {
+            "description": "Environment or integration not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove an integration",
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/environments/{environmentId}/integrations/{type}/primary": {
+      "patch": {
+        "description": "Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.",
+        "operationId": "setPrimaryIntegration",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration promoted to primary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment or integration not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Set an integration as primary",
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/environments/{environmentId}/integrations": {
+      "get": {
+        "description": "Returns every integration configured for this environment, sanitized (no secrets).",
+        "operationId": "listIntegrations",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListIntegrationsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List configured integrations",
+        "tags": [
+          "Integrations"
+        ]
+      }
+    },
+    "/environments/{environmentId}/analytics": {
+      "get": {
+        "description": "Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.",
+        "operationId": "getAnalytics",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 365,
+              "default": 30,
+              "type": "number"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get environment-wide analytics",
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/environments/{environmentId}/inbound-events": {
+      "get": {
+        "description": "Webhook events received from inbound sources (e.g. Stripe) for this environment, most recent first, with the events they matched and what happened (workflow triggered, no workflow triggered by it, person not found, etc.).",
+        "operationId": "listInboundEvents",
+        "parameters": [
+          {
+            "name": "source",
+            "required": false,
+            "in": "query",
+            "description": "Only events from this source, e.g. \"stripe\".",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListInboundEventsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List inbound webhook events",
+        "tags": [
+          "Inbound events"
+        ]
+      }
+    },
+    "/environments/{environmentId}/trigger-sources": {
+      "get": {
+        "description": "Integrations whose events can trigger workflows (e.g. Stripe), whether each is connected in this environment, and the events each offers.",
+        "operationId": "listTriggerSources",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTriggerSourcesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List workflow trigger sources",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/mcp": {
+      "post": {
+        "operationId": "StreamableHttpController_handlePostRequest",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "StreamableHttp"
+        ],
+        "x-excluded": true
+      },
+      "get": {
+        "operationId": "StreamableHttpController_handleGetRequest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "StreamableHttp"
+        ],
+        "x-excluded": true
+      },
+      "delete": {
+        "operationId": "StreamableHttpController_handleDeleteRequest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "StreamableHttp"
+        ],
+        "x-excluded": true
+      }
+    }
+  },
+  "info": {
+    "title": "Subscriber API",
+    "description": "REST API for Subscriber - Customer.io alternative",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://api.subscriber.dev",
+      "description": "Cloud"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "Enter JWT token"
+      },
+      "api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Enter API key"
+      }
+    },
+    "schemas": {
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email": {
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "apiKeys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "prefix": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "prefix"
+              ]
+            }
+          }
+        },
+        "required": [
+          "publicId",
+          "name",
+          "email",
+          "image",
+          "apiKeys"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateUserResponseDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "publicId",
+          "name",
+          "image"
+        ]
+      },
+      "WorkspaceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "publicId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "publicId",
+          "name",
+          "slug"
+        ]
+      },
+      "CreateWorkspaceDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "CreateWorkspaceResponseDto": {
+        "type": "object",
+        "properties": {
+          "workspace": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "publicId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "publicId",
+              "name",
+              "slug"
+            ]
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "publicId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "publicId",
+              "name",
+              "slug"
+            ]
+          }
+        },
+        "required": [
+          "workspace",
+          "environment"
+        ]
+      },
+      "ListEnvironmentsResponseDto": {
+        "type": "object",
+        "properties": {
+          "environments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "publicId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "publicId",
+                "name",
+                "slug"
+              ]
+            }
+          }
+        },
+        "required": [
+          "environments"
+        ]
+      },
+      "CreateEnvironmentDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "EnvironmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "publicId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "publicId",
+          "name",
+          "slug"
+        ]
+      },
+      "BillingResponseDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "False when billing is off, e.g. on a self-hosted install."
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "starter",
+              "growth",
+              "scale",
+              "pro",
+              "business"
+            ],
+            "description": "The current plan, e.g. \"growth\"."
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "month",
+                  "year"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Stripe subscription status, e.g. \"active\" or \"past_due\"."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currentPeriodEnd": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cancelAtPeriodEnd": {
+            "type": "boolean"
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "subscribers": {
+                "type": "number",
+                "description": "Subscribers billed on: opted-in subscribers in production, or distinct subscribers emailed this period if that's more."
+              },
+              "subscriberLimit": {
+                "type": "number"
+              },
+              "sendsThisMonth": {
+                "type": "number",
+                "description": "Email and webhook steps sent this calendar month (UTC)."
+              },
+              "sendLimit": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "description": "Monthly send limit; null when the plan doesn't limit sends."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "subscribers",
+              "subscriberLimit",
+              "sendsThisMonth",
+              "sendLimit"
+            ]
+          },
+          "overLimit": {
+            "type": "boolean"
+          },
+          "ceiling": {
+            "type": "number",
+            "description": "Sends to subscribers past this aren't sent until an upgrade: the free plan's limit, or one plan up for paid plans."
+          },
+          "movesUpOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                "description": "When an over-limit paid workspace moves up one plan (3 days after going over); null when not over."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "planAtRenewal": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "The plan this workspace moves to at its next renewal, from its subscriber count; \"custom\" above the largest plan; null when it stays the same."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "enabled",
+          "plan",
+          "interval",
+          "status",
+          "currentPeriodEnd",
+          "cancelAtPeriodEnd",
+          "usage",
+          "overLimit",
+          "ceiling",
+          "movesUpOn",
+          "planAtRenewal"
+        ]
+      },
+      "CreateCheckoutDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "starter",
+              "growth",
+              "scale",
+              "pro",
+              "business"
+            ],
+            "description": "A paid plan, e.g. \"growth\"."
+          },
+          "interval": {
+            "default": "month",
+            "type": "string",
+            "enum": [
+              "month",
+              "year"
+            ]
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      },
+      "BillingLinkResponseDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A Stripe page to open in the browser."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "checkout",
+              "portal",
+              "changed"
+            ],
+            "description": "checkout: open the URL to start a plan. changed: the existing plan was changed straight away, prorated. portal: open the URL to manage card, invoices or cancel."
+          }
+        },
+        "required": [
+          "url",
+          "kind"
+        ]
+      },
+      "ListSubscribersResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscribers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "phone": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "externalId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "firstName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lastName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "attributes": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdVia": {
+                  "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "publicId",
+                "email",
+                "phone",
+                "externalId",
+                "firstName",
+                "lastName",
+                "name",
+                "attributes",
+                "createdVia",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "subscribers",
+          "limit",
+          "offset"
+        ]
+      },
+      "ListTagsResponseDto": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "tags"
+        ]
+      },
+      "GetSubscriberResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscriber": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "externalId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "firstName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lastName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "attributes": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "createdVia": {
+                "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "unsubscribeUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "publicId",
+              "email",
+              "phone",
+              "externalId",
+              "firstName",
+              "lastName",
+              "name",
+              "attributes",
+              "createdVia",
+              "createdAt",
+              "updatedAt",
+              "unsubscribeUrl",
+              "tags"
+            ]
+          },
+          "preferences": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "publicId": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "boolean"
+                  },
+                  "version": {
+                    "type": "number"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  }
+                },
+                "required": [
+                  "publicId",
+                  "email",
+                  "version",
+                  "createdAt"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "subscriber",
+          "preferences"
+        ]
+      },
+      "CreateSubscriberDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "description": "Bring your own identifier for this subscriber. Must be unique within the environment. If omitted, one is generated automatically.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "preferences": {
+            "default": {
+              "email": true
+            },
+            "type": "object",
+            "properties": {
+              "email": {
+                "default": true,
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "CreateSubscriberResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscriber": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "externalId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "firstName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lastName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "attributes": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "createdVia": {
+                "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "unsubscribeUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "publicId",
+              "email",
+              "phone",
+              "externalId",
+              "firstName",
+              "lastName",
+              "name",
+              "attributes",
+              "createdVia",
+              "createdAt",
+              "updatedAt",
+              "unsubscribeUrl"
+            ]
+          },
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "number"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              }
+            },
+            "required": [
+              "publicId",
+              "email",
+              "version",
+              "createdAt"
+            ]
+          }
+        },
+        "required": [
+          "subscriber",
+          "preferences"
+        ]
+      },
+      "BulkUpsertSubscribersDto": {
+        "type": "object",
+        "properties": {
+          "subscribers": {
+            "minItems": 1,
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "description": "Bring your own identifier. Used (along with externalId and email) to find an existing subscriber to update; if none match, a new subscriber is created.",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                },
+                "phone": {
+                  "type": "string"
+                },
+                "externalId": {
+                  "type": "string"
+                },
+                "firstName": {
+                  "type": "string"
+                },
+                "lastName": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "attributes": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                },
+                "preferences": {
+                  "description": "Omit entirely to leave existing preferences untouched on update.",
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "subscribers"
+        ]
+      },
+      "BulkUpsertSubscribersResponseDto": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "number"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "created",
+                    "updated",
+                    "error"
+                  ]
+                },
+                "subscriber": {
+                  "type": "object",
+                  "properties": {
+                    "publicId": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "phone": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "firstName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "lastName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "attributes": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {}
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdVia": {
+                      "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "unsubscribeUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "publicId",
+                    "email",
+                    "phone",
+                    "externalId",
+                    "firstName",
+                    "lastName",
+                    "name",
+                    "attributes",
+                    "createdVia",
+                    "createdAt",
+                    "updatedAt",
+                    "unsubscribeUrl"
+                  ]
+                },
+                "preferences": {
+                  "type": "object",
+                  "properties": {
+                    "publicId": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "boolean"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    }
+                  },
+                  "required": [
+                    "publicId",
+                    "email",
+                    "version",
+                    "createdAt"
+                  ]
+                },
+                "error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "index",
+                "status"
+              ]
+            }
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "created": {
+                "type": "number"
+              },
+              "updated": {
+                "type": "number"
+              },
+              "errored": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "created",
+              "updated",
+              "errored"
+            ]
+          }
+        },
+        "required": [
+          "results",
+          "summary"
+        ]
+      },
+      "UpdateSubscriberDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "externalId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "firstName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lastName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "attributes": {
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "UpdateSubscriberResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscriber": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "externalId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "firstName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lastName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "attributes": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "createdVia": {
+                "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "unsubscribeUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "publicId",
+              "email",
+              "phone",
+              "externalId",
+              "firstName",
+              "lastName",
+              "name",
+              "attributes",
+              "createdVia",
+              "createdAt",
+              "updatedAt",
+              "unsubscribeUrl"
+            ]
+          }
+        },
+        "required": [
+          "subscriber"
+        ]
+      },
+      "UpdatePreferencesDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdatePreferencesResponseDto": {
+        "type": "object",
+        "properties": {
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "subscriberPublicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "number"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              }
+            },
+            "required": [
+              "publicId",
+              "subscriberPublicId",
+              "email",
+              "version",
+              "createdAt"
+            ]
+          }
+        },
+        "required": [
+          "preferences"
+        ]
+      },
+      "AddTagDto": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "tag"
+        ]
+      },
+      "TagResponseDto": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag"
+        ]
+      },
+      "UnsubscribeBodyDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "UnsubscribeResponseDto": {
+        "type": "object",
+        "properties": {
+          "unsubscribed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "unsubscribed"
+        ]
+      },
+      "TriggerWorkflowDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The workflow key, e.g. \"user-signup\"."
+          },
+          "subscriber": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "externalId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              }
+            }
+          },
+          "payload": {
+            "description": "Arbitrary data merged into {{variable}} interpolation alongside subscriber fields.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "key",
+          "subscriber"
+        ]
+      },
+      "TriggerWorkflowResponseDto": {
+        "type": "object",
+        "properties": {
+          "triggered": {
+            "type": "boolean"
+          },
+          "runPublicId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "triggered"
+        ]
+      },
+      "CreateWorkflowDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "Stable identifier used to trigger this workflow, e.g. \"user-signup\". Unique within the environment."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "type": {
+            "default": "automation",
+            "description": "Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.",
+            "type": "string",
+            "enum": [
+              "automation",
+              "broadcast"
+            ]
+          },
+          "steps": {
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "email"
+                    },
+                    "delayMs": {
+                      "default": 0,
+                      "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "subject": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class=\"button\" to a link to render it as a call-to-action button."
+                    },
+                    "layout": {
+                      "default": "default",
+                      "description": "\"default\" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). \"none\" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is.",
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "none"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "subject",
+                    "body"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "webhook"
+                    },
+                    "delayMs": {
+                      "default": 0,
+                      "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Destination URL the JSON payload is POSTed to."
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON."
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "url",
+                    "body"
+                  ]
+                }
+              ]
+            }
+          },
+          "triggers": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                }
+              },
+              "required": [
+                "source",
+                "event"
+              ]
+            },
+            "description": "Events from connected integrations that start this workflow for the person they're about. Automation workflows only; the integration must be connected first."
+          },
+          "exitConditions": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                }
+              },
+              "required": [
+                "source",
+                "event"
+              ]
+            },
+            "description": "Events from connected integrations that stop this workflow for the person they're about: their active runs are cancelled and unsent steps never send. Checked before triggers, so an event in both restarts the workflow. Automation workflows only; the integration must be connected first."
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "steps"
+        ]
+      },
+      "WorkflowResponseDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "automation",
+              "broadcast"
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "stepOrder": {
+                  "type": "number"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "delayMs": {
+                  "type": "number"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "layout": {
+                  "description": "Email steps only. Steps saved before layouts existed have no value and use \"default\".",
+                  "type": "string",
+                  "enum": [
+                    "default",
+                    "none"
+                  ]
+                },
+                "url": {
+                  "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "publicId",
+                "stepOrder",
+                "type",
+                "delayMs"
+              ]
+            }
+          },
+          "triggers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable name of the event."
+                },
+                "active": {
+                  "type": "boolean",
+                  "description": "False while the source's integration is disconnected; it resumes once it's reconnected."
+                }
+              },
+              "required": [
+                "source",
+                "event",
+                "label",
+                "active"
+              ]
+            }
+          },
+          "exitConditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable name of the event."
+                },
+                "active": {
+                  "type": "boolean",
+                  "description": "False while the source's integration is disconnected; it resumes once it's reconnected."
+                }
+              },
+              "required": [
+                "source",
+                "event",
+                "label",
+                "active"
+              ]
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "publicId",
+          "key",
+          "name",
+          "description",
+          "status",
+          "type",
+          "steps",
+          "triggers",
+          "exitConditions",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ListWorkflowsResponseDto": {
+        "type": "object",
+        "properties": {
+          "workflows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "key": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "paused"
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "automation",
+                    "broadcast"
+                  ]
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "publicId": {
+                        "type": "string"
+                      },
+                      "stepOrder": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "delayMs": {
+                        "type": "number"
+                      },
+                      "subject": {
+                        "type": "string"
+                      },
+                      "body": {
+                        "type": "string"
+                      },
+                      "layout": {
+                        "description": "Email steps only. Steps saved before layouts existed have no value and use \"default\".",
+                        "type": "string",
+                        "enum": [
+                          "default",
+                          "none"
+                        ]
+                      },
+                      "url": {
+                        "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "publicId",
+                      "stepOrder",
+                      "type",
+                      "delayMs"
+                    ]
+                  }
+                },
+                "triggers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                      },
+                      "event": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Human-readable name of the event."
+                      },
+                      "active": {
+                        "type": "boolean",
+                        "description": "False while the source's integration is disconnected; it resumes once it's reconnected."
+                      }
+                    },
+                    "required": [
+                      "source",
+                      "event",
+                      "label",
+                      "active"
+                    ]
+                  }
+                },
+                "exitConditions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                      },
+                      "event": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Human-readable name of the event."
+                      },
+                      "active": {
+                        "type": "boolean",
+                        "description": "False while the source's integration is disconnected; it resumes once it's reconnected."
+                      }
+                    },
+                    "required": [
+                      "source",
+                      "event",
+                      "label",
+                      "active"
+                    ]
+                  }
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "publicId",
+                "key",
+                "name",
+                "description",
+                "status",
+                "type",
+                "steps",
+                "triggers",
+                "exitConditions",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "workflows",
+          "limit",
+          "offset"
+        ]
+      },
+      "ListEnvironmentRunsResponseDto": {
+        "type": "object",
+        "properties": {
+          "runs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "completed",
+                    "cancelled"
+                  ]
+                },
+                "triggeredAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "completedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "subscriber": {
+                  "type": "object",
+                  "properties": {
+                    "publicId": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "publicId",
+                    "email",
+                    "name",
+                    "externalId"
+                  ]
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "stepOrder": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "sent",
+                          "skipped",
+                          "failed",
+                          "cancelled",
+                          "bounced"
+                        ]
+                      },
+                      "scheduledAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "sentAt": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "errorMessage": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "bounceType": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "hard",
+                              "soft"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "stepOrder",
+                      "type",
+                      "status",
+                      "scheduledAt",
+                      "sentAt",
+                      "errorMessage",
+                      "bounceType"
+                    ]
+                  }
+                },
+                "workflow": {
+                  "type": "object",
+                  "properties": {
+                    "publicId": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "publicId",
+                    "key",
+                    "name"
+                  ]
+                }
+              },
+              "required": [
+                "publicId",
+                "status",
+                "triggeredAt",
+                "completedAt",
+                "subscriber",
+                "steps",
+                "workflow"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "runs",
+          "limit",
+          "offset"
+        ]
+      },
+      "WorkflowDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "automation",
+              "broadcast"
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "stepOrder": {
+                  "type": "number"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "delayMs": {
+                  "type": "number"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "layout": {
+                  "description": "Email steps only. Steps saved before layouts existed have no value and use \"default\".",
+                  "type": "string",
+                  "enum": [
+                    "default",
+                    "none"
+                  ]
+                },
+                "url": {
+                  "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "publicId",
+                "stepOrder",
+                "type",
+                "delayMs"
+              ]
+            }
+          },
+          "triggers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable name of the event."
+                },
+                "active": {
+                  "type": "boolean",
+                  "description": "False while the source's integration is disconnected; it resumes once it's reconnected."
+                }
+              },
+              "required": [
+                "source",
+                "event",
+                "label",
+                "active"
+              ]
+            }
+          },
+          "exitConditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable name of the event."
+                },
+                "active": {
+                  "type": "boolean",
+                  "description": "False while the source's integration is disconnected; it resumes once it's reconnected."
+                }
+              },
+              "required": [
+                "source",
+                "event",
+                "label",
+                "active"
+              ]
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "sentCount": {
+            "type": "number"
+          },
+          "failedCount": {
+            "type": "number"
+          },
+          "skippedCount": {
+            "type": "number"
+          },
+          "pendingCount": {
+            "type": "number"
+          },
+          "bouncedCount": {
+            "type": "number"
+          },
+          "hardBounceCount": {
+            "type": "number"
+          },
+          "softBounceCount": {
+            "type": "number"
+          },
+          "successRate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "publicId",
+          "key",
+          "name",
+          "description",
+          "status",
+          "type",
+          "steps",
+          "triggers",
+          "exitConditions",
+          "createdAt",
+          "updatedAt",
+          "sentCount",
+          "failedCount",
+          "skippedCount",
+          "pendingCount",
+          "bouncedCount",
+          "hardBounceCount",
+          "softBounceCount",
+          "successRate"
+        ]
+      },
+      "UpdateWorkflowDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused"
+            ]
+          },
+          "steps": {
+            "description": "If provided, replaces ALL existing steps for this workflow.",
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "email"
+                    },
+                    "delayMs": {
+                      "default": 0,
+                      "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "subject": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields, subscriber.attributes, and the trigger payload, plus {{unsubscribeUrl}} for this subscriber's unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class=\"button\" to a link to render it as a call-to-action button."
+                    },
+                    "layout": {
+                      "default": "default",
+                      "description": "\"default\" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). \"none\" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is.",
+                      "type": "string",
+                      "enum": [
+                        "default",
+                        "none"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "subject",
+                    "body"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "webhook"
+                    },
+                    "delayMs": {
+                      "default": 0,
+                      "description": "Milliseconds to wait after the previous step (or after trigger, for the first step) before sending this step.",
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Destination URL the JSON payload is POSTed to."
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "JSON payload template, rendered via Liquid (https://liquidjs.com) then POSTed as-is with Content-Type: application/json. e.g. {\"content\": \"{{ subscriber.email | json }} just signed up!\"} for a Discord webhook. Use the `json` filter around interpolated values to keep the result valid JSON."
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "url",
+                    "body"
+                  ]
+                }
+              ]
+            }
+          },
+          "triggers": {
+            "description": "If provided, replaces ALL existing triggers for this workflow. Automation workflows only; each trigger's integration must be connected.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                }
+              },
+              "required": [
+                "source",
+                "event"
+              ]
+            }
+          },
+          "exitConditions": {
+            "description": "If provided, replaces ALL existing exit conditions for this workflow. Each one's integration must be connected.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Connected integration that fires the trigger, e.g. \"stripe\"."
+                },
+                "event": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "One of the source's events (see list_trigger_sources), e.g. \"trial_started\", or a raw event type such as \"checkout.session.completed\"."
+                }
+              },
+              "required": [
+                "source",
+                "event"
+              ]
+            }
+          }
+        }
+      },
+      "ListRunsResponseDto": {
+        "type": "object",
+        "properties": {
+          "runs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "completed",
+                    "cancelled"
+                  ]
+                },
+                "triggeredAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "completedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "subscriber": {
+                  "type": "object",
+                  "properties": {
+                    "publicId": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "publicId",
+                    "email",
+                    "name",
+                    "externalId"
+                  ]
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "stepOrder": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "sent",
+                          "skipped",
+                          "failed",
+                          "cancelled",
+                          "bounced"
+                        ]
+                      },
+                      "scheduledAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "sentAt": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "errorMessage": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "bounceType": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "hard",
+                              "soft"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "stepOrder",
+                      "type",
+                      "status",
+                      "scheduledAt",
+                      "sentAt",
+                      "errorMessage",
+                      "bounceType"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "publicId",
+                "status",
+                "triggeredAt",
+                "completedAt",
+                "subscriber",
+                "steps"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "runs",
+          "limit",
+          "offset"
+        ]
+      },
+      "TriggerBroadcastDto__schema0": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "optedIn"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "tag"
+              },
+              "tag": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "type",
+              "tag"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "attribute"
+              },
+              "field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "op": {
+                "type": "string",
+                "enum": [
+                  "equals",
+                  "contains",
+                  "exists"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "field",
+              "op"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "and"
+              },
+              "clauses": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+                }
+              }
+            },
+            "required": [
+              "type",
+              "clauses"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "or"
+              },
+              "clauses": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+                }
+              }
+            },
+            "required": [
+              "type",
+              "clauses"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "not"
+              },
+              "clause": {
+                "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+              }
+            },
+            "required": [
+              "type",
+              "clause"
+            ]
+          }
+        ]
+      },
+      "TriggerBroadcastDto": {
+        "type": "object",
+        "properties": {
+          "audience": {
+            "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+          },
+          "sendOverHours": {
+            "description": "Spread sends evenly over this many hours (max 168) instead of sending as fast as possible. Gentler on sender reputation for large audiences, and leaves time to pause or cancel.",
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 168
+          },
+          "allowOverPlan": {
+            "description": "subscriber.dev cloud: confirm sending to more subscribers than the plan includes, which moves the workspace up one plan after 3 days. Without it, such a broadcast is refused with an explanation; ask the user before setting it.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "audience"
+        ]
+      },
+      "PreviewBroadcastResponseDto": {
+        "type": "object",
+        "properties": {
+          "matchedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "matchedCount"
+        ]
+      },
+      "TriggerBroadcastResponseDto": {
+        "type": "object",
+        "properties": {
+          "broadcastId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "queued",
+              "failed",
+              "paused",
+              "cancelled"
+            ]
+          }
+        },
+        "required": [
+          "broadcastId",
+          "status"
+        ]
+      },
+      "ListBroadcastsResponseDto": {
+        "type": "object",
+        "properties": {
+          "broadcasts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "queued",
+                    "failed",
+                    "paused",
+                    "cancelled"
+                  ]
+                },
+                "matchedCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "sendOverHours": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "publicId",
+                "status",
+                "matchedCount",
+                "sendOverHours",
+                "createdAt"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "broadcasts",
+          "limit",
+          "offset"
+        ]
+      },
+      "BroadcastDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "queued",
+              "failed",
+              "paused",
+              "cancelled"
+            ]
+          },
+          "matchedCount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sendOverHours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "sentCount": {
+            "type": "number"
+          },
+          "failedCount": {
+            "type": "number"
+          },
+          "skippedCount": {
+            "type": "number"
+          },
+          "pendingCount": {
+            "type": "number"
+          },
+          "bouncedCount": {
+            "type": "number"
+          },
+          "hardBounceCount": {
+            "type": "number"
+          },
+          "softBounceCount": {
+            "type": "number"
+          },
+          "successRate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "publicId",
+          "status",
+          "matchedCount",
+          "sendOverHours",
+          "createdAt",
+          "sentCount",
+          "failedCount",
+          "skippedCount",
+          "pendingCount",
+          "bouncedCount",
+          "hardBounceCount",
+          "softBounceCount",
+          "successRate"
+        ]
+      },
+      "BroadcastSummaryDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "queued",
+              "failed",
+              "paused",
+              "cancelled"
+            ]
+          },
+          "matchedCount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sendOverHours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "publicId",
+          "status",
+          "matchedCount",
+          "sendOverHours",
+          "createdAt"
+        ]
+      },
+      "BounceWebhookBodyDto": {
+        "type": "object",
+        "properties": {
+          "runStepPublicId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bounceType": {
+            "type": "string",
+            "enum": [
+              "hard",
+              "soft"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "runStepPublicId",
+          "bounceType",
+          "reason"
+        ]
+      },
+      "UpsertIntegrationDto": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "IntegrationResponseDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "number"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "type",
+          "priority",
+          "updatedAt"
+        ]
+      },
+      "ListIntegrationsResponseDto": {
+        "type": "object",
+        "properties": {
+          "integrations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "number"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "type",
+                "priority",
+                "updatedAt"
+              ],
+              "additionalProperties": {}
+            }
+          }
+        },
+        "required": [
+          "integrations"
+        ]
+      },
+      "AnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "number"
+          },
+          "subscribers": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "newInPeriod": {
+                "type": "number"
+              },
+              "optedOut": {
+                "type": "number"
+              },
+              "optedOutInPeriod": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "total",
+              "newInPeriod",
+              "optedOut",
+              "optedOutInPeriod"
+            ]
+          },
+          "sends": {
+            "type": "object",
+            "properties": {
+              "sent": {
+                "type": "number"
+              },
+              "failed": {
+                "type": "number"
+              },
+              "skipped": {
+                "type": "number"
+              },
+              "pending": {
+                "type": "number"
+              },
+              "bounced": {
+                "type": "number"
+              },
+              "successRate": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "sent",
+              "failed",
+              "skipped",
+              "pending",
+              "bounced",
+              "successRate"
+            ]
+          },
+          "bounces": {
+            "type": "object",
+            "properties": {
+              "hard": {
+                "type": "number"
+              },
+              "soft": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "hard",
+              "soft"
+            ]
+          }
+        },
+        "required": [
+          "days",
+          "subscribers",
+          "sends",
+          "bounces"
+        ]
+      },
+      "ListInboundEventsResponseDto": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string"
+                },
+                "externalEventId": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "received",
+                    "processed",
+                    "ignored",
+                    "failed"
+                  ]
+                },
+                "matchedEvents": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "outcome": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subscriberPublicId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "subscriberEmail": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "processedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "source",
+                "externalEventId",
+                "type",
+                "status",
+                "matchedEvents",
+                "outcome",
+                "subscriberPublicId",
+                "subscriberEmail",
+                "createdAt",
+                "processedAt"
+              ]
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "events",
+          "limit",
+          "offset"
+        ]
+      },
+      "ListTriggerSourcesResponseDto": {
+        "type": "object",
+        "properties": {
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "description": "Use as a trigger's `source`, e.g. \"stripe\"."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "connected": {
+                  "type": "boolean",
+                  "description": "Whether the integration is set up in this environment. Triggers can only be added for connected sources."
+                },
+                "events": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Use as a trigger's `event`."
+                      },
+                      "label": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "label"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "source",
+                "name",
+                "connected",
+                "events"
+              ]
+            }
+          }
+        },
+        "required": [
+          "sources"
+        ]
+      }
+    }
+  }
+}

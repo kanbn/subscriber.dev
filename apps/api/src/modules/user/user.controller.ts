@@ -13,6 +13,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -30,6 +31,7 @@ import { UserService } from "./user.service.js";
 
 @ApiTags("Users")
 @ApiBearerAuth("bearer")
+@ApiSecurity("api-key")
 @Controller("users")
 @UseGuards(AuthGuard)
 export class UserController {
