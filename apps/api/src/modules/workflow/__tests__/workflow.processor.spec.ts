@@ -382,21 +382,24 @@ describe("process", () => {
     expect(html).toContain('href="https://example.com/unsubscribe?token=abc"');
   });
 
-  it("also supports {{unsubscribeUrl}} interpolation for custom placement, without duplicating the auto-footer", async () => {
-    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
-      ...mockRunStep,
-      configSnapshot: {
-        subject: "Hi {{ subscriber.firstName }}",
-        body: "Bye - {{unsubscribeUrl}}",
-      },
-    } as any);
+  it.each(["{{unsubscribeUrl}}", "{{ unsubscribeUrl }}"])(
+    "also supports %s interpolation for custom placement, without duplicating the auto-footer",
+    async (token) => {
+      vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+        ...mockRunStep,
+        configSnapshot: {
+          subject: "Hi {{ subscriber.firstName }}",
+          body: `Bye - ${token}`,
+        },
+      } as any);
 
-    await processor.process(makeJob());
+      await processor.process(makeJob());
 
-    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
-    expect(html).toContain("Bye - https://example.com/unsubscribe?token=abc");
-    expect(html).not.toContain("Don&#x27;t want these emails?");
-  });
+      const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+      expect(html).toContain("Bye - https://example.com/unsubscribe?token=abc");
+      expect(html).not.toContain("Don&#x27;t want these emails?");
+    },
+  );
 
   it("supports Liquid {% if %} conditionals, taking the truthy branch when the subscriber has a first name", async () => {
     vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({

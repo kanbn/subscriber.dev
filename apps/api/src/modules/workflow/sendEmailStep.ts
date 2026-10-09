@@ -102,8 +102,9 @@ export async function sendEmailStep(
   const context = { ...baseContext, unsubscribeUrl };
   const subject = await renderTemplate(stepConfig.subject, context);
   const interpolatedBody = await renderTemplate(stepConfig.body, context);
-  const bodyHasUnsubscribeToken =
-    stepConfig.body.includes("{{unsubscribeUrl}}");
+  const bodyHasUnsubscribeToken = /\{\{-?\s*unsubscribeUrl\b/.test(
+    stepConfig.body,
+  );
   const footerUnsubscribeUrl =
     unsubscribeUrl && !bodyHasUnsubscribeToken ? unsubscribeUrl : undefined;
   const bareHtml = footerUnsubscribeUrl

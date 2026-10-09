@@ -41,4 +41,4 @@ Add `class="button"` to a link to show it as a button:
 <a class="button" href="https://acme.com/start">Get started</a>
 ```
 
-To use your own full template, set `"layout": "none"`. A body that's already a full HTML document, with `<html>` or `<body>`, is always sent as-is. Include `{{unsubscribeUrl}}` in your own template, written without spaces, or a second unsubscribe link is added at the bottom.
+To use your own full template, set `"layout": "none"`. A body that's already a full HTML document, with `<html>` or `<body>`, is always sent as-is. Include `{{ unsubscribeUrl }}` in your own template. If you leave it out, an unsubscribe link is added at the bottom.
