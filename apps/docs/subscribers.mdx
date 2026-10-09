@@ -27,12 +27,13 @@ Or ask [your agent](/mcp): "Add jane@acme.com, first name Jane, plan pro."
 <Tabs>
   <Tab title="CLI">
     ```bash
-    subscriber subscribers create --email jane@acme.com --first-name Jane --external-id user_123
+    subscriber subscribers create --email jane@acme.com --first-name Jane --external-id user_123 \
+      --attributes '{"plan": "pro"}'
     subscriber subscribers update <subscriberId> --last-name Doe
     subscriber subscribers list --search acme
     ```
 
-    The CLI can't set `attributes` on a single subscriber. Use [`bulk`](#import-subscribers) with one row, or the API.
+    `--attributes` on `update` replaces all of a subscriber's attributes, so include the ones you want to keep.
   </Tab>
   <Tab title="TUI">
     Open **Subscribers** and press `n` to add someone. Choose a subscriber and press `e` to edit them.

@@ -51,8 +51,8 @@ See [Subscribers](/subscribers).
 | --- | --- |
 | `subscribers list` | List subscribers. Filter with `--email`, `--external-id`, `--search <text>`, `--opted-in` or `--opted-out`. |
 | `subscribers get <subscriberId>` | Show one subscriber. |
-| `subscribers create` | Add a subscriber with `--email`, `--external-id`, `--first-name`, `--last-name`, `--name` and `--phone`. |
-| `subscribers update <subscriberId>` | Change the fields you pass, using the same options as `create`. |
+| `subscribers create` | Add a subscriber with `--email`, `--external-id`, `--first-name`, `--last-name`, `--name`, `--phone` and `--attributes <json>`. |
+| `subscribers update <subscriberId>` | Change the fields you pass, using the same options as `create`. `--attributes` replaces all existing attributes. |
 | `subscribers bulk --file <path>` | Create or update up to 500 subscribers from a JSON file. |
 | `subscribers tag <subscriberId>` | `--add <tag>` or `--remove <tag>`. |
 | `subscribers update-preferences <subscriberId>` | `--opted-in` or `--opted-out`. |
@@ -96,6 +96,7 @@ See [Integrations](/integrations/overview).
 | `integrations get <type>` | Show one, such as `smtp`. |
 | `integrations set <type> --body <json>` | Connect or update `smtp`, `cloudflare` or `stripe`. |
 | `integrations set-primary <type>` | Try this email provider first. |
+| `integrations events` | List events from Stripe and what happened to each. `--source stripe` filters them. |
 | `integrations remove <type>` | Disconnect an integration. |
 
 ## Other commands

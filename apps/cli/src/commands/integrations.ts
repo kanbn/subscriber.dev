@@ -4,6 +4,7 @@ import type { UpsertIntegrationDto } from "@subscriber.dev/api-client/cli";
 import {
   deleteIntegration,
   getIntegration,
+  listInboundEvents,
   listIntegrations,
   setPrimaryIntegration,
   upsertIntegration,
@@ -41,6 +42,40 @@ export function registerIntegrationsCommand(program: Command): void {
         }
         printResult(response.data.integrations, opts);
       }),
+    );
+
+  integrations
+    .command("events")
+    .description(
+      "List events received from connected integrations (e.g. Stripe webhooks) and what happened to each",
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option("--source <source>", 'only events from this source, e.g. "stripe"')
+    .option("--limit <limit>", "max results (1-100)")
+    .option("--offset <offset>", "pagination offset")
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (opts: {
+          environment?: string;
+          source?: string;
+          limit?: string;
+          offset?: string;
+          json?: boolean;
+        }) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+          const response = await listInboundEvents(environmentId, {
+            source: opts.source,
+            limit: opts.limit ? Number(opts.limit) : undefined,
+            offset: opts.offset ? Number(opts.offset) : undefined,
+          });
+          printResult(response.data.events, opts);
+        },
+      ),
     );
 
   integrations

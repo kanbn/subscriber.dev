@@ -31,6 +31,7 @@ interface SubscriberFieldOpts {
   firstName?: string;
   lastName?: string;
   name?: string;
+  attributes?: string;
   json?: boolean;
 }
 
@@ -46,7 +47,28 @@ function addFieldOptions(command: Command) {
     .option("--first-name <firstName>", "first name")
     .option("--last-name <lastName>", "last name")
     .option("--name <name>", "full name")
+    .option(
+      "--attributes <json>",
+      'custom attributes as a JSON object, e.g. \'{"plan":"pro"}\' (replaces all existing attributes on update)',
+    )
     .option("--json", "output as JSON");
+}
+
+function parseAttributes(
+  value: string | undefined,
+): Record<string, unknown> | undefined | null {
+  if (value === undefined) return undefined;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    parsed = undefined;
+  }
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed))
+    return parsed as Record<string, unknown>;
+  console.error("--attributes must be a JSON object.");
+  process.exitCode = 1;
+  return null;
 }
 
 export function registerSubscribersCommand(program: Command): void {
@@ -144,6 +166,8 @@ export function registerSubscribersCommand(program: Command): void {
       run(async (opts: SubscriberFieldOpts) => {
         ensureLoggedIn();
         const environmentId = requireEnvironmentId(opts);
+        const attributes = parseAttributes(opts.attributes);
+        if (attributes === null) return;
         const response = await createSubscriber(environmentId, {
           email: opts.email,
           phone: opts.phone,
@@ -151,6 +175,7 @@ export function registerSubscribersCommand(program: Command): void {
           firstName: opts.firstName,
           lastName: opts.lastName,
           name: opts.name,
+          attributes,
         } as CreateSubscriberDto);
         if (response.status !== 201) {
           console.error("Failed to create subscriber.");
@@ -175,10 +200,13 @@ export function registerSubscribersCommand(program: Command): void {
         if (opts.firstName !== undefined) patch.firstName = opts.firstName;
         if (opts.lastName !== undefined) patch.lastName = opts.lastName;
         if (opts.name !== undefined) patch.name = opts.name;
+        const attributes = parseAttributes(opts.attributes);
+        if (attributes === null) return;
+        if (attributes !== undefined) patch.attributes = attributes;
 
         if (Object.keys(patch).length === 0) {
           console.error(
-            "No fields to update. Pass at least one of --email, --phone, --external-id, --first-name, --last-name, --name.",
+            "No fields to update. Pass at least one of --email, --phone, --external-id, --first-name, --last-name, --name, --attributes.",
           );
           process.exitCode = 1;
           return;

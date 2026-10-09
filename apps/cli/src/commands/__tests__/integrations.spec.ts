@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   deleteIntegration,
   getIntegration,
+  listInboundEvents,
   listIntegrations,
   setPrimaryIntegration,
   upsertIntegration,
@@ -14,6 +15,7 @@ import { registerIntegrationsCommand } from "../integrations.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   listIntegrations: vi.fn(),
+  listInboundEvents: vi.fn(),
   getIntegration: vi.fn(),
   upsertIntegration: vi.fn(),
   deleteIntegration: vi.fn(),
@@ -79,6 +81,36 @@ describe("integrations list", () => {
     expect(process.exitCode).toBe(1);
 
     process.exitCode = undefined;
+  });
+});
+
+describe("integrations events", () => {
+  it("passes filters through and prints the events", async () => {
+    const event = {
+      source: "stripe",
+      type: "customer.subscription.created",
+      status: "ignored",
+    };
+    vi.mocked(listInboundEvents).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { events: [event], limit: 5, offset: 0 },
+    } as never);
+    const tableSpy = vi
+      .spyOn(console, "table")
+      .mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["integrations", "events", "--source", "stripe", "--limit", "5"],
+      { from: "user" },
+    );
+
+    expect(listInboundEvents).toHaveBeenCalledWith("test-environment-1", {
+      source: "stripe",
+      limit: 5,
+      offset: undefined,
+    });
+    expect(tableSpy).toHaveBeenCalledWith([event]);
   });
 });
 

@@ -221,8 +221,58 @@ describe("subscribers create", () => {
       firstName: undefined,
       lastName: undefined,
       name: undefined,
+      attributes: undefined,
     });
   });
+
+  it("parses --attributes as a JSON object", async () => {
+    vi.mocked(createSubscriber).mockResolvedValue({
+      status: 201,
+      headers: new Headers(),
+      data: { subscriber: testSubscriber, preferences: {} },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      [
+        "subscribers",
+        "create",
+        "--email",
+        "a@b.com",
+        "--attributes",
+        '{"plan":"pro"}',
+      ],
+      { from: "user" },
+    );
+
+    expect(createSubscriber).toHaveBeenCalledWith(
+      "test-environment-1",
+      expect.objectContaining({ attributes: { plan: "pro" } }),
+    );
+  });
+
+  it.each(["not json", "[1]", '"pro"'])(
+    "errors without calling the API when --attributes is %s",
+    async (value) => {
+      const errorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => undefined);
+      process.exitCode = undefined;
+
+      await buildProgram().parseAsync(
+        ["subscribers", "create", "--email", "a@b.com", "--attributes", value],
+        { from: "user" },
+      );
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        "--attributes must be a JSON object.",
+      );
+      expect(process.exitCode).toBe(1);
+      expect(createSubscriber).not.toHaveBeenCalled();
+
+      process.exitCode = undefined;
+    },
+  );
 
   it("prints an error and exits when creation fails", async () => {
     vi.mocked(createSubscriber).mockResolvedValue({
@@ -265,6 +315,32 @@ describe("subscribers update", () => {
       "test-environment-1",
       "test-subscriber-1",
       { firstName: "Updated" },
+    );
+  });
+
+  it("sends --attributes on its own", async () => {
+    vi.mocked(updateSubscriber).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { subscriber: testSubscriber },
+    } as never);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      [
+        "subscribers",
+        "update",
+        "test-subscriber-1",
+        "--attributes",
+        '{"plan":"pro"}',
+      ],
+      { from: "user" },
+    );
+
+    expect(updateSubscriber).toHaveBeenCalledWith(
+      "test-environment-1",
+      "test-subscriber-1",
+      { attributes: { plan: "pro" } },
     );
   });
 
