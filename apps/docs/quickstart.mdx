@@ -1,0 +1,207 @@
+---
+title: Quickstart
+description: "Send your first workflow email in about five minutes."
+---
+
+<Tip>
+  Using an AI agent? [Add the MCP server](/mcp) and it can do every step below for you.
+</Tip>
+
+The steps below use the CLI, the TUI or the REST API. Pick a tab on any step and the rest follow.
+
+## 1. Sign in
+
+Install the CLI and sign in. A browser opens once to confirm.
+
+```bash
+npm install -g @subscriber.dev/cli
+subscriber login
+```
+
+The CLI stores an API key in `~/.config/subscriber/config.json`. The API and MCP use the same key. It needs Node.js 22.12 or later.
+
+To use your AI agent, [add the MCP server](/mcp) with that key. To use the TUI, run `subscriber` with no arguments.
+
+## 2. Pick a workspace and environment
+
+A workspace is your team's account. Inside it, environments keep separate sets of data, such as production and staging, so testing never emails real people. Every workspace starts with a **Production** environment.
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber workspaces list
+    subscriber workspaces use <workspaceId>
+    subscriber environments list
+    subscriber environments use <environmentId>
+    ```
+
+    Later commands run against the workspace and environment you picked. Create a workspace with `subscriber workspaces create "Acme"`.
+  </Tab>
+  <Tab title="TUI">
+    Run `subscriber`, then choose a workspace and an environment. Press `n` to create either.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl https://api.subscriber.dev/workspaces -H "x-api-key: $KEY"
+    curl https://api.subscriber.dev/workspaces/$WORKSPACE/environments -H "x-api-key: $KEY"
+    ```
+
+    Most endpoints take the environment's ID in the path.
+  </Tab>
+</Tabs>
+
+## 3. Connect your email provider
+
+Subscriber.dev sends through your own provider, so you keep your sending reputation and pay them directly. It works with any SMTP provider, or Cloudflare Email.
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber integrations set smtp --body '{
+      "host": "smtp.resend.com",
+      "port": 465,
+      "secure": true,
+      "fromEmail": "hello@acme.com",
+      "fromName": "Acme",
+      "user": "resend",
+      "password": "re_..."
+    }'
+    ```
+
+    For Cloudflare Email, use `subscriber integrations set cloudflare` with `accountId`, `apiToken`, `fromEmail` and `fromName`.
+  </Tab>
+  <Tab title="TUI">
+    Open **Integrations**, press `n`, choose **SMTP** or **Cloudflare Email**, and fill in the form.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/smtp \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"host": "smtp.resend.com", "port": 465, "secure": true, "fromEmail": "hello@acme.com", "fromName": "Acme", "user": "resend", "password": "re_..."}'
+    ```
+  </Tab>
+</Tabs>
+
+The connection is checked before it's saved, and credentials are encrypted at rest. See [Sending](/sending) for other providers and how to stay out of the spam folder.
+
+## 4. Create a workflow
+
+This one sends a welcome email straight away and a follow-up two days later.
+
+<Tabs>
+  <Tab title="CLI">
+    Save this as `welcome.json`:
+
+    ```json welcome.json
+    {
+      "key": "welcome",
+      "name": "Welcome",
+      "steps": [
+        {
+          "type": "email",
+          "subject": "Welcome to Acme",
+          "body": "<p>Hey {{ subscriber.firstName | default: \"there\" }},</p><p>Thanks for signing up.</p><p><a class=\"button\" href=\"https://acme.com/start\">Get started</a></p>"
+        },
+        {
+          "type": "email",
+          "delayMs": 172800000,
+          "subject": "How's it going?",
+          "body": "<p>Just checking in. Reply to this email if you're stuck.</p>"
+        }
+      ]
+    }
+    ```
+
+    ```bash
+    subscriber workflows create --file welcome.json
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Workflows**, press `n`, and fill in the key, name and steps. Each step is an email or a webhook, with an optional delay.
+  </Tab>
+  <Tab title="API">
+    With the same `welcome.json` as the CLI tab:
+
+    ```bash
+    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d @welcome.json
+    ```
+  </Tab>
+</Tabs>
+
+See [Workflows](/workflows) and [Templates](/templates) for everything a workflow can do.
+
+## 5. Add a subscriber and trigger the workflow
+
+A subscriber is someone you email. Triggering a workflow starts it for one subscriber, which is what your app would do when someone signs up.
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber subscribers create --email jane@acme.com --first-name Jane
+    subscriber workflows trigger welcome --email jane@acme.com
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Subscribers** and press `n` to add Jane. Then open **Workflows**, choose **Welcome**, press `t` and enter her email.
+  </Tab>
+  <Tab title="API">
+    In production you'll usually do this from your app's code, right after signup:
+
+    ```ts
+    const api = `https://api.subscriber.dev/environments/${ENV}`;
+    const headers = {
+      "x-api-key": process.env.SUBSCRIBER_API_KEY,
+      "content-type": "application/json",
+    };
+
+    await fetch(`${api}/subscribers`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ email: user.email, firstName: user.firstName }),
+    });
+
+    await fetch(`${api}/workflows/trigger`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ key: "welcome", subscriber: { email: user.email } }),
+    });
+    ```
+  </Tab>
+</Tabs>
+
+The subscriber has to exist before you trigger a workflow for them. To bring in existing subscribers, use `subscriber subscribers bulk` or ask your agent to import an export.
+
+## 6. Check it sent
+
+Each time a workflow is triggered it creates a run, which records what sent and what's still waiting.
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber workflows runs <workflowId>
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Workflows**, choose **Welcome** and press `r` to see its runs. **Run History** shows runs across every workflow.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW/runs -H "x-api-key: $KEY"
+    ```
+  </Tab>
+</Tabs>
+
+Each run shows its status and which steps have sent.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Connect your AI agent" icon="robot" href="/mcp">
+    Let your agent write workflows and manage subscribers for you.
+  </Card>
+  <Card title="Start workflows from Stripe" icon="bolt" href="/integrations/stripe">
+    Send trial and payment emails automatically.
+  </Card>
+</CardGroup>

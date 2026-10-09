@@ -1,23 +1,30 @@
 ---
 title: Introduction
-description: "Subscriber.dev is the open source alternative to Customer.io."
+description: "Lifecycle email you run from your terminal or your AI agent."
 ---
 
-## Getting Started
-
-Get started with Subscriber.dev by choosing your preferred deployment option below.
+Subscriber.dev sends the emails your product sends automatically, like a welcome email when someone signs up, a reminder before their trial ends, or an announcement to everyone. They go out through your own email provider. There's no dashboard: you set it up and run it through your AI agent over MCP, the CLI, or the REST API.
 
 <CardGroup cols={2}>
-  <Card title="Cloud" icon="cloud" href="https://subscriber.dev/signup">
-    Get started instantly with our hosted solution - we'll handle all the
-    hosting, scaling, and maintenance for you.
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Sign in, connect a provider and send your first workflow email.
   </Card>
-  <Card
-    title="Self-host"
-    icon="code"
-    href="https://github.com/subscriber.dev/subscriber.dev?tab=readme-ov-file#self-hosting-"
-  >
-    For full data ownership and control, you can self-host Subscriber.dev on your
-    infrastructure.
+  <Card title="Connect your AI agent" icon="robot" href="/mcp">
+    Add the MCP server to Claude, Cursor or any MCP client.
+  </Card>
+  <Card title="Workflows" icon="envelope" href="/workflows">
+    Email and webhook steps, delays, templates and Stripe triggers.
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/introduction">
+    Every endpoint, with request and response examples.
   </Card>
 </CardGroup>
+
+## How it fits together
+
+There are four things to know about:
+
+- **Workspaces** hold your team's billing and environments. Every workspace starts with a **Production** environment, and you can add more, such as staging.
+- **[Subscribers](/subscribers)** are the people you email. They belong to an environment and are matched by `email`, `externalId` (your own ID) or their `publicId`.
+- **Integrations** connect an environment to an email provider (any SMTP server, or Cloudflare Email) and to event sources such as Stripe. See [Integrations](/integrations/overview).
+- **Workflows** are a list of email or webhook steps with delays. Your app, your agent or a Stripe event triggers them for one subscriber, or you send them to everyone as a broadcast.

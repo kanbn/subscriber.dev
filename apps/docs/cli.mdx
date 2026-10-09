@@ -1,0 +1,108 @@
+---
+title: CLI reference
+description: "Every subscriber command and its options."
+---
+
+The CLI lets you do everything from your terminal. Run `subscriber` with no arguments to open the [TUI](/tui), or add `--help` to any command to see its options.
+
+```bash
+npm install -g @subscriber.dev/cli
+```
+
+It needs Node.js 22.12 or later.
+
+## Options most commands share
+
+| Option | Description |
+| --- | --- |
+| `--environment <id>` | Run against this environment instead of the current one. |
+| `--workspace <id>` | Run against this workspace instead of the current one. |
+| `--json` | Print JSON, for scripts and agents. |
+| `--limit <n>`, `--offset <n>` | Page through lists. `--limit` is 1 to 100. |
+
+Options that take a file, such as `--file`, accept `-` to read from stdin.
+
+## Account
+
+| Command | Description |
+| --- | --- |
+| `login` | Sign in through the browser. `--api-key <key>` uses an existing key instead. `--base-url` and `--app-url` point at a [self-hosted](/self-hosting) server. |
+| `logout` | Forget the saved API key. |
+| `whoami` | Show whether you're signed in, the API URL, and the current workspace and environment. |
+| `users get` | Show your account. |
+| `users update` | Change your `--name` or `--image`. |
+
+## Workspaces and environments
+
+| Command | Description |
+| --- | --- |
+| `workspaces list` | List your workspaces. |
+| `workspaces create <name>` | Create a workspace. |
+| `workspaces use <workspaceId>` | Make it the current workspace. |
+| `environments list` | List the current workspace's environments. |
+| `environments create <name>` | Create an environment, such as staging. |
+| `environments use <environmentId>` | Make it the current environment. |
+
+## Subscribers
+
+See [Subscribers](/subscribers).
+
+| Command | Description |
+| --- | --- |
+| `subscribers list` | List subscribers. Filter with `--email`, `--external-id`, `--search <text>`, `--opted-in` or `--opted-out`. |
+| `subscribers get <subscriberId>` | Show one subscriber. |
+| `subscribers create` | Add a subscriber with `--email`, `--external-id`, `--first-name`, `--last-name`, `--name` and `--phone`. |
+| `subscribers update <subscriberId>` | Change the fields you pass, using the same options as `create`. |
+| `subscribers bulk --file <path>` | Create or update up to 500 subscribers from a JSON file. |
+| `subscribers tag <subscriberId>` | `--add <tag>` or `--remove <tag>`. |
+| `subscribers update-preferences <subscriberId>` | `--opted-in` or `--opted-out`. |
+| `subscribers delete <subscriberId>` | Delete a subscriber. |
+
+## Workflows
+
+See [Workflows](/workflows).
+
+| Command | Description |
+| --- | --- |
+| `workflows list` | List workflows. `--type automation` or `--type broadcast` filters them. |
+| `workflows get <workflowId>` | Show a workflow and its steps. |
+| `workflows create --file <path>` | Create a workflow from a JSON file. |
+| `workflows update <workflowId> --file <path>` | Change the fields in the file. If it includes `steps`, they replace all existing steps. |
+| `workflows delete <workflowId>` | Delete a workflow. |
+| `workflows trigger <key>` | Start a workflow for one subscriber, chosen by `--email`, `--external-id` or `--subscriber-id`. `--payload <json>` adds [template variables](/templates#variables). |
+| `workflows runs <workflowId>` | List a workflow's runs. |
+| `workflows run-history` | List runs across every workflow. |
+
+## Broadcasts
+
+See [Broadcasts](/broadcasts).
+
+| Command | Description |
+| --- | --- |
+| `workflows broadcast <workflowId> --audience <path>` | Send a workflow to everyone matching an [audience](/broadcasts#audiences). `--send-over-hours <n>` spreads it over up to 168 hours. `--allow-over-plan` sends even if it goes past your plan's subscriber limit. |
+| `workflows broadcasts <workflowId>` | List a workflow's broadcasts. |
+| `workflows broadcast-pause <workflowId> <broadcastId>` | Hold every send that hasn't gone out yet. |
+| `workflows broadcast-resume <workflowId> <broadcastId>` | Carry on a paused broadcast. |
+| `workflows broadcast-cancel <workflowId> <broadcastId>` | Stop every send that hasn't gone out yet. This can't be undone. |
+| `workflows broadcast-redispatch <workflowId> <broadcastId>` | Retry anyone a broadcast didn't reach, such as after an error. People already sent to are skipped. |
+
+## Integrations
+
+See [Integrations](/integrations/overview).
+
+| Command | Description |
+| --- | --- |
+| `integrations list` | List connected integrations. |
+| `integrations get <type>` | Show one, such as `smtp`. |
+| `integrations set <type> --body <json>` | Connect or update `smtp`, `cloudflare` or `stripe`. |
+| `integrations set-primary <type>` | Try this email provider first. |
+| `integrations remove <type>` | Disconnect an integration. |
+
+## Other commands
+
+| Command | Description |
+| --- | --- |
+| `analytics` | Subscriber counts, opt-outs, sends and bounces for an environment. `--days <n>` sets the window for new and opted-out counts (default 30); send and bounce totals are all-time. |
+| `billing` | Show your plan and usage. See [Plans and limits](/plans). |
+| `billing upgrade <plan>` | Start or change a paid plan: `starter`, `growth`, `scale`, `pro` or `business`. `--annual` or `--monthly`. |
+| `billing portal` | Open Stripe to manage your card and invoices, or cancel. |

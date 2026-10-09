@@ -1,21 +1,27 @@
 ---
 title: "Introduction"
-description: "Learn how to integrate with Subscriber.dev's REST API."
+description: "Call subscriber.dev from your own app."
 ---
+
+The REST API is how your app talks to subscriber.dev, for example to add a subscriber and trigger a welcome email when someone signs up. The CLI and MCP server use the same API.
 
 ## Base URL
 
 ```
-https://subscriber.dev/api/v1
+https://api.subscriber.dev
 ```
+
+If you self-host, use your own API URL instead.
 
 ## Authentication
 
-Most endpoints require authentication using your API key. You can create one in the [settings page](https://subscriber.dev/settings) of your account. Include this key in the `x-api-key` header of each request.
+An API key proves the request comes from you. Every endpoint needs one in the `x-api-key` header.
 
 ```
-'x-api-key': sub_123456789
+x-api-key: <your API key>
 ```
+
+To get one, run `subscriber login` with the [CLI](/quickstart). It signs you in through the browser and saves the key in `~/.config/subscriber/config.json`.
 
 ## Response codes
 
@@ -23,11 +29,10 @@ Subscriber.dev uses standard HTTP codes to indicate the success or failure of yo
 
 In general, `2xx` HTTP codes correspond to success, `4xx` codes are for user-related failures, and `5xx` codes are for infrastructure issues.
 
-| Status | Description                     |
-| ------ | ------------------------------- |
-| `200`  | Success                         |
-| `400`  | Invalid parameters              |
-| `401`  | Missing token                   |
-| `403`  | Invalid token                   |
-| `404`  | Resource not found              |
-| `500`  | Error with our infrastructure   |
+| Status | Description                   |
+| ------ | ----------------------------- |
+| `200`  | Success                       |
+| `400`  | Invalid parameters            |
+| `401`  | Missing or invalid API key    |
+| `404`  | Resource not found            |
+| `500`  | Error with our infrastructure |
