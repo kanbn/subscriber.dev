@@ -1,7 +1,10 @@
+import { apiKey } from "@better-auth/api-key";
+import { oauthProvider } from "@better-auth/oauth-provider";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { apiKey } from "@better-auth/api-key";
-import { bearer, deviceAuthorization } from "better-auth/plugins";
+import { createAuthMiddleware } from "better-auth/api";
+import { verifyJwsAccessToken } from "better-auth/oauth2";
+import { bearer, deviceAuthorization, jwt } from "better-auth/plugins";
 import { magicLink } from "better-auth/plugins/magic-link";
 import { env } from "next-runtime-env";
 
@@ -20,8 +23,49 @@ const configuredProviders =
       }
     : {};
 
+export const authIssuer = () =>
+  `${(env("NEXT_PUBLIC_BASE_URL") ?? "").replace(/\/$/, "")}/api/auth`;
+
+export const mcpResourceUrls = () => [
+  ...new Set(
+    [
+      process.env.MCP_URL,
+      process.env.NEXT_PUBLIC_API_BASE_URL &&
+        `${process.env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, "")}/mcp`,
+    ].filter((url): url is string => !!url),
+  ),
+];
+
+const isNativeRedirect = (uri: unknown) => {
+  try {
+    const { protocol, hostname } = new URL(String(uri));
+    return protocol === "http:"
+      ? ["localhost", "127.0.0.1", "[::1]"].includes(hostname)
+      : protocol !== "https:";
+  } catch {
+    return false;
+  }
+};
+
+const inferNativeMcpClients = createAuthMiddleware((ctx) => {
+  const body = ctx.body as Record<string, unknown> | undefined;
+  if (
+    ctx.path === "/oauth2/register" &&
+    body &&
+    body.application_type === undefined &&
+    Array.isArray(body.redirect_uris) &&
+    body.redirect_uris.length > 0 &&
+    body.redirect_uris.every(isNativeRedirect)
+  )
+    body.application_type = "native";
+  return Promise.resolve();
+});
+
 export const initAuth = (db: dbClient) => {
+  const mcpResources = mcpResourceUrls();
   return betterAuth({
+    disabledPaths: ["/token"],
+    hooks: { before: inferNativeMcpClients },
     secret: process.env.BETTER_AUTH_SECRET!,
     baseURL: env("NEXT_PUBLIC_BASE_URL"),
     trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS
@@ -73,6 +117,15 @@ export const initAuth = (db: dbClient) => {
           maxRequests: 100, // 100 requests per minute
         },
       }),
+      jwt(),
+      oauthProvider({
+        loginPage: "/auth",
+        consentPage: "/auth/consent",
+        allowDynamicClientRegistration: true,
+        allowUnauthenticatedClientRegistration: true,
+        resources: mcpResources,
+        clientRegistrationDefaultResources: mcpResources,
+      }),
       magicLink({
         expiresIn: 60 * 60 * 24 * 7, // 7 days
         sendMagicLink: async ({ email, url }) => {
@@ -105,4 +158,27 @@ export const initAuth = (db: dbClient) => {
       },
     },
   });
+};
+
+export const verifyMcpAccessToken = async (
+  auth: ReturnType<typeof initAuth>,
+  token: string,
+) => {
+  const payload = await verifyJwsAccessToken(token, {
+    jwksFetch: () => auth.api.getJwks(),
+    jwksCacheKey: auth,
+    verifyOptions: {
+      audience: mcpResourceUrls(),
+      issuer: authIssuer(),
+      algorithms: ["EdDSA"],
+    },
+  });
+  if (!payload.sub || typeof payload.azp !== "string") return null;
+  const context = await auth.$context;
+  const client = await context.adapter.findOne<{ disabled: boolean | null }>({
+    model: "oauthClient",
+    where: [{ field: "clientId", value: payload.azp }],
+  });
+  if (!client || client.disabled) return null;
+  return context.internalAdapter.findUserById(payload.sub);
 };

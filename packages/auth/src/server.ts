@@ -1,1 +1,6 @@
-export { initAuth } from "./auth.js";
+export {
+  authIssuer,
+  initAuth,
+  mcpResourceUrls,
+  verifyMcpAccessToken,
+} from "./auth.js";

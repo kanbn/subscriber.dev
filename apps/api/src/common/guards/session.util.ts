@@ -1,7 +1,8 @@
 import { UnauthorizedException } from "@nestjs/common";
 
+import type { dbClient } from "@subscriber.dev/db/client";
 import { initAuth } from "@subscriber.dev/auth/server";
-import { createDrizzleClient, type dbClient } from "@subscriber.dev/db/client";
+import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 export function headersFromRaw(
   raw: Record<string, string | string[] | undefined>,
@@ -19,9 +20,16 @@ export function headersFromRaw(
   return headers;
 }
 
-export async function resolveSessionFromHeaders(headers: Headers) {
+let cachedAuth: ReturnType<typeof initAuth> | undefined;
+
+export function getAuth() {
   const db: dbClient = createDrizzleClient();
-  const auth = initAuth(db);
+  cachedAuth ??= initAuth(db);
+  return { db, auth: cachedAuth };
+}
+
+export async function resolveSessionFromHeaders(headers: Headers) {
+  const { db, auth } = getAuth();
 
   const session = await auth.api.getSession({ headers });
 

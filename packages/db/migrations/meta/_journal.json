@@ -176,6 +176,13 @@
       "when": 1791491767837,
       "tag": "20261008203607_RenameApiKeyUserIdToReferenceId",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1791794326988,
+      "tag": "20261012083846_AddOAuthProvider",
+      "breakpoints": true
     }
   ]
 }

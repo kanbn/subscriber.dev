@@ -7,3 +7,4 @@ export * from "./workflows.js";
 export * from "./environmentIntegrations.js";
 export * from "./inboundEvents.js";
 export * from "./workspaceBilling.js";
+export * from "./oauth.js";

@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 import { McpModule, McpTransportType } from "@rekog/mcp-nest";
 
-import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { AnalyticsModule } from "../analytics/analytics.module.js";
 import { BillingModule } from "../billing/billing.module.js";
 import { billingEnabled } from "../billing/billing.service.js";
@@ -11,6 +10,8 @@ import { SubscriberModule } from "../subscriber/subscriber.module.js";
 import { UserModule } from "../user/user.module.js";
 import { WorkflowModule } from "../workflow/workflow.module.js";
 import { WorkspaceModule } from "../workspace/workspace.module.js";
+import { McpAuthGuard } from "./mcp-auth.guard.js";
+import { OAuthMetadataController } from "./oauth-metadata.controller.js";
 import { AnalyticsTools } from "./tools/analytics.tools.js";
 import { BillingTools } from "./tools/billing.tools.js";
 import { InboundTools } from "./tools/inbound.tools.js";
@@ -39,7 +40,7 @@ const TOOL_PROVIDERS = [
       name: SERVER_NAME,
       version: "0.1.0",
       transport: [McpTransportType.STREAMABLE_HTTP],
-      guards: [AuthGuard],
+      guards: [McpAuthGuard],
     }),
     SubscriberModule,
     WorkflowModule,
@@ -50,6 +51,7 @@ const TOOL_PROVIDERS = [
     WorkspaceModule,
     BillingModule,
   ],
+  controllers: [OAuthMetadataController],
   providers: TOOL_PROVIDERS,
 })
 export class SubscriberMcpModule {}

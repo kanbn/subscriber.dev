@@ -50,6 +50,8 @@
   },
   "globalEnv": [
     "POSTGRES_URL",
+    "MCP_URL",
+    "NEXT_PUBLIC_API_BASE_URL",
     "BETTER_AUTH_ALLOWED_DOMAINS",
     "GITHUB_CLIENT_ID",
     "GITHUB_CLIENT_SECRET",

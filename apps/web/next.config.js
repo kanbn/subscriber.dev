@@ -24,6 +24,20 @@ const config = {
     "@subscriber.dev/auth",
   ],
 
+  rewrites: async () =>
+    ["oauth-authorization-server", "openid-configuration"].flatMap(
+      (document) => [
+        {
+          source: `/.well-known/${document}`,
+          destination: `/api/well-known/${document}`,
+        },
+        {
+          source: `/.well-known/${document}/api/auth`,
+          destination: `/api/well-known/${document}`,
+        },
+      ],
+    ),
+
   /** We already do linting and typechecking as separate tasks in CI */
   typescript: { ignoreBuildErrors: true },
 };

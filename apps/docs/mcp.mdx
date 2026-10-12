@@ -5,20 +5,38 @@ description: "Run subscriber.dev from Claude, Cursor or any MCP client."
 
 MCP (Model Context Protocol) is how AI agents like Claude and Cursor connect to other tools. Once you add subscriber.dev's MCP server, you can ask your agent to do anything you could do with the CLI or API. It gets the same tools as the API. Ask it to write a workflow, import subscribers or check how a broadcast went, and it calls subscriber.dev for you.
 
-## 1. Get an API key
+## 1. Add the server
 
-The MCP server signs in with an API key. Get one by signing in with the [CLI](/quickstart#1-sign-in):
+The server URL is `https://mcp.subscriber.dev/mcp`.
+
+<Tabs>
+  <Tab title="Claude Code">
+    ```bash
+    claude mcp add --transport http subscriber https://mcp.subscriber.dev/mcp
+    ```
+  </Tab>
+  <Tab title="Claude app">
+    Add a custom connector in Claude's settings, with the URL `https://mcp.subscriber.dev/mcp`.
+  </Tab>
+  <Tab title="Other clients">
+    Add a streamable HTTP server with the URL `https://mcp.subscriber.dev/mcp`.
+  </Tab>
+</Tabs>
+
+## 2. Sign in
+
+The first time your agent uses subscriber.dev, it opens your browser. Sign in with GitHub or an email link, then allow access. Your agent stays signed in from then on.
+
+### Use an API key instead
+
+To skip the browser, use an API key. Get one by signing in with the [CLI](/quickstart#1-sign-in):
 
 ```bash
 npm install -g @subscriber.dev/cli
 subscriber login
 ```
 
-The key is saved in `~/.config/subscriber/config.json` as `apiKey`.
-
-## 2. Add the server
-
-The server URL is `https://mcp.subscriber.dev/mcp`, and the key goes in the `x-api-key` header.
+The key is saved in `~/.config/subscriber/config.json` as `apiKey`. Send it in the `x-api-key` header:
 
 <Tabs>
   <Tab title="Claude Code">
@@ -40,12 +58,6 @@ The server URL is `https://mcp.subscriber.dev/mcp`, and the key goes in the `x-a
       }
     }
     ```
-  </Tab>
-  <Tab title="Other clients">
-    Add a streamable HTTP server with:
-
-    - **URL:** `https://mcp.subscriber.dev/mcp`
-    - **Header:** `x-api-key: YOUR_API_KEY`
   </Tab>
 </Tabs>
 

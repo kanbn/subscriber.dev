@@ -1,13 +1,13 @@
 import type { FormEvent } from "react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { authClient } from "@subscriber.dev/auth/client";
 
 import { Comment, MarketingLayout, Ok, Prompt } from "~/components/Marketing";
 
-// Where the CLI (`subscriber login`, via ?user_code=) and, later, MCP OAuth
-// (via ?next=) send people to sign in. Signing in creates the account.
+// Where the CLI (`subscriber login`, via ?user_code=) and MCP clients (via a
+// signed OAuth query) send people to sign in. Signing in creates the account.
 
 const input =
   "border-border bg-background focus:border-foreground w-full border px-3 py-2 outline-hidden";
@@ -28,11 +28,19 @@ export default function AuthPage() {
       ? router.query.user_code.replace(/^(\w{4})(\w{4})$/, "$1-$2")
       : "";
   const next = safeNext(router.query.next);
+  const oauth = typeof router.query.sig === "string";
 
   if (!session) {
     return (
       <Shell>
         <SignIn userCode={userCode} />
+      </Shell>
+    );
+  }
+  if (oauth) {
+    return (
+      <Shell>
+        <ContinueOAuth />
       </Shell>
     );
   }
@@ -62,6 +70,24 @@ function Shell({ children }: { children: React.ReactNode }) {
       </section>
     </MarketingLayout>
   );
+}
+
+function ContinueOAuth() {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    for (const key of ["sig", "exp", "ba_iat", "ba_pl", "ba_param"])
+      params.delete(key);
+    const prompt = params
+      .get("prompt")
+      ?.split(" ")
+      .filter((value) => value !== "login")
+      .join(" ");
+    if (prompt) params.set("prompt", prompt);
+    else params.delete("prompt");
+    window.location.replace(`/api/auth/oauth2/authorize?${params}`);
+  }, []);
+
+  return <p className="text-muted-foreground">connecting…</p>;
 }
 
 function SignIn({ userCode }: { userCode: string }) {
@@ -119,7 +145,7 @@ function SignIn({ userCode }: { userCode: string }) {
         {userCode ? (
           <>
             sign in to connect your terminal. code{" "}
-            <span className="text-foreground whitespace-nowrap font-semibold">
+            <span className="text-foreground font-semibold whitespace-nowrap">
               {userCode}
             </span>
           </>
@@ -222,7 +248,7 @@ function Approve({
           placeholder="ABCD-EFGH"
           autoComplete="off"
           spellCheck={false}
-          className={`${input} text-lg uppercase tracking-widest`}
+          className={`${input} text-lg tracking-widest uppercase`}
         />
         <div className="flex gap-2">
           <button
