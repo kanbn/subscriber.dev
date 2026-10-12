@@ -71,6 +71,74 @@
         ]
       }
     },
+    "/users/me/agents": {
+      "get": {
+        "operationId": "listAgents",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AgentResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List AI agents connected through MCP sign-in",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/me/agents/{clientId}": {
+      "delete": {
+        "operationId": "disconnectAgent",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "Agent not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Disconnect an AI agent and revoke its access",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/workspaces": {
       "get": {
         "operationId": "getWorkspaces",
@@ -2578,6 +2646,34 @@
           "publicId",
           "name",
           "image"
+        ]
+      },
+      "AgentResponseDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "connectedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "clientId",
+          "name",
+          "connectedAt"
         ]
       },
       "WorkspaceDto": {

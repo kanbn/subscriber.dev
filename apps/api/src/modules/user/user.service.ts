@@ -30,4 +30,20 @@ export class UserService {
 
     return result;
   }
+
+  async listAgents(db: dbClient, userId: number) {
+    const agents = await userRepo.listAgents(db, userId);
+    return agents.map((agent) => ({
+      ...agent,
+      connectedAt: agent.connectedAt.toISOString(),
+    }));
+  }
+
+  async disconnectAgent(db: dbClient, userId: number, clientId: string) {
+    const disconnected = await userRepo.disconnectAgent(db, userId, clientId);
+
+    if (!disconnected) {
+      throw new NotFoundException("Agent not found");
+    }
+  }
 }

@@ -2,9 +2,11 @@ import type { Request } from "express";
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Put,
   Req,
   UseGuards,
@@ -23,6 +25,7 @@ import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import {
+  AgentResponseDto,
   UpdateUserDto,
   UpdateUserResponseDto,
   UserResponseDto,
@@ -62,5 +65,32 @@ export class UserController {
   ): Promise<UpdateUserResponseDto> {
     const db = createDrizzleClient();
     return this.userService.updateUser(db, user.publicId, input);
+  }
+
+  @Get("me/agents")
+  @ApiOperation({
+    operationId: "listAgents",
+    summary: "List AI agents connected through MCP sign-in",
+  })
+  @ApiResponse({ status: 200, type: [AgentResponseDto] })
+  async listAgents(@CurrentUser() user: User): Promise<AgentResponseDto[]> {
+    const db = createDrizzleClient();
+    return this.userService.listAgents(db, user.id);
+  }
+
+  @Delete("me/agents/:clientId")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    operationId: "disconnectAgent",
+    summary: "Disconnect an AI agent and revoke its access",
+  })
+  @ApiResponse({ status: 204 })
+  @ApiResponse({ status: 404, description: "Agent not found" })
+  async disconnectAgent(
+    @CurrentUser() user: User,
+    @Param("clientId") clientId: string,
+  ): Promise<void> {
+    const db = createDrizzleClient();
+    await this.userService.disconnectAgent(db, user.id, clientId);
   }
 }

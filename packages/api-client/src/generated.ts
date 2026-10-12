@@ -50,6 +50,13 @@ export interface UpdateUserResponseDto {
   image: string | null;
 }
 
+export interface AgentResponseDto {
+  clientId: string;
+  name: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  connectedAt: string;
+}
+
 export interface WorkspaceDto {
   id: number;
   publicId: string;
@@ -1818,6 +1825,214 @@ export const useUpdateCurrentUser = <TError = unknown,
         TContext
       > => {
       return useMutation(getUpdateCurrentUserMutationOptions(options), queryClient);
+    }
+
+export type listAgentsResponse200 = {
+  data: AgentResponseDto[]
+  status: 200
+}
+
+export type listAgentsResponseSuccess = (listAgentsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listAgentsResponse = (listAgentsResponseSuccess)
+
+export const getListAgentsUrl = () => {
+
+
+
+
+  return `/users/me/agents`
+}
+
+/**
+ * @summary List AI agents connected through MCP sign-in
+ */
+export const listAgents = async ( options?: Parameters<typeof customFetch>[1]): Promise<listAgentsResponse> => {
+
+  return customFetch<listAgentsResponse>(getListAgentsUrl(),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAgentsQueryKey = () => {
+    return [
+    `/users/me/agents`
+    ] as const;
+    }
+
+
+export const getListAgentsQueryOptions = <TData = Awaited<ReturnType<typeof listAgents>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAgents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAgentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAgents>>> = ({ signal }) => listAgents({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAgents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAgentsQueryResult = NonNullable<Awaited<ReturnType<typeof listAgents>>>
+export type ListAgentsQueryError = unknown
+
+
+export function useListAgents<TData = Awaited<ReturnType<typeof listAgents>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAgents>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAgents>>,
+          TError,
+          Awaited<ReturnType<typeof listAgents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAgents<TData = Awaited<ReturnType<typeof listAgents>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAgents>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAgents>>,
+          TError,
+          Awaited<ReturnType<typeof listAgents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAgents<TData = Awaited<ReturnType<typeof listAgents>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAgents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List AI agents connected through MCP sign-in
+ */
+
+export function useListAgents<TData = Awaited<ReturnType<typeof listAgents>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAgents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAgentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type disconnectAgentResponse204 = {
+  data: void
+  status: 204
+}
+
+export type disconnectAgentResponse404 = {
+  data: void
+  status: 404
+}
+
+export type disconnectAgentResponseSuccess = (disconnectAgentResponse204) & {
+  headers: Headers;
+};
+export type disconnectAgentResponseError = (disconnectAgentResponse404) & {
+  headers: Headers;
+};
+
+export type disconnectAgentResponse = (disconnectAgentResponseSuccess | disconnectAgentResponseError)
+
+export const getDisconnectAgentUrl = (clientId: string,) => {
+
+
+
+
+  return `/users/me/agents/${clientId}`
+}
+
+/**
+ * @summary Disconnect an AI agent and revoke its access
+ */
+export const disconnectAgent = async (clientId: string, options?: Parameters<typeof customFetch>[1]): Promise<disconnectAgentResponse> => {
+
+  return customFetch<disconnectAgentResponse>(getDisconnectAgentUrl(clientId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDisconnectAgentMutationKey = () => ['disconnectAgent'] as const;
+
+export const getDisconnectAgentMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectAgent>>, TError,DisconnectAgentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof disconnectAgent>>, TError,DisconnectAgentMutationVariables, TContext> => {
+
+const mutationKey = getDisconnectAgentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disconnectAgent>>, DisconnectAgentMutationVariables> = (props) => {
+          const {clientId} = props ?? {};
+
+          return  disconnectAgent(clientId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisconnectAgentMutationResult = NonNullable<Awaited<ReturnType<typeof disconnectAgent>>>
+
+    export type DisconnectAgentMutationError = void
+    export type DisconnectAgentMutationVariables = {clientId: string}
+
+    /**
+ * @summary Disconnect an AI agent and revoke its access
+ */
+export const useDisconnectAgent = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectAgent>>, TError,DisconnectAgentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof disconnectAgent>>,
+        TError,
+        DisconnectAgentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDisconnectAgentMutationOptions(options), queryClient);
     }
 
 export type getWorkspacesResponse200 = {

@@ -25,8 +25,15 @@ export const UpdateUserResponseSchema = z.object({
   image: z.string().nullable(),
 });
 
+export const AgentResponseSchema = z.object({
+  clientId: z.string(),
+  name: z.string().nullable(),
+  connectedAt: z.iso.datetime(),
+});
+
 export class UpdateUserDto extends createZodDto(UpdateUserSchema) {}
 export class UserResponseDto extends createZodDto(UserResponseSchema) {}
 export class UpdateUserResponseDto extends createZodDto(
   UpdateUserResponseSchema,
 ) {}
+export class AgentResponseDto extends createZodDto(AgentResponseSchema) {}

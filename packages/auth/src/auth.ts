@@ -180,5 +180,13 @@ export const verifyMcpAccessToken = async (
     where: [{ field: "clientId", value: payload.azp }],
   });
   if (!client || client.disabled) return null;
+  const consent = await context.adapter.findOne({
+    model: "oauthConsent",
+    where: [
+      { field: "clientId", value: payload.azp },
+      { field: "userId", value: payload.sub },
+    ],
+  });
+  if (!consent) return null;
   return context.internalAdapter.findUserById(payload.sub);
 };
