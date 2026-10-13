@@ -83,7 +83,7 @@ export default function EditorPage() {
   return (
     <div
       style={{ fontFamily: monoStack }}
-      className="light min-h-screen bg-background text-[13px] leading-relaxed text-foreground [color-scheme:light]"
+      className="min-h-screen bg-background text-[13px] leading-relaxed text-foreground"
     >
       <PageHead
         title={
@@ -95,16 +95,18 @@ export default function EditorPage() {
       <Head>
         <meta name="robots" content="noindex" />
       </Head>
-      <section className="mx-auto min-h-screen max-w-[880px] border-x border-border px-4 py-12 sm:px-8">
-        {!session || workflows.isPending ? null : workflows.isError ? (
-          <p>
+      <section className="mx-auto min-h-screen max-w-[880px] border-x border-border">
+        {!session || workflows.isPending ? (
+          <EditorNav />
+        ) : workflows.isError ? (
+          <Message>
             ✕ this environment doesn&apos;t exist, or you can&apos;t see it.
-          </p>
+          </Message>
         ) : !workflow || !step ? (
-          <p>
+          <Message>
             ✕ no emails here yet. ask your agent to create a workflow, then open
             the link it gives you.
-          </p>
+          </Message>
         ) : (
           <EmailPane
             key={`${workflow.publicId}:${step.stepOrder}`}
@@ -117,6 +119,15 @@ export default function EditorPage() {
         )}
       </section>
     </div>
+  );
+}
+
+function Message({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <EditorNav />
+      <p className="px-4 py-12 sm:px-8">{children}</p>
+    </>
   );
 }
 
@@ -147,14 +158,27 @@ function EmailPane({
   const [previewText, setPreviewText] = useState(saved.previewText);
   const [fromName, setFromName] = useState(saved.fromName);
   const [replyTo, setReplyTo] = useState(saved.replyTo);
+  const [showReplyTo, setShowReplyTo] = useState(Boolean(saved.replyTo));
+  const [showPreviewText, setShowPreviewText] = useState(
+    Boolean(saved.previewText),
+  );
   const [visual, setVisual] = useState(() =>
     canEditVisually(saved.body, layout),
   );
   const [previewing, setPreviewing] = useState(false);
   const [mobile, setMobile] = useState(false);
+  const [loadedHtml, setLoadedHtml] = useState<string | null>(null);
+  const [leaveTo, setLeaveTo] = useState<string | null>(null);
+  const router = useRouter();
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(
     null,
   );
+
+  useEffect(() => {
+    if (!notice?.ok) return;
+    const timer = setTimeout(() => setNotice(null), 3000);
+    return () => clearTimeout(timer);
+  }, [notice]);
 
   const update = useUpdateWorkflow();
   const preview = usePreviewEmail();
@@ -274,9 +298,9 @@ function EmailPane({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [save]);
 
-  const togglePreview = () => {
-    if (!previewing) preview.mutate({ environmentId, data: content });
-    setPreviewing(!previewing);
+  const showPreview = (show: boolean) => {
+    if (show && !previewing) preview.mutate({ environmentId, data: content });
+    setPreviewing(show);
   };
 
   const test = async () => {
@@ -325,158 +349,50 @@ function EmailPane({
     [environmentId],
   );
 
-  const sharedHint = steps.length > 1 ? "# all emails" : undefined;
-
-  const confirmLeave = (event: React.MouseEvent) => {
-    if (dirty && !window.confirm("Discard your unsaved changes?")) {
-      event.preventDefault();
-    }
+  const confirmLeave = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!dirty || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    setLeaveTo(event.currentTarget.getAttribute("href"));
   };
 
   return (
     <>
-      <h1 className="mb-6 font-semibold">
-        <Prompt />
-        edit {workflow.name}
-      </h1>
-
-      {steps.length > 1 && (
-        <nav role="tablist" className="mb-2 flex gap-3 overflow-x-auto">
-          {steps.map((item) => (
-            <Link
-              key={item.publicId}
-              role="tab"
-              aria-selected={item === step}
-              href={`/editor/${environmentId}/${workflow.publicId}?step=${item.stepOrder}`}
-              onClick={item === step ? undefined : confirmLeave}
-              title={item.subject}
-              className={`shrink-0 ${
-                item === step
-                  ? "font-semibold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {sendsAt(workflow, item)}
-            </Link>
-          ))}
-        </nav>
+      {leaveTo && (
+        <LeaveDialog
+          onStay={() => setLeaveTo(null)}
+          onLeave={() => void router.push(leaveTo)}
+        />
       )}
-
-      <div className="mb-4 border border-border">
-        <Field label="from" hint={sharedHint}>
-          {sender ? (
-            <>
-              <input
-                value={fromName}
-                onChange={(event) => setFromName(event.target.value)}
-                placeholder={sender.fromName ?? "name"}
-                aria-label="From name"
-                className="min-w-0 flex-1 bg-transparent outline-none"
-              />
-              <span className="shrink-0 text-muted-foreground">
-                &lt;{sender.fromEmail}&gt;
-              </span>
-            </>
-          ) : (
-            <Comment># connect an email integration to set this</Comment>
-          )}
-        </Field>
-        <Field label="reply-to" hint={sharedHint}>
-          <input
-            value={replyTo}
-            onChange={(event) => setReplyTo(event.target.value)}
-            placeholder={sender?.replyTo ?? sender?.fromEmail ?? ""}
-            aria-label="Reply-to address"
-            type="email"
-            className="min-w-0 flex-1 bg-transparent outline-none"
-          />
-        </Field>
-        <Field label="subject">
-          <input
-            value={subject}
-            onChange={(event) => setSubject(event.target.value)}
-            aria-label="Subject"
-            className="min-w-0 flex-1 bg-transparent font-semibold outline-none"
-          />
-        </Field>
-        {layout !== "none" && (
-          <Field label="preview">
-            <input
-              value={previewText}
-              onChange={(event) => setPreviewText(event.target.value)}
-              placeholder="the line inboxes show after the subject"
-              aria-label="Preview text"
-              className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/60"
-            />
-          </Field>
-        )}
-        <div className="bg-white text-zinc-900">
-          {previewing ? (
-            preview.isError ? (
-              <p className="p-6 text-red-600">
-                {errorMessage(preview.error, "couldn't render the preview.")}
-              </p>
-            ) : preview.isPending ? (
-              <p className="p-6 text-zinc-400">rendering…</p>
+      <EditorNav onLeave={confirmLeave}>
+        <span role="status" className="mr-auto">
+          {notice ? (
+            notice.ok ? (
+              <Ok>✓ {notice.text}</Ok>
             ) : (
-              <iframe
-                title="Email preview"
-                srcDoc={preview.data?.data.html ?? ""}
-                sandbox=""
-                className={`mx-auto block h-[70vh] w-full ${
-                  mobile ? "max-w-[375px] border-x border-border" : ""
-                }`}
-              />
+              <span className="text-red-600">✕ {notice.text}</span>
             )
-          ) : visual ? (
-            <div className="mx-auto max-w-[600px] px-6 pt-12 pb-16">
-              <EmailEditor
-                html={body}
-                media={media}
-                onChange={setBody}
-                onReady={(normalized) => {
-                  setBody(normalized);
-                  setSaved((current) =>
-                    current.body === body
-                      ? { ...current, body: normalized }
-                      : current,
-                  );
-                }}
-                onUnsupported={() => setVisual(false)}
-              />
-            </div>
           ) : (
-            <textarea
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-              spellCheck={false}
-              aria-label="Email HTML"
-              className="block min-h-[420px] w-full resize-y bg-transparent p-4 font-mono text-[13px] outline-none"
-            />
+            dirty && <Comment># unsaved</Comment>
           )}
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => void save()}
-          disabled={!dirty || update.isPending}
-          className={`${button} font-semibold`}
-        >
-          {update.isPending ? "saving…" : "save"}
-        </button>
-        <button type="button" onClick={togglePreview} className={button}>
-          {previewing ? "edit" : "preview"}
-        </button>
+        </span>
+        <span role="tablist" className="flex gap-3">
+          <Tab selected={!previewing} onClick={() => showPreview(false)}>
+            edit
+          </Tab>
+          <Tab selected={previewing} onClick={() => showPreview(true)}>
+            preview
+          </Tab>
+        </span>
         {previewing && (
-          <button
-            type="button"
-            onClick={() => setMobile(!mobile)}
-            className={button}
-          >
-            {mobile ? "desktop" : "mobile"}
-          </button>
+          <span role="tablist" className="flex gap-3">
+            <span className="text-muted-foreground">|</span>
+            <Tab selected={!mobile} onClick={() => setMobile(false)}>
+              desktop
+            </Tab>
+            <Tab selected={mobile} onClick={() => setMobile(true)}>
+              mobile
+            </Tab>
+          </span>
         )}
         <button
           type="button"
@@ -486,27 +402,233 @@ function EmailPane({
         >
           {sendTest.isPending ? "sending…" : "send test"}
         </button>
-        <span role="status" className="ml-2">
-          {notice ? (
-            notice.ok ? (
-              <Ok>✓ {notice.text}</Ok>
-            ) : (
-              <span className="text-red-600">✕ {notice.text}</span>
-            )
-          ) : (
-            dirty && <Comment># unsaved changes</Comment>
-          )}
-        </span>
-      </div>
+        <button
+          type="button"
+          onClick={() => void save()}
+          disabled={!dirty || update.isPending}
+          className={`${button} font-semibold`}
+        >
+          {update.isPending ? "saving…" : "save"}
+        </button>
+      </EditorNav>
 
-      {!visual && (
-        <p className="mt-4">
-          <Comment>
-            # this email uses its own HTML template, so it opens as code.
-          </Comment>
-        </p>
-      )}
+      <div className="px-4 py-12 sm:px-8">
+        <h1 className="mb-6 font-semibold">
+          <Prompt />
+          edit {workflow.name}
+        </h1>
+
+        {steps.length > 1 && (
+          <nav role="tablist" className="mb-2 flex gap-3 overflow-x-auto">
+            {steps.map((item) => (
+              <Link
+                key={item.publicId}
+                role="tab"
+                aria-selected={item === step}
+                href={`/editor/${environmentId}/${workflow.publicId}?step=${item.stepOrder}`}
+                onClick={item === step ? undefined : confirmLeave}
+                title={item.subject}
+                className={`shrink-0 ${
+                  item === step
+                    ? "font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {sendsAt(workflow, item)}
+              </Link>
+            ))}
+          </nav>
+        )}
+
+        <div className="mb-4 border border-border">
+          <Field label="from">
+            {sender ? (
+              <>
+                <input
+                  value={fromName}
+                  onChange={(event) => setFromName(event.target.value)}
+                  placeholder={sender.fromName ?? "name"}
+                  aria-label="From name"
+                  className="min-w-0 flex-1 bg-transparent outline-none"
+                />
+                <span className="shrink-0 text-muted-foreground">
+                  &lt;{sender.fromEmail}&gt;
+                </span>
+              </>
+            ) : (
+              <span className="flex-1">
+                <Comment># connect an email integration to set this</Comment>
+              </span>
+            )}
+            {!showReplyTo && (
+              <Reveal onClick={() => setShowReplyTo(true)}>reply-to</Reveal>
+            )}
+          </Field>
+          {showReplyTo && (
+            <Field
+              label="reply-to"
+              onClose={() => {
+                setReplyTo("");
+                setShowReplyTo(false);
+              }}
+            >
+              <input
+                value={replyTo}
+                onChange={(event) => setReplyTo(event.target.value)}
+                placeholder={sender?.replyTo ?? sender?.fromEmail ?? ""}
+                aria-label="Reply-to address"
+                type="email"
+                autoFocus={!saved.replyTo}
+                className="min-w-0 flex-1 bg-transparent outline-none"
+              />
+            </Field>
+          )}
+          <Field label="subject">
+            <input
+              value={subject}
+              onChange={(event) => setSubject(event.target.value)}
+              aria-label="Subject"
+              className="min-w-0 flex-1 bg-transparent font-semibold outline-none"
+            />
+            {layout !== "none" && !showPreviewText && (
+              <Reveal onClick={() => setShowPreviewText(true)}>preview</Reveal>
+            )}
+          </Field>
+          {layout !== "none" && showPreviewText && (
+            <Field
+              label="preview"
+              onClose={() => {
+                setPreviewText("");
+                setShowPreviewText(false);
+              }}
+            >
+              <input
+                autoFocus={!saved.previewText}
+                value={previewText}
+                onChange={(event) => setPreviewText(event.target.value)}
+                placeholder="the line inboxes show after the subject"
+                aria-label="Preview text"
+                className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/60"
+              />
+            </Field>
+          )}
+          <div className="light bg-white text-zinc-900 [color-scheme:light]">
+            {previewing ? (
+              preview.isError ? (
+                <p className="p-6 text-red-600">
+                  {errorMessage(preview.error, "couldn't render the preview.")}
+                </p>
+              ) : (
+                <iframe
+                  title="Email preview"
+                  srcDoc={preview.data?.data.html ?? ""}
+                  sandbox=""
+                  onLoad={() => setLoadedHtml(preview.data?.data.html ?? null)}
+                  className={`mx-auto block h-[70vh] w-full ${
+                    mobile ? "max-w-[375px] border-x border-border" : ""
+                  } ${loadedHtml === preview.data?.data.html ? "" : "invisible"}`}
+                />
+              )
+            ) : visual ? (
+              <div className="mx-auto max-w-[600px] px-6 pt-12 pb-16">
+                <EmailEditor
+                  html={body}
+                  media={media}
+                  onChange={setBody}
+                  onReady={(normalized) => {
+                    setBody(normalized);
+                    setSaved((current) =>
+                      current.body === body
+                        ? { ...current, body: normalized }
+                        : current,
+                    );
+                  }}
+                  onUnsupported={() => setVisual(false)}
+                />
+              </div>
+            ) : (
+              <textarea
+                value={body}
+                onChange={(event) => setBody(event.target.value)}
+                spellCheck={false}
+                aria-label="Email HTML"
+                className="block min-h-[420px] w-full resize-y bg-transparent p-4 font-mono text-[13px] outline-none"
+              />
+            )}
+          </div>
+        </div>
+
+        {!visual && (
+          <p className="mt-4">
+            <Comment>
+              # this email uses its own HTML template, so it opens as code.
+            </Comment>
+          </p>
+        )}
+      </div>
     </>
+  );
+}
+
+function LeaveDialog({
+  onStay,
+  onLeave,
+}: {
+  onStay: () => void;
+  onLeave: () => void;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="leave-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onMouseDown={onStay}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") onStay();
+      }}
+    >
+      <div
+        className="w-full max-w-sm border border-border bg-background p-5"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <h2 id="leave-title" className="mb-1 font-semibold">
+          discard your changes?
+        </h2>
+        <p className="mb-4 text-muted-foreground">
+          # you have unsaved changes to this email.
+        </p>
+        <div className="flex justify-end gap-2">
+          <button type="button" autoFocus onClick={onStay} className={button}>
+            keep editing
+          </button>
+          <button
+            type="button"
+            onClick={onLeave}
+            className="px-3 py-2 text-red-600 hover:underline"
+          >
+            discard
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EditorNav({
+  onLeave,
+  children,
+}: {
+  onLeave?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+  children?: React.ReactNode;
+}) {
+  return (
+    <nav className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border bg-background px-4 sm:px-8">
+      <Link href="/" onClick={onLeave} className="font-semibold">
+        subscriber.dev
+      </Link>
+      <div className="flex items-baseline gap-3">{children}</div>
+    </nav>
   );
 }
 
@@ -520,21 +642,72 @@ function sendsAt(workflow: Workflow, step: Step) {
   return `day ${days}`;
 }
 
+function Tab({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={selected}
+      onClick={onClick}
+      className={
+        selected
+          ? "font-semibold"
+          : "text-muted-foreground hover:text-foreground"
+      }
+    >
+      {children}
+    </button>
+  );
+}
+
+function Reveal({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="shrink-0 text-muted-foreground hover:text-foreground"
+    >
+      {children}
+    </button>
+  );
+}
+
 function Field({
   label,
-  hint,
+  onClose,
   children,
 }: {
   label: string;
-  hint?: string;
+  onClose?: () => void;
   children: React.ReactNode;
 }) {
   return (
     <label className="flex items-center gap-3 border-b border-border px-3 py-2">
       <span className="w-16 shrink-0 text-muted-foreground">{label}</span>
       {children}
-      {hint && (
-        <span className="shrink-0 text-xs text-muted-foreground">{hint}</span>
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={`Remove ${label}`}
+          className="shrink-0 text-muted-foreground hover:text-foreground"
+        >
+          ×
+        </button>
       )}
     </label>
   );
