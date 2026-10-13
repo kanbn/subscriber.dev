@@ -19,7 +19,7 @@ const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
   hr: [],
   blockquote: [],
   a: ["href", "class", "target", "rel", "title"],
-  img: ["src", "alt", "title", "width", "height"],
+  img: ["src", "alt", "title", "width", "height", "data-align"],
 };
 
 const BLOCK_CONTAINERS = new Set(["UL", "OL"]);

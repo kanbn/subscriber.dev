@@ -51,7 +51,8 @@ const contentStyles = (theme: SubscriberLayoutTheme) => `
   .content a.button { display: inline-block; background-color: ${theme.accentColor}; color: #ffffff !important; text-decoration: none; font-size: 13px; font-weight: 500; line-height: 20px; padding: 8px 16px; border-radius: 6px; margin: 2px 0 14px; }
   .content ul, .content ol { margin: 0 0 14px; padding-left: 20px; }
   .content li { margin: 0 0 4px; }
-  .content img { max-width: 100%; height: auto; border-radius: 6px; }
+  .content img { max-width: 100%; height: auto; border-radius: 6px; border: 0; }
+  .content img[data-align="center"] { display: block; margin: 0 auto 14px; }
   .content hr { border: none; border-top: 1px solid ${theme.borderColor}; margin: 24px 0; }
   .content blockquote { margin: 0 0 14px; padding-left: 16px; border-left: 3px solid ${theme.borderColor}; color: ${theme.mutedColor}; }
   .content code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background-color: #f4f4f5; padding: 2px 4px; border-radius: 4px; }

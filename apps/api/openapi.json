@@ -2412,6 +2412,121 @@
         ]
       }
     },
+    "/environments/{environmentId}/uploads": {
+      "post": {
+        "description": "Uploads a PNG, JPEG, GIF or WebP image (up to 5 MB) and returns its public URL to use in an email.",
+        "operationId": "uploadImage",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not an image, or too large"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload an image for your emails",
+        "tags": [
+          "Uploads"
+        ]
+      }
+    },
+    "/environments/{environmentId}/uploads/video": {
+      "post": {
+        "description": "Email clients can't play video, so emails show a thumbnail with a play button that links to the video. Give a YouTube, Vimeo or Loom link and this stores the thumbnail and returns what to put in the email.",
+        "operationId": "uploadVideoThumbnail",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not a supported video link"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Turn a video link into a thumbnail",
+        "tags": [
+          "Uploads"
+        ]
+      }
+    },
     "/environments/{environmentId}/analytics": {
       "get": {
         "description": "Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.",
@@ -6039,6 +6154,52 @@
         },
         "required": [
           "integrations"
+        ]
+      },
+      "UploadResponseDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public URL of the uploaded image."
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "VideoInputDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A YouTube, Vimeo or Loom link."
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "VideoResponseDto": {
+        "type": "object",
+        "properties": {
+          "src": {
+            "type": "string",
+            "description": "Public URL of the video's thumbnail, with a play button."
+          },
+          "href": {
+            "type": "string",
+            "description": "Link to the video."
+          },
+          "title": {
+            "type": "string",
+            "description": "The video's title, for the image's alt text."
+          }
+        },
+        "required": [
+          "src",
+          "href",
+          "title"
         ]
       },
       "AnalyticsResponseDto": {

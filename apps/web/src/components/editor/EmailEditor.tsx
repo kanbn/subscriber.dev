@@ -3,35 +3,96 @@ import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import { useEffect, useRef, useState } from "react";
 
+import type { ImageAttrs } from "./extensions";
 import { monoStack } from "~/components/Marketing";
 import { emailExtensions } from "./extensions";
 import { fromEditorHtml, liquidSnippets, toEditorHtml } from "./html";
 
+export interface MediaHandlers {
+  upload: (file: File) => Promise<string>;
+  video: (url: string) => Promise<ImageAttrs>;
+  onError: (message: string) => void;
+}
+
 interface EmailEditorProps {
   html: string;
+  media: MediaHandlers;
   onChange: (html: string) => void;
   onReady: (html: string) => void;
   onUnsupported: () => void;
 }
 
+interface MediaRequest {
+  kind: "image" | "video";
+  insert: (attrs: ImageAttrs) => void;
+}
+
+function imageFiles(files: FileList | null | undefined) {
+  return Array.from(files ?? []).filter((file) =>
+    file.type.startsWith("image/"),
+  );
+}
+
 export function EmailEditor({
   html,
+  media,
   onChange,
   onReady,
   onUnsupported,
 }: EmailEditorProps) {
-  const [imageRequest, setImageRequest] = useState<
-    ((src: string) => void) | null
-  >(null);
+  const [request, setRequest] = useState<MediaRequest | null>(null);
+  const mediaRef = useRef(media);
+  useEffect(() => {
+    mediaRef.current = media;
+  }, [media]);
+
+  const uploadAt = (editor: Editor, files: File[], position?: number) => {
+    for (const file of files) {
+      mediaRef.current
+        .upload(file)
+        .then((src) => {
+          const content = { type: "image", attrs: { src, alt: "" } };
+          if (position === undefined) {
+            editor.chain().focus().insertContent(content).run();
+          } else {
+            editor.chain().focus().insertContentAt(position, content).run();
+          }
+        })
+        .catch((error: unknown) =>
+          mediaRef.current.onError(
+            error instanceof Error
+              ? error.message
+              : "Couldn't upload that image",
+          ),
+        );
+    }
+  };
 
   const editor = useEditor({
     immediatelyRender: false,
     extensions: emailExtensions({
-      onImage: (insert) => setImageRequest(() => insert),
+      onImage: (insert) => setRequest({ kind: "image", insert }),
+      onVideo: (insert) => setRequest({ kind: "video", insert }),
     }),
     content: toEditorHtml(html),
     editorProps: {
       attributes: { class: "email-content min-h-[320px] focus:outline-none" },
+      handlePaste: (_view, event) => {
+        const files = imageFiles(event.clipboardData?.files);
+        if (files.length === 0 || !editor) return false;
+        uploadAt(editor, files);
+        return true;
+      },
+      handleDrop: (view, event, _slice, moved) => {
+        const files = imageFiles(event.dataTransfer?.files);
+        if (moved || files.length === 0 || !editor) return false;
+        const position = view.posAtCoords({
+          left: event.clientX,
+          top: event.clientY,
+        })?.pos;
+        uploadAt(editor, files, position);
+        return true;
+      },
     },
     onCreate: ({ editor }) => {
       const roundTrip = fromEditorHtml(editor.getHTML());
@@ -52,13 +113,16 @@ export function EmailEditor({
     <>
       <FormattingMenu editor={editor} />
       <VariableMenu editor={editor} />
+      <ImageMenu editor={editor} />
       <EditorContent editor={editor} />
-      {imageRequest && (
-        <ImageDialog
-          onClose={() => setImageRequest(null)}
-          onInsert={(src) => {
-            imageRequest(src);
-            setImageRequest(null);
+      {request && (
+        <MediaDialog
+          kind={request.kind}
+          media={media}
+          onClose={() => setRequest(null)}
+          onInsert={(attrs) => {
+            request.insert(attrs);
+            setRequest(null);
           }}
         />
       )}
@@ -93,7 +157,7 @@ function FormattingMenu({ editor }: { editor: Editor }) {
         !editor.isActive("image")
       }
       style={{ fontFamily: monoStack }}
-      className="light flex items-center gap-0.5 border border-border bg-background p-1 text-[13px] text-foreground"
+      className="light border-border bg-background text-foreground flex items-center gap-0.5 border p-1 text-[13px]"
     >
       {editingLink ? (
         <LinkInput
@@ -135,7 +199,7 @@ function FormattingMenu({ editor }: { editor: Editor }) {
           >
             <span className="line-through">S</span>
           </MenuButton>
-          <span className="mx-1 h-5 w-px bg-border" />
+          <span className="bg-border mx-1 h-5 w-px" />
           <MenuButton
             label="Link"
             active={state.link}
@@ -200,7 +264,7 @@ function VariableMenu({ editor }: { editor: Editor }) {
         editor.isEditable && editor.isActive("liquid")
       }
       style={{ fontFamily: monoStack }}
-      className="light border border-border bg-background p-2 text-[13px] text-foreground"
+      className="light border-border bg-background text-foreground border p-2 text-[13px]"
     >
       {code && (
         <VariableForm
@@ -243,7 +307,7 @@ function VariableForm({
       }}
     >
       <label className="flex items-center gap-2">
-        <span className="w-16 text-muted-foreground">
+        <span className="text-muted-foreground w-16">
           {isTag ? "code" : "variable"}
         </span>
         <input
@@ -255,7 +319,7 @@ function VariableForm({
       </label>
       {!isTag && (
         <label className="flex items-center gap-2">
-          <span className="w-16 text-muted-foreground">fallback</span>
+          <span className="text-muted-foreground w-16">fallback</span>
           <input
             value={fallback}
             onChange={(event) => setFallback(event.target.value)}
@@ -267,7 +331,7 @@ function VariableForm({
       )}
       <button
         type="submit"
-        className="self-end border border-border px-2 py-1 hover:bg-background-50"
+        className="border-border hover:bg-background-50 self-end border px-2 py-1"
       >
         apply
       </button>
@@ -334,23 +398,49 @@ function LinkInput({
         }}
         placeholder="https://"
         aria-label="Link URL"
-        className="w-64 bg-transparent px-2 py-1 text-foreground outline-none"
+        className="text-foreground w-64 bg-transparent px-2 py-1 outline-none"
       />
-      <button type="submit" className="px-2 py-1 hover:bg-background-50">
+      <button type="submit" className="hover:bg-background-50 px-2 py-1">
         Apply
       </button>
     </form>
   );
 }
 
-function ImageDialog({
+function MediaDialog({
+  kind,
+  media,
   onClose,
   onInsert,
 }: {
+  kind: "image" | "video";
+  media: MediaHandlers;
   onClose: () => void;
-  onInsert: (src: string) => void;
+  onInsert: (attrs: ImageAttrs) => void;
 }) {
-  const [src, setSrc] = useState("");
+  const [url, setUrl] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const field =
+    "mb-3 w-full border border-border bg-transparent px-3 py-2 outline-none";
+  const button = "border border-border px-3 py-2 hover:bg-background-50";
+
+  const run = async (task: () => Promise<ImageAttrs>) => {
+    setPending(true);
+    setError(null);
+    try {
+      onInsert(await task());
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Something went wrong");
+      setPending(false);
+    }
+  };
+
+  const upload = (file: File | undefined) => {
+    if (file)
+      void run(async () => ({ src: await media.upload(file), alt: "" }));
+  };
 
   return (
     <div
@@ -358,44 +448,175 @@ function ImageDialog({
       onMouseDown={onClose}
     >
       <form
-        className="w-full max-w-md border border-border bg-background p-5"
+        style={{ fontFamily: monoStack }}
+        className="light border-border bg-background text-foreground w-full max-w-md border p-5 text-[13px]"
         onMouseDown={(event) => event.stopPropagation()}
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => {
+          event.preventDefault();
+          if (kind === "image") upload(event.dataTransfer.files[0]);
+        }}
         onSubmit={(event) => {
           event.preventDefault();
-          if (src.trim()) onInsert(src.trim());
+          const value = url.trim();
+          if (!value) return;
+          void run(async () =>
+            kind === "video"
+              ? { ...(await media.video(value)), align: "center" }
+              : { src: value, alt: "" },
+          );
         }}
       >
-        <h2 className="mb-1 font-semibold">Add an image</h2>
-        <p className="mb-4 text-muted-foreground">
-          Paste the URL of an image that&apos;s already hosted online.
+        <h2 className="mb-1 font-semibold">
+          {kind === "video" ? "add a video" : "add an image"}
+        </h2>
+        <p className="text-muted-foreground mb-4">
+          {kind === "video"
+            ? "# paste a YouTube, Vimeo or Loom link. emails show its thumbnail with a play button, linked to the video."
+            : "# upload a PNG, JPEG, GIF or WebP up to 5 MB, or paste a link."}
         </p>
+        {kind === "image" && (
+          <>
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/png,image/jpeg,image/gif,image/webp"
+              className="hidden"
+              onChange={(event) => upload(event.target.files?.[0])}
+            />
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => fileInput.current?.click()}
+              className={`${button} mb-3 w-full`}
+            >
+              {pending ? "uploading…" : "choose a file, or drop it here"}
+            </button>
+          </>
+        )}
         <input
-          autoFocus
-          value={src}
-          onChange={(event) => setSrc(event.target.value)}
+          autoFocus={kind === "video"}
+          value={url}
+          onChange={(event) => setUrl(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Escape") onClose();
           }}
-          placeholder="https://example.com/image.png"
-          aria-label="Image URL"
-          className="mb-4 w-full border border-border bg-transparent px-3 py-2 outline-none"
+          placeholder={
+            kind === "video"
+              ? "https://youtu.be/…"
+              : "or paste https://example.com/image.png"
+          }
+          aria-label={kind === "video" ? "Video link" : "Image URL"}
+          className={field}
         />
+        {error && <p className="mb-3 text-red-600">✕ {error}</p>}
         <div className="flex justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-2 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground px-3 py-2"
           >
-            Cancel
+            cancel
           </button>
           <button
             type="submit"
-            className="border border-border px-3 py-2 font-semibold hover:bg-background-50"
+            disabled={pending || !url.trim()}
+            className={`${button} font-semibold disabled:opacity-50`}
           >
-            Add image
+            {pending && kind === "video" ? "adding…" : "add"}
           </button>
         </div>
       </form>
     </div>
+  );
+}
+
+const WIDTHS: { label: string; width: number | null }[] = [
+  { label: "auto", width: null },
+  { label: "half", width: 276 },
+  { label: "full", width: 552 },
+];
+
+function ImageMenu({ editor }: { editor: Editor }) {
+  const attrs = useEditorState({
+    editor,
+    selector: ({ editor }) =>
+      editor.isActive("image")
+        ? (editor.getAttributes("image") as ImageAttrs)
+        : null,
+  });
+  const set = (next: Partial<ImageAttrs>) =>
+    editor.chain().focus().updateAttributes("image", next).run();
+  const input =
+    "w-48 border border-border bg-transparent px-2 py-1 outline-none";
+
+  return (
+    <BubbleMenu
+      editor={editor}
+      pluginKey="imageMenu"
+      options={{ placement: "bottom", offset: 8 }}
+      shouldShow={({ editor }) => editor.isEditable && editor.isActive("image")}
+      style={{ fontFamily: monoStack }}
+      className="light border-border bg-background text-foreground flex flex-col gap-2 border p-2 text-[13px]"
+    >
+      {attrs && (
+        <>
+          <label className="flex items-center gap-2">
+            <span className="text-muted-foreground w-12">alt</span>
+            <input
+              key={`alt-${attrs.src}`}
+              defaultValue={attrs.alt ?? ""}
+              onBlur={(event) => set({ alt: event.target.value })}
+              placeholder="describe the image"
+              aria-label="Alt text"
+              className={input}
+            />
+          </label>
+          <label className="flex items-center gap-2">
+            <span className="text-muted-foreground w-12">link</span>
+            <input
+              key={`href-${attrs.src}`}
+              defaultValue={attrs.href ?? ""}
+              onBlur={(event) =>
+                set({ href: event.target.value.trim() || null })
+              }
+              placeholder="https://"
+              aria-label="Image link"
+              className={input}
+            />
+          </label>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground w-12">size</span>
+            {WIDTHS.map((option) => (
+              <MenuButton
+                key={option.label}
+                label={`Width: ${option.label}`}
+                active={(attrs.width ?? null) === option.width}
+                onClick={() => set({ width: option.width })}
+              >
+                {option.label}
+              </MenuButton>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground w-12">align</span>
+            <MenuButton
+              label="Align left"
+              active={attrs.align !== "center"}
+              onClick={() => set({ align: null })}
+            >
+              left
+            </MenuButton>
+            <MenuButton
+              label="Align centre"
+              active={attrs.align === "center"}
+              onClick={() => set({ align: "center" })}
+            >
+              centre
+            </MenuButton>
+          </div>
+        </>
+      )}
+    </BubbleMenu>
   );
 }

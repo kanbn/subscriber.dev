@@ -44,6 +44,9 @@ These settings go in `.env`.
 | `POSTGRES_PASSWORD` | With Compose | Password for the bundled Postgres |
 | `POSTGRES_URL` | With your own database | Connection string for an external Postgres |
 | `REDIS_HOST`, `REDIS_PASSWORD` | Yes | Redis connection |
+| `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | For image uploads | Any S3-compatible storage, such as Cloudflare R2 or MinIO |
+| `S3_REGION` | No | The bucket's region. Defaults to `us-east-1`, which works for R2 and MinIO |
+| `ASSETS_BUCKET`, `ASSETS_URL` | For image uploads | The bucket to upload to, and the public URL it's served from. Without these, uploads are turned off and you can still use image links |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` | For sign-in | Sends sign-in links. This is separate from the providers your workflows send through |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | No | Enables GitHub sign-in |
 

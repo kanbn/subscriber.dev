@@ -11,6 +11,8 @@ import type {
 } from "@subscriber.dev/api-client/hooks";
 import {
   getListWorkflowsQueryKey,
+  uploadImage,
+  uploadVideoThumbnail,
   useListIntegrations,
   useListWorkflows,
   usePreviewEmail,
@@ -19,6 +21,7 @@ import {
 } from "@subscriber.dev/api-client/hooks";
 import { authClient } from "@subscriber.dev/auth/client";
 
+import type { MediaHandlers } from "~/components/editor/EmailEditor";
 import { EmailEditor } from "~/components/editor/EmailEditor";
 import { canEditVisually } from "~/components/editor/html";
 import { Comment, monoStack, Ok, Prompt } from "~/components/Marketing";
@@ -289,6 +292,39 @@ function EmailPane({
     }
   };
 
+  const media = useMemo<MediaHandlers>(
+    () => ({
+      upload: async (file) => {
+        try {
+          const response = await uploadImage(environmentId, { file });
+          if (response.status !== 201) {
+            throw new Error("Couldn't upload that image");
+          }
+          return response.data.url;
+        } catch (error) {
+          throw new Error(errorMessage(error, "Couldn't upload that image"));
+        }
+      },
+      video: async (url) => {
+        try {
+          const response = await uploadVideoThumbnail(environmentId, { url });
+          if (response.status !== 201) {
+            throw new Error("Couldn't add that video");
+          }
+          return {
+            src: response.data.src,
+            href: response.data.href,
+            alt: response.data.title,
+          };
+        } catch (error) {
+          throw new Error(errorMessage(error, "Couldn't add that video"));
+        }
+      },
+      onError: (message) => setNotice({ ok: false, text: message }),
+    }),
+    [environmentId],
+  );
+
   const sharedHint = steps.length > 1 ? "# all emails" : undefined;
 
   const confirmLeave = (event: React.MouseEvent) => {
@@ -396,6 +432,7 @@ function EmailPane({
             <div className="mx-auto max-w-[600px] px-6 pt-12 pb-16">
               <EmailEditor
                 html={body}
+                media={media}
                 onChange={setBody}
                 onReady={(normalized) => {
                   setBody(normalized);

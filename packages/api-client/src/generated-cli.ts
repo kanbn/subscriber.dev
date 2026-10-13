@@ -1531,6 +1531,25 @@ export interface ListIntegrationsResponseDto {
   integrations: ListIntegrationsResponseDtoIntegrationsItem[];
 }
 
+export interface UploadResponseDto {
+  /** Public URL of the uploaded image. */
+  url: string;
+}
+
+export interface VideoInputDto {
+  /** A YouTube, Vimeo or Loom link. */
+  url: string;
+}
+
+export interface VideoResponseDto {
+  /** Public URL of the video's thumbnail, with a play button. */
+  src: string;
+  /** Link to the video. */
+  href: string;
+  /** The video's title, for the image's alt text. */
+  title: string;
+}
+
 export type AnalyticsResponseDtoSubscribers = {
   total: number;
   newInPeriod: number;
@@ -1702,6 +1721,10 @@ limit?: number;
  * @maximum 9007199254740991
  */
 offset?: number;
+};
+
+export type UploadImageBody = {
+  file: Blob | File;
 };
 
 export type GetAnalyticsParams = {
@@ -4099,6 +4122,112 @@ export const listIntegrations = async (environmentId: string, options?: Paramete
     method: 'GET'
 
 
+  }
+);}
+
+
+
+export type uploadImageResponse201 = {
+  data: UploadResponseDto
+  status: 201
+}
+
+export type uploadImageResponse400 = {
+  data: void
+  status: 400
+}
+
+export type uploadImageResponseSuccess = (uploadImageResponse201) & {
+  headers: Headers;
+};
+export type uploadImageResponseError = (uploadImageResponse400) & {
+  headers: Headers;
+};
+
+export type uploadImageResponse = (uploadImageResponseSuccess | uploadImageResponseError)
+
+export const getUploadImageUrl = (environmentId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/uploads`
+}
+
+/**
+ * Uploads a PNG, JPEG, GIF or WebP image (up to 5 MB) and returns its public URL to use in an email.
+ * @summary Upload an image for your emails
+ */
+export const uploadImage = async (environmentId: string,
+    uploadImageBody: UploadImageBody, options?: Parameters<typeof cliFetch>[1]): Promise<uploadImageResponse> => {
+    const formData = new FormData();
+formData.append(`file`, uploadImageBody.file);
+
+  return cliFetch<uploadImageResponse>(getUploadImageUrl(environmentId),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+export type uploadVideoThumbnailResponse201 = {
+  data: VideoResponseDto
+  status: 201
+}
+
+export type uploadVideoThumbnailResponse400 = {
+  data: void
+  status: 400
+}
+
+export type uploadVideoThumbnailResponseSuccess = (uploadVideoThumbnailResponse201) & {
+  headers: Headers;
+};
+export type uploadVideoThumbnailResponseError = (uploadVideoThumbnailResponse400) & {
+  headers: Headers;
+};
+
+export type uploadVideoThumbnailResponse = (uploadVideoThumbnailResponseSuccess | uploadVideoThumbnailResponseError)
+
+export const getUploadVideoThumbnailUrl = (environmentId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/uploads/video`
+}
+
+/**
+ * Email clients can't play video, so emails show a thumbnail with a play button that links to the video. Give a YouTube, Vimeo or Loom link and this stores the thumbnail and returns what to put in the email.
+ * @summary Turn a video link into a thumbnail
+ */
+export const uploadVideoThumbnail = async (environmentId: string,
+    videoInputDto: VideoInputDto, options?: Parameters<typeof cliFetch>[1]): Promise<uploadVideoThumbnailResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return cliFetch<uploadVideoThumbnailResponse>(getUploadVideoThumbnailUrl(environmentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(videoInputDto)
   }
 );}
 

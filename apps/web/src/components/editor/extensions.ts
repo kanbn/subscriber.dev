@@ -3,7 +3,7 @@ import type { SuggestionOptions, SuggestionProps } from "@tiptap/suggestion";
 import Image from "@tiptap/extension-image";
 import { Placeholder } from "@tiptap/extensions";
 import { PluginKey } from "@tiptap/pm/state";
-import { Extension, Node, ReactRenderer } from "@tiptap/react";
+import { Extension, mergeAttributes, Node, ReactRenderer } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Suggestion from "@tiptap/suggestion";
 
@@ -158,19 +158,92 @@ export const VariableSuggestion = suggestionExtension("variableSuggestion", {
   items: ({ query }) => variableItems(query),
 });
 
+export interface ImageAttrs {
+  src: string;
+  alt?: string | null;
+  href?: string | null;
+  align?: "center" | null;
+  width?: number | null;
+}
+
+export const EmailImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      href: {
+        default: null,
+        parseHTML: (element) =>
+          element.parentElement?.tagName === "A"
+            ? element.parentElement.getAttribute("href")
+            : null,
+        renderHTML: () => ({}),
+      },
+      align: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-align"),
+        renderHTML: (attributes) =>
+          attributes.align ? { "data-align": attributes.align as string } : {},
+      },
+    };
+  },
+
+  addNodeView() {
+    return ({ node }) => {
+      const dom = document.createElement("img");
+      const apply = (attrs: Record<string, unknown>) => {
+        const values: Record<string, unknown> = {
+          src: attrs.src,
+          alt: attrs.alt,
+          title: attrs.title,
+          width: attrs.width,
+          height: attrs.height,
+          "data-align": attrs.align,
+          "data-href": attrs.href,
+        };
+        for (const [name, value] of Object.entries(values)) {
+          if (typeof value === "string" || typeof value === "number") {
+            dom.setAttribute(name, String(value));
+          } else {
+            dom.removeAttribute(name);
+          }
+        }
+      };
+      apply(node.attrs);
+      return {
+        dom,
+        update: (updated) => {
+          if (updated.type !== node.type) return false;
+          apply(updated.attrs);
+          return true;
+        },
+      };
+    };
+  },
+
+  renderHTML({ node, HTMLAttributes }) {
+    const image = [
+      "img",
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+    ] as const;
+    const href = node.attrs.href as string | null;
+    return href ? ["a", { href }, image] : image;
+  },
+});
+
 export interface SlashCommandOptions {
-  onImage: (insert: (src: string) => void) => void;
+  onImage: (insert: (attrs: ImageAttrs) => void) => void;
+  onVideo: (insert: (attrs: ImageAttrs) => void) => void;
 }
 
 export const SlashCommand = Extension.create<SlashCommandOptions>({
   name: "slashCommand",
 
   addOptions() {
-    return { onImage: () => undefined };
+    return { onImage: () => undefined, onVideo: () => undefined };
   },
 
   addProseMirrorPlugins() {
-    const { onImage } = this.options;
+    const { onImage, onVideo } = this.options;
     const items: MenuItem[] = [
       {
         title: "Text",
@@ -216,10 +289,30 @@ export const SlashCommand = Extension.create<SlashCommandOptions>({
       },
       {
         title: "Image",
-        hint: "From a URL",
+        hint: "Upload or link",
         run: (editor, range) => {
           editor.chain().focus().deleteRange(range).run();
-          onImage((src) => editor.chain().focus().setImage({ src }).run());
+          onImage((attrs) =>
+            editor
+              .chain()
+              .focus()
+              .insertContent({ type: "image", attrs })
+              .run(),
+          );
+        },
+      },
+      {
+        title: "Video",
+        hint: "YouTube, Vimeo, Loom",
+        run: (editor, range) => {
+          editor.chain().focus().deleteRange(range).run();
+          onVideo((attrs) =>
+            editor
+              .chain()
+              .focus()
+              .insertContent({ type: "image", attrs })
+              .run(),
+          );
         },
       },
       {
@@ -283,7 +376,7 @@ export function emailExtensions(options: SlashCommandOptions) {
           url.trim().startsWith("{{") || defaultValidate(url),
       },
     }),
-    Image,
+    EmailImage,
     Liquid,
     Placeholder.configure({
       placeholder: ({ node }) =>

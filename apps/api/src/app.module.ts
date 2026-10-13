@@ -7,6 +7,7 @@ import { InboundModule } from "./modules/inbound/inbound.module.js";
 import { IntegrationsModule } from "./modules/integrations/integrations.module.js";
 import { SubscriberMcpModule } from "./modules/mcp/mcp.module.js";
 import { SubscriberModule } from "./modules/subscriber/subscriber.module.js";
+import { UploadsModule } from "./modules/uploads/uploads.module.js";
 import { UserModule } from "./modules/user/user.module.js";
 import { WorkflowModule } from "./modules/workflow/workflow.module.js";
 import { WorkspaceModule } from "./modules/workspace/workspace.module.js";
@@ -21,6 +22,7 @@ import { getRedisConnection } from "./queue/bullmq.connection.js";
     SubscriberModule,
     WorkflowModule,
     IntegrationsModule,
+    UploadsModule,
     AnalyticsModule,
     InboundModule,
     SubscriberMcpModule,
