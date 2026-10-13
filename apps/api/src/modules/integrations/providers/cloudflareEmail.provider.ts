@@ -107,8 +107,10 @@ export const cloudflareEmailProvider: IntegrationProvider<
     }
   },
   send: async (config, secret, message) => {
-    const from = config.fromName
-      ? { address: config.fromEmail, name: config.fromName }
+    const fromName = message.fromName ?? config.fromName;
+    const replyTo = message.replyTo ?? config.replyTo;
+    const from = fromName
+      ? { address: config.fromEmail, name: fromName }
       : config.fromEmail;
 
     const response = await fetch(
@@ -125,7 +127,7 @@ export const cloudflareEmailProvider: IntegrationProvider<
           subject: message.subject,
           html: message.html,
           text: message.text,
-          ...(config.replyTo ? { reply_to: config.replyTo } : {}),
+          ...(replyTo ? { reply_to: replyTo } : {}),
           ...(message.headers ? { headers: message.headers } : {}),
         }),
       },

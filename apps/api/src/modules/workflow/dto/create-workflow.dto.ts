@@ -20,6 +20,41 @@ const emailLayoutSchema = z
     '"default" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). "none" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is.',
   );
 
+export const emailPreviewTextSchema = z
+  .string()
+  .max(255)
+  .optional()
+  .describe(
+    "Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.",
+  );
+
+export const emailFromNameSchema = z
+  .string()
+  .max(255)
+  .optional()
+  .describe(
+    'Sender name for every email in this workflow, e.g. "Jane from Acme". Defaults to the email integration\'s fromName. The from address always comes from the integration.',
+  );
+
+export const emailReplyToSchema = z
+  .email()
+  .optional()
+  .describe(
+    "Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.",
+  );
+
+export const workflowEmailSettingsSchema = z
+  .object({ fromName: emailFromNameSchema, replyTo: emailReplyToSchema })
+  .describe(
+    "Email settings for every email in this workflow. Leave a field out to use the email integration's.",
+  );
+
+export const workflowChannelsSchema = z
+  .object({ email: workflowEmailSettingsSchema.optional() })
+  .describe(
+    "Settings for each channel this workflow sends on. Channel-specific, so the workflow itself stays channel-neutral.",
+  );
+
 const EmailWorkflowStepSchema = z.object({
   type: z.literal("email"),
   delayMs: delayMsSchema,
@@ -31,6 +66,7 @@ const EmailWorkflowStepSchema = z.object({
       'HTML (or plain text) email body, rendered as a Liquid template (https://liquidjs.com). Supports {{ subscriber.firstName }} etc. interpolation from subscriber fields and custom attributes (an attribute called company is {{ subscriber.company }}), and trigger payload fields at the top level (payload {"plan": "pro"} is {{ plan }}), plus {{unsubscribeUrl}} for this subscriber\'s unsubscribe link, and {% if %}/{% else %}/{% endif %} conditionals, e.g. {% if subscriber.firstName %}Hey {{ subscriber.firstName }}{% else %}Hey there{% endif %}. With the default layout, write just the content (<p>, <h1>, <h2>, <a>, <ul>, <img>, <hr>, <blockquote>…) — fonts, spacing and the centred column are applied for you. Add class="button" to a link to render it as a call-to-action button.',
     ),
   layout: emailLayoutSchema,
+  previewText: emailPreviewTextSchema,
 });
 
 const WebhookWorkflowStepSchema = z.object({
@@ -107,6 +143,7 @@ export const CreateWorkflowSchema = z.object({
     .describe(
       "Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way.",
     ),
+  channels: workflowChannelsSchema.optional(),
   steps: z.array(WorkflowStepSchema).min(1).max(50),
   triggers: workflowTriggersSchema.optional(),
   exitConditions: workflowExitConditionsSchema.optional(),
@@ -125,6 +162,7 @@ export const WorkflowStepResponseSchema = z.object({
     .describe(
       'Email steps only. Steps saved before layouts existed have no value and use "default".',
     ),
+  previewText: z.string().optional().describe("Email steps only."),
   url: z
     .string()
     .optional()
@@ -140,11 +178,27 @@ export const WorkflowSchema = z.object({
   description: z.string().nullable(),
   status: z.enum(["active", "paused"]),
   type: z.enum(["automation", "broadcast"]),
+  channels: z
+    .object({
+      email: z
+        .object({
+          fromName: z.string().optional(),
+          replyTo: z.string().optional(),
+        })
+        .optional(),
+    })
+    .describe("Settings for each channel this workflow sends on."),
   steps: z.array(WorkflowStepResponseSchema),
   triggers: z.array(WorkflowTriggerResponseSchema),
   exitConditions: z.array(WorkflowTriggerResponseSchema),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+  editUrl: z
+    .string()
+    .optional()
+    .describe(
+      "Link to edit this workflow's emails in the web editor. Share it when someone wants to tweak the copy or preview an email.",
+    ),
 });
 
 export const WorkflowDetailResponseSchema = WorkflowSchema.extend({

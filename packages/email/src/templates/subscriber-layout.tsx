@@ -1,5 +1,14 @@
 import * as React from "react";
-import { Body, Container, Head, Html, Link, render, Text } from "react-email";
+import {
+  Body,
+  Container,
+  Head,
+  Html,
+  Link,
+  Preview,
+  render,
+  Text,
+} from "react-email";
 
 export interface SubscriberLayoutTheme {
   fontFamily: string;
@@ -26,6 +35,7 @@ export const defaultSubscriberLayoutTheme: SubscriberLayoutTheme = {
 
 export interface SubscriberLayoutProps {
   bodyHtml: string;
+  previewText?: string;
   unsubscribeUrl?: string;
   theme?: SubscriberLayoutTheme;
 }
@@ -52,6 +62,7 @@ const contentStyles = (theme: SubscriberLayoutTheme) => `
 
 export const SubscriberLayout = ({
   bodyHtml,
+  previewText,
   unsubscribeUrl,
   theme = defaultSubscriberLayoutTheme,
 }: SubscriberLayoutProps) => (
@@ -60,6 +71,7 @@ export const SubscriberLayout = ({
       <meta name="color-scheme" content="light" />
       <style dangerouslySetInnerHTML={{ __html: contentStyles(theme) }} />
     </Head>
+    {previewText && <Preview>{previewText}</Preview>}
     <Body style={{ backgroundColor: theme.backgroundColor, margin: 0 }}>
       <Container
         className="container"

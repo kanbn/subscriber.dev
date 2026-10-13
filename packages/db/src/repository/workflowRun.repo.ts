@@ -106,6 +106,7 @@ export const getRunStepByProviderMessageId = async (
 export const getRunById = async (db: dbClient, id: number) => {
   return await db.query.workflowRuns.findFirst({
     where: eq(workflowRuns.id, id),
+    with: { workflow: { columns: { channels: true } } },
   });
 };
 

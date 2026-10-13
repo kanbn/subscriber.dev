@@ -68,11 +68,12 @@ export class WorkflowTools {
       args.environmentId,
     );
 
-    return this.workflowService.createWorkflow(db, environment.id, {
+    return this.workflowService.createWorkflow(db, environment, {
       key: args.key,
       name: args.name,
       description: args.description,
       type: args.type,
+      channels: args.channels,
       steps: args.steps,
       triggers: args.triggers,
       exitConditions: args.exitConditions,
@@ -99,7 +100,7 @@ export class WorkflowTools {
       args.environmentId,
     );
 
-    return this.workflowService.listWorkflows(db, environment.id, {
+    return this.workflowService.listWorkflows(db, environment, {
       limit: args.limit,
       offset: args.offset,
       type: args.type,
@@ -151,11 +152,7 @@ export class WorkflowTools {
       args.environmentId,
     );
 
-    return this.workflowService.getWorkflow(
-      db,
-      environment.id,
-      args.workflowId,
-    );
+    return this.workflowService.getWorkflow(db, environment, args.workflowId);
   }
 
   @Tool({
@@ -185,13 +182,14 @@ export class WorkflowTools {
 
     return this.workflowService.updateWorkflow(
       db,
-      environment.id,
+      environment,
       args.workflowId,
       {
         key: args.key,
         name: args.name,
         description: args.description,
         status: args.status,
+        channels: args.channels,
         steps: args.steps,
         triggers: args.triggers,
         exitConditions: args.exitConditions,

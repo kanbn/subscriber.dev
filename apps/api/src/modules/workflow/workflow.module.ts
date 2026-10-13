@@ -9,6 +9,7 @@ import { BroadcastDispatchProcessor } from "./broadcastDispatch.processor.js";
 import { BroadcastResumeProcessor } from "./broadcastResume.processor.js";
 import { BroadcastSetupProcessor } from "./broadcastSetup.processor.js";
 import { BroadcastStepsProcessor } from "./broadcastSteps.processor.js";
+import { EmailController } from "./email.controller.js";
 import {
   BOUNCE_EVENTS_QUEUE_NAME,
   BOUNCE_POLL_QUEUE_NAME,
@@ -35,7 +36,7 @@ import { WorkflowService } from "./workflow.service.js";
       { name: BOUNCE_POLL_QUEUE_NAME },
     ),
   ],
-  controllers: [WorkflowController, BouncesController],
+  controllers: [WorkflowController, BouncesController, EmailController],
   providers: [
     WorkflowService,
     WorkflowProcessor,

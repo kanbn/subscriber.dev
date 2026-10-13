@@ -70,6 +70,10 @@ export const workflowBroadcastStatusEnum = pgEnum(
   workflowBroadcastStatuses,
 );
 
+export interface WorkflowChannels {
+  email?: { fromName?: string; replyTo?: string };
+}
+
 export const workflows = pgTable(
   "workflows",
   {
@@ -85,6 +89,7 @@ export const workflows = pgTable(
     description: text("description"),
     status: workflowStatusEnum("status").notNull().default("active"),
     type: workflowTypeEnum("type").notNull().default("automation"),
+    channels: jsonb("channels").$type<WorkflowChannels>(),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt").notNull().defaultNow(),
     deletedAt: timestamp("deletedAt"),

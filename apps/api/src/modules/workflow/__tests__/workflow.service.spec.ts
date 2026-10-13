@@ -13,7 +13,7 @@ import * as workflowBroadcastRepo from "@subscriber.dev/db/repository/workflowBr
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
 import { resolveAudienceSubscriberIds } from "../audienceQuery.js";
-import { WorkflowService } from "../workflow.service.js";
+import { mergeChannels, WorkflowService } from "../workflow.service.js";
 
 vi.mock("../audienceQuery.js", () => ({
   resolveAudienceSubscriberIds: vi.fn(),
@@ -107,6 +107,8 @@ beforeEach(() => {
 // ---------------------------------------------------------------------------
 // triggerWorkflow
 // ---------------------------------------------------------------------------
+
+const testEnvironment = { id: 10, publicId: "env_test" };
 
 describe("triggerWorkflow", () => {
   const workflow = { id: 1, key: "user-signup", status: "active" as const };
@@ -457,7 +459,7 @@ describe("createWorkflow", () => {
       ],
     } as any);
 
-    const result = await service.createWorkflow(mockDb, 10, {
+    const result = await service.createWorkflow(mockDb, testEnvironment, {
       key: "user-signup",
       name: "Signup",
       type: "automation",
@@ -518,7 +520,7 @@ describe("createWorkflow", () => {
       ],
     } as any);
 
-    const result = await service.createWorkflow(mockDb, 10, {
+    const result = await service.createWorkflow(mockDb, testEnvironment, {
       key: "user-signup",
       name: "Signup",
       type: "automation",
@@ -577,7 +579,7 @@ describe("workflow triggers", () => {
   }
 
   const create = (overrides: Record<string, unknown>) =>
-    service.createWorkflow(mockDb, 10, {
+    service.createWorkflow(mockDb, testEnvironment, {
       key: "trial-welcome",
       name: "Trial welcome",
       type: "automation",
@@ -680,7 +682,7 @@ describe("workflow triggers", () => {
       { source: "stripe", event: "payment_failed" },
     ] as any);
 
-    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+    await service.updateWorkflow(mockDb, testEnvironment, "wf_abc", {
       triggers: [{ source: "stripe", event: "payment_failed" }],
       updatedBy: 1,
     });
@@ -692,7 +694,7 @@ describe("workflow triggers", () => {
     );
 
     vi.mocked(workflowRepo.replaceWorkflowTriggers).mockClear();
-    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+    await service.updateWorkflow(mockDb, testEnvironment, "wf_abc", {
       name: "Renamed",
       updatedBy: 1,
     });
@@ -713,7 +715,7 @@ describe("workflow triggers", () => {
       { source: "stripe", event: "trial_started" },
     ] as any);
 
-    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+    await service.updateWorkflow(mockDb, testEnvironment, "wf_abc", {
       triggers: [{ source: "stripe", event: "trial_started" }],
       updatedBy: 1,
     });
@@ -725,7 +727,7 @@ describe("workflow triggers", () => {
     );
 
     await expect(
-      service.updateWorkflow(mockDb, 10, "wf_abc", {
+      service.updateWorkflow(mockDb, testEnvironment, "wf_abc", {
         triggers: [
           { source: "stripe", event: "trial_started" },
           { source: "stripe", event: "trial_ending" },
@@ -799,7 +801,7 @@ describe("workflow triggers", () => {
     vi.mocked(workflowRepo.updateWorkflow).mockResolvedValue(workflow as any);
     vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([]);
 
-    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+    await service.updateWorkflow(mockDb, testEnvironment, "wf_abc", {
       exitConditions: [{ source: "stripe", event: "trial_converted" }],
       updatedBy: 1,
     });
@@ -811,6 +813,50 @@ describe("workflow triggers", () => {
       "exit",
       [{ source: "stripe", event: "trial_converted" }],
     );
+  });
+
+  it("links to the editor only when the workflow has an email step", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(
+      workflow as any,
+    );
+    vi.mocked(workflowRepo.listTriggersForWorkflow).mockResolvedValue([]);
+    vi.mocked(workflowRunRepo.getWorkflowStepCounts).mockResolvedValue({
+      sent: 0,
+      failed: 0,
+      skipped: 0,
+      pending: 0,
+      bounced: 0,
+    } as any);
+    vi.mocked(workflowRunRepo.getWorkflowBounceBreakdown).mockResolvedValue({
+      hard: 0,
+      soft: 0,
+    } as any);
+
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([
+      { publicId: "st_1", stepOrder: 0, type: "email", delayMs: 0, config: {} },
+    ] as any);
+    const withEmail = await service.getWorkflow(
+      mockDb,
+      testEnvironment,
+      "wf_abc",
+    );
+    expect(withEmail.editUrl).toMatch(/\/editor\/env_test\/wf_abc$/);
+
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue([
+      {
+        publicId: "st_2",
+        stepOrder: 0,
+        type: "webhook",
+        delayMs: 0,
+        config: { url: "https://example.com/hook", body: "{}" },
+      },
+    ] as any);
+    const webhookOnly = await service.getWorkflow(
+      mockDb,
+      testEnvironment,
+      "wf_abc",
+    );
+    expect(webhookOnly.editUrl).toBeUndefined();
   });
 
   it("shows triggers as inactive while their integration is disconnected", async () => {
@@ -833,7 +879,7 @@ describe("workflow triggers", () => {
       soft: 0,
     } as any);
 
-    const result = await service.getWorkflow(mockDb, 10, "wf_abc");
+    const result = await service.getWorkflow(mockDb, testEnvironment, "wf_abc");
 
     expect(result.triggers).toEqual([
       expect.objectContaining({ event: "trial_started", active: false }),
@@ -880,17 +926,22 @@ describe("updateWorkflow webhook URLs", () => {
   });
 
   it("restores the stored URL when the redacted form is sent back", async () => {
-    const result = await service.updateWorkflow(mockDb, 10, "wf_abc", {
-      steps: [
-        {
-          type: "webhook",
-          delayMs: 0,
-          url: "https://discord.com/***oken",
-          body: '{"content":"changed"}',
-        },
-      ],
-      updatedBy: 1,
-    });
+    const result = await service.updateWorkflow(
+      mockDb,
+      testEnvironment,
+      "wf_abc",
+      {
+        steps: [
+          {
+            type: "webhook",
+            delayMs: 0,
+            url: "https://discord.com/***oken",
+            body: '{"content":"changed"}',
+          },
+        ],
+        updatedBy: 1,
+      },
+    );
 
     expect(workflowRepo.replaceWorkflowSteps).toHaveBeenCalledWith(mockDb, 1, [
       {
@@ -904,7 +955,7 @@ describe("updateWorkflow webhook URLs", () => {
 
   it("stores a new URL as given", async () => {
     const newUrl = "https://hooks.slack.com/services/T0/B0/other";
-    await service.updateWorkflow(mockDb, 10, "wf_abc", {
+    await service.updateWorkflow(mockDb, testEnvironment, "wf_abc", {
       steps: [{ type: "webhook", delayMs: 0, url: newUrl, body: "{}" }],
       updatedBy: 1,
     });
@@ -1531,7 +1582,7 @@ describe("getWorkflow", () => {
       soft: 0,
     });
 
-    const result = await service.getWorkflow(mockDb, 10, "wf_abc");
+    const result = await service.getWorkflow(mockDb, testEnvironment, "wf_abc");
 
     expect(result).toEqual(
       expect.objectContaining({
@@ -1582,7 +1633,7 @@ describe("getWorkflow", () => {
       soft: 0,
     });
 
-    const result = await service.getWorkflow(mockDb, 10, "wf_abc");
+    const result = await service.getWorkflow(mockDb, testEnvironment, "wf_abc");
 
     expect(result.successRate).toBeNull();
   });
@@ -1590,9 +1641,9 @@ describe("getWorkflow", () => {
   it("throws NotFoundException when the workflow does not exist", async () => {
     vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(undefined);
 
-    await expect(service.getWorkflow(mockDb, 10, "wf_missing")).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.getWorkflow(mockDb, testEnvironment, "wf_missing"),
+    ).rejects.toThrow(NotFoundException);
     expect(workflowRunRepo.getWorkflowStepCounts).not.toHaveBeenCalled();
     expect(workflowRunRepo.getWorkflowBounceBreakdown).not.toHaveBeenCalled();
   });
@@ -1700,5 +1751,21 @@ describe("recordBounceEvent", () => {
       }),
     ).rejects.toThrow(NotFoundException);
     expect(mockBounceEventsQueue.add).not.toHaveBeenCalled();
+  });
+});
+
+describe("mergeChannels", () => {
+  const existing = { email: { fromName: "Jane", replyTo: "jane@acme.com" } };
+
+  it("replaces a channel's settings and keeps channels left out", () => {
+    expect(mergeChannels(existing, { email: { fromName: "Acme" } })).toEqual({
+      email: { fromName: "Acme" },
+    });
+    expect(mergeChannels(existing, {})).toEqual(existing);
+  });
+
+  it("removes a channel set to null", () => {
+    expect(mergeChannels(existing, { email: null })).toEqual({});
+    expect(mergeChannels(null, { email: null })).toEqual({});
   });
 });

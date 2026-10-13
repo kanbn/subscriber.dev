@@ -44,8 +44,9 @@ export const smtpProvider: IntegrationProvider<SmtpConfig, SmtpSecret> = {
     });
   },
   send: async (config, secret, message) => {
-    const from = config.fromName
-      ? `${config.fromName} <${config.fromEmail}>`
+    const fromName = message.fromName ?? config.fromName;
+    const from = fromName
+      ? `${fromName} <${config.fromEmail}>`
       : config.fromEmail;
 
     const response = await sendRawEmail(
@@ -63,7 +64,7 @@ export const smtpProvider: IntegrationProvider<SmtpConfig, SmtpSecret> = {
       {
         text: message.text,
         headers: message.headers,
-        replyTo: config.replyTo,
+        replyTo: message.replyTo ?? config.replyTo,
       },
     );
 

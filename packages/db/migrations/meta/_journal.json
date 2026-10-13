@@ -183,6 +183,13 @@
       "when": 1791794326988,
       "tag": "20261012083846_AddOAuthProvider",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1791885708622,
+      "tag": "20261013100148_AddWorkflowChannels",
+      "breakpoints": true
     }
   ]
 }

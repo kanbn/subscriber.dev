@@ -114,11 +114,12 @@ export class WorkflowController {
   ) {
     const db = createDrizzleClient();
 
-    return this.workflowService.createWorkflow(db, environment.id, {
+    return this.workflowService.createWorkflow(db, environment, {
       key: input.key,
       name: input.name,
       description: input.description,
       type: input.type,
+      channels: input.channels,
       steps: input.steps,
       triggers: input.triggers,
       exitConditions: input.exitConditions,
@@ -149,7 +150,7 @@ export class WorkflowController {
   ): Promise<ListWorkflowsResponseDto> {
     const db = createDrizzleClient();
 
-    return this.workflowService.listWorkflows(db, environment.id, {
+    return this.workflowService.listWorkflows(db, environment, {
       limit: query.limit,
       offset: query.offset,
       type: query.type,
@@ -198,7 +199,7 @@ export class WorkflowController {
   ): Promise<WorkflowDetailResponseDto> {
     const db = createDrizzleClient();
 
-    return this.workflowService.getWorkflow(db, environment.id, workflowId);
+    return this.workflowService.getWorkflow(db, environment, workflowId);
   }
 
   @Patch(":workflowId")
@@ -221,11 +222,12 @@ export class WorkflowController {
   ) {
     const db = createDrizzleClient();
 
-    return this.workflowService.updateWorkflow(db, environment.id, workflowId, {
+    return this.workflowService.updateWorkflow(db, environment, workflowId, {
       key: input.key,
       name: input.name,
       description: input.description,
       status: input.status,
+      channels: input.channels,
       steps: input.steps,
       triggers: input.triggers,
       exitConditions: input.exitConditions,

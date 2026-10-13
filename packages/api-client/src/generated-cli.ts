@@ -569,6 +569,30 @@ export const CreateWorkflowDtoType = {
   broadcast: 'broadcast',
 } as const;
 
+/**
+ * Email settings for every email in this workflow. Leave a field out to use the email integration's.
+ */
+export type CreateWorkflowDtoChannelsEmail = {
+  /**
+     * Sender name for every email in this workflow, e.g. "Jane from Acme". Defaults to the email integration's fromName. The from address always comes from the integration.
+     * @maxLength 255
+     */
+  fromName?: string;
+  /**
+     * Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.
+     * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+     */
+  replyTo?: string;
+};
+
+/**
+ * Settings for each channel this workflow sends on. Channel-specific, so the workflow itself stays channel-neutral.
+ */
+export type CreateWorkflowDtoChannels = {
+  /** Email settings for every email in this workflow. Leave a field out to use the email integration's. */
+  email?: CreateWorkflowDtoChannelsEmail;
+};
+
 export type CreateWorkflowDtoStepsItem = {
   type: 'email';
   /**
@@ -589,6 +613,11 @@ export type CreateWorkflowDtoStepsItem = {
   body: string;
   /** "default" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). "none" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is. */
   layout?: 'default' | 'none';
+  /**
+     * Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.
+     * @maxLength 255
+     */
+  previewText?: string;
 } | {
   type: 'webhook';
   /**
@@ -650,6 +679,8 @@ export interface CreateWorkflowDto {
   description?: string;
   /** Purely organizational: automation workflows are meant to be triggered individually per-subscriber; broadcast workflows are meant to be fanned out via the broadcast endpoint. Either can technically still be used either way. */
   type?: CreateWorkflowDtoType;
+  /** Settings for each channel this workflow sends on. Channel-specific, so the workflow itself stays channel-neutral. */
+  channels?: CreateWorkflowDtoChannels;
   /**
      * @minItems 1
      * @maxItems 50
@@ -683,6 +714,18 @@ export const WorkflowResponseDtoType = {
   broadcast: 'broadcast',
 } as const;
 
+export type WorkflowResponseDtoChannelsEmail = {
+  fromName?: string;
+  replyTo?: string;
+};
+
+/**
+ * Settings for each channel this workflow sends on.
+ */
+export type WorkflowResponseDtoChannels = {
+  email?: WorkflowResponseDtoChannelsEmail;
+};
+
 /**
  * Email steps only. Steps saved before layouts existed have no value and use "default".
  */
@@ -703,6 +746,8 @@ export type WorkflowResponseDtoStepsItem = {
   body?: string;
   /** Email steps only. Steps saved before layouts existed have no value and use "default". */
   layout?: WorkflowResponseDtoStepsItemLayout;
+  /** Email steps only. */
+  previewText?: string;
   /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
@@ -750,6 +795,8 @@ export interface WorkflowResponseDto {
   description: string | null;
   status: WorkflowResponseDtoStatus;
   type: WorkflowResponseDtoType;
+  /** Settings for each channel this workflow sends on. */
+  channels: WorkflowResponseDtoChannels;
   steps: WorkflowResponseDtoStepsItem[];
   triggers: WorkflowResponseDtoTriggersItem[];
   exitConditions: WorkflowResponseDtoExitConditionsItem[];
@@ -757,6 +804,8 @@ export interface WorkflowResponseDto {
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+  /** Link to edit this workflow's emails in the web editor. Share it when someone wants to tweak the copy or preview an email. */
+  editUrl?: string;
 }
 
 export type ListWorkflowsResponseDtoWorkflowsItemStatus = typeof ListWorkflowsResponseDtoWorkflowsItemStatus[keyof typeof ListWorkflowsResponseDtoWorkflowsItemStatus];
@@ -774,6 +823,18 @@ export const ListWorkflowsResponseDtoWorkflowsItemType = {
   automation: 'automation',
   broadcast: 'broadcast',
 } as const;
+
+export type ListWorkflowsResponseDtoWorkflowsItemChannelsEmail = {
+  fromName?: string;
+  replyTo?: string;
+};
+
+/**
+ * Settings for each channel this workflow sends on.
+ */
+export type ListWorkflowsResponseDtoWorkflowsItemChannels = {
+  email?: ListWorkflowsResponseDtoWorkflowsItemChannelsEmail;
+};
 
 /**
  * Email steps only. Steps saved before layouts existed have no value and use "default".
@@ -795,6 +856,8 @@ export type ListWorkflowsResponseDtoWorkflowsItemStepsItem = {
   body?: string;
   /** Email steps only. Steps saved before layouts existed have no value and use "default". */
   layout?: ListWorkflowsResponseDtoWorkflowsItemStepsItemLayout;
+  /** Email steps only. */
+  previewText?: string;
   /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
@@ -843,6 +906,8 @@ export type ListWorkflowsResponseDtoWorkflowsItem = {
   description: string | null;
   status: ListWorkflowsResponseDtoWorkflowsItemStatus;
   type: ListWorkflowsResponseDtoWorkflowsItemType;
+  /** Settings for each channel this workflow sends on. */
+  channels: ListWorkflowsResponseDtoWorkflowsItemChannels;
   steps: ListWorkflowsResponseDtoWorkflowsItemStepsItem[];
   triggers: ListWorkflowsResponseDtoWorkflowsItemTriggersItem[];
   exitConditions: ListWorkflowsResponseDtoWorkflowsItemExitConditionsItem[];
@@ -850,6 +915,8 @@ export type ListWorkflowsResponseDtoWorkflowsItem = {
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+  /** Link to edit this workflow's emails in the web editor. Share it when someone wants to tweak the copy or preview an email. */
+  editUrl?: string;
 };
 
 export interface ListWorkflowsResponseDto {
@@ -948,6 +1015,18 @@ export const WorkflowDetailResponseDtoType = {
   broadcast: 'broadcast',
 } as const;
 
+export type WorkflowDetailResponseDtoChannelsEmail = {
+  fromName?: string;
+  replyTo?: string;
+};
+
+/**
+ * Settings for each channel this workflow sends on.
+ */
+export type WorkflowDetailResponseDtoChannels = {
+  email?: WorkflowDetailResponseDtoChannelsEmail;
+};
+
 /**
  * Email steps only. Steps saved before layouts existed have no value and use "default".
  */
@@ -968,6 +1047,8 @@ export type WorkflowDetailResponseDtoStepsItem = {
   body?: string;
   /** Email steps only. Steps saved before layouts existed have no value and use "default". */
   layout?: WorkflowDetailResponseDtoStepsItemLayout;
+  /** Email steps only. */
+  previewText?: string;
   /** Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL. */
   url?: string;
 };
@@ -1015,6 +1096,8 @@ export interface WorkflowDetailResponseDto {
   description: string | null;
   status: WorkflowDetailResponseDtoStatus;
   type: WorkflowDetailResponseDtoType;
+  /** Settings for each channel this workflow sends on. */
+  channels: WorkflowDetailResponseDtoChannels;
   steps: WorkflowDetailResponseDtoStepsItem[];
   triggers: WorkflowDetailResponseDtoTriggersItem[];
   exitConditions: WorkflowDetailResponseDtoExitConditionsItem[];
@@ -1022,6 +1105,8 @@ export interface WorkflowDetailResponseDto {
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+  /** Link to edit this workflow's emails in the web editor. Share it when someone wants to tweak the copy or preview an email. */
+  editUrl?: string;
   sentCount: number;
   failedCount: number;
   skippedCount: number;
@@ -1039,6 +1124,30 @@ export const UpdateWorkflowDtoStatus = {
   active: 'active',
   paused: 'paused',
 } as const;
+
+/**
+ * Replaces the workflow's email settings. Null goes back to the email integration's.
+ */
+export type UpdateWorkflowDtoChannelsEmail = {
+  /**
+     * Sender name for every email in this workflow, e.g. "Jane from Acme". Defaults to the email integration's fromName. The from address always comes from the integration.
+     * @maxLength 255
+     */
+  fromName?: string;
+  /**
+     * Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.
+     * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+     */
+  replyTo?: string;
+} | null;
+
+/**
+ * Per-channel settings. Each channel you include replaces that channel's settings; channels you leave out are unchanged.
+ */
+export type UpdateWorkflowDtoChannels = {
+  /** Replaces the workflow's email settings. Null goes back to the email integration's. */
+  email?: UpdateWorkflowDtoChannelsEmail;
+};
 
 export type UpdateWorkflowDtoStepsItem = {
   type: 'email';
@@ -1060,6 +1169,11 @@ export type UpdateWorkflowDtoStepsItem = {
   body: string;
   /** "default" wraps the body in a centred, readable layout (system font stack, 600px width, unsubscribe footer). "none" sends the body as-is, for bringing your own full HTML template. A body that is already a full HTML document (has <html> or <body>) is always sent as-is. */
   layout?: 'default' | 'none';
+  /**
+     * Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.
+     * @maxLength 255
+     */
+  previewText?: string;
 } | {
   type: 'webhook';
   /**
@@ -1118,6 +1232,8 @@ export interface UpdateWorkflowDto {
   name?: string;
   description?: string | null;
   status?: UpdateWorkflowDtoStatus;
+  /** Per-channel settings. Each channel you include replaces that channel's settings; channels you leave out are unchanged. */
+  channels?: UpdateWorkflowDtoChannels;
   /**
      * If provided, replaces ALL existing steps for this workflow.
      * @minItems 1
@@ -1353,6 +1469,45 @@ export interface BounceWebhookBodyDto {
      * @maxLength 2000
      */
   reason: string;
+}
+
+export type EmailContentDtoLayout = typeof EmailContentDtoLayout[keyof typeof EmailContentDtoLayout];
+
+
+export const EmailContentDtoLayout = {
+  default: 'default',
+  none: 'none',
+} as const;
+
+export interface EmailContentDto {
+  /** @maxLength 500 */
+  subject: string;
+  body: string;
+  layout?: EmailContentDtoLayout;
+  /**
+     * Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.
+     * @maxLength 255
+     */
+  previewText?: string;
+  /**
+     * Sender name for every email in this workflow, e.g. "Jane from Acme". Defaults to the email integration's fromName. The from address always comes from the integration.
+     * @maxLength 255
+     */
+  fromName?: string;
+  /**
+     * Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.
+     * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+     */
+  replyTo?: string;
+}
+
+export interface RenderedEmailDto {
+  subject: string;
+  html: string;
+}
+
+export interface TestEmailResponseDto {
+  to: string;
 }
 
 export interface UpsertIntegrationDto {[key: string]: unknown}
@@ -3586,6 +3741,117 @@ return cliFetch<recordInboundBounceResponse>(getRecordInboundBounceUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(bounceWebhookBodyDto)
+  }
+);}
+
+
+
+export type previewEmailResponse200 = {
+  data: RenderedEmailDto
+  status: 200
+}
+
+export type previewEmailResponseSuccess = (previewEmailResponse200) & {
+  headers: Headers;
+};
+;
+
+export type previewEmailResponse = (previewEmailResponseSuccess)
+
+export const getPreviewEmailUrl = (environmentId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/emails/preview`
+}
+
+/**
+ * Renders a subject and body the way they'd send, filling in variables with your own details as the sample subscriber. Nothing is sent.
+ * @summary Render an email
+ */
+export const previewEmail = async (environmentId: string,
+    emailContentDto: EmailContentDto, options?: Parameters<typeof cliFetch>[1]): Promise<previewEmailResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return cliFetch<previewEmailResponse>(getPreviewEmailUrl(environmentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(emailContentDto)
+  }
+);}
+
+
+
+export type sendTestEmailResponse200 = {
+  data: TestEmailResponseDto
+  status: 200
+}
+
+export type sendTestEmailResponse400 = {
+  data: void
+  status: 400
+}
+
+export type sendTestEmailResponseSuccess = (sendTestEmailResponse200) & {
+  headers: Headers;
+};
+export type sendTestEmailResponseError = (sendTestEmailResponse400) & {
+  headers: Headers;
+};
+
+export type sendTestEmailResponse = (sendTestEmailResponseSuccess | sendTestEmailResponseError)
+
+export const getSendTestEmailUrl = (environmentId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/emails/test`
+}
+
+/**
+ * Sends a subject and body to your own email address through the environment's email integration, with your details as the sample subscriber. Subject lines are prefixed with [Test].
+ * @summary Send a test email to yourself
+ */
+export const sendTestEmail = async (environmentId: string,
+    emailContentDto: EmailContentDto, options?: Parameters<typeof cliFetch>[1]): Promise<sendTestEmailResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return cliFetch<sendTestEmailResponse>(getSendTestEmailUrl(environmentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(emailContentDto)
   }
 );}
 

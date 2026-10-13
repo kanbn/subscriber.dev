@@ -91,7 +91,11 @@ describe("getWorkflow", () => {
     const result = await controller.getWorkflow(mockEnvironment as any, "wf_1");
 
     expect(result).toEqual({ publicId: "wf_1" });
-    expect(mockService.getWorkflow).toHaveBeenCalledWith({}, 10, "wf_1");
+    expect(mockService.getWorkflow).toHaveBeenCalledWith(
+      {},
+      mockEnvironment,
+      "wf_1",
+    );
   });
 });
 

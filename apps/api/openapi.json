@@ -2061,6 +2061,109 @@
         "x-excluded": true
       }
     },
+    "/environments/{environmentId}/emails/preview": {
+      "post": {
+        "description": "Renders a subject and body the way they'd send, filling in variables with your own details as the sample subscriber. Nothing is sent.",
+        "operationId": "previewEmail",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailContentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenderedEmailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render an email",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
+    "/environments/{environmentId}/emails/test": {
+      "post": {
+        "description": "Sends a subject and body to your own email address through the environment's email integration, with your details as the sample subscriber. Subject lines are prefixed with [Test].",
+        "operationId": "sendTestEmail",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailContentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEmailResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No email integration, or the email couldn't be sent"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a test email to yourself",
+        "tags": [
+          "Workflows"
+        ]
+      }
+    },
     "/environments/{environmentId}/integrations/{type}": {
       "patch": {
         "description": "Creates or updates the integration of the given type for this environment (e.g. \"smtp\"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full.",
@@ -4059,6 +4162,29 @@
               "broadcast"
             ]
           },
+          "channels": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "object",
+                "properties": {
+                  "fromName": {
+                    "description": "Sender name for every email in this workflow, e.g. \"Jane from Acme\". Defaults to the email integration's fromName. The from address always comes from the integration.",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "replyTo": {
+                    "description": "Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.",
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  }
+                },
+                "description": "Email settings for every email in this workflow. Leave a field out to use the email integration's."
+              }
+            },
+            "description": "Settings for each channel this workflow sends on. Channel-specific, so the workflow itself stays channel-neutral."
+          },
           "steps": {
             "minItems": 1,
             "maxItems": 50,
@@ -4097,6 +4223,11 @@
                         "default",
                         "none"
                       ]
+                    },
+                    "previewText": {
+                      "description": "Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.",
+                      "type": "string",
+                      "maxLength": 255
                     }
                   },
                   "required": [
@@ -4232,6 +4363,23 @@
               "broadcast"
             ]
           },
+          "channels": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "object",
+                "properties": {
+                  "fromName": {
+                    "type": "string"
+                  },
+                  "replyTo": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "description": "Settings for each channel this workflow sends on."
+          },
           "steps": {
             "type": "array",
             "items": {
@@ -4262,6 +4410,10 @@
                     "default",
                     "none"
                   ]
+                },
+                "previewText": {
+                  "description": "Email steps only.",
+                  "type": "string"
                 },
                 "url": {
                   "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
@@ -4351,6 +4503,10 @@
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "editUrl": {
+            "description": "Link to edit this workflow's emails in the web editor. Share it when someone wants to tweak the copy or preview an email.",
+            "type": "string"
           }
         },
         "required": [
@@ -4360,6 +4516,7 @@
           "description",
           "status",
           "type",
+          "channels",
           "steps",
           "triggers",
           "exitConditions",
@@ -4404,6 +4561,23 @@
                     "broadcast"
                   ]
                 },
+                "channels": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "object",
+                      "properties": {
+                        "fromName": {
+                          "type": "string"
+                        },
+                        "replyTo": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "description": "Settings for each channel this workflow sends on."
+                },
                 "steps": {
                   "type": "array",
                   "items": {
@@ -4434,6 +4608,10 @@
                           "default",
                           "none"
                         ]
+                      },
+                      "previewText": {
+                        "description": "Email steps only.",
+                        "type": "string"
                       },
                       "url": {
                         "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
@@ -4523,6 +4701,10 @@
                   "type": "string",
                   "format": "date-time",
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "editUrl": {
+                  "description": "Link to edit this workflow's emails in the web editor. Share it when someone wants to tweak the copy or preview an email.",
+                  "type": "string"
                 }
               },
               "required": [
@@ -4532,6 +4714,7 @@
                 "description",
                 "status",
                 "type",
+                "channels",
                 "steps",
                 "triggers",
                 "exitConditions",
@@ -4772,6 +4955,23 @@
               "broadcast"
             ]
           },
+          "channels": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "object",
+                "properties": {
+                  "fromName": {
+                    "type": "string"
+                  },
+                  "replyTo": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "description": "Settings for each channel this workflow sends on."
+          },
           "steps": {
             "type": "array",
             "items": {
@@ -4802,6 +5002,10 @@
                     "default",
                     "none"
                   ]
+                },
+                "previewText": {
+                  "description": "Email steps only.",
+                  "type": "string"
                 },
                 "url": {
                   "description": "Webhook URL, redacted to origin + last 4 characters since it usually contains a secret. Sending the redacted value back in an update keeps the stored URL.",
@@ -4892,6 +5096,10 @@
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
+          "editUrl": {
+            "description": "Link to edit this workflow's emails in the web editor. Share it when someone wants to tweak the copy or preview an email.",
+            "type": "string"
+          },
           "sentCount": {
             "type": "number"
           },
@@ -4931,6 +5139,7 @@
           "description",
           "status",
           "type",
+          "channels",
           "steps",
           "triggers",
           "exitConditions",
@@ -4977,6 +5186,37 @@
               "paused"
             ]
           },
+          "channels": {
+            "description": "Per-channel settings. Each channel you include replaces that channel's settings; channels you leave out are unchanged.",
+            "type": "object",
+            "properties": {
+              "email": {
+                "description": "Replaces the workflow's email settings. Null goes back to the email integration's.",
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fromName": {
+                        "description": "Sender name for every email in this workflow, e.g. \"Jane from Acme\". Defaults to the email integration's fromName. The from address always comes from the integration.",
+                        "type": "string",
+                        "maxLength": 255
+                      },
+                      "replyTo": {
+                        "description": "Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.",
+                        "type": "string",
+                        "format": "email",
+                        "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                      }
+                    },
+                    "description": "Email settings for every email in this workflow. Leave a field out to use the email integration's."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
           "steps": {
             "description": "If provided, replaces ALL existing steps for this workflow.",
             "minItems": 1,
@@ -5016,6 +5256,11 @@
                         "default",
                         "none"
                       ]
+                    },
+                    "previewText": {
+                      "description": "Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.",
+                      "type": "string",
+                      "maxLength": 255
                     }
                   },
                   "required": [
@@ -5669,6 +5914,72 @@
           "runStepPublicId",
           "bounceType",
           "reason"
+        ]
+      },
+      "EmailContentDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "body": {
+            "type": "string"
+          },
+          "layout": {
+            "default": "default",
+            "type": "string",
+            "enum": [
+              "default",
+              "none"
+            ]
+          },
+          "previewText": {
+            "description": "Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.",
+            "type": "string",
+            "maxLength": 255
+          },
+          "fromName": {
+            "description": "Sender name for every email in this workflow, e.g. \"Jane from Acme\". Defaults to the email integration's fromName. The from address always comes from the integration.",
+            "type": "string",
+            "maxLength": 255
+          },
+          "replyTo": {
+            "description": "Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.",
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          }
+        },
+        "required": [
+          "subject",
+          "body"
+        ]
+      },
+      "RenderedEmailDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject",
+          "html"
+        ]
+      },
+      "TestEmailResponseDto": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "to"
         ]
       },
       "UpsertIntegrationDto": {

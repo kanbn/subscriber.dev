@@ -70,7 +70,7 @@ export async function processRunStepJob(
   };
 
   if (runStep.type === "email") {
-    await sendEmailStep(db, runStep, subscriber, baseContext);
+    await sendEmailStep(db, runStep, subscriber, baseContext, run.workflow);
   } else if (runStep.type === "webhook") {
     const config = runStep.configSnapshot as { url: string; body: string };
     const payload = await renderTemplate(config.body, baseContext);

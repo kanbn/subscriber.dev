@@ -71,6 +71,38 @@ describe("send", () => {
     });
   });
 
+  it("lets an email override the sender name and reply-to", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          errors: [],
+          result: { message_id: "msg-1" },
+        }),
+    });
+
+    await cloudflareEmailProvider.send(
+      { ...config, replyTo: "support@kan.bn" },
+      secret,
+      {
+        to: "alice@example.com",
+        subject: "Hi",
+        html: "<p>Hi</p>",
+        text: "Hi",
+        fromName: "Jane from Kan",
+        replyTo: "jane@kan.bn",
+      },
+    );
+
+    const body = JSON.parse(fetchMock.mock.calls[0]![1].body);
+    expect(body.from).toEqual({
+      address: "hello@mail.kan.bn",
+      name: "Jane from Kan",
+    });
+    expect(body.reply_to).toBe("jane@kan.bn");
+  });
+
   it("sends reply_to when replyTo is configured", async () => {
     fetchMock.mockResolvedValue({
       ok: true,

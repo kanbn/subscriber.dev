@@ -1,7 +1,10 @@
 import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
-import type { WorkflowTriggerAction } from "@subscriber.dev/db/schema";
+import type {
+  WorkflowChannels,
+  WorkflowTriggerAction,
+} from "@subscriber.dev/db/schema";
 import {
   workflows,
   workflowSteps,
@@ -89,6 +92,7 @@ export const createWorkflow = async (
     name: string;
     description?: string | null;
     type?: "automation" | "broadcast";
+    channels?: WorkflowChannels | null;
     steps: WorkflowStepInput[];
     triggers?: WorkflowTriggerInput[];
     exitConditions?: WorkflowTriggerInput[];
@@ -105,6 +109,7 @@ export const createWorkflow = async (
         name: data.name,
         description: data.description ?? null,
         type: data.type ?? "automation",
+        channels: data.channels ?? null,
         createdBy: data.createdBy,
         updatedBy: data.createdBy,
       })
@@ -186,6 +191,7 @@ export const updateWorkflow = async (
     name?: string;
     description?: string | null;
     status?: "active" | "paused";
+    channels?: WorkflowChannels | null;
     updatedBy: number;
   },
 ) => {

@@ -11,7 +11,10 @@ import { Queue } from "bullmq";
 import type { dbClient } from "@subscriber.dev/db/client";
 import type { WorkflowTriggerInput } from "@subscriber.dev/db/repository/workflow.repo";
 import type { RunScope } from "@subscriber.dev/db/repository/workflowRun.repo";
-import type { WorkflowBroadcastStatus } from "@subscriber.dev/db/schema";
+import type {
+  WorkflowBroadcastStatus,
+  WorkflowChannels,
+} from "@subscriber.dev/db/schema";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRepo from "@subscriber.dev/db/repository/workflow.repo";
@@ -49,11 +52,40 @@ type WorkflowStepInput = z.infer<typeof WorkflowStepSchema>;
 const HOUR_MS = 60 * 60 * 1000;
 const RESUME_SECOND_PASS_DELAY_MS = 60_000;
 
+type WorkflowChannelsUpdate = {
+  [Channel in keyof WorkflowChannels]?: WorkflowChannels[Channel] | null;
+};
+
+export function mergeChannels(
+  existing: WorkflowChannels | null,
+  update: WorkflowChannelsUpdate,
+): WorkflowChannels {
+  const merged: Record<string, unknown> = { ...existing };
+  for (const [channel, settings] of Object.entries(update)) {
+    if (settings === null) delete merged[channel];
+    else if (settings !== undefined) merged[channel] = settings;
+  }
+  return merged as WorkflowChannels;
+}
+
+interface EnvironmentRef {
+  id: number;
+  publicId: string;
+}
+
+function editUrl(environmentPublicId: string, workflowPublicId: string) {
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BASE_URL ?? "https://subscriber.dev"
+  ).replace(/\/$/, "");
+  return `${baseUrl}/editor/${environmentPublicId}/${workflowPublicId}`;
+}
+
 interface CreateWorkflowData {
   key: string;
   name: string;
   description?: string;
   type: "automation" | "broadcast";
+  channels?: WorkflowChannels;
   steps: WorkflowStepInput[];
   triggers?: WorkflowTriggerInput[];
   exitConditions?: WorkflowTriggerInput[];
@@ -65,6 +97,7 @@ interface UpdateWorkflowData {
   name?: string;
   description?: string | null;
   status?: "active" | "paused";
+  channels?: WorkflowChannelsUpdate;
   steps?: WorkflowStepInput[];
   triggers?: WorkflowTriggerInput[];
   exitConditions?: WorkflowTriggerInput[];
@@ -122,12 +155,14 @@ export class WorkflowService {
       description: string | null;
       status: "active" | "paused";
       type: "automation" | "broadcast";
+      channels: WorkflowChannels | null;
       createdAt: Date;
       updatedAt: Date;
     },
     steps: WorkflowStepRow[],
     triggers: WorkflowTriggerRow[],
     connectedSources: Set<string>,
+    environmentPublicId: string,
   ) {
     return {
       publicId: workflow.publicId,
@@ -136,6 +171,7 @@ export class WorkflowService {
       description: workflow.description,
       status: workflow.status,
       type: workflow.type,
+      channels: workflow.channels ?? {},
       steps: steps.map((s) => ({
         ...s.config,
         ...(typeof s.config.url === "string"
@@ -150,6 +186,9 @@ export class WorkflowService {
       exitConditions: this.toTriggerDtos(triggers, "exit", connectedSources),
       createdAt: workflow.createdAt.toISOString(),
       updatedAt: workflow.updatedAt.toISOString(),
+      ...(steps.some((step) => step.type === "email")
+        ? { editUrl: editUrl(environmentPublicId, workflow.publicId) }
+        : {}),
     };
   }
 
@@ -445,9 +484,10 @@ export class WorkflowService {
 
   async createWorkflow(
     db: dbClient,
-    environmentId: number,
+    environment: EnvironmentRef,
     data: CreateWorkflowData,
   ) {
+    const environmentId = environment.id;
     const connectedSources = await this.connectedSources(db, environmentId);
     const { workflow, steps, triggers } = await workflowRepo.createWorkflow(
       db,
@@ -457,6 +497,7 @@ export class WorkflowService {
         name: data.name,
         description: data.description ?? null,
         type: data.type,
+        channels: data.channels ?? null,
         steps: this.toStepInputs(data.steps),
         triggers: this.validateTriggers(
           data.type,
@@ -472,18 +513,25 @@ export class WorkflowService {
       },
     );
 
-    return this.toWorkflowDto(workflow, steps, triggers, connectedSources);
+    return this.toWorkflowDto(
+      workflow,
+      steps,
+      triggers,
+      connectedSources,
+      environment.publicId,
+    );
   }
 
   async listWorkflows(
     db: dbClient,
-    environmentId: number,
+    environment: EnvironmentRef,
     opts: {
       limit: number;
       offset: number;
       type?: "automation" | "broadcast";
     },
   ) {
+    const environmentId = environment.id;
     const rows = await workflowRepo.listWorkflows(db, environmentId, opts);
     const connectedSources = await this.connectedSources(db, environmentId);
     const workflows = await Promise.all(
@@ -492,7 +540,13 @@ export class WorkflowService {
           workflowRepo.listStepsForWorkflow(db, workflow.id),
           workflowRepo.listTriggersForWorkflow(db, workflow.id),
         ]);
-        return this.toWorkflowDto(workflow, steps, triggers, connectedSources);
+        return this.toWorkflowDto(
+          workflow,
+          steps,
+          triggers,
+          connectedSources,
+          environment.publicId,
+        );
       }),
     );
 
@@ -501,9 +555,10 @@ export class WorkflowService {
 
   async getWorkflow(
     db: dbClient,
-    environmentId: number,
+    environment: EnvironmentRef,
     workflowPublicId: string,
   ) {
+    const environmentId = environment.id;
     const workflow = await workflowRepo.getWorkflowByPublicId(
       db,
       environmentId,
@@ -521,7 +576,13 @@ export class WorkflowService {
       ]);
 
     return {
-      ...this.toWorkflowDto(workflow, steps, triggers, connectedSources),
+      ...this.toWorkflowDto(
+        workflow,
+        steps,
+        triggers,
+        connectedSources,
+        environment.publicId,
+      ),
       sentCount: counts.sent,
       failedCount: counts.failed,
       skippedCount: counts.skipped,
@@ -535,10 +596,11 @@ export class WorkflowService {
 
   async updateWorkflow(
     db: dbClient,
-    environmentId: number,
+    environment: EnvironmentRef,
     workflowPublicId: string,
     data: UpdateWorkflowData,
   ) {
+    const environmentId = environment.id;
     const existing = await workflowRepo.getWorkflowByPublicId(
       db,
       environmentId,
@@ -567,6 +629,9 @@ export class WorkflowService {
       name: data.name,
       description: data.description,
       status: data.status,
+      channels: data.channels
+        ? mergeChannels(existing.channels, data.channels)
+        : undefined,
       updatedBy: data.updatedBy,
     });
     if (!workflow) throw new NotFoundException("Workflow not found");
@@ -604,7 +669,13 @@ export class WorkflowService {
         ? await workflowRepo.listTriggersForWorkflow(db, existing.id)
         : current;
 
-    return this.toWorkflowDto(workflow, steps, triggers, connectedSources);
+    return this.toWorkflowDto(
+      workflow,
+      steps,
+      triggers,
+      connectedSources,
+      environment.publicId,
+    );
   }
 
   async deleteWorkflow(
