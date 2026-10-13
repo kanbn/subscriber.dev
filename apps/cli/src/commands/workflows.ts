@@ -27,6 +27,7 @@ import { requireEnvironmentId } from "../context.js";
 import { readJsonFile } from "../json-input.js";
 import { printResult } from "../output.js";
 import { run } from "../run.js";
+import { openBrowser } from "./login.js";
 
 export function registerWorkflowsCommand(program: Command): void {
   const workflows = program
@@ -98,6 +99,28 @@ export function registerWorkflowsCommand(program: Command): void {
           printResult(response.data, opts);
         },
       ),
+    );
+
+  workflows
+    .command("edit <workflowId>")
+    .description("Open a workflow's emails in the web editor")
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .action(
+      run(async (workflowId: string, opts: { environment?: string }) => {
+        ensureLoggedIn();
+        const environmentId = requireEnvironmentId(opts);
+        const response = await getWorkflow(environmentId, workflowId);
+        if (response.status !== 200 || !response.data.editUrl) {
+          console.error("Workflow not found.");
+          process.exitCode = 1;
+          return;
+        }
+        console.log(`Opening ${response.data.editUrl}`);
+        openBrowser(response.data.editUrl);
+      }),
     );
 
   workflows
