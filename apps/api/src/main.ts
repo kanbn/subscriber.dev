@@ -1,6 +1,7 @@
 import "reflect-metadata";
 
 import { existsSync, writeFileSync } from "fs";
+import type { NestExpressApplication } from "@nestjs/platform-express";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { cleanupOpenApiDoc, ZodValidationPipe } from "nestjs-zod";
@@ -9,6 +10,7 @@ import { AppModule } from "./app.module.js";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
+  (app as NestExpressApplication).useBodyParser("json", { limit: "8mb" });
 
   app.enableCors({
     origin:

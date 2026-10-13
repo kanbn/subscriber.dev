@@ -9,6 +9,7 @@ import { registerEnvironmentsCommand } from "./commands/environments.js";
 import { registerIntegrationsCommand } from "./commands/integrations.js";
 import { registerLoginCommand } from "./commands/login.js";
 import { registerSubscribersCommand } from "./commands/subscribers.js";
+import { registerUploadsCommand } from "./commands/uploads.js";
 import { registerUsersCommand } from "./commands/users.js";
 import { registerWorkflowsCommand } from "./commands/workflows.js";
 import { registerWorkspacesCommand } from "./commands/workspaces.js";
@@ -27,6 +28,7 @@ if (process.argv.length <= 2) {
   registerEnvironmentsCommand(program);
   registerSubscribersCommand(program);
   registerWorkflowsCommand(program);
+  registerUploadsCommand(program);
   registerUsersCommand(program);
   registerAgentsCommand(program);
   registerIntegrationsCommand(program);

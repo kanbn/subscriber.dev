@@ -1,4 +1,3 @@
-import { generateUID } from "@subscriber.dev/shared/utils";
 import {
   BadRequestException,
   Body,
@@ -32,21 +31,8 @@ import {
   VideoInputDto,
   VideoResponseDto,
 } from "./dto/upload.dto.js";
-import {
-  detectImage,
-  MAX_IMAGE_BYTES,
-  putPublicObject,
-  storageConfigured,
-} from "./storage.js";
-import { resolveVideo, thumbnailWithPlayButton } from "./video.js";
-
-function requireStorage() {
-  if (!storageConfigured()) {
-    throw new BadRequestException(
-      "Uploads aren't set up on this server yet. You can still paste an image URL.",
-    );
-  }
-}
+import { MAX_IMAGE_BYTES } from "./storage.js";
+import { UploadsService } from "./uploads.service.js";
 
 @ApiTags("Uploads")
 @ApiBearerAuth("bearer")
@@ -54,6 +40,8 @@ function requireStorage() {
 @Controller("environments/:environmentId/uploads")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class UploadsController {
+  constructor(private readonly uploadsService: UploadsService) {}
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(
@@ -82,18 +70,8 @@ export class UploadsController {
     @CurrentEnvironment() environment: EnvironmentForUser,
     @UploadedFile() file: { buffer: Buffer } | undefined,
   ): Promise<UploadResponseDto> {
-    requireStorage();
     if (!file) throw new BadRequestException("Attach an image as `file`");
-    const image = await detectImage(file.buffer);
-    if (!image) {
-      throw new BadRequestException("Upload a PNG, JPEG, GIF or WebP image");
-    }
-    const url = await putPublicObject(
-      `${environment.publicId}/${generateUID()}.${image.ext}`,
-      file.buffer,
-      image.type,
-    );
-    return { url };
+    return this.uploadsService.uploadImage(environment, file.buffer);
   }
 
   @Post("video")
@@ -111,20 +89,6 @@ export class UploadsController {
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: VideoInputDto,
   ): Promise<VideoResponseDto> {
-    requireStorage();
-    try {
-      const video = await resolveVideo(input.url);
-      const thumbnail = await thumbnailWithPlayButton(video.thumbnailUrl);
-      const src = await putPublicObject(
-        `${environment.publicId}/${generateUID()}.jpg`,
-        thumbnail,
-        "image/jpeg",
-      );
-      return { src, href: video.href, title: video.title };
-    } catch (error) {
-      throw new BadRequestException(
-        error instanceof Error ? error.message : "Couldn't add that video",
-      );
-    }
+    return this.uploadsService.addVideo(environment, input.url);
   }
 }
