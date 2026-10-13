@@ -24,6 +24,7 @@ import { CurrentEnvironment } from "../../common/decorators/current-environment.
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
+import { BillingService } from "../billing/billing.service.js";
 import {
   EmailContentDto,
   RenderedEmailDto,
@@ -54,6 +55,8 @@ function sampleContext(user: User) {
 @Controller("environments/:environmentId/emails")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class EmailController {
+  constructor(private readonly billing: BillingService) {}
+
   @Post("preview")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -66,12 +69,18 @@ export class EmailController {
   @ApiResponse({ status: 200, type: RenderedEmailDto })
   async preview(
     @CurrentUser() user: User,
+    @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: EmailContentDto,
   ): Promise<RenderedEmailDto> {
+    const poweredBy = await this.billing.showsPoweredBy(
+      createDrizzleClient(),
+      environment.id,
+    );
     const { subject, html } = await renderEmail(
       input,
       sampleContext(user),
       "#",
+      poweredBy,
     ).catch((error: unknown) => {
       throw new BadRequestException(
         error instanceof Error ? error.message : "Couldn't render the email",
@@ -101,7 +110,12 @@ export class EmailController {
   ): Promise<TestEmailResponseDto> {
     const db = createDrizzleClient();
     try {
-      const email = await renderEmail(input, sampleContext(user), "#");
+      const email = await renderEmail(
+        input,
+        sampleContext(user),
+        "#",
+        await this.billing.showsPoweredBy(db, environment.id),
+      );
       await sendWithIntegrations(db, environment.id, {
         to: user.email,
         ...email,

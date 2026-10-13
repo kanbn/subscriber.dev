@@ -17,6 +17,7 @@ export async function processRunStepJob(
   db: dbClient,
   runStepId: number,
   skipSendReason?: SkipSendReason,
+  showsPoweredBy?: (environmentId: number) => Promise<boolean>,
 ): Promise<void> {
   const runStep = await workflowRunRepo.getRunStepById(db, runStepId);
   if (!runStep || runStep.status !== "pending") return;
@@ -70,7 +71,14 @@ export async function processRunStepJob(
   };
 
   if (runStep.type === "email") {
-    await sendEmailStep(db, runStep, subscriber, baseContext, run.workflow);
+    await sendEmailStep(
+      db,
+      runStep,
+      subscriber,
+      baseContext,
+      run.workflow,
+      await showsPoweredBy?.(run.environmentId),
+    );
   } else if (runStep.type === "webhook") {
     const config = runStep.configSnapshot as { url: string; body: string };
     const payload = await renderTemplate(config.body, baseContext);

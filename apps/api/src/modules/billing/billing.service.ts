@@ -430,6 +430,16 @@ export class BillingService {
     }
   }
 
+  async showsPoweredBy(db: dbClient, environmentId: number) {
+    if (!this.isEnabled()) return true;
+    const environment = await billingRepo.getEnvironmentById(db, environmentId);
+    if (!environment) return true;
+    const { paid } = this.activePlan(
+      await billingRepo.getBillingForWorkspace(db, environment.workspaceId),
+    );
+    return !paid;
+  }
+
   async skipSendReason(
     db: dbClient,
     environmentId: number,

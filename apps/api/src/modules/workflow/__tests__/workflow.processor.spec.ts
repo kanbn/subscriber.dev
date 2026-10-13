@@ -84,6 +84,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   processor = new WorkflowProcessor({
     skipSendReason: () => Promise.resolve(null),
+    showsPoweredBy: () => Promise.resolve(false),
   } as unknown as BillingService);
   vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue(
     mockRunStep as any,
@@ -382,6 +383,27 @@ describe("process", () => {
     expect(html).toContain('href="https://example.com/unsubscribe?token=abc"');
   });
 
+  it.each([
+    [true, true],
+    [false, false],
+  ])(
+    "adds Powered by subscriber.dev when billing says so (%s)",
+    async (showsPoweredBy, expected) => {
+      const branded = new WorkflowProcessor({
+        skipSendReason: () => Promise.resolve(null),
+        showsPoweredBy: () => Promise.resolve(showsPoweredBy),
+      } as unknown as BillingService);
+
+      await branded.process(makeJob());
+
+      const [, , , html, options] = vi.mocked(sendRawEmail).mock.calls[0]!;
+      expect(html.includes('href="https://subscriber.dev"')).toBe(expected);
+      expect(options?.text?.includes("Powered by subscriber.dev")).toBe(
+        expected,
+      );
+    },
+  );
+
   it.each(["{{unsubscribeUrl}}", "{{ unsubscribeUrl }}"])(
     "also supports %s interpolation for custom placement, without duplicating the auto-footer",
     async (token) => {
@@ -508,6 +530,7 @@ describe("process", () => {
       "Not sent: over the free plan's 1,000 subscribers. Upgrade to send to new subscribers.";
     const overPlan = new WorkflowProcessor({
       skipSendReason: () => Promise.resolve(reason),
+      showsPoweredBy: () => Promise.resolve(false),
     } as unknown as BillingService);
 
     await overPlan.process(makeJob());

@@ -25,6 +25,7 @@ export class WorkflowProcessor extends WorkerHost {
       job.data.runStepId,
       (environmentId, subscriberId) =>
         this.billing.skipSendReason(db, environmentId, subscriberId),
+      (environmentId) => this.billing.showsPoweredBy(db, environmentId),
     );
   }
 

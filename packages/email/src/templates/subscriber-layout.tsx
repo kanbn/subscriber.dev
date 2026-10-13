@@ -33,10 +33,13 @@ export const defaultSubscriberLayoutTheme: SubscriberLayoutTheme = {
   backgroundColor: "#ffffff",
 };
 
+export const POWERED_BY_URL = "https://subscriber.dev";
+
 export interface SubscriberLayoutProps {
   bodyHtml: string;
   previewText?: string;
   unsubscribeUrl?: string;
+  poweredBy?: boolean;
   theme?: SubscriberLayoutTheme;
 }
 
@@ -65,6 +68,7 @@ export const SubscriberLayout = ({
   bodyHtml,
   previewText,
   unsubscribeUrl,
+  poweredBy,
   theme = defaultSubscriberLayoutTheme,
 }: SubscriberLayoutProps) => (
   <Html>
@@ -104,6 +108,25 @@ export const SubscriberLayout = ({
               style={{ color: theme.linkColor, textDecoration: "underline" }}
             >
               Unsubscribe
+            </Link>
+          </Text>
+        )}
+        {poweredBy && (
+          <Text
+            style={{
+              fontFamily: theme.fontFamily,
+              fontSize: "11px",
+              lineHeight: "16px",
+              color: theme.mutedColor,
+              margin: unsubscribeUrl ? "12px 0 0" : "32px 0 0",
+            }}
+          >
+            Powered by{" "}
+            <Link
+              href={POWERED_BY_URL}
+              style={{ color: theme.mutedColor, textDecoration: "underline" }}
+            >
+              subscriber.dev
             </Link>
           </Text>
         )}

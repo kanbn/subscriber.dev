@@ -5,7 +5,7 @@ import type { WorkflowChannels } from "@subscriber.dev/db/schema";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
-import { renderSubscriberEmail } from "@subscriber.dev/email";
+import { POWERED_BY_URL, renderSubscriberEmail } from "@subscriber.dev/email";
 import {
   createEmailUnsubscribeLink,
   createOneClickUnsubscribeUrl,
@@ -53,6 +53,7 @@ export async function sendEmailStep(
   subscriber: SubscriberForSend,
   baseContext: Record<string, unknown>,
   workflow?: { channels: WorkflowChannels | null } | null,
+  poweredBy = false,
 ): Promise<void> {
   const preferences = await subscriberRepo.getLatestPreferences(
     db,
@@ -87,7 +88,12 @@ export async function sendEmailStep(
     subscriber.environmentId,
     subscriber.publicId,
   );
-  const email = await renderEmail(stepConfig, baseContext, unsubscribeUrl);
+  const email = await renderEmail(
+    stepConfig,
+    baseContext,
+    unsubscribeUrl,
+    poweredBy,
+  );
   const headers = await buildListUnsubscribeHeaders(subscriber);
 
   try {
@@ -131,6 +137,7 @@ export async function renderEmail(
   content: EmailContent,
   baseContext: Record<string, unknown>,
   unsubscribeUrl: string | null | undefined,
+  poweredBy = false,
 ): Promise<{ subject: string; html: string; text: string }> {
   const context = { ...baseContext, unsubscribeUrl };
   const subject = await renderTemplate(content.subject, context);
@@ -140,9 +147,15 @@ export async function renderEmail(
   );
   const footerUnsubscribeUrl =
     unsubscribeUrl && !bodyHasUnsubscribeToken ? unsubscribeUrl : undefined;
-  const bareHtml = footerUnsubscribeUrl
-    ? `${interpolatedBody}<p style="font-size:12px;color:#666;">Don't want these emails? <a href="${footerUnsubscribeUrl}">Unsubscribe</a></p>`
-    : interpolatedBody;
+  const bareHtml = [
+    interpolatedBody,
+    footerUnsubscribeUrl
+      ? `<p style="font-size:12px;color:#666;">Don't want these emails? <a href="${footerUnsubscribeUrl}">Unsubscribe</a></p>`
+      : "",
+    poweredBy
+      ? `<p style="font-size:12px;color:#666;">Powered by <a href="${POWERED_BY_URL}">subscriber.dev</a></p>`
+      : "",
+  ].join("");
   const useLayout =
     content.layout !== "none" && !isFullHtmlDocument(interpolatedBody);
   const html = useLayout
@@ -152,6 +165,7 @@ export async function renderEmail(
           ? await renderTemplate(content.previewText, context)
           : undefined,
         unsubscribeUrl: footerUnsubscribeUrl,
+        poweredBy,
       })
     : bareHtml;
   const text = convert(bareHtml, { wordwrap: false });

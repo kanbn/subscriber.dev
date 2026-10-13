@@ -36,6 +36,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   processor = new BroadcastStepsProcessor({
     skipSendReason: () => Promise.resolve(null),
+    showsPoweredBy: () => Promise.resolve(false),
   } as unknown as BillingService);
 });
 
@@ -51,6 +52,7 @@ describe("process", () => {
     expect(processRunStepJob).toHaveBeenCalledWith(
       {},
       42,
+      expect.any(Function),
       expect.any(Function),
     );
   });
@@ -143,6 +145,7 @@ describe("process before the scheduled time", () => {
     expect(processRunStepJob).toHaveBeenCalledWith(
       {},
       42,
+      expect.any(Function),
       expect.any(Function),
     );
   });

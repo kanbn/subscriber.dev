@@ -72,8 +72,12 @@ export class BroadcastStepsProcessor extends WorkerHost {
       throw new DelayedError();
     }
 
-    await processRunStepJob(db, runStepId, (environmentId, subscriberId) =>
-      this.billing.skipSendReason(db, environmentId, subscriberId),
+    await processRunStepJob(
+      db,
+      runStepId,
+      (environmentId, subscriberId) =>
+        this.billing.skipSendReason(db, environmentId, subscriberId),
+      (environmentId) => this.billing.showsPoweredBy(db, environmentId),
     );
   }
 
