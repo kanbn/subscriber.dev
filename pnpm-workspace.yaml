@@ -27,6 +27,7 @@ overrides:
   react-dom: ^19.3.0
   "@types/minimatch": "npm:minimatch@*"
   "@types/glob": "npm:@types/glob@^8.1.0"
+  prosemirror-model: ^1.25.12
 
 allowBuilds:
   "@scarf/scarf": false

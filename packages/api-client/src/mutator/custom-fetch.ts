@@ -12,5 +12,5 @@ export const customFetch = async <T>(
     throw data ?? new Error(`Request failed with status ${response.status}`);
   }
 
-  return data as T;
+  return { status: response.status, data, headers: response.headers } as T;
 };
