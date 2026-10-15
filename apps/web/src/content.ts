@@ -33,7 +33,7 @@ export const FAQS: [
   ],
   [
     "which email providers can I use?",
-    "Anything with SMTP, including Amazon SES, Resend, SendGrid, Postmark and Mailgun, plus a native Cloudflare Email integration. You pay your provider directly, usually a few dollars a month.",
+    "Resend, Postmark, Amazon SES and Cloudflare Email are built in, with bounces and spam complaints handled automatically. Anything else with SMTP works too, such as SendGrid or Mailgun. You pay your provider directly, usually a few dollars a month.",
     ["/providers", "compare providers and costs"],
   ],
   [
@@ -70,6 +70,7 @@ export const PROVIDERS: {
   region: string;
   price: string;
   example: number;
+  builtIn?: boolean;
 }[] = [
   {
     name: "Amazon SES",
@@ -77,6 +78,7 @@ export const PROVIDERS: {
     region: "US, EU, Asia",
     price: "$0.10 per 1k",
     example: 4,
+    builtIn: true,
   },
   {
     name: "Mailgun",
@@ -91,6 +93,7 @@ export const PROVIDERS: {
     region: "US",
     price: "$15 for 10k, +$1.80 per 1k",
     example: 69,
+    builtIn: true,
   },
   {
     name: "Scaleway",
@@ -105,6 +108,7 @@ export const PROVIDERS: {
     region: "US, EU, more",
     price: "$20 for 50k",
     example: 20,
+    builtIn: true,
   },
   {
     name: "SendGrid",
@@ -119,6 +123,7 @@ export const PROVIDERS: {
     region: "global",
     price: "$0.35 per 1k after 3k",
     example: 18,
+    builtIn: true,
   },
 ].sort((a, b) => a.example - b.example);
 
@@ -151,7 +156,7 @@ const CUSTOMER_IO: Comparison = {
     ["sends", "no limit on paid plans", "1M emails/mo, then add-on"],
     ["free", "1,000 subscribers", "trial"],
     ["AI agents", "MCP server", "MCP server, built-in agent"],
-    ["sending", "your SMTP or Cloudflare", "theirs, or custom SMTP"],
+    ["sending", "your own provider", "theirs, or custom SMTP"],
     ["channels", "email, webhooks", "email, SMS, push, in-app"],
     ["open source", "AGPL-3.0, self-hostable", "no"],
   ],
@@ -197,7 +202,7 @@ const LOOPS: Comparison = {
     ["sends", "no limit on paid plans", "unlimited on paid plans"],
     ["AI agents", "MCP server", "MCP server"],
     ["terminal", "CLI and TUI", "CLI"],
-    ["sending", "your SMTP or Cloudflare", "Loops' infrastructure"],
+    ["sending", "your own provider", "Loops' infrastructure"],
     ["open source", "AGPL-3.0, self-hostable", "no"],
   ],
   why: [
@@ -207,7 +212,7 @@ const LOOPS: Comparison = {
     ],
     [
       "your provider, your reputation",
-      "Send through SES, Postmark, Resend, any SMTP server or Cloudflare. Your domain's reputation is yours, and you pay them directly.",
+      "Send through Resend, Postmark, Amazon SES, Cloudflare or any SMTP server. Your domain's reputation is yours, and you pay them directly.",
     ],
     [
       "open source",
@@ -239,7 +244,7 @@ const BREVO: Comparison = {
     ["5,000 × 4 emails", "$19/mo", "$65/mo"],
     ["25,000 × 4 emails", "$79/mo", "$129/mo"],
     ["automation", "every plan", "Standard plan and up"],
-    ["sending", "your SMTP or Cloudflare", "Brevo's infrastructure"],
+    ["sending", "your own provider", "Brevo's infrastructure"],
     ["channels", "email, webhooks", "email, SMS, WhatsApp, chat"],
     ["open source", "AGPL-3.0, self-hostable", "no"],
   ],

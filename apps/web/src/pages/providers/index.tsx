@@ -27,19 +27,27 @@ export default function Providers() {
             <p className="text-muted-foreground mt-3 max-w-[60ch]">
               subscriber.dev doesn&apos;t send email itself. Connect a provider
               and pay them directly for what you send, with no markup from us.
-              Any SMTP server works; these are the common ones. Need your data
-              in the EU? Scaleway is the closest thing to SES there.
+              Resend, Postmark, Amazon SES and Cloudflare Email are built in, and
+              any SMTP server works. Need your data in the EU? Scaleway is the
+              closest thing to SES there.
             </p>
           </div>
 
           <Section title="providers">
             <FitTable
-              head={["provider", "region", "price"]}
-              rows={PROVIDERS.map((p) => [p.name, p.region, p.price])}
+              head={["provider", "region", "price", "connects"]}
+              rows={PROVIDERS.map((p) => [
+                p.name,
+                p.region,
+                p.price,
+                p.builtIn ? "built in" : "SMTP",
+              ])}
             />
             <p className="text-muted-foreground mt-3 max-w-[70ch]">
-              All connect over SMTP except Cloudflare Email, which is built in
-              and needs the $5 Workers Paid plan. Prices from each
+              Built-in providers pick up bounces and spam complaints and opt
+              those people out automatically; over SMTP they aren&apos;t picked
+              up. Cloudflare Email needs the $5 Workers Paid plan. Prices from
+              each
               provider&apos;s pricing page, checked {CHECKED}:{" "}
               {PROVIDERS.map((p, i) => (
                 <span key={p.name}>

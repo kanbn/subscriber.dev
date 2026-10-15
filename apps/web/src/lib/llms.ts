@@ -24,7 +24,7 @@ const answer = (question: string) =>
 
 const intro = () => `# subscriber.dev
 
-> Open source lifecycle email for developers and AI agents. An alternative to Customer.io, Loops and Brevo with no dashboard: workflows, broadcasts and subscribers are managed over MCP, a REST API, a CLI and a TUI. Email sends through the user's own provider: any SMTP server (e.g. Amazon SES, Postmark, Mailgun), or Cloudflare Email.
+> Open source lifecycle email for developers and AI agents. An alternative to Customer.io, Loops and Brevo with no dashboard: workflows, broadcasts and subscribers are managed over MCP, a REST API, a CLI and a TUI. Email sends through the user's own provider: Resend, Postmark, Amazon SES and Cloudflare Email are built in, with bounces and spam complaints handled; any other provider connects over SMTP.
 
 ## Connect
 
@@ -37,7 +37,7 @@ const intro = () => `# subscriber.dev
 ## Typical setup
 
 1. Sign in over MCP or with the CLI.
-2. Connect an email provider: SMTP or Cloudflare (MCP \`set_integration\`, CLI \`subscriber integrations set smtp\`).
+2. Connect an email provider: resend, postmark, ses, cloudflare or smtp (MCP \`set_integration\`, CLI \`subscriber integrations set resend\`).
 3. Create a workflow: an ordered list of email or webhook steps, each with a delay. Email bodies are HTML with Liquid, e.g. {{ subscriber.firstName }}. Optional \`triggers\` start it from integration events (e.g. Stripe trial_started) and \`exitConditions\` stop a person's run on others (e.g. Stripe trial_converted).
 4. Trigger it from the app after an event such as signup:
 
@@ -76,7 +76,7 @@ ${answer("can I self-host it?")}
 
 The user pays their provider directly; subscriber.dev adds no markup. Prices checked ${PROVIDERS_CHECKED}.
 
-${PROVIDERS.map((p) => `- ${p.name} (${p.region}): ${p.price}`).join("\n")}
+${PROVIDERS.map((p) => `- ${p.name} (${p.region}, ${p.builtIn ? "built in" : "SMTP"}): ${p.price}`).join("\n")}
 
 ## Moving from another tool
 
@@ -120,7 +120,7 @@ ${FAQS.map(([q, a]) => `### ${q}\n\n${a}`).join("\n\n")}
 `,
     `## Email providers and costs (${site}/providers)
 
-${PROVIDERS.map((p) => `- ${p.name}: ${p.region}, ${p.price}. Pricing: ${p.url}`).join("\n")}
+${PROVIDERS.map((p) => `- ${p.name}: ${p.region}, ${p.builtIn ? "built in" : "SMTP"}, ${p.price}. Pricing: ${p.url}`).join("\n")}
 
 What a month costs: ${n(EXAMPLE_PLAN.subscribers)} subscribers, each emailed ${EXAMPLE_EMAILS_EACH} times a month (${n(emails)} emails), on the ${EXAMPLE_PLAN.name} plan at $${EXAMPLE_PLAN.price}/month.
 

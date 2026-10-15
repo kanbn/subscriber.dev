@@ -99,17 +99,17 @@ const STEPS: Step[] = [
   {
     title: "connect your email provider",
     detail:
-      "SMTP or Cloudflare. You keep your sending reputation and pay them directly.",
+      "Resend, Postmark, Amazon SES, Cloudflare or any SMTP server. You keep your sending reputation and pay them directly.",
     scripts: {
       mcp: {
-        chat: ["connect my SMTP server", "set_integration", "smtp connected"],
+        chat: ["connect Resend", "set_integration", "resend connected"],
       },
       api: {
-        shell: `curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/smtp \\
+        shell: `curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/resend \\
   -H "x-api-key: $KEY" -d '{…}'`,
       },
-      cli: { shell: "subscriber integrations set smtp --body '{…}'" },
-      tui: { tui: ["Integrations", "n new", "SMTP"] },
+      cli: { shell: "subscriber integrations set resend --body '{…}'" },
+      tui: { tui: ["Integrations", "n new", "Resend"] },
     },
   },
   {
@@ -687,7 +687,7 @@ const WHY: [title: string, detail: string][] = [
   ],
   [
     "bring your own provider",
-    "Send through SMTP or Cloudflare. You keep your sending reputation and there's no markup on every email.",
+    "Send through Resend, Postmark, Amazon SES, Cloudflare or any SMTP server. You keep your sending reputation and there's no markup on every email.",
   ],
   [
     "event-driven",
