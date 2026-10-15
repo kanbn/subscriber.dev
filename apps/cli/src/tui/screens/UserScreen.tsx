@@ -1,4 +1,4 @@
-import { Box, Text, useInput } from "ink";
+import { Box, Text, useApp, useInput } from "ink";
 import SelectInput from "ink-select-input";
 import TextInput from "ink-text-input";
 import { useState } from "react";
@@ -8,11 +8,18 @@ import {
   updateCurrentUser,
 } from "@subscriber.dev/api-client/cli";
 
+import { logout } from "../../auth.js";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
 import { useAsyncData } from "../useAsyncData.js";
 
-type EditMode = "idle" | "menu" | "editing-text" | "submitting";
+type EditMode =
+  | "idle"
+  | "menu"
+  | "editing-text"
+  | "submitting"
+  | "confirm-logout"
+  | "logging-out";
 type TextField = "name" | "image";
 
 const SUBMIT_VALUE = "__submit__";
@@ -30,9 +37,24 @@ export function UserScreen() {
   const [values, setValues] = useState({ name: "", image: "" });
   const [editingField, setEditingField] = useState<TextField | null>(null);
   const [error, setError] = useState("");
+  const { exit } = useApp();
 
   useInput((input) => {
-    if (editMode !== "idle" || !user) return;
+    if (editMode === "confirm-logout") {
+      if (input === "y" || input === "Y") {
+        setEditMode("logging-out");
+        void logout().then(() => exit());
+      } else {
+        setEditMode("idle");
+      }
+      return;
+    }
+    if (editMode !== "idle") return;
+    if (input === "l" || input === "L") {
+      setEditMode("confirm-logout");
+      return;
+    }
+    if (!user) return;
     if (input === "e" || input === "E") {
       setValues({ name: user.name ?? "", image: user.image ?? "" });
       setError("");
@@ -105,10 +127,18 @@ export function UserScreen() {
 
       {editMode === "submitting" && <Text color="gray">Saving…</Text>}
 
+      {editMode === "confirm-logout" && (
+        <Text color="yellow">
+          Log out and revoke this machine&apos;s API key? (y/n)
+        </Text>
+      )}
+
+      {editMode === "logging-out" && <Text color="gray">Logging out…</Text>}
+
       <Hints
         text={
           editMode === "idle"
-            ? "e edit · Esc back · q quit"
+            ? "e edit · l log out · Esc back · q quit"
             : "↑↓ navigate · Enter select"
         }
       />

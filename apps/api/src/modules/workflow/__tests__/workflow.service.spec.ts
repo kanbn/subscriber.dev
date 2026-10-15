@@ -1697,6 +1697,41 @@ describe("getBroadcast", () => {
     });
   });
 
+  it("reports completed once every run exists and nothing is pending", async () => {
+    vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue({
+      id: 1,
+    } as any);
+    vi.mocked(workflowBroadcastRepo.getBroadcastByPublicId).mockResolvedValue({
+      id: 5,
+      publicId: "bc_abc",
+      status: "queued",
+      matchedCount: 3,
+      sendOverMs: null,
+      createdAt: new Date("2026-01-01T00:00:00Z"),
+    } as any);
+    vi.mocked(workflowBroadcastRepo.getBroadcastStepCounts).mockResolvedValue({
+      pending: 0,
+      sent: 3,
+      skipped: 0,
+      failed: 0,
+      cancelled: 0,
+      bounced: 0,
+    });
+    vi.mocked(
+      workflowBroadcastRepo.getBroadcastBounceBreakdown,
+    ).mockResolvedValue({ hard: 0, soft: 0 });
+
+    vi.mocked(workflowBroadcastRepo.countRunsForBroadcast).mockResolvedValue(2);
+    expect(
+      (await service.getBroadcast(mockDb, 10, "wf_abc", "bc_abc")).status,
+    ).toBe("queued");
+
+    vi.mocked(workflowBroadcastRepo.countRunsForBroadcast).mockResolvedValue(3);
+    expect(
+      (await service.getBroadcast(mockDb, 10, "wf_abc", "bc_abc")).status,
+    ).toBe("completed");
+  });
+
   it("throws NotFoundException when the workflow does not exist", async () => {
     vi.mocked(workflowRepo.getWorkflowByPublicId).mockResolvedValue(undefined);
 

@@ -1,5 +1,6 @@
 import type { Request } from "express";
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -24,6 +25,7 @@ import { createDrizzleClient } from "@subscriber.dev/db/client";
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
+import { getAuth } from "../../common/guards/session.util.js";
 import {
   AgentResponseDto,
   UpdateUserDto,
@@ -92,5 +94,33 @@ export class UserController {
   ): Promise<void> {
     const db = createDrizzleClient();
     await this.userService.disconnectAgent(db, user.id, clientId);
+  }
+
+  @Delete("me/api-key")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    operationId: "revokeCurrentApiKey",
+    summary: "Revoke the API key this request was made with",
+  })
+  @ApiResponse({ status: 204 })
+  @ApiResponse({ status: 400, description: "Not signed in with an API key" })
+  async revokeCurrentApiKey(
+    @CurrentUser() user: User,
+    @Req() req: Request,
+  ): Promise<void> {
+    const key = req.headers["x-api-key"];
+    if (typeof key !== "string") {
+      throw new BadRequestException("Not signed in with an API key");
+    }
+    const { auth } = getAuth();
+    const verified = await auth.api.verifyApiKey({ body: { key } });
+    if (!verified.key) {
+      throw new BadRequestException("Not signed in with an API key");
+    }
+    await this.userService.revokeApiKey(
+      createDrizzleClient(),
+      user.id,
+      Number(verified.key.id),
+    );
   }
 }

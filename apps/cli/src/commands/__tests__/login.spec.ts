@@ -1,9 +1,14 @@
 import { Command } from "commander";
 import { describe, expect, it, vi } from "vitest";
 
+import { revokeCurrentApiKey } from "@subscriber.dev/api-client/cli";
 import { readCliConfig, updateCliConfig } from "@subscriber.dev/shared";
 
 import { registerLoginCommand } from "../login.js";
+
+vi.mock("@subscriber.dev/api-client/cli", () => ({
+  revokeCurrentApiKey: vi.fn(),
+}));
 
 vi.mock("@subscriber.dev/shared", () => ({
   readCliConfig: vi.fn(),
@@ -55,13 +60,29 @@ describe("login", () => {
 });
 
 describe("logout", () => {
-  it("clears the stored API key", async () => {
+  it("revokes the API key, then clears it", async () => {
+    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "sub_test_key" });
+    vi.mocked(revokeCurrentApiKey).mockResolvedValue({ status: 204 } as never);
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(["logout"], { from: "user" });
+
+    expect(revokeCurrentApiKey).toHaveBeenCalledOnce();
+    expect(updateCliConfig).toHaveBeenCalledWith({ apiKey: undefined });
+    expect(logSpy).toHaveBeenCalledWith("Logged out.");
+  });
+
+  it("still clears the key when the API can't be reached", async () => {
+    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "sub_test_key" });
+    vi.mocked(revokeCurrentApiKey).mockRejectedValue(new Error("offline"));
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
     await buildProgram().parseAsync(["logout"], { from: "user" });
 
     expect(updateCliConfig).toHaveBeenCalledWith({ apiKey: undefined });
-    expect(logSpy).toHaveBeenCalledWith("Logged out.");
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("couldn't reach the API"),
+    );
   });
 });
 

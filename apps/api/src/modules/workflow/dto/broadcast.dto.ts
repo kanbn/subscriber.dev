@@ -39,7 +39,11 @@ export const ListBroadcastsQuerySchema = z.object({
 
 export const BroadcastSummarySchema = z.object({
   publicId: z.string(),
-  status: z.enum(workflowBroadcastStatuses),
+  status: z
+    .enum([...workflowBroadcastStatuses, "completed"])
+    .describe(
+      "completed: every matched subscriber has a run and no sends are pending.",
+    ),
   matchedCount: z.number().nullable(),
   sendOverHours: z.number().nullable(),
   createdAt: z.iso.datetime(),

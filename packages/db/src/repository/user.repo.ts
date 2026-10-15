@@ -101,3 +101,13 @@ export const disconnectAgent = async (
     return true;
   });
 };
+
+export const deleteApiKey = async (
+  db: dbClient,
+  userId: number,
+  keyId: number,
+) => {
+  await db
+    .delete(apikey)
+    .where(and(eq(apikey.id, keyId), eq(apikey.referenceId, userId)));
+};

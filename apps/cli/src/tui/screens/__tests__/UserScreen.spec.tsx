@@ -6,11 +6,16 @@ import {
   updateCurrentUser,
 } from "@subscriber.dev/api-client/cli";
 
+import { logout } from "../../../auth.js";
 import { UserScreen } from "../UserScreen.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
   getCurrentUser: vi.fn(),
   updateCurrentUser: vi.fn(),
+}));
+
+vi.mock("../../../auth.js", () => ({
+  logout: vi.fn(() => Promise.resolve({ revoked: true })),
 }));
 
 const testUser = {
@@ -123,5 +128,38 @@ describe("UserScreen edit", () => {
       expect(lastFrame()).toContain("Name: Test User Updated");
     });
     expect(updateCurrentUser).not.toHaveBeenCalled();
+  });
+});
+
+describe("UserScreen log out", () => {
+  it("asks first, then logs out on y", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: testUser,
+    } as never);
+    const { lastFrame, stdin } = render(<UserScreen />);
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("name: Test User");
+    });
+
+    stdin.write("l");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Log out and revoke");
+    });
+    stdin.write("n");
+    await vi.waitFor(() => {
+      expect(lastFrame()).not.toContain("Log out and revoke");
+    });
+    expect(logout).not.toHaveBeenCalled();
+
+    stdin.write("l");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Log out and revoke");
+    });
+    stdin.write("y");
+    await vi.waitFor(() => {
+      expect(logout).toHaveBeenCalledOnce();
+    });
   });
 });

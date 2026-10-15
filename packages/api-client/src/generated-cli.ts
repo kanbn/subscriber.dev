@@ -1376,6 +1376,9 @@ export interface TriggerBroadcastResponseDto {
   status: TriggerBroadcastResponseDtoStatus;
 }
 
+/**
+ * completed: every matched subscriber has a run and no sends are pending.
+ */
 export type ListBroadcastsResponseDtoBroadcastsItemStatus = typeof ListBroadcastsResponseDtoBroadcastsItemStatus[keyof typeof ListBroadcastsResponseDtoBroadcastsItemStatus];
 
 
@@ -1385,10 +1388,12 @@ export const ListBroadcastsResponseDtoBroadcastsItemStatus = {
   failed: 'failed',
   paused: 'paused',
   cancelled: 'cancelled',
+  completed: 'completed',
 } as const;
 
 export type ListBroadcastsResponseDtoBroadcastsItem = {
   publicId: string;
+  /** completed: every matched subscriber has a run and no sends are pending. */
   status: ListBroadcastsResponseDtoBroadcastsItemStatus;
   /** @nullable */
   matchedCount: number | null;
@@ -1404,6 +1409,9 @@ export interface ListBroadcastsResponseDto {
   offset: number;
 }
 
+/**
+ * completed: every matched subscriber has a run and no sends are pending.
+ */
 export type BroadcastDetailResponseDtoStatus = typeof BroadcastDetailResponseDtoStatus[keyof typeof BroadcastDetailResponseDtoStatus];
 
 
@@ -1413,10 +1421,12 @@ export const BroadcastDetailResponseDtoStatus = {
   failed: 'failed',
   paused: 'paused',
   cancelled: 'cancelled',
+  completed: 'completed',
 } as const;
 
 export interface BroadcastDetailResponseDto {
   publicId: string;
+  /** completed: every matched subscriber has a run and no sends are pending. */
   status: BroadcastDetailResponseDtoStatus;
   matchedCount: number | null;
   sendOverHours: number | null;
@@ -1432,6 +1442,9 @@ export interface BroadcastDetailResponseDto {
   successRate: number | null;
 }
 
+/**
+ * completed: every matched subscriber has a run and no sends are pending.
+ */
 export type BroadcastSummaryDtoStatus = typeof BroadcastSummaryDtoStatus[keyof typeof BroadcastSummaryDtoStatus];
 
 
@@ -1441,10 +1454,12 @@ export const BroadcastSummaryDtoStatus = {
   failed: 'failed',
   paused: 'paused',
   cancelled: 'cancelled',
+  completed: 'completed',
 } as const;
 
 export interface BroadcastSummaryDto {
   publicId: string;
+  /** completed: every matched subscriber has a run and no sends are pending. */
   status: BroadcastSummaryDtoStatus;
   matchedCount: number | null;
   sendOverHours: number | null;
@@ -1907,6 +1922,49 @@ export const getDisconnectAgentUrl = (clientId: string,) => {
 export const disconnectAgent = async (clientId: string, options?: Parameters<typeof cliFetch>[1]): Promise<disconnectAgentResponse> => {
 
   return cliFetch<disconnectAgentResponse>(getDisconnectAgentUrl(clientId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export type revokeCurrentApiKeyResponse204 = {
+  data: void
+  status: 204
+}
+
+export type revokeCurrentApiKeyResponse400 = {
+  data: void
+  status: 400
+}
+
+export type revokeCurrentApiKeyResponseSuccess = (revokeCurrentApiKeyResponse204) & {
+  headers: Headers;
+};
+export type revokeCurrentApiKeyResponseError = (revokeCurrentApiKeyResponse400) & {
+  headers: Headers;
+};
+
+export type revokeCurrentApiKeyResponse = (revokeCurrentApiKeyResponseSuccess | revokeCurrentApiKeyResponseError)
+
+export const getRevokeCurrentApiKeyUrl = () => {
+
+
+
+
+  return `/users/me/api-key`
+}
+
+/**
+ * @summary Revoke the API key this request was made with
+ */
+export const revokeCurrentApiKey = async ( options?: Parameters<typeof cliFetch>[1]): Promise<revokeCurrentApiKeyResponse> => {
+
+  return cliFetch<revokeCurrentApiKeyResponse>(getRevokeCurrentApiKeyUrl(),
   {
     ...options,
     method: 'DELETE'

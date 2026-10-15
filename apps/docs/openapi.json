@@ -139,6 +139,32 @@
         ]
       }
     },
+    "/users/me/api-key": {
+      "delete": {
+        "operationId": "revokeCurrentApiKey",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "Not signed in with an API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke the API key this request was made with",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/workspaces": {
       "get": {
         "operationId": "getWorkspaces",
@@ -5823,8 +5849,10 @@
                     "queued",
                     "failed",
                     "paused",
-                    "cancelled"
-                  ]
+                    "cancelled",
+                    "completed"
+                  ],
+                  "description": "completed: every matched subscriber has a run and no sends are pending."
                 },
                 "matchedCount": {
                   "type": [
@@ -5879,8 +5907,10 @@
               "queued",
               "failed",
               "paused",
-              "cancelled"
-            ]
+              "cancelled",
+              "completed"
+            ],
+            "description": "completed: every matched subscriber has a run and no sends are pending."
           },
           "matchedCount": {
             "anyOf": [
@@ -5968,8 +5998,10 @@
               "queued",
               "failed",
               "paused",
-              "cancelled"
-            ]
+              "cancelled",
+              "completed"
+            ],
+            "description": "completed: every matched subscriber has a run and no sends are pending."
           },
           "matchedCount": {
             "anyOf": [

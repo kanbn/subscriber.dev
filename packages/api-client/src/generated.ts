@@ -1395,6 +1395,9 @@ export interface TriggerBroadcastResponseDto {
   status: TriggerBroadcastResponseDtoStatus;
 }
 
+/**
+ * completed: every matched subscriber has a run and no sends are pending.
+ */
 export type ListBroadcastsResponseDtoBroadcastsItemStatus = typeof ListBroadcastsResponseDtoBroadcastsItemStatus[keyof typeof ListBroadcastsResponseDtoBroadcastsItemStatus];
 
 
@@ -1404,10 +1407,12 @@ export const ListBroadcastsResponseDtoBroadcastsItemStatus = {
   failed: 'failed',
   paused: 'paused',
   cancelled: 'cancelled',
+  completed: 'completed',
 } as const;
 
 export type ListBroadcastsResponseDtoBroadcastsItem = {
   publicId: string;
+  /** completed: every matched subscriber has a run and no sends are pending. */
   status: ListBroadcastsResponseDtoBroadcastsItemStatus;
   /** @nullable */
   matchedCount: number | null;
@@ -1423,6 +1428,9 @@ export interface ListBroadcastsResponseDto {
   offset: number;
 }
 
+/**
+ * completed: every matched subscriber has a run and no sends are pending.
+ */
 export type BroadcastDetailResponseDtoStatus = typeof BroadcastDetailResponseDtoStatus[keyof typeof BroadcastDetailResponseDtoStatus];
 
 
@@ -1432,10 +1440,12 @@ export const BroadcastDetailResponseDtoStatus = {
   failed: 'failed',
   paused: 'paused',
   cancelled: 'cancelled',
+  completed: 'completed',
 } as const;
 
 export interface BroadcastDetailResponseDto {
   publicId: string;
+  /** completed: every matched subscriber has a run and no sends are pending. */
   status: BroadcastDetailResponseDtoStatus;
   matchedCount: number | null;
   sendOverHours: number | null;
@@ -1451,6 +1461,9 @@ export interface BroadcastDetailResponseDto {
   successRate: number | null;
 }
 
+/**
+ * completed: every matched subscriber has a run and no sends are pending.
+ */
 export type BroadcastSummaryDtoStatus = typeof BroadcastSummaryDtoStatus[keyof typeof BroadcastSummaryDtoStatus];
 
 
@@ -1460,10 +1473,12 @@ export const BroadcastSummaryDtoStatus = {
   failed: 'failed',
   paused: 'paused',
   cancelled: 'cancelled',
+  completed: 'completed',
 } as const;
 
 export interface BroadcastSummaryDto {
   publicId: string;
+  /** completed: every matched subscriber has a run and no sends are pending. */
   status: BroadcastSummaryDtoStatus;
   matchedCount: number | null;
   sendOverHours: number | null;
@@ -2211,6 +2226,100 @@ export const useDisconnectAgent = <TError = void,
         TContext
       > => {
       return useMutation(getDisconnectAgentMutationOptions(options), queryClient);
+    }
+
+export type revokeCurrentApiKeyResponse204 = {
+  data: void
+  status: 204
+}
+
+export type revokeCurrentApiKeyResponse400 = {
+  data: void
+  status: 400
+}
+
+export type revokeCurrentApiKeyResponseSuccess = (revokeCurrentApiKeyResponse204) & {
+  headers: Headers;
+};
+export type revokeCurrentApiKeyResponseError = (revokeCurrentApiKeyResponse400) & {
+  headers: Headers;
+};
+
+export type revokeCurrentApiKeyResponse = (revokeCurrentApiKeyResponseSuccess | revokeCurrentApiKeyResponseError)
+
+export const getRevokeCurrentApiKeyUrl = () => {
+
+
+
+
+  return `/users/me/api-key`
+}
+
+/**
+ * @summary Revoke the API key this request was made with
+ */
+export const revokeCurrentApiKey = async ( options?: Parameters<typeof customFetch>[1]): Promise<revokeCurrentApiKeyResponse> => {
+
+  return customFetch<revokeCurrentApiKeyResponse>(getRevokeCurrentApiKeyUrl(),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevokeCurrentApiKeyMutationKey = () => ['revokeCurrentApiKey'] as const;
+
+export const getRevokeCurrentApiKeyMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeCurrentApiKey>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof revokeCurrentApiKey>>, TError,void, TContext> => {
+
+const mutationKey = getRevokeCurrentApiKeyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeCurrentApiKey>>, void> = () => {
+
+
+          return  revokeCurrentApiKey(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeCurrentApiKeyMutationResult = NonNullable<Awaited<ReturnType<typeof revokeCurrentApiKey>>>
+
+    export type RevokeCurrentApiKeyMutationError = void
+
+
+    /**
+ * @summary Revoke the API key this request was made with
+ */
+export const useRevokeCurrentApiKey = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeCurrentApiKey>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revokeCurrentApiKey>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getRevokeCurrentApiKeyMutationOptions(options), queryClient);
     }
 
 export type getWorkspacesResponse200 = {

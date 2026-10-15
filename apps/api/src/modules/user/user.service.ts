@@ -46,4 +46,8 @@ export class UserService {
       throw new NotFoundException("Agent not found");
     }
   }
+
+  async revokeApiKey(db: dbClient, userId: number, keyId: number) {
+    await userRepo.deleteApiKey(db, userId, keyId);
+  }
 }

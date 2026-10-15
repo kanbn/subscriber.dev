@@ -231,18 +231,40 @@ export class WorkflowService {
     return broadcast;
   }
 
-  private async assertBroadcastNotFinished(
+  private async isBroadcastFinished(
     db: dbClient,
     broadcast: { id: number; matchedCount: number | null },
   ) {
-    if (broadcast.matchedCount === null) return;
+    if (broadcast.matchedCount === null) return false;
     const [counts, runCount] = await Promise.all([
       workflowBroadcastRepo.getBroadcastStepCounts(db, broadcast.id),
       workflowBroadcastRepo.countRunsForBroadcast(db, broadcast.id),
     ]);
-    if (runCount >= broadcast.matchedCount && counts.pending === 0) {
+    return runCount >= broadcast.matchedCount && counts.pending === 0;
+  }
+
+  private async assertBroadcastNotFinished(
+    db: dbClient,
+    broadcast: { id: number; matchedCount: number | null },
+  ) {
+    if (await this.isBroadcastFinished(db, broadcast)) {
       throw new ConflictException("Broadcast has already finished sending");
     }
+  }
+
+  private async withCompletedStatus(
+    db: dbClient,
+    broadcast: Parameters<WorkflowService["toBroadcastSummary"]>[0] & {
+      id: number;
+    },
+  ) {
+    const completed =
+      broadcast.status === "queued" &&
+      (await this.isBroadcastFinished(db, broadcast));
+    return {
+      ...this.toBroadcastSummary(broadcast),
+      ...(completed ? { status: "completed" as const } : {}),
+    };
   }
 
   async pauseBroadcast(
@@ -1002,7 +1024,9 @@ export class WorkflowService {
     );
 
     return {
-      broadcasts: rows.map((b) => this.toBroadcastSummary(b)),
+      broadcasts: await Promise.all(
+        rows.map((b) => this.withCompletedStatus(db, b)),
+      ),
       limit: opts.limit,
       offset: opts.offset,
     };
@@ -1027,7 +1051,7 @@ export class WorkflowService {
     ]);
 
     return {
-      ...this.toBroadcastSummary(broadcast),
+      ...(await this.withCompletedStatus(db, broadcast)),
       sentCount: counts.sent,
       failedCount: counts.failed,
       skippedCount: counts.skipped,

@@ -4,6 +4,7 @@ import type { Command } from "commander";
 
 import { readCliConfig, updateCliConfig } from "@subscriber.dev/shared";
 
+import { logout } from "../auth.js";
 import { printResult } from "../output.js";
 
 export function registerLoginCommand(program: Command): void {
@@ -23,10 +24,14 @@ export function registerLoginCommand(program: Command): void {
 
   program
     .command("logout")
-    .description("Clear the stored API key")
-    .action(() => {
-      updateCliConfig({ apiKey: undefined });
-      console.log("Logged out.");
+    .description("Revoke and clear the stored API key")
+    .action(async () => {
+      const { revoked } = await logout();
+      console.log(
+        revoked
+          ? "Logged out."
+          : "Logged out here, but couldn't reach the API to revoke the key, so it still works until revoked.",
+      );
     });
 
   program
