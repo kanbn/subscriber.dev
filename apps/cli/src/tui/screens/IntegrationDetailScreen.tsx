@@ -15,12 +15,16 @@ import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateFo
 import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
-import { ResendCreateForm } from "../components/ResendCreateForm.js";
+import {
+  POSTMARK_FIELDS,
+  ProviderForm,
+  RESEND_FIELDS,
+} from "../components/ProviderForm.js";
 import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
 import { formatRelativeTime } from "../formatRelativeTime.js";
 import {
   cloudflareIntegrationBody,
-  resendIntegrationBody,
+  providerIntegrationBody,
   smtpIntegrationBody,
   stripeIntegrationBody,
 } from "../integrationBodies.js";
@@ -29,7 +33,7 @@ import { useAsyncData } from "../useAsyncData.js";
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
 type PrimaryStatus = "idle" | "setting" | "error";
 
-const EDITABLE_TYPES = ["smtp", "cloudflare", "resend", "stripe"];
+const EDITABLE_TYPES = ["smtp", "cloudflare", "resend", "postmark", "stripe"];
 
 function text(value: unknown): string {
   return typeof value === "string" ? value : "";
@@ -173,16 +177,24 @@ export function IntegrationDetailScreen({
             }
             onCancel={() => setEditing(false)}
           />
-        ) : type === "resend" ? (
-          <ResendCreateForm
+        ) : type === "resend" || type === "postmark" ? (
+          <ProviderForm
             editing
+            fields={type === "resend" ? RESEND_FIELDS : POSTMARK_FIELDS}
             initialValues={{
               fromEmail: text(data.fromEmail),
               fromName: text(data.fromName),
               replyTo: text(data.replyTo),
+              messageStream: text(data.messageStream),
             }}
             onSubmit={(values) =>
-              handleSave(resendIntegrationBody(values, { editing: true }))
+              handleSave(
+                providerIntegrationBody(
+                  type === "resend" ? RESEND_FIELDS : POSTMARK_FIELDS,
+                  values,
+                  { editing: true },
+                ),
+              )
             }
             onCancel={() => setEditing(false)}
           />

@@ -10,17 +10,24 @@ import {
 
 import type { CloudflareEmailCreateValues } from "../components/CloudflareEmailCreateForm.js";
 import type { IntegrationCreateValues } from "../components/IntegrationCreateForm.js";
-import type { ResendCreateValues } from "../components/ResendCreateForm.js";
+import type {
+  ProviderField,
+  ProviderValues,
+} from "../components/ProviderForm.js";
 import type { StripeIntegrationValues } from "../components/StripeIntegrationForm.js";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateForm.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
-import { ResendCreateForm } from "../components/ResendCreateForm.js";
+import {
+  POSTMARK_FIELDS,
+  ProviderForm,
+  RESEND_FIELDS,
+} from "../components/ProviderForm.js";
 import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
 import {
   cloudflareIntegrationBody,
-  resendIntegrationBody,
+  providerIntegrationBody,
   smtpIntegrationBody,
   stripeIntegrationBody,
 } from "../integrationBodies.js";
@@ -32,12 +39,14 @@ type Mode =
   | "creating-smtp"
   | "creating-cloudflare"
   | "creating-resend"
+  | "creating-postmark"
   | "creating-stripe";
 
 const CREATE_MODES: Mode[] = [
   "creating-smtp",
   "creating-cloudflare",
   "creating-resend",
+  "creating-postmark",
   "creating-stripe",
 ];
 
@@ -144,31 +153,31 @@ export function IntegrationsScreen({
     }
   };
 
-  const handleCreateResend = async (
-    values: ResendCreateValues,
-  ): Promise<string | undefined> => {
-    try {
-      const response = await upsertIntegration(
-        environmentId,
-        "resend",
-        resendIntegrationBody(values) as unknown as UpsertIntegrationDto,
-      );
-      if (response.status === 400) {
-        const message = (response.data as { message?: unknown } | undefined)
-          ?.message;
-        return typeof message === "string"
-          ? message
-          : "Invalid config or failed verification.";
+  const handleCreateProvider =
+    (type: "resend" | "postmark", fields: ProviderField[]) =>
+    async (values: ProviderValues): Promise<string | undefined> => {
+      try {
+        const response = await upsertIntegration(
+          environmentId,
+          type,
+          providerIntegrationBody(fields, values) as UpsertIntegrationDto,
+        );
+        if (response.status === 400) {
+          const message = (response.data as { message?: unknown } | undefined)
+            ?.message;
+          return typeof message === "string"
+            ? message
+            : "Invalid config or failed verification.";
+        }
+        if (response.status !== 200) {
+          return "Failed to create integration.";
+        }
+        onSelect(type);
+        return undefined;
+      } catch (err) {
+        return err instanceof Error ? err.message : String(err);
       }
-      if (response.status !== 200) {
-        return "Failed to create integration.";
-      }
-      onSelect("resend");
-      return undefined;
-    } catch (err) {
-      return err instanceof Error ? err.message : String(err);
-    }
-  };
+    };
 
   if (mode === "choosing-type") {
     return (
@@ -178,6 +187,7 @@ export function IntegrationsScreen({
           items={[
             { label: "SMTP", value: "smtp" as const },
             { label: "Resend", value: "resend" as const },
+            { label: "Postmark", value: "postmark" as const },
             { label: "Cloudflare Email", value: "cloudflare" as const },
             { label: "Stripe (trigger workflows)", value: "stripe" as const },
           ]}
@@ -219,16 +229,22 @@ export function IntegrationsScreen({
     );
   }
 
-  if (mode === "creating-resend") {
+  if (mode === "creating-resend" || mode === "creating-postmark") {
+    const type = mode === "creating-resend" ? "resend" : "postmark";
+    const fields = type === "resend" ? RESEND_FIELDS : POSTMARK_FIELDS;
     return (
       <Box flexDirection="column">
-        <Text bold>New Resend integration</Text>
-        <Text dimColor>
-          Add the webhook signing secret after creating a webhook in Resend with
-          the URL shown next, so bounces and spam complaints opt people out.
+        <Text bold>
+          New {type === "resend" ? "Resend" : "Postmark"} integration
         </Text>
-        <ResendCreateForm
-          onSubmit={handleCreateResend}
+        <Text dimColor>
+          {type === "resend"
+            ? "Add the webhook signing secret after creating a webhook in Resend with the URL shown next, so bounces and spam complaints opt people out."
+            : "Next, add a webhook in Postmark with the URL shown, for bounces and spam complaints, so they opt people out."}
+        </Text>
+        <ProviderForm
+          fields={fields}
+          onSubmit={handleCreateProvider(type, fields)}
           onCancel={cancelCreate}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />

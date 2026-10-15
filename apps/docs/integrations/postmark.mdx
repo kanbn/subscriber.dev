@@ -1,0 +1,54 @@
+---
+title: Postmark
+description: "Send through Postmark, with bounces and spam complaints handled for you."
+---
+
+Postmark sends your emails through its API. When an email bounces or someone marks it as spam, Postmark tells subscriber.dev, and that person stops getting emails.
+
+## Connect
+
+You need a Postmark server API token, from your server's **API Tokens** tab, and a sender signature or verified domain for your from address.
+
+Or ask [your agent](/mcp): "Connect Postmark, sending from hello@acme.com."
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber integrations set postmark --body '{
+      "serverToken": "<server API token>",
+      "fromEmail": "hello@acme.com",
+      "fromName": "Acme"
+    }'
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Integrations**, press `n` and choose **Postmark**.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/postmark \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"serverToken": "<server API token>", "fromEmail": "hello@acme.com", "fromName": "Acme"}'
+    ```
+  </Tab>
+</Tabs>
+
+You get back a webhook URL to set up next.
+
+## Settings
+
+| Field | Description |
+| --- | --- |
+| `serverToken` | Your Postmark server API token. |
+| `fromEmail`, `fromName` | Who the email is from. Postmark must have a sender signature or verified domain for it. |
+| `replyTo` | Where replies go, if not `fromEmail`. |
+| `messageStream` | The message stream to send through. Defaults to `outbound`, Postmark's transactional stream. |
+
+## Bounces and spam complaints
+
+1. Run `subscriber integrations get postmark` to see the webhook URL.
+2. In Postmark, open your server, then the message stream's **Webhooks** tab. Add a webhook with that URL and tick **Bounce** and **Spam complaint**.
+
+The URL contains a secret token, so keep it private. Postmark doesn't sign its webhooks, so the token is what proves a request came from your Postmark account.
+
+Emails send without the webhook, but bounces and complaints aren't picked up. When Postmark stops delivering to an address, after a hard bounce or a spam complaint, that subscriber is [opted out](/subscribers#opting-in-and-out). Temporary bounces, like a full inbox, are recorded on the run but don't opt anyone out.

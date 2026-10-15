@@ -42,6 +42,7 @@
         "pages": [
           "integrations/overview",
           "integrations/resend",
+          "integrations/postmark",
           "integrations/smtp",
           "integrations/cloudflare",
           "integrations/stripe"

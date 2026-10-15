@@ -33,8 +33,10 @@ export interface ConfigurableIntegration<TConfig = unknown, TSecret = unknown> {
   describe?: (config: Record<string, unknown>) => Record<string, unknown>;
 }
 
-export interface IntegrationProvider<TConfig = unknown, TSecret = unknown>
-  extends ConfigurableIntegration<TConfig, TSecret> {
+export interface IntegrationProvider<
+  TConfig = unknown,
+  TSecret = unknown,
+> extends ConfigurableIntegration<TConfig, TSecret> {
   send: (
     config: TConfig,
     secret: TSecret,
