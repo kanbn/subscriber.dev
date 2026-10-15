@@ -35,4 +35,11 @@ In general, `2xx` HTTP codes correspond to success, `4xx` codes are for user-rel
 | `400`  | Invalid parameters            |
 | `401`  | Missing or invalid API key    |
 | `404`  | Resource not found            |
+| `429`  | Too many requests             |
 | `500`  | Error with our infrastructure |
+
+## Rate limits
+
+Each API key, or agent signed in through MCP, can make 10 requests a second. Each IP address can make 20 requests a second across all of them. Over the limit, you get a `429`. Wait a second and try again. To add many subscribers at once, use the bulk endpoint, which takes 500 per request.
+
+Inbound webhooks from email providers and Stripe have a higher limit, so a burst of bounces after a big broadcast isn't dropped.

@@ -1,6 +1,7 @@
 import type { Response } from "express";
 import { Controller, Get, Res } from "@nestjs/common";
 import { ApiExcludeController } from "@nestjs/swagger";
+import { SkipThrottle } from "@nestjs/throttler";
 import { sql } from "drizzle-orm";
 
 import { createDrizzleClient } from "@subscriber.dev/db/client";
@@ -24,6 +25,7 @@ async function check(probe: () => Promise<unknown>): Promise<"ok" | "down"> {
 }
 
 @ApiExcludeController()
+@SkipThrottle({ ip: true, credential: true })
 @Controller("health")
 export class HealthController {
   @Get()

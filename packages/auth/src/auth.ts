@@ -111,11 +111,7 @@ export const initAuth = (db: dbClient) => {
       bearer(),
       apiKey({
         enableSessionForAPIKeys: true,
-        rateLimit: {
-          enabled: true,
-          timeWindow: 1000 * 60, // 1 minute
-          maxRequests: 100, // 100 requests per minute
-        },
+        rateLimit: { enabled: false },
       }),
       jwt(),
       oauthProvider({

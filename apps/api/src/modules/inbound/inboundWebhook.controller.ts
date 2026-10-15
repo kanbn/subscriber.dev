@@ -13,6 +13,7 @@ import {
   Req,
 } from "@nestjs/common";
 import { ApiExcludeController } from "@nestjs/swagger";
+import { seconds, Throttle } from "@nestjs/throttler";
 import { Queue } from "bullmq";
 
 import { createDrizzleClient } from "@subscriber.dev/db/client";
@@ -32,6 +33,7 @@ import { InvalidWebhookError } from "./inboundSource.js";
 import { INBOUND_SOURCES } from "./sources/index.js";
 
 @ApiExcludeController()
+@Throttle({ ip: { limit: 100, ttl: seconds(1) } })
 @Controller("webhooks")
 export class InboundWebhookController {
   private readonly logger = new Logger(InboundWebhookController.name);

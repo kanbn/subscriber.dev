@@ -8,6 +8,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { seconds, Throttle } from "@nestjs/throttler";
 
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
@@ -15,6 +16,7 @@ import { BounceWebhookBodyDto } from "./dto/bounce-webhook.dto.js";
 import { WorkflowService } from "./workflow.service.js";
 
 @ApiTags("Bounces")
+@Throttle({ ip: { limit: 100, ttl: seconds(1) } })
 @Controller("bounces")
 export class BouncesController {
   constructor(private readonly workflowService: WorkflowService) {}

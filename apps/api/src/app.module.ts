@@ -1,5 +1,7 @@
 import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
+import { APP_GUARD } from "@nestjs/core";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 import { HealthController } from "./health.controller.js";
 import { AnalyticsModule } from "./modules/analytics/analytics.module.js";
@@ -13,10 +15,12 @@ import { UserModule } from "./modules/user/user.module.js";
 import { WorkflowModule } from "./modules/workflow/workflow.module.js";
 import { WorkspaceModule } from "./modules/workspace/workspace.module.js";
 import { getRedisConnection } from "./queue/bullmq.connection.js";
+import { throttlerOptions } from "./throttle.js";
 
 @Module({
   imports: [
     BullModule.forRoot({ connection: getRedisConnection() }),
+    ThrottlerModule.forRoot(throttlerOptions()),
     UserModule,
     WorkspaceModule,
     BillingModule,
@@ -29,5 +33,6 @@ import { getRedisConnection } from "./queue/bullmq.connection.js";
     SubscriberMcpModule,
   ],
   controllers: [HealthController],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
