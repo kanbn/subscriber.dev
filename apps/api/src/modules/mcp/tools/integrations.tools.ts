@@ -4,8 +4,28 @@ import { z } from "zod";
 
 import { UpsertIntegrationSchema } from "../../integrations/dto/integration.dto.js";
 import { IntegrationsService } from "../../integrations/integrations.service.js";
+import { CONFIGURABLE_INTEGRATIONS } from "../../integrations/providers/index.js";
 import { requireEnvironment } from "../mcp-environment.util.js";
 import { requireMcpDb, requireMcpUser } from "../mcp-user.util.js";
+
+function fieldList(schema: z.ZodType): string[] {
+  if (!(schema instanceof z.ZodObject)) return [];
+  return Object.entries(schema.shape as Record<string, z.ZodType>)
+    .filter(([name]) => name !== "webhookToken")
+    .map(([name, field]) =>
+      field.safeParse(undefined).success ? name : `${name}*`,
+    );
+}
+
+const INTEGRATION_FIELDS = Object.values(CONFIGURABLE_INTEGRATIONS)
+  .map(
+    (integration) =>
+      `${integration.type}: ${[
+        ...fieldList(integration.configSchema),
+        ...fieldList(integration.secretSchema),
+      ].join(", ")}`,
+  )
+  .join("; ");
 
 @Injectable()
 export class IntegrationsTools {
@@ -13,8 +33,7 @@ export class IntegrationsTools {
 
   @Tool({
     name: "set_integration",
-    description:
-      'Create or update the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full.',
+    description: `Create or update the integration of the given type for this environment. Types and their fields (* = required): ${INTEGRATION_FIELDS}. Secret fields (keys, tokens, passwords) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full. The response may include a webhookUrl and eventsToEnable: tell the user to add that webhook in the provider, then save its signing secret as webhookSecret.`,
     parameters: UpsertIntegrationSchema.extend({
       environmentId: z.string(),
       type: z.string(),

@@ -1,10 +1,9 @@
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
-import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
 import { decrypt } from "../../common/encryption.js";
 import { INTEGRATION_PROVIDERS } from "../integrations/providers/index.js";
-import { recordBounce } from "./recordBounce.js";
+import { recordBounceEvents } from "./recordBounceEvents.js";
 
 export async function pollBounces(db: dbClient): Promise<void> {
   const integrations = await environmentIntegrationsRepo.listAll(db);
@@ -29,19 +28,7 @@ export async function pollBounces(db: dbClient): Promise<void> {
 
       if (events === null) continue;
 
-      for (const event of events) {
-        const runStep = await workflowRunRepo.getRunStepByProviderMessageId(
-          db,
-          event.providerMessageId,
-        );
-        if (!runStep) continue;
-
-        await recordBounce(db, {
-          runStepId: runStep.id,
-          bounceType: event.bounceType,
-          reason: event.reason,
-        });
-      }
+      await recordBounceEvents(db, events);
 
       await environmentIntegrationsRepo.updateLastBounceCheckAt(
         db,

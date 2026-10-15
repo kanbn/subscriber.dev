@@ -1,5 +1,6 @@
 import type { CloudflareEmailCreateValues } from "./components/CloudflareEmailCreateForm.js";
 import type { IntegrationCreateValues } from "./components/IntegrationCreateForm.js";
+import type { ResendCreateValues } from "./components/ResendCreateForm.js";
 import type { StripeIntegrationValues } from "./components/StripeIntegrationForm.js";
 
 function secret(value: string, editing: boolean): string | undefined {
@@ -33,6 +34,19 @@ export function cloudflareIntegrationBody(
     replyTo: values.replyTo.trim() || undefined,
     apiToken: secret(values.apiToken.trim(), editing),
     zoneId: values.zoneId.trim() || undefined,
+  };
+}
+
+export function resendIntegrationBody(
+  values: ResendCreateValues,
+  { editing = false } = {},
+) {
+  return {
+    fromEmail: values.fromEmail.trim(),
+    fromName: values.fromName.trim() || undefined,
+    replyTo: values.replyTo.trim() || undefined,
+    apiKey: secret(values.apiKey.trim(), editing),
+    webhookSecret: secret(values.webhookSecret.trim(), true),
   };
 }
 

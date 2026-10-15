@@ -17,18 +17,11 @@
     "groups": [
       {
         "group": "Get started",
-        "pages": [
-          "introduction",
-          "quickstart"
-        ]
+        "pages": ["introduction", "quickstart"]
       },
       {
         "group": "Tools",
-        "pages": [
-          "mcp",
-          "cli",
-          "tui"
-        ]
+        "pages": ["mcp", "cli", "tui"]
       },
       {
         "group": "Guides",
@@ -48,6 +41,7 @@
         "group": "Integrations",
         "pages": [
           "integrations/overview",
+          "integrations/resend",
           "integrations/smtp",
           "integrations/cloudflare",
           "integrations/stripe"
@@ -55,16 +49,12 @@
       },
       {
         "group": "API reference",
-        "pages": [
-          "api-reference/introduction"
-        ],
+        "pages": ["api-reference/introduction"],
         "openapi": "openapi.json"
       },
       {
         "group": "Self-hosting",
-        "pages": [
-          "self-hosting"
-        ]
+        "pages": ["self-hosting"]
       }
     ]
   },

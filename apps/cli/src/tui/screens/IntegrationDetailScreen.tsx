@@ -15,10 +15,12 @@ import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateFo
 import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
+import { ResendCreateForm } from "../components/ResendCreateForm.js";
 import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
 import { formatRelativeTime } from "../formatRelativeTime.js";
 import {
   cloudflareIntegrationBody,
+  resendIntegrationBody,
   smtpIntegrationBody,
   stripeIntegrationBody,
 } from "../integrationBodies.js";
@@ -27,7 +29,7 @@ import { useAsyncData } from "../useAsyncData.js";
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
 type PrimaryStatus = "idle" | "setting" | "error";
 
-const EDITABLE_TYPES = ["smtp", "cloudflare", "stripe"];
+const EDITABLE_TYPES = ["smtp", "cloudflare", "resend", "stripe"];
 
 function text(value: unknown): string {
   return typeof value === "string" ? value : "";
@@ -171,6 +173,19 @@ export function IntegrationDetailScreen({
             }
             onCancel={() => setEditing(false)}
           />
+        ) : type === "resend" ? (
+          <ResendCreateForm
+            editing
+            initialValues={{
+              fromEmail: text(data.fromEmail),
+              fromName: text(data.fromName),
+              replyTo: text(data.replyTo),
+            }}
+            onSubmit={(values) =>
+              handleSave(resendIntegrationBody(values, { editing: true }))
+            }
+            onCancel={() => setEditing(false)}
+          />
         ) : type === "stripe" ? (
           <StripeIntegrationForm
             editing
@@ -231,7 +246,7 @@ export function IntegrationDetailScreen({
       </AsyncBoundary>
 
       {state.status === "ready" &&
-        "webhookUrl" in state.data &&
+        type === "stripe" &&
         inboundEvents.status === "ready" &&
         (() => {
           const events = inboundEvents.data;

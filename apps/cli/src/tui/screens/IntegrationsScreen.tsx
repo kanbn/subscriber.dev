@@ -10,14 +10,17 @@ import {
 
 import type { CloudflareEmailCreateValues } from "../components/CloudflareEmailCreateForm.js";
 import type { IntegrationCreateValues } from "../components/IntegrationCreateForm.js";
+import type { ResendCreateValues } from "../components/ResendCreateForm.js";
 import type { StripeIntegrationValues } from "../components/StripeIntegrationForm.js";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateForm.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
+import { ResendCreateForm } from "../components/ResendCreateForm.js";
 import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
 import {
   cloudflareIntegrationBody,
+  resendIntegrationBody,
   smtpIntegrationBody,
   stripeIntegrationBody,
 } from "../integrationBodies.js";
@@ -28,11 +31,13 @@ type Mode =
   | "choosing-type"
   | "creating-smtp"
   | "creating-cloudflare"
+  | "creating-resend"
   | "creating-stripe";
 
 const CREATE_MODES: Mode[] = [
   "creating-smtp",
   "creating-cloudflare",
+  "creating-resend",
   "creating-stripe",
 ];
 
@@ -139,6 +144,32 @@ export function IntegrationsScreen({
     }
   };
 
+  const handleCreateResend = async (
+    values: ResendCreateValues,
+  ): Promise<string | undefined> => {
+    try {
+      const response = await upsertIntegration(
+        environmentId,
+        "resend",
+        resendIntegrationBody(values) as unknown as UpsertIntegrationDto,
+      );
+      if (response.status === 400) {
+        const message = (response.data as { message?: unknown } | undefined)
+          ?.message;
+        return typeof message === "string"
+          ? message
+          : "Invalid config or failed verification.";
+      }
+      if (response.status !== 200) {
+        return "Failed to create integration.";
+      }
+      onSelect("resend");
+      return undefined;
+    } catch (err) {
+      return err instanceof Error ? err.message : String(err);
+    }
+  };
+
   if (mode === "choosing-type") {
     return (
       <Box flexDirection="column">
@@ -146,6 +177,7 @@ export function IntegrationsScreen({
         <SelectInput
           items={[
             { label: "SMTP", value: "smtp" as const },
+            { label: "Resend", value: "resend" as const },
             { label: "Cloudflare Email", value: "cloudflare" as const },
             { label: "Stripe (trigger workflows)", value: "stripe" as const },
           ]}
@@ -180,6 +212,23 @@ export function IntegrationsScreen({
         </Text>
         <StripeIntegrationForm
           onSubmit={handleCreateStripe}
+          onCancel={cancelCreate}
+        />
+        <Hints text="↑↓ navigate · Enter select/edit" />
+      </Box>
+    );
+  }
+
+  if (mode === "creating-resend") {
+    return (
+      <Box flexDirection="column">
+        <Text bold>New Resend integration</Text>
+        <Text dimColor>
+          Add the webhook signing secret after creating a webhook in Resend with
+          the URL shown next, so bounces and spam complaints opt people out.
+        </Text>
+        <ResendCreateForm
+          onSubmit={handleCreateResend}
           onCancel={cancelCreate}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />

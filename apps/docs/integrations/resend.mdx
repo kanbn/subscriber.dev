@@ -1,0 +1,53 @@
+---
+title: Resend
+description: "Send through Resend, with bounces and spam complaints handled for you."
+---
+
+Resend sends your emails through its API. When an email bounces or someone marks it as spam, Resend tells subscriber.dev, and that person stops getting emails.
+
+## Connect
+
+You need a Resend API key and a domain verified in Resend. A key with **Sending access** is enough.
+
+Or ask [your agent](/mcp): "Connect Resend, sending from hello@acme.com."
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber integrations set resend --body '{
+      "apiKey": "re_...",
+      "fromEmail": "hello@acme.com",
+      "fromName": "Acme"
+    }'
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Integrations**, press `n` and choose **Resend**.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/resend \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"apiKey": "re_...", "fromEmail": "hello@acme.com", "fromName": "Acme"}'
+    ```
+  </Tab>
+</Tabs>
+
+You get back a webhook URL to set up next.
+
+## Settings
+
+| Field | Description |
+| --- | --- |
+| `apiKey` | Your Resend API key. |
+| `fromEmail`, `fromName` | Who the email is from. The domain must be verified in Resend. |
+| `replyTo` | Where replies go, if not `fromEmail`. |
+| `webhookSecret` | The webhook's signing secret (`whsec_...`), so bounces and spam complaints are picked up. |
+
+## Bounces and spam complaints
+
+1. Run `subscriber integrations get resend` to see the webhook URL.
+2. In Resend, open **Webhooks**, add an endpoint with that URL, and choose the `email.bounced` and `email.complained` events.
+3. Copy the webhook's signing secret, then connect Resend again with your settings plus `"webhookSecret": "whsec_..."`. Your API key is kept, so you can leave it out.
+
+Emails send without a webhook, but bounces and complaints aren't picked up. When an address bounces for good or someone marks your email as spam, that subscriber is [opted out](/subscribers#opting-in-and-out). Temporary bounces, like a full inbox, are recorded on the run but don't opt anyone out.

@@ -33,15 +33,18 @@ export interface ConfigurableIntegration<TConfig = unknown, TSecret = unknown> {
   describe?: (config: Record<string, unknown>) => Record<string, unknown>;
 }
 
-export interface IntegrationProvider<
-  TConfig = unknown,
-  TSecret = unknown,
-> extends ConfigurableIntegration<TConfig, TSecret> {
+export interface IntegrationProvider<TConfig = unknown, TSecret = unknown>
+  extends ConfigurableIntegration<TConfig, TSecret> {
   send: (
     config: TConfig,
     secret: TSecret,
     message: OutboundEmail,
   ) => Promise<SendResult>;
+  parseWebhook?: (input: {
+    rawBody: Buffer;
+    headers: Record<string, string | string[] | undefined>;
+    secret: TSecret;
+  }) => BounceEvent[];
   checkBounces?: (
     config: TConfig,
     secret: TSecret,
