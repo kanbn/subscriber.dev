@@ -24,6 +24,7 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "juice": "^12.2.0",
     "next-runtime-env": "^1.8.0",
     "nodemailer": "^10.0.16",
     "react": "catalog:react19",

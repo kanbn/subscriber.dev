@@ -383,6 +383,24 @@ describe("process", () => {
     expect(html).toContain('href="https://example.com/unsubscribe?token=abc"');
   });
 
+  it("inlines the layout's CSS so email apps that strip <style> keep it", async () => {
+    vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue({
+      ...mockRunStep,
+      configSnapshot: {
+        subject: "Hi",
+        body: '<p>Hello</p><a class="button" href="https://example.com">Go</a>',
+      },
+    } as any);
+
+    await processor.process(makeJob());
+
+    const [, , , html] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toContain('<p style="margin: 0 0 14px;">Hello</p>');
+    expect(html).toMatch(
+      /<a class="button"[^>]*style="[^"]*background-color: #111113/,
+    );
+  });
+
   it.each([
     [true, true],
     [false, false],

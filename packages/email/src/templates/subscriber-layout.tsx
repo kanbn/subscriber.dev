@@ -1,3 +1,4 @@
+import juice from "juice";
 import * as React from "react";
 import {
   Body,
@@ -146,7 +147,9 @@ SubscriberLayout.PreviewProps = {
   unsubscribeUrl: "https://example.com/unsubscribe?token=abc",
 } satisfies SubscriberLayoutProps;
 
-export const renderSubscriberEmail = (props: SubscriberLayoutProps) =>
-  render(<SubscriberLayout {...props} />);
+export const renderSubscriberEmail = async (props: SubscriberLayoutProps) =>
+  juice(await render(<SubscriberLayout {...props} />), {
+    applyHeightAttributes: false,
+  });
 
 export default SubscriberLayout;
