@@ -9,10 +9,13 @@ Each environment needs at least one provider. Without one, email steps fail with
 
 ## Connect a provider
 
-| Provider | Use it for |
+| Provider | Bounces and spam complaints |
 | --- | --- |
-| [SMTP](/integrations/smtp) | Any SMTP provider. |
-| [Cloudflare Email](/integrations/cloudflare) | Domains on Cloudflare. Bounces are picked up automatically. |
+| [Resend](/integrations/resend) | Picked up automatically |
+| [Postmark](/integrations/postmark) | Picked up automatically |
+| [Amazon SES](/integrations/ses) | Picked up automatically |
+| [Cloudflare Email](/integrations/cloudflare) | Bounces only |
+| [SMTP](/integrations/smtp), for any other provider | Not picked up |
 
 You can connect more than one, and the next is tried if one fails. See [Integrations](/integrations/overview#more-than-one-email-provider).
 
@@ -28,12 +31,22 @@ Subscriber.dev already does the rest: every email has a plain-text version, an u
 
 Sending from a subdomain, such as `mail.acme.com`, keeps your marketing email's reputation separate from your main domain.
 
+## Postal address
+
+Marketing email usually includes the sender's physical postal address. Set it once on the workspace and it appears in the footer of every email:
+
+```bash
+subscriber workspaces update --postal-address "Acme Inc., 1 Market Street, San Francisco, CA 94105"
+```
+
+Or ask [your agent](/mcp): "Set our postal address to Acme Inc., 1 Market Street, San Francisco." Agents use `update_workspace`. To remove it, set it to `""`.
+
 ## Bounces
 
 A bounce is an email that couldn't be delivered. A hard bounce means the address doesn't exist; a soft bounce is temporary, such as a full inbox.
 
 When a hard bounce comes back, the subscriber is [opted out](/subscribers#opting-in-and-out) so you don't keep sending to a dead address, which hurts your reputation. Soft bounces are recorded but don't opt anyone out.
 
-Bounces are picked up automatically from [Cloudflare Email](/integrations/cloudflare#bounces). They aren't picked up from [SMTP](/integrations/smtp#bounces) providers yet.
+Bounces and spam complaints are picked up automatically from Resend, Postmark and Amazon SES, and a spam complaint opts the subscriber out. Cloudflare Email reports bounces only. Neither is picked up over [SMTP](/integrations/smtp#bounces).
 
 [Analytics](/cli#other-commands) shows sends and bounces for an environment.

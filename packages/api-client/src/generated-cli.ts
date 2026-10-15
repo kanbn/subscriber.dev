@@ -43,6 +43,7 @@ export interface WorkspaceDto {
   publicId: string;
   name: string;
   slug: string;
+  postalAddress: string | null;
 }
 
 export interface CreateWorkspaceDto {
@@ -70,6 +71,11 @@ export type CreateWorkspaceResponseDtoEnvironment = {
 export interface CreateWorkspaceResponseDto {
   workspace: CreateWorkspaceResponseDtoWorkspace;
   environment: CreateWorkspaceResponseDtoEnvironment;
+}
+
+export interface UpdateWorkspaceDto {
+  /** The business's physical postal address, shown in every email's footer. Shown on one line; line breaks become commas. Send null or an empty string to remove it. */
+  postalAddress: string | null;
 }
 
 export type ListEnvironmentsResponseDtoEnvironmentsItem = {
@@ -2056,6 +2062,64 @@ return cliFetch<createWorkspaceResponse>(getCreateWorkspaceUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(createWorkspaceDto)
+  }
+);}
+
+
+
+export type updateWorkspaceResponse200 = {
+  data: WorkspaceDto
+  status: 200
+}
+
+export type updateWorkspaceResponse404 = {
+  data: void
+  status: 404
+}
+
+export type updateWorkspaceResponseSuccess = (updateWorkspaceResponse200) & {
+  headers: Headers;
+};
+export type updateWorkspaceResponseError = (updateWorkspaceResponse404) & {
+  headers: Headers;
+};
+
+export type updateWorkspaceResponse = (updateWorkspaceResponseSuccess | updateWorkspaceResponseError)
+
+export const getUpdateWorkspaceUrl = (workspaceId: string,) => {
+
+
+
+
+  return `/workspaces/${workspaceId}`
+}
+
+/**
+ * @summary Update a workspace
+ */
+export const updateWorkspace = async (workspaceId: string,
+    updateWorkspaceDto: UpdateWorkspaceDto, options?: Parameters<typeof cliFetch>[1]): Promise<updateWorkspaceResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return cliFetch<updateWorkspaceResponse>(getUpdateWorkspaceUrl(workspaceId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateWorkspaceDto)
   }
 );}
 

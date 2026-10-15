@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { CreateEnvironmentSchema } from "../../workspace/dto/create-environment.dto.js";
 import { CreateWorkspaceSchema } from "../../workspace/dto/create-workspace.dto.js";
+import { UpdateWorkspaceSchema } from "../../workspace/dto/update-workspace.dto.js";
 import { WorkspaceService } from "../../workspace/workspace.service.js";
 import { requireMcpDb, requireMcpUser } from "../mcp-user.util.js";
 
@@ -42,6 +43,34 @@ export class WorkspaceTools {
 
     return this.workspaceService.createWorkspace(db, user.id, {
       name: args.name,
+    });
+  }
+
+  @Tool({
+    name: "update_workspace",
+    description:
+      "Set the workspace's postal address, shown in the footer of every email it sends. Marketing email usually includes the sender's physical address, so if list_workspaces shows postalAddress as null, offer to add one before sending broadcasts.",
+    parameters: UpdateWorkspaceSchema.extend({ workspaceId: z.string() }),
+  })
+  async updateWorkspace(
+    args: z.infer<typeof UpdateWorkspaceSchema> & { workspaceId: string },
+    _context: unknown,
+    rawRequest: { user?: unknown; db?: unknown } | undefined,
+  ) {
+    const user = requireMcpUser(rawRequest);
+    const db = requireMcpDb(rawRequest);
+
+    const workspace = await this.workspaceService.getWorkspaceForUser(
+      db,
+      user.id,
+      args.workspaceId,
+    );
+    if (!workspace) {
+      throw new NotFoundException("Workspace not found");
+    }
+
+    return this.workspaceService.updateWorkspace(db, workspace.id, user.id, {
+      postalAddress: args.postalAddress,
     });
   }
 

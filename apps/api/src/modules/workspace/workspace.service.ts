@@ -138,6 +138,30 @@ export class WorkspaceService {
       );
   }
 
+  async updateWorkspace(
+    db: dbClient,
+    workspaceId: number,
+    userId: number,
+    data: { postalAddress: string | null },
+  ) {
+    const [workspace] = await db
+      .update(workspaces)
+      .set({
+        postalAddress: data.postalAddress,
+        updatedBy: userId,
+        updatedAt: new Date(),
+      })
+      .where(eq(workspaces.id, workspaceId))
+      .returning({
+        id: workspaces.id,
+        publicId: workspaces.publicId,
+        name: workspaces.name,
+        slug: workspaces.slug,
+        postalAddress: workspaces.postalAddress,
+      });
+    return workspace;
+  }
+
   async getWorkspacesByUserId(db: dbClient, userId: number) {
     const result = await db
       .select({
@@ -145,6 +169,7 @@ export class WorkspaceService {
         publicId: workspaces.publicId,
         name: workspaces.name,
         slug: workspaces.slug,
+        postalAddress: workspaces.postalAddress,
       })
       .from(workspaces)
       .innerJoin(

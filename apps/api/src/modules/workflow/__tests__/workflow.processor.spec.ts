@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
+import * as workspaceRepo from "@subscriber.dev/db/repository/workspace.repo";
 import { sendRawEmail } from "@subscriber.dev/email";
 import {
   createEmailUnsubscribeLink,
@@ -42,6 +43,10 @@ vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
 
 vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
   listByEnvironment: vi.fn(),
+}));
+
+vi.mock("@subscriber.dev/db/repository/workspace.repo", () => ({
+  getPostalAddressForEnvironment: vi.fn(() => Promise.resolve(null)),
 }));
 
 vi.mock("../../../common/encryption.js", () => ({
@@ -421,6 +426,20 @@ describe("process", () => {
       );
     },
   );
+
+  it("puts the workspace's postal address in the footer", async () => {
+    vi.mocked(
+      workspaceRepo.getPostalAddressForEnvironment,
+    ).mockResolvedValueOnce("Acme <Inc>,\n1 Market Street\n\nSan Francisco");
+
+    await processor.process(makeJob());
+
+    const [, , , html, options] = vi.mocked(sendRawEmail).mock.calls[0]!;
+    expect(html).toContain("Acme &lt;Inc&gt;, 1 Market Street, San Francisco");
+    expect(options?.text).toContain(
+      "Acme <Inc>, 1 Market Street, San Francisco",
+    );
+  });
 
   it.each(["{{unsubscribeUrl}}", "{{ unsubscribeUrl }}"])(
     "also supports %s interpolation for custom placement, without duplicating the auto-footer",

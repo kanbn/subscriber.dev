@@ -295,7 +295,7 @@ export class WorkflowTools {
   @Tool({
     name: "trigger_broadcast",
     description:
-      "Fan this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via list_broadcasts/get_broadcast) for progress. Sends real email/webhooks; call preview_broadcast first to check the matched count. For large audiences, set sendOverHours to spread sends out; a running broadcast can be stopped with pause_broadcast or cancel_broadcast.",
+      "Fan this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via list_broadcasts/get_broadcast) for progress. Sends real email/webhooks; call preview_broadcast first to check the matched count. For large audiences, set sendOverHours to spread sends out; a running broadcast can be stopped with pause_broadcast or cancel_broadcast. Marketing email usually includes the sender's postal address: if list_workspaces shows postalAddress as null, offer to set one with update_workspace first.",
     parameters: TriggerBroadcastSchema.extend({
       environmentId: z.string(),
       workflowId: z.string(),

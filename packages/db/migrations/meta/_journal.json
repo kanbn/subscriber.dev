@@ -190,6 +190,13 @@
       "when": 1791885708622,
       "tag": "20261013100148_AddWorkflowChannels",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792095478541,
+      "tag": "20261015201758_AddWorkspacePostalAddress",
+      "breakpoints": true
     }
   ]
 }

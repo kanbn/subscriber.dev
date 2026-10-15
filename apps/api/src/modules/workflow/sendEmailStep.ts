@@ -5,7 +5,12 @@ import type { WorkflowChannels } from "@subscriber.dev/db/schema";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
-import { POWERED_BY_URL, renderSubscriberEmail } from "@subscriber.dev/email";
+import * as workspaceRepo from "@subscriber.dev/db/repository/workspace.repo";
+import {
+  formatPostalAddress,
+  POWERED_BY_URL,
+  renderSubscriberEmail,
+} from "@subscriber.dev/email";
 import {
   createEmailUnsubscribeLink,
   createOneClickUnsubscribeUrl,
@@ -88,12 +93,13 @@ export async function sendEmailStep(
     subscriber.environmentId,
     subscriber.publicId,
   );
-  const email = await renderEmail(
-    stepConfig,
-    baseContext,
-    unsubscribeUrl,
+  const email = await renderEmail(stepConfig, baseContext, unsubscribeUrl, {
     poweredBy,
-  );
+    postalAddress: await workspaceRepo.getPostalAddressForEnvironment(
+      db,
+      subscriber.environmentId,
+    ),
+  });
   const headers = await buildListUnsubscribeHeaders(subscriber);
 
   try {
@@ -133,11 +139,24 @@ export interface EmailContent {
   previewText?: string;
 }
 
+export interface EmailFooter {
+  poweredBy?: boolean;
+  postalAddress?: string | null;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 export async function renderEmail(
   content: EmailContent,
   baseContext: Record<string, unknown>,
   unsubscribeUrl: string | null | undefined,
-  poweredBy = false,
+  { poweredBy = false, postalAddress }: EmailFooter = {},
 ): Promise<{ subject: string; html: string; text: string }> {
   const context = { ...baseContext, unsubscribeUrl };
   const subject = await renderTemplate(content.subject, context);
@@ -145,12 +164,16 @@ export async function renderEmail(
   const bodyHasUnsubscribeToken = /\{\{-?\s*unsubscribeUrl\b/.test(
     content.body,
   );
+  const address = formatPostalAddress(postalAddress);
   const footerUnsubscribeUrl =
     unsubscribeUrl && !bodyHasUnsubscribeToken ? unsubscribeUrl : undefined;
   const bareHtml = [
     interpolatedBody,
     footerUnsubscribeUrl
       ? `<p style="font-size:12px;color:#666;">Don't want these emails? <a href="${footerUnsubscribeUrl}">Unsubscribe</a></p>`
+      : "",
+    address
+      ? `<p style="font-size:12px;color:#666;">${escapeHtml(address)}</p>`
       : "",
     poweredBy
       ? `<p style="font-size:12px;color:#666;">Powered by <a href="${POWERED_BY_URL}">subscriber.dev</a></p>`
@@ -165,6 +188,7 @@ export async function renderEmail(
           ? await renderTemplate(content.previewText, context)
           : undefined,
         unsubscribeUrl: footerUnsubscribeUrl,
+        postalAddress,
         poweredBy,
       })
     : bareHtml;

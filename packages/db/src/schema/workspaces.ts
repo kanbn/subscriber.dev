@@ -28,6 +28,7 @@ export const workspaces = pgTable("workspaces", {
     .$defaultFn(() => generateUID()),
   name: varchar("name", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
+  postalAddress: text("postalAddress"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
   deletedAt: timestamp("deletedAt"),

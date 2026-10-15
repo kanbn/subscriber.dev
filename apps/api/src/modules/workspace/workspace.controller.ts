@@ -6,6 +6,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from "@nestjs/common";
@@ -34,6 +35,7 @@ import {
   ListEnvironmentsResponseDto,
   WorkspaceDto,
 } from "./dto/get-workspace.dto.js";
+import { UpdateWorkspaceDto } from "./dto/update-workspace.dto.js";
 import { WorkspaceService } from "./workspace.service.js";
 
 @ApiTags("Workspaces")
@@ -74,6 +76,34 @@ export class WorkspaceController {
 
     return this.workspaceService.createWorkspace(db, user.id, {
       name: input.name,
+    });
+  }
+
+  @Patch(":workspaceId")
+  @ApiOperation({
+    operationId: "updateWorkspace",
+    summary: "Update a workspace",
+  })
+  @ApiParam({ name: "workspaceId", type: "string" })
+  @ApiResponse({ status: 200, type: WorkspaceDto })
+  @ApiResponse({ status: 404, description: "Workspace not found" })
+  async updateWorkspace(
+    @CurrentUser() user: User,
+    @Param("workspaceId") workspaceId: string,
+    @Body() input: UpdateWorkspaceDto,
+  ): Promise<WorkspaceDto> {
+    const db = createDrizzleClient();
+    const workspace = await this.workspaceService.getWorkspaceForUser(
+      db,
+      user.id,
+      workspaceId,
+    );
+    if (!workspace) {
+      throw new NotFoundException("Workspace not found");
+    }
+
+    return this.workspaceService.updateWorkspace(db, workspace.id, user.id, {
+      postalAddress: input.postalAddress,
     });
   }
 

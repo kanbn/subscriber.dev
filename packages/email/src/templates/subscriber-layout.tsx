@@ -36,10 +36,18 @@ export const defaultSubscriberLayoutTheme: SubscriberLayoutTheme = {
 
 export const POWERED_BY_URL = "https://subscriber.dev";
 
+export const formatPostalAddress = (address: string | null | undefined) =>
+  (address ?? "")
+    .split("\n")
+    .map((line) => line.trim().replace(/,$/, ""))
+    .filter(Boolean)
+    .join(", ");
+
 export interface SubscriberLayoutProps {
   bodyHtml: string;
   previewText?: string;
   unsubscribeUrl?: string;
+  postalAddress?: string | null;
   poweredBy?: boolean;
   theme?: SubscriberLayoutTheme;
 }
@@ -69,72 +77,81 @@ export const SubscriberLayout = ({
   bodyHtml,
   previewText,
   unsubscribeUrl,
+  postalAddress,
   poweredBy,
   theme = defaultSubscriberLayoutTheme,
-}: SubscriberLayoutProps) => (
-  <Html>
-    <Head>
-      <meta name="color-scheme" content="light" />
-      <style dangerouslySetInnerHTML={{ __html: contentStyles(theme) }} />
-    </Head>
-    {previewText && <Preview>{previewText}</Preview>}
-    <Body style={{ backgroundColor: theme.backgroundColor, margin: 0 }}>
-      <Container
-        className="container"
-        style={{ maxWidth: "600px", padding: "48px 24px 64px" }}
-      >
-        <div
-          className="content"
-          style={{
-            fontFamily: theme.fontFamily,
-            fontSize: "14px",
-            lineHeight: "22px",
-            color: theme.textColor,
-          }}
-          dangerouslySetInnerHTML={{ __html: bodyHtml }}
-        />
-        {unsubscribeUrl && (
-          <Text
+}: SubscriberLayoutProps) => {
+  const address = formatPostalAddress(postalAddress);
+  const footerText = (first: boolean) => ({
+    fontFamily: theme.fontFamily,
+    fontSize: "11px",
+    lineHeight: "16px",
+    margin: first ? "32px 0 0" : "12px 0 0",
+  });
+  return (
+    <Html>
+      <Head>
+        <meta name="color-scheme" content="light" />
+        <style dangerouslySetInnerHTML={{ __html: contentStyles(theme) }} />
+      </Head>
+      {previewText && <Preview>{previewText}</Preview>}
+      <Body style={{ backgroundColor: theme.backgroundColor, margin: 0 }}>
+        <Container
+          className="container"
+          style={{ maxWidth: "600px", padding: "48px 24px 64px" }}
+        >
+          <div
+            className="content"
             style={{
               fontFamily: theme.fontFamily,
-              fontSize: "11px",
-              lineHeight: "16px",
+              fontSize: "14px",
+              lineHeight: "22px",
               color: theme.textColor,
-              margin: "32px 0 0",
             }}
-          >
-            Don&apos;t want these emails?{" "}
-            <Link
-              href={unsubscribeUrl}
-              style={{ color: theme.linkColor, textDecoration: "underline" }}
+            dangerouslySetInnerHTML={{ __html: bodyHtml }}
+          />
+          {unsubscribeUrl && (
+            <Text style={{ ...footerText(true), color: theme.textColor }}>
+              Don&apos;t want these emails?{" "}
+              <Link
+                href={unsubscribeUrl}
+                style={{ color: theme.linkColor, textDecoration: "underline" }}
+              >
+                Unsubscribe
+              </Link>
+            </Text>
+          )}
+          {address && (
+            <Text
+              style={{
+                ...footerText(!unsubscribeUrl),
+                color: theme.mutedColor,
+              }}
             >
-              Unsubscribe
-            </Link>
-          </Text>
-        )}
-        {poweredBy && (
-          <Text
-            style={{
-              fontFamily: theme.fontFamily,
-              fontSize: "11px",
-              lineHeight: "16px",
-              color: theme.mutedColor,
-              margin: unsubscribeUrl ? "12px 0 0" : "32px 0 0",
-            }}
-          >
-            Powered by{" "}
-            <Link
-              href={POWERED_BY_URL}
-              style={{ color: theme.mutedColor, textDecoration: "underline" }}
+              {address}
+            </Text>
+          )}
+          {poweredBy && (
+            <Text
+              style={{
+                ...footerText(!unsubscribeUrl && !address),
+                color: theme.mutedColor,
+              }}
             >
-              subscriber.dev
-            </Link>
-          </Text>
-        )}
-      </Container>
-    </Body>
-  </Html>
-);
+              Powered by{" "}
+              <Link
+                href={POWERED_BY_URL}
+                style={{ color: theme.mutedColor, textDecoration: "underline" }}
+              >
+                subscriber.dev
+              </Link>
+            </Text>
+          )}
+        </Container>
+      </Body>
+    </Html>
+  );
+};
 
 SubscriberLayout.PreviewProps = {
   bodyHtml: `<h1>Welcome to Acme, Alice</h1>
@@ -145,6 +162,7 @@ SubscriberLayout.PreviewProps = {
 <p>Reply to this email and it'll come straight to us, or <a href="https://example.com/docs">read the docs</a>.</p>
 <p>Cheers,<br />The Acme team</p>`,
   unsubscribeUrl: "https://example.com/unsubscribe?token=abc",
+  postalAddress: "Acme Inc.\n1 Market Street\nSan Francisco, CA 94105",
 } satisfies SubscriberLayoutProps;
 
 export const renderSubscriberEmail = async (props: SubscriberLayoutProps) =>

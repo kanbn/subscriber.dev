@@ -236,6 +236,58 @@
         ]
       }
     },
+    "/workspaces/{workspaceId}": {
+      "patch": {
+        "operationId": "updateWorkspace",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkspaceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a workspace",
+        "tags": [
+          "Workspaces"
+        ]
+      }
+    },
     "/workspaces/{workspaceId}/environments": {
       "get": {
         "operationId": "listEnvironments",
@@ -2934,13 +2986,24 @@
           },
           "slug": {
             "type": "string"
+          },
+          "postalAddress": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
           "id",
           "publicId",
           "name",
-          "slug"
+          "slug",
+          "postalAddress"
         ]
       },
       "CreateWorkspaceDto": {
@@ -3009,6 +3072,26 @@
         "required": [
           "workspace",
           "environment"
+        ]
+      },
+      "UpdateWorkspaceDto": {
+        "type": "object",
+        "properties": {
+          "postalAddress": {
+            "description": "The business's physical postal address, shown in every email's footer. Shown on one line; line breaks become commas. Send null or an empty string to remove it.",
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "postalAddress"
         ]
       },
       "ListEnvironmentsResponseDto": {

@@ -62,6 +62,7 @@ export interface WorkspaceDto {
   publicId: string;
   name: string;
   slug: string;
+  postalAddress: string | null;
 }
 
 export interface CreateWorkspaceDto {
@@ -89,6 +90,11 @@ export type CreateWorkspaceResponseDtoEnvironment = {
 export interface CreateWorkspaceResponseDto {
   workspace: CreateWorkspaceResponseDtoWorkspace;
   environment: CreateWorkspaceResponseDtoEnvironment;
+}
+
+export interface UpdateWorkspaceDto {
+  /** The business's physical postal address, shown in every email's footer. Shown on one line; line breaks become commas. Send null or an empty string to remove it. */
+  postalAddress: string | null;
 }
 
 export type ListEnvironmentsResponseDtoEnvironmentsItem = {
@@ -2535,6 +2541,115 @@ export const useCreateWorkspace = <TError = unknown,
         TContext
       > => {
       return useMutation(getCreateWorkspaceMutationOptions(options), queryClient);
+    }
+
+export type updateWorkspaceResponse200 = {
+  data: WorkspaceDto
+  status: 200
+}
+
+export type updateWorkspaceResponse404 = {
+  data: void
+  status: 404
+}
+
+export type updateWorkspaceResponseSuccess = (updateWorkspaceResponse200) & {
+  headers: Headers;
+};
+export type updateWorkspaceResponseError = (updateWorkspaceResponse404) & {
+  headers: Headers;
+};
+
+export type updateWorkspaceResponse = (updateWorkspaceResponseSuccess | updateWorkspaceResponseError)
+
+export const getUpdateWorkspaceUrl = (workspaceId: string,) => {
+
+
+
+
+  return `/workspaces/${workspaceId}`
+}
+
+/**
+ * @summary Update a workspace
+ */
+export const updateWorkspace = async (workspaceId: string,
+    updateWorkspaceDto: UpdateWorkspaceDto, options?: Parameters<typeof customFetch>[1]): Promise<updateWorkspaceResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<updateWorkspaceResponse>(getUpdateWorkspaceUrl(workspaceId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateWorkspaceDto)
+  }
+);}
+
+
+
+
+
+export const getUpdateWorkspaceMutationKey = () => ['updateWorkspace'] as const;
+
+export const getUpdateWorkspaceMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkspace>>, TError,UpdateWorkspaceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateWorkspace>>, TError,UpdateWorkspaceMutationVariables, TContext> => {
+
+const mutationKey = getUpdateWorkspaceMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorkspace>>, UpdateWorkspaceMutationVariables> = (props) => {
+          const {workspaceId,data} = props ?? {};
+
+          return  updateWorkspace(workspaceId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateWorkspaceMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorkspace>>>
+    export type UpdateWorkspaceMutationBody = UpdateWorkspaceDto
+    export type UpdateWorkspaceMutationError = void
+    export type UpdateWorkspaceMutationVariables = {workspaceId: string;data: UpdateWorkspaceDto}
+
+    /**
+ * @summary Update a workspace
+ */
+export const useUpdateWorkspace = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkspace>>, TError,UpdateWorkspaceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateWorkspace>>,
+        TError,
+        UpdateWorkspaceMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateWorkspaceMutationOptions(options), queryClient);
     }
 
 export type listEnvironmentsResponse200 = {

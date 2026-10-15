@@ -16,8 +16,10 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import type { dbClient } from "@subscriber.dev/db/client";
 import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscriber.repo";
 import { createDrizzleClient } from "@subscriber.dev/db/client";
+import * as workspaceRepo from "@subscriber.dev/db/repository/workspace.repo";
 
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
@@ -57,6 +59,14 @@ function sampleContext(user: User) {
 export class EmailController {
   constructor(private readonly billing: BillingService) {}
 
+  private async footer(db: dbClient, environmentId: number) {
+    const [poweredBy, postalAddress] = await Promise.all([
+      this.billing.showsPoweredBy(db, environmentId),
+      workspaceRepo.getPostalAddressForEnvironment(db, environmentId),
+    ]);
+    return { poweredBy, postalAddress };
+  }
+
   @Post("preview")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -72,15 +82,11 @@ export class EmailController {
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: EmailContentDto,
   ): Promise<RenderedEmailDto> {
-    const poweredBy = await this.billing.showsPoweredBy(
-      createDrizzleClient(),
-      environment.id,
-    );
     const { subject, html } = await renderEmail(
       input,
       sampleContext(user),
       "#",
-      poweredBy,
+      await this.footer(createDrizzleClient(), environment.id),
     ).catch((error: unknown) => {
       throw new BadRequestException(
         error instanceof Error ? error.message : "Couldn't render the email",
@@ -114,7 +120,7 @@ export class EmailController {
         input,
         sampleContext(user),
         "#",
-        await this.billing.showsPoweredBy(db, environment.id),
+        await this.footer(db, environment.id),
       );
       await sendWithIntegrations(db, environment.id, {
         to: user.email,
