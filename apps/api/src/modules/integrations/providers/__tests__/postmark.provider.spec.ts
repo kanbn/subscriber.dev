@@ -137,9 +137,9 @@ describe("webhooks", () => {
     ]);
   });
 
-  it("treats other bounces as soft", () => {
+  it("treats other bounces as soft", async () => {
     expect(
-      webhook({ ...bounce, Type: "SoftBounce", Inactive: false })?.[0]
+      (await webhook({ ...bounce, Type: "SoftBounce", Inactive: false }))?.[0]
         ?.bounceType,
     ).toBe("soft");
   });

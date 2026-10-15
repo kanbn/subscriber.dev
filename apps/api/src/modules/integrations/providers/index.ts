@@ -3,12 +3,14 @@ import { stripeIntegration } from "../../inbound/sources/stripe/stripe.integrati
 import { cloudflareEmailProvider } from "./cloudflareEmail.provider.js";
 import { postmarkProvider } from "./postmark.provider.js";
 import { resendProvider } from "./resend.provider.js";
+import { sesProvider } from "./ses.provider.js";
 import { smtpProvider } from "./smtp.provider.js";
 
 export type { ConfigurableIntegration, IntegrationProvider } from "./types.js";
 export { cloudflareEmailProvider } from "./cloudflareEmail.provider.js";
 export { postmarkProvider } from "./postmark.provider.js";
 export { resendProvider } from "./resend.provider.js";
+export { sesProvider } from "./ses.provider.js";
 export { smtpProvider } from "./smtp.provider.js";
 
 export const INTEGRATION_PROVIDERS: Record<
@@ -19,6 +21,7 @@ export const INTEGRATION_PROVIDERS: Record<
   cloudflare: cloudflareEmailProvider,
   resend: resendProvider,
   postmark: postmarkProvider,
+  ses: sesProvider,
 };
 
 export const CONFIGURABLE_INTEGRATIONS: Record<

@@ -48,11 +48,9 @@ export class InboundWebhookController {
     @Req() request: RawBodyRequest<Request>,
   ): Promise<{ received: true }> {
     const source = INBOUND_SOURCES[sourceName] as
-      | (typeof INBOUND_SOURCES)[string]
-      | undefined;
+      (typeof INBOUND_SOURCES)[string] | undefined;
     const provider = INTEGRATION_PROVIDERS[sourceName] as
-      | (typeof INTEGRATION_PROVIDERS)[string]
-      | undefined;
+      (typeof INTEGRATION_PROVIDERS)[string] | undefined;
     if (!source && !provider?.parseWebhook) {
       throw new NotFoundException("Unknown webhook");
     }
@@ -72,7 +70,7 @@ export class InboundWebhookController {
     if (provider?.parseWebhook) {
       let events: BounceEvent[];
       try {
-        events = provider.parseWebhook({
+        events = await provider.parseWebhook({
           rawBody: request.rawBody,
           headers: request.headers,
           secret: provider.secretSchema.parse(secret) as unknown,

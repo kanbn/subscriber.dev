@@ -176,7 +176,7 @@ describe("webhooks", () => {
     ]);
   });
 
-  it("treats transient bounces as soft", () => {
+  it("treats transient bounces as soft", async () => {
     const body = {
       ...bounced,
       data: {
@@ -185,7 +185,7 @@ describe("webhooks", () => {
       },
     };
     expect(
-      resendProvider.parseWebhook?.({ ...signed(body), secret })?.[0]
+      (await resendProvider.parseWebhook?.({ ...signed(body), secret }))?.[0]
         ?.bounceType,
     ).toBe("soft");
   });

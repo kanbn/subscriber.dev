@@ -46,7 +46,7 @@ export interface IntegrationProvider<
     rawBody: Buffer;
     headers: Record<string, string | string[] | undefined>;
     secret: TSecret;
-  }) => BounceEvent[];
+  }) => BounceEvent[] | Promise<BounceEvent[]>;
   checkBounces?: (
     config: TConfig,
     secret: TSecret,

@@ -15,11 +15,7 @@ import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateFo
 import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
-import {
-  POSTMARK_FIELDS,
-  ProviderForm,
-  RESEND_FIELDS,
-} from "../components/ProviderForm.js";
+import { providerFields, ProviderForm } from "../components/ProviderForm.js";
 import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
 import { formatRelativeTime } from "../formatRelativeTime.js";
 import {
@@ -33,7 +29,14 @@ import { useAsyncData } from "../useAsyncData.js";
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
 type PrimaryStatus = "idle" | "setting" | "error";
 
-const EDITABLE_TYPES = ["smtp", "cloudflare", "resend", "postmark", "stripe"];
+const EDITABLE_TYPES = [
+  "smtp",
+  "cloudflare",
+  "resend",
+  "postmark",
+  "ses",
+  "stripe",
+];
 
 function text(value: unknown): string {
   return typeof value === "string" ? value : "";
@@ -177,23 +180,23 @@ export function IntegrationDetailScreen({
             }
             onCancel={() => setEditing(false)}
           />
-        ) : type === "resend" || type === "postmark" ? (
+        ) : type === "resend" || type === "postmark" || type === "ses" ? (
           <ProviderForm
             editing
-            fields={type === "resend" ? RESEND_FIELDS : POSTMARK_FIELDS}
+            fields={providerFields(type)}
             initialValues={{
               fromEmail: text(data.fromEmail),
               fromName: text(data.fromName),
               replyTo: text(data.replyTo),
               messageStream: text(data.messageStream),
+              region: text(data.region),
+              configurationSetName: text(data.configurationSetName),
             }}
             onSubmit={(values) =>
               handleSave(
-                providerIntegrationBody(
-                  type === "resend" ? RESEND_FIELDS : POSTMARK_FIELDS,
-                  values,
-                  { editing: true },
-                ),
+                providerIntegrationBody(providerFields(type), values, {
+                  editing: true,
+                }),
               )
             }
             onCancel={() => setEditing(false)}

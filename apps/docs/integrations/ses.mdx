@@ -1,0 +1,64 @@
+---
+title: Amazon SES
+description: "Send through Amazon SES, with bounces and spam complaints handled for you."
+---
+
+Amazon SES sends your emails through AWS. When an email bounces or someone marks it as spam, SES tells subscriber.dev through an SNS topic, and that person stops getting emails.
+
+## Connect
+
+You need:
+
+- A from address or domain verified in SES, in the region you send from.
+- An IAM user's access keys with `ses:SendEmail`, `ses:GetAccount` and `ses:GetEmailIdentity`.
+
+New SES accounts start in the sandbox, which only sends to verified addresses. [Request production access](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html) before emailing your subscribers.
+
+Or ask [your agent](/mcp): "Connect Amazon SES in eu-west-2, sending from hello@acme.com."
+
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    subscriber integrations set ses --body '{
+      "region": "eu-west-2",
+      "accessKeyId": "<access key ID>",
+      "secretAccessKey": "<secret access key>",
+      "fromEmail": "hello@acme.com",
+      "fromName": "Acme"
+    }'
+    ```
+  </Tab>
+  <Tab title="TUI">
+    Open **Integrations**, press `n` and choose **Amazon SES**.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/ses \
+      -H "x-api-key: $KEY" -H "content-type: application/json" \
+      -d '{"region": "eu-west-2", "accessKeyId": "<access key ID>", "secretAccessKey": "<secret access key>", "fromEmail": "hello@acme.com", "fromName": "Acme"}'
+    ```
+  </Tab>
+</Tabs>
+
+subscriber.dev checks the keys work and the from address or its domain is verified before saving. You get back a webhook URL to set up next.
+
+## Settings
+
+| Field | Description |
+| --- | --- |
+| `region` | The AWS region your SES identity is in, such as `us-east-1`. |
+| `accessKeyId`, `secretAccessKey` | The IAM user's access keys. |
+| `fromEmail`, `fromName` | Who the email is from. The address or its domain must be verified in SES. |
+| `replyTo` | Where replies go, if not `fromEmail`. |
+| `configurationSetName` | Optional. An SES configuration set to send with. |
+
+## Bounces and spam complaints
+
+1. Run `subscriber integrations get ses` to see the webhook URL.
+2. In SNS, in the same region, create a standard topic.
+3. Add a subscription to the topic with the **HTTPS** protocol and the webhook URL as the endpoint. subscriber.dev confirms it automatically.
+4. In SES, open your verified identity, then **Notifications**, and set **Bounce feedback** and **Complaint feedback** to the topic.
+
+If you publish events through a configuration set instead, add an SNS event destination for bounces and complaints. Both work.
+
+Every notification's signature is checked against AWS's certificate before it's used. Emails send without the topic, but bounces and complaints aren't picked up. When an address bounces for good or someone marks your email as spam, that subscriber is [opted out](/subscribers#opting-in-and-out). Temporary bounces are recorded on the run but don't opt anyone out.

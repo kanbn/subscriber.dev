@@ -43,6 +43,39 @@ export const POSTMARK_FIELDS: ProviderField[] = [
   },
 ];
 
+export const SES_FIELDS: ProviderField[] = [
+  { key: "region", label: "AWS region, e.g. us-east-1", required: true },
+  { key: "accessKeyId", label: "Access key ID", secret: true, required: true },
+  {
+    key: "secretAccessKey",
+    label: "Secret access key",
+    secret: true,
+    required: true,
+  },
+  { key: "fromEmail", label: "From email", required: true },
+  { key: "fromName", label: "From name" },
+  { key: "replyTo", label: "Reply-to email (optional)" },
+  { key: "configurationSetName", label: "Configuration set (optional)" },
+];
+
+const PROVIDER_FIELDS = {
+  resend: RESEND_FIELDS,
+  postmark: POSTMARK_FIELDS,
+  ses: SES_FIELDS,
+};
+
+export type ProviderType = keyof typeof PROVIDER_FIELDS;
+
+export const PROVIDER_NAMES: Record<ProviderType, string> = {
+  resend: "Resend",
+  postmark: "Postmark",
+  ses: "Amazon SES",
+};
+
+export function providerFields(type: ProviderType): ProviderField[] {
+  return PROVIDER_FIELDS[type];
+}
+
 function preview(field: ProviderField, value: string, editing: boolean) {
   if (value.length === 0) return editing && field.secret ? "(unchanged)" : "—";
   return field.secret ? "•".repeat(Math.min(value.length, 8)) : value;

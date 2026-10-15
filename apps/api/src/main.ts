@@ -11,6 +11,7 @@ import { AppModule } from "./app.module.js";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
   (app as NestExpressApplication).useBodyParser("json", { limit: "8mb" });
+  (app as NestExpressApplication).useBodyParser("text");
 
   app.enableCors({
     origin:

@@ -43,6 +43,7 @@
           "integrations/overview",
           "integrations/resend",
           "integrations/postmark",
+          "integrations/ses",
           "integrations/smtp",
           "integrations/cloudflare",
           "integrations/stripe"

@@ -11,7 +11,7 @@ import {
 import type { CloudflareEmailCreateValues } from "../components/CloudflareEmailCreateForm.js";
 import type { IntegrationCreateValues } from "../components/IntegrationCreateForm.js";
 import type {
-  ProviderField,
+  ProviderType,
   ProviderValues,
 } from "../components/ProviderForm.js";
 import type { StripeIntegrationValues } from "../components/StripeIntegrationForm.js";
@@ -20,9 +20,9 @@ import { CloudflareEmailCreateForm } from "../components/CloudflareEmailCreateFo
 import { Hints } from "../components/Hints.js";
 import { IntegrationCreateForm } from "../components/IntegrationCreateForm.js";
 import {
-  POSTMARK_FIELDS,
+  PROVIDER_NAMES,
+  providerFields,
   ProviderForm,
-  RESEND_FIELDS,
 } from "../components/ProviderForm.js";
 import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
 import {
@@ -40,6 +40,7 @@ type Mode =
   | "creating-cloudflare"
   | "creating-resend"
   | "creating-postmark"
+  | "creating-ses"
   | "creating-stripe";
 
 const CREATE_MODES: Mode[] = [
@@ -47,8 +48,17 @@ const CREATE_MODES: Mode[] = [
   "creating-cloudflare",
   "creating-resend",
   "creating-postmark",
+  "creating-ses",
   "creating-stripe",
 ];
+
+const WEBHOOK_HINTS: Record<ProviderType, string> = {
+  resend:
+    "Add the webhook signing secret after creating a webhook in Resend with the URL shown next, so bounces and spam complaints opt people out.",
+  postmark:
+    "Next, add a webhook in Postmark with the URL shown, for bounces and spam complaints, so they opt people out.",
+  ses: "Next, subscribe the URL shown to an SNS topic that gets your SES bounce and complaint notifications, so they opt people out.",
+};
 
 export function IntegrationsScreen({
   environmentId,
@@ -154,13 +164,16 @@ export function IntegrationsScreen({
   };
 
   const handleCreateProvider =
-    (type: "resend" | "postmark", fields: ProviderField[]) =>
+    (type: ProviderType) =>
     async (values: ProviderValues): Promise<string | undefined> => {
       try {
         const response = await upsertIntegration(
           environmentId,
           type,
-          providerIntegrationBody(fields, values) as UpsertIntegrationDto,
+          providerIntegrationBody(
+            providerFields(type),
+            values,
+          ) as UpsertIntegrationDto,
         );
         if (response.status === 400) {
           const message = (response.data as { message?: unknown } | undefined)
@@ -188,6 +201,7 @@ export function IntegrationsScreen({
             { label: "SMTP", value: "smtp" as const },
             { label: "Resend", value: "resend" as const },
             { label: "Postmark", value: "postmark" as const },
+            { label: "Amazon SES", value: "ses" as const },
             { label: "Cloudflare Email", value: "cloudflare" as const },
             { label: "Stripe (trigger workflows)", value: "stripe" as const },
           ]}
@@ -229,22 +243,19 @@ export function IntegrationsScreen({
     );
   }
 
-  if (mode === "creating-resend" || mode === "creating-postmark") {
-    const type = mode === "creating-resend" ? "resend" : "postmark";
-    const fields = type === "resend" ? RESEND_FIELDS : POSTMARK_FIELDS;
+  if (
+    mode === "creating-resend" ||
+    mode === "creating-postmark" ||
+    mode === "creating-ses"
+  ) {
+    const type = mode.replace("creating-", "") as ProviderType;
     return (
       <Box flexDirection="column">
-        <Text bold>
-          New {type === "resend" ? "Resend" : "Postmark"} integration
-        </Text>
-        <Text dimColor>
-          {type === "resend"
-            ? "Add the webhook signing secret after creating a webhook in Resend with the URL shown next, so bounces and spam complaints opt people out."
-            : "Next, add a webhook in Postmark with the URL shown, for bounces and spam complaints, so they opt people out."}
-        </Text>
+        <Text bold>New {PROVIDER_NAMES[type]} integration</Text>
+        <Text dimColor>{WEBHOOK_HINTS[type]}</Text>
         <ProviderForm
-          fields={fields}
-          onSubmit={handleCreateProvider(type, fields)}
+          fields={providerFields(type)}
+          onSubmit={handleCreateProvider(type)}
           onCancel={cancelCreate}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />
