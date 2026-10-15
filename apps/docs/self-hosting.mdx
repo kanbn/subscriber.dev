@@ -58,7 +58,38 @@ These settings go in `.env`.
 subscriber login --base-url https://api.yourdomain.com --app-url https://yourdomain.com
 ```
 
+The browser opens your web app to sign in. The first time, you get an email link, sent with the `SMTP_` settings above, or you can sign in with GitHub if you set it up. That creates your account. Then create a workspace, which comes with a **Production** environment:
+
+```bash
+subscriber workspaces create "Acme"
+```
+
 For MCP, use `https://api.yourdomain.com/mcp` as the server URL.
+
+## Upgrade
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+Database migrations run when the web container starts.
+
+## Back up
+
+Everything lives in Postgres. To take a backup:
+
+```bash
+docker compose exec postgres pg_dump -U subscriber subscriber_db > backup.sql
+```
+
+To restore it into an empty database:
+
+```bash
+docker compose exec -T postgres psql -U subscriber subscriber_db < backup.sql
+```
+
+Redis only holds the job queue. Losing it can drop steps that were waiting to run, but no data.
 
 ## Business license
 
