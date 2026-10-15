@@ -6,7 +6,7 @@ description: "Send through any SMTP provider."
 SMTP is the standard way email servers accept mail, and almost every email provider supports it. Connect yours with its SMTP settings.
 
 <Warning>
-  Bounced addresses aren't suppressed automatically with SMTP. SMTP has no standard way to report bounces, so subscriber.dev keeps emailing an address that doesn't exist until you opt it out. See [Bounces](#bounces). Use a native email integration, like [Cloudflare Email](/integrations/cloudflare), to suppress them for you.
+  Bounces and spam complaints aren't handled with SMTP. SMTP has no standard way to report them, so subscriber.dev keeps emailing addresses that bounce or mark you as spam until you opt them out. See [Bounces](#bounces). Use a built-in integration, like [Resend](/integrations/resend), [Postmark](/integrations/postmark) or [Amazon SES](/integrations/ses), to opt them out for you.
 </Warning>
 
 ## Connect
@@ -63,4 +63,4 @@ The password is the API key or SMTP password from your provider.
 
 ## Bounces
 
-Check bounces in your provider's dashboard, and opt out dead addresses with `subscriber subscribers update-preferences <subscriberId> --opted-out`. Opted-out subscribers are never emailed.
+Check bounces and spam complaints in your provider's dashboard, and opt out dead addresses with `subscriber subscribers update-preferences <subscriberId> --opted-out`. Opted-out subscribers are never emailed.

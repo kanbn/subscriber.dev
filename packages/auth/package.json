@@ -20,7 +20,7 @@
       "default": "./src/server.ts"
     }
   },
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0",
   "scripts": {
     "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
