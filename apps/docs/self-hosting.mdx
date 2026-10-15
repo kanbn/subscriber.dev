@@ -30,6 +30,8 @@ docker compose up -d
 
 The web container runs database migrations when it starts.
 
+`GET /health` on the API returns `200` when it can reach Postgres and Redis, and `503` when it can't. Docker Compose uses it as the API's healthcheck, and you can point an uptime monitor at it.
+
 ## Configuration
 
 These settings go in `.env`.
