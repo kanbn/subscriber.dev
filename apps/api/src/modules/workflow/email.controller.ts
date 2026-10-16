@@ -31,7 +31,7 @@ import {
 } from "./dto/email.dto.js";
 import { EmailTestService } from "./emailTest.service.js";
 
-@ApiTags("Workflows")
+@ApiTags("Emails")
 @ApiBearerAuth("bearer")
 @ApiSecurity("api-key")
 @Controller("environments/:environmentId/emails")

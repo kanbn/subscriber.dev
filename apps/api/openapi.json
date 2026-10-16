@@ -2183,7 +2183,7 @@
         ],
         "summary": "Render an email",
         "tags": [
-          "Workflows"
+          "Emails"
         ]
       }
     },
@@ -2239,7 +2239,7 @@
         ],
         "summary": "Send a test email",
         "tags": [
-          "Workflows"
+          "Emails"
         ]
       }
     },
@@ -2807,7 +2807,7 @@
         ],
         "summary": "List workflow trigger sources",
         "tags": [
-          "Workflows"
+          "Inbound events"
         ]
       }
     },

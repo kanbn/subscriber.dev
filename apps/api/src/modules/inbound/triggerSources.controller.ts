@@ -23,7 +23,7 @@ import { EnvironmentAccessGuard } from "../../common/guards/environment-access.g
 import { ListTriggerSourcesResponseDto } from "./dto/trigger-sources.dto.js";
 import { InboundService } from "./inbound.service.js";
 
-@ApiTags("Workflows")
+@ApiTags("Inbound events")
 @ApiBearerAuth("bearer")
 @ApiSecurity("api-key")
 @Controller("environments/:environmentId/trigger-sources")
