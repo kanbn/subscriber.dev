@@ -73,6 +73,7 @@ See [Workflows](/workflows).
 | `workflows create --file <path>` | Create a workflow from a JSON file. |
 | `workflows update <workflowId> --file <path>` | Change the fields in the file. If it includes `steps`, they replace all existing steps. |
 | `workflows delete <workflowId>` | Delete a workflow. |
+| `workflows test <workflowId>` | Send yourself one of the workflow's emails, with `[Test]` before the subject, without creating a subscriber or a run. `--step <n>` picks the step, counting from 1 (defaults to the first email), `--to <email>` sends it to someone else, and `--data <json>` fills in [template variables](/templates#variables). |
 | `workflows trigger <key>` | Start a workflow for one subscriber, chosen by `--email`, `--external-id` or `--subscriber-id`. `--payload <json>` adds [template variables](/templates#variables). |
 | `workflows runs <workflowId>` | List a workflow's runs. |
 | `workflows run-history` | List runs across every workflow. |

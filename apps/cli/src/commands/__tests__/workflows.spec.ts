@@ -14,6 +14,7 @@ import {
   pauseBroadcast,
   redispatchBroadcast,
   resumeBroadcast,
+  sendTestEmail,
   triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
@@ -26,6 +27,7 @@ vi.mock("@subscriber.dev/api-client/cli", () => ({
   listWorkflows: vi.fn(),
   getWorkflow: vi.fn(),
   triggerWorkflow: vi.fn(),
+  sendTestEmail: vi.fn(),
   createWorkflow: vi.fn(),
   updateWorkflow: vi.fn(),
   deleteWorkflow: vi.fn(),
@@ -176,6 +178,66 @@ describe("workflows get", () => {
     expect(errorSpy).toHaveBeenCalledWith("Workflow not found.");
     expect(process.exitCode).toBe(1);
 
+    process.exitCode = undefined;
+  });
+});
+
+describe("workflows test", () => {
+  it("sends the chosen step to the given address with sample data", async () => {
+    vi.mocked(sendTestEmail).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { to: "ada@acme.com", subject: "[Test] Welcome" },
+    } as never);
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      [
+        "workflows",
+        "test",
+        "wf-1",
+        "--step",
+        "3",
+        "--to",
+        "ada@acme.com",
+        "--data",
+        '{"plan":"pro"}',
+      ],
+      { from: "user" },
+    );
+
+    expect(sendTestEmail).toHaveBeenCalledWith("test-environment-1", {
+      workflowId: "wf-1",
+      step: 3,
+      to: "ada@acme.com",
+      data: { plan: "pro" },
+    });
+    expect(logSpy).toHaveBeenCalledWith(
+      'Sent "[Test] Welcome" to ada@acme.com.',
+    );
+  });
+
+  it("shows the API's reason when it can't send", async () => {
+    vi.mocked(sendTestEmail).mockResolvedValue({
+      status: 400,
+      headers: new Headers(),
+      data: { message: "Step 2 is a webhook step, not an email" },
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["workflows", "test", "wf-1", "--step", "2"],
+      {
+        from: "user",
+      },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Step 2 is a webhook step, not an email",
+    );
+    expect(process.exitCode).toBe(1);
     process.exitCode = undefined;
   });
 });

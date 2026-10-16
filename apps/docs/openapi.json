@@ -2191,7 +2191,7 @@
     },
     "/environments/{environmentId}/emails/test": {
       "post": {
-        "description": "Sends a subject and body through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.",
+        "description": "Sends one of a workflow's email steps (workflowId, and optionally step), or a subject and body, through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.",
         "operationId": "sendTestEmail",
         "parameters": [
           {
@@ -2225,7 +2225,10 @@
             }
           },
           "400": {
-            "description": "No email integration, or the email couldn't be sent"
+            "description": "No such email step, no email integration, or the email couldn't be sent"
+          },
+          "404": {
+            "description": "Workflow not found"
           }
         },
         "security": [
@@ -6275,6 +6278,16 @@
             "format": "email",
             "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
           },
+          "workflowId": {
+            "description": "Send one of this workflow's email steps, as it stands now, instead of a subject and body.",
+            "type": "string"
+          },
+          "step": {
+            "description": "Which of the workflow's steps to send, counting from 1. Defaults to its first email step.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
           "to": {
             "description": "Who to send it to. Defaults to your own address.",
             "type": "string",
@@ -6289,11 +6302,7 @@
             },
             "additionalProperties": {}
           }
-        },
-        "required": [
-          "subject",
-          "body"
-        ]
+        }
       },
       "TestEmailResponseDto": {
         "type": "object",

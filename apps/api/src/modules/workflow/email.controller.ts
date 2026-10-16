@@ -68,26 +68,24 @@ export class EmailController {
     operationId: "sendTestEmail",
     summary: "Send a test email",
     description:
-      "Sends a subject and body through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.",
+      "Sends one of a workflow's email steps (workflowId, and optionally step), or a subject and body, through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.",
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: TestEmailResponseDto })
   @ApiResponse({
     status: 400,
-    description: "No email integration, or the email couldn't be sent",
+    description:
+      "No such email step, no email integration, or the email couldn't be sent",
   })
+  @ApiResponse({ status: 404, description: "Workflow not found" })
   async sendTest(
     @CurrentUser() user: User,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: TestEmailDto,
   ): Promise<TestEmailResponseDto> {
-    const { to, data, ...content } = input;
-    return this.emailTest.send(
-      createDrizzleClient(),
-      user,
-      environment.id,
-      content,
-      { to, data },
-    );
+    const { to, data, ...rest } = input;
+    const db = createDrizzleClient();
+    const content = await this.emailTest.content(db, environment.id, rest);
+    return this.emailTest.send(db, user, environment.id, content, { to, data });
   }
 }

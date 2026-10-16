@@ -1542,8 +1542,8 @@ export type TestEmailDtoData = {[key: string]: unknown};
 
 export interface TestEmailDto {
   /** @maxLength 500 */
-  subject: string;
-  body: string;
+  subject?: string;
+  body?: string;
   layout?: TestEmailDtoLayout;
   /**
      * Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.
@@ -1560,6 +1560,14 @@ export interface TestEmailDto {
      * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
      */
   replyTo?: string;
+  /** Send one of this workflow's email steps, as it stands now, instead of a subject and body. */
+  workflowId?: string;
+  /**
+     * Which of the workflow's steps to send, counting from 1. Defaults to its first email step.
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  step?: number;
   /**
      * Who to send it to. Defaults to your own address.
      * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
@@ -4047,10 +4055,15 @@ export type sendTestEmailResponse400 = {
   status: 400
 }
 
+export type sendTestEmailResponse404 = {
+  data: void
+  status: 404
+}
+
 export type sendTestEmailResponseSuccess = (sendTestEmailResponse200) & {
   headers: Headers;
 };
-export type sendTestEmailResponseError = (sendTestEmailResponse400) & {
+export type sendTestEmailResponseError = (sendTestEmailResponse400 | sendTestEmailResponse404) & {
   headers: Headers;
 };
 
@@ -4065,7 +4078,7 @@ export const getSendTestEmailUrl = (environmentId: string,) => {
 }
 
 /**
- * Sends a subject and body through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.
+ * Sends one of a workflow's email steps (workflowId, and optionally step), or a subject and body, through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.
  * @summary Send a test email
  */
 export const sendTestEmail = async (environmentId: string,

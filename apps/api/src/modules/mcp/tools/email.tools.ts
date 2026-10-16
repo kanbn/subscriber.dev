@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Tool } from "@rekog/mcp-nest";
 import { z } from "zod";
 
@@ -68,20 +68,8 @@ export class EmailTools {
       args.environmentId,
     );
 
-    const { workflowId, step, to, data, environmentId: _, ...raw } = args;
-    let content;
-    if (workflowId) {
-      content = await this.emailTest.workflowStep(
-        db,
-        environment.id,
-        workflowId,
-        step,
-      );
-    } else if (raw.subject && raw.body) {
-      content = { ...raw, subject: raw.subject, body: raw.body };
-    } else {
-      throw new BadRequestException("Pass a workflowId, or a subject and body");
-    }
+    const { to, data, environmentId: _, ...rest } = args;
+    const content = await this.emailTest.content(db, environment.id, rest);
     return this.emailTest.send(db, user, environment.id, content, { to, data });
   }
 }

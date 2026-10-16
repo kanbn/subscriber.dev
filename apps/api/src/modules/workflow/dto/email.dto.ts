@@ -30,7 +30,24 @@ export const testEmailDataSchema = z
     'Sample data for the template, like a trigger payload: {"plan": "pro"} is {{ plan }}. Put subscriber fields under "subscriber", e.g. {"subscriber": {"firstName": "Ada"}}. Defaults to your own details as the subscriber.',
   );
 
-export const TestEmailSchema = EmailContentSchema.extend({
+export const TestEmailSchema = EmailContentSchema.partial({
+  subject: true,
+  body: true,
+}).extend({
+  workflowId: z
+    .string()
+    .optional()
+    .describe(
+      "Send one of this workflow's email steps, as it stands now, instead of a subject and body.",
+    ),
+  step: z
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .describe(
+      "Which of the workflow's steps to send, counting from 1. Defaults to its first email step.",
+    ),
   to: testEmailRecipientSchema,
   data: testEmailDataSchema,
 });

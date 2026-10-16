@@ -101,3 +101,14 @@ describe("workflowStep", () => {
     );
   });
 });
+
+describe("content", () => {
+  it("uses a subject and body, or asks for one", async () => {
+    await expect(
+      service.content(db, 1, { subject: "Hi", body: "<p>Hi</p>" }),
+    ).resolves.toEqual({ subject: "Hi", body: "<p>Hi</p>" });
+    await expect(service.content(db, 1, { subject: "Hi" })).rejects.toThrow(
+      "Pass a workflowId, or a subject and body",
+    );
+  });
+});

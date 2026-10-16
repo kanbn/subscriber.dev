@@ -17,6 +17,7 @@ import {
   pauseBroadcast,
   redispatchBroadcast,
   resumeBroadcast,
+  sendTestEmail,
   triggerBroadcast,
   triggerWorkflow,
   updateWorkflow,
@@ -186,6 +187,85 @@ export function registerWorkflowsCommand(program: Command): void {
             return;
           }
           printResult(response.data, opts);
+        },
+      ),
+    );
+
+  workflows
+    .command("test <workflowId>")
+    .description(
+      "Send yourself one of a workflow's emails, without creating a subscriber or a run",
+    )
+    .option(
+      "--environment <environmentId>",
+      "environment public ID (defaults to the current environment)",
+    )
+    .option(
+      "--step <number>",
+      "which step to send, counting from 1 (defaults to the first email step)",
+    )
+    .option("--to <email>", "send it to someone else instead of you")
+    .option(
+      "--data <json>",
+      'sample data for the template, e.g. \'{"plan": "pro", "subscriber": {"firstName": "Ada"}}\'',
+    )
+    .option("--json", "output as JSON")
+    .action(
+      run(
+        async (
+          workflowId: string,
+          opts: {
+            environment?: string;
+            step?: string;
+            to?: string;
+            data?: string;
+            json?: boolean;
+          },
+        ) => {
+          ensureLoggedIn();
+          const environmentId = requireEnvironmentId(opts);
+
+          let data: Record<string, unknown> | undefined;
+          if (opts.data) {
+            try {
+              data = JSON.parse(opts.data) as Record<string, unknown>;
+            } catch {
+              console.error("--data must be valid JSON.");
+              process.exitCode = 1;
+              return;
+            }
+          }
+          const step = opts.step === undefined ? undefined : Number(opts.step);
+          if (step !== undefined && !(Number.isInteger(step) && step >= 1)) {
+            console.error("--step must be a whole number, starting from 1.");
+            process.exitCode = 1;
+            return;
+          }
+
+          const response = await sendTestEmail(environmentId, {
+            workflowId,
+            step,
+            to: opts.to,
+            data,
+          });
+          if (response.status !== 200) {
+            const message = (response.data as { message?: unknown } | undefined)
+              ?.message;
+            console.error(
+              typeof message === "string"
+                ? message
+                : "The test email didn't send.",
+            );
+            process.exitCode = 1;
+            return;
+          }
+          if (opts.json) {
+            printResult(response.data, opts);
+            return;
+          }
+          console.log(
+            `Sent "${response.data.subject}" to ${response.data.to}.`,
+          );
         },
       ),
     );

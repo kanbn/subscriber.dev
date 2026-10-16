@@ -104,6 +104,21 @@ export class EmailTestService {
     }
   }
 
+  async content(
+    db: dbClient,
+    environmentId: number,
+    input: Partial<TestEmailContent> & { workflowId?: string; step?: number },
+  ): Promise<TestEmailContent> {
+    const { workflowId, step, ...raw } = input;
+    if (workflowId) {
+      return this.workflowStep(db, environmentId, workflowId, step);
+    }
+    if (raw.subject === undefined || raw.body === undefined) {
+      throw new BadRequestException("Pass a workflowId, or a subject and body");
+    }
+    return { ...raw, subject: raw.subject, body: raw.body };
+  }
+
   async workflowStep(
     db: dbClient,
     environmentId: number,
