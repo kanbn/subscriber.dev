@@ -16,6 +16,7 @@ import { McpAuthGuard } from "./mcp-auth.guard.js";
 import { OAuthMetadataController } from "./oauth-metadata.controller.js";
 import { AnalyticsTools } from "./tools/analytics.tools.js";
 import { BillingTools } from "./tools/billing.tools.js";
+import { EmailTools } from "./tools/email.tools.js";
 import { InboundTools } from "./tools/inbound.tools.js";
 import { IntegrationsTools } from "./tools/integrations.tools.js";
 import { SetupTools } from "./tools/setup.tools.js";
@@ -37,6 +38,7 @@ const TOOL_PROVIDERS = [
   WorkspaceTools,
   UploadsTools,
   SetupTools,
+  EmailTools,
   ...(billingEnabled() ? [BillingTools] : []),
 ];
 

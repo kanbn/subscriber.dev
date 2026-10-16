@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   HttpCode,
@@ -16,40 +15,21 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
-import type { dbClient } from "@subscriber.dev/db/client";
 import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscriber.repo";
 import { createDrizzleClient } from "@subscriber.dev/db/client";
-import * as workspaceRepo from "@subscriber.dev/db/repository/workspace.repo";
 
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
-import { BillingService } from "../billing/billing.service.js";
 import {
   EmailContentDto,
   RenderedEmailDto,
+  TestEmailDto,
   TestEmailResponseDto,
 } from "./dto/email.dto.js";
-import {
-  NoEmailIntegrationError,
-  renderEmail,
-  sendWithIntegrations,
-} from "./sendEmailStep.js";
-
-function sampleContext(user: User) {
-  const name: string | null = user.name;
-  const [firstName, ...rest] = (name ?? "").trim().split(/\s+/);
-  return {
-    subscriber: {
-      email: user.email,
-      firstName: firstName || null,
-      lastName: rest.join(" ") || null,
-      name: name ?? null,
-    },
-  };
-}
+import { EmailTestService } from "./emailTest.service.js";
 
 @ApiTags("Workflows")
 @ApiBearerAuth("bearer")
@@ -57,15 +37,7 @@ function sampleContext(user: User) {
 @Controller("environments/:environmentId/emails")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class EmailController {
-  constructor(private readonly billing: BillingService) {}
-
-  private async footer(db: dbClient, environmentId: number) {
-    const [poweredBy, postalAddress] = await Promise.all([
-      this.billing.showsPoweredBy(db, environmentId),
-      workspaceRepo.getPostalAddressForEnvironment(db, environmentId),
-    ]);
-    return { poweredBy, postalAddress };
-  }
+  constructor(private readonly emailTest: EmailTestService) {}
 
   @Post("preview")
   @HttpCode(HttpStatus.OK)
@@ -82,26 +54,21 @@ export class EmailController {
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: EmailContentDto,
   ): Promise<RenderedEmailDto> {
-    const { subject, html } = await renderEmail(
+    return this.emailTest.preview(
+      createDrizzleClient(),
+      user,
+      environment.id,
       input,
-      sampleContext(user),
-      "#",
-      await this.footer(createDrizzleClient(), environment.id),
-    ).catch((error: unknown) => {
-      throw new BadRequestException(
-        error instanceof Error ? error.message : "Couldn't render the email",
-      );
-    });
-    return { subject, html };
+    );
   }
 
   @Post("test")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "sendTestEmail",
-    summary: "Send a test email to yourself",
+    summary: "Send a test email",
     description:
-      "Sends a subject and body to your own email address through the environment's email integration, with your details as the sample subscriber. Subject lines are prefixed with [Test].",
+      "Sends a subject and body through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.",
   })
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: TestEmailResponseDto })
@@ -112,32 +79,15 @@ export class EmailController {
   async sendTest(
     @CurrentUser() user: User,
     @CurrentEnvironment() environment: EnvironmentForUser,
-    @Body() input: EmailContentDto,
+    @Body() input: TestEmailDto,
   ): Promise<TestEmailResponseDto> {
-    const db = createDrizzleClient();
-    try {
-      const email = await renderEmail(
-        input,
-        sampleContext(user),
-        "#",
-        await this.footer(db, environment.id),
-      );
-      await sendWithIntegrations(db, environment.id, {
-        to: user.email,
-        ...email,
-        subject: `[Test] ${email.subject}`,
-        fromName: input.fromName,
-        replyTo: input.replyTo,
-      });
-    } catch (error) {
-      throw new BadRequestException(
-        error instanceof NoEmailIntegrationError
-          ? "Connect an email integration to this environment first"
-          : error instanceof Error
-            ? error.message
-            : "Couldn't send the test email",
-      );
-    }
-    return { to: user.email };
+    const { to, data, ...content } = input;
+    return this.emailTest.send(
+      createDrizzleClient(),
+      user,
+      environment.id,
+      content,
+      { to, data },
+    );
   }
 }

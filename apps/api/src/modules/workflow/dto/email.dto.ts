@@ -17,6 +17,24 @@ export const EmailContentSchema = z.object({
   replyTo: emailReplyToSchema,
 });
 
+export const testEmailRecipientSchema = z
+  .string()
+  .email()
+  .optional()
+  .describe("Who to send it to. Defaults to your own address.");
+
+export const testEmailDataSchema = z
+  .record(z.string(), z.unknown())
+  .optional()
+  .describe(
+    'Sample data for the template, like a trigger payload: {"plan": "pro"} is {{ plan }}. Put subscriber fields under "subscriber", e.g. {"subscriber": {"firstName": "Ada"}}. Defaults to your own details as the subscriber.',
+  );
+
+export const TestEmailSchema = EmailContentSchema.extend({
+  to: testEmailRecipientSchema,
+  data: testEmailDataSchema,
+});
+
 export const RenderedEmailSchema = z.object({
   subject: z.string(),
   html: z.string(),
@@ -24,9 +42,11 @@ export const RenderedEmailSchema = z.object({
 
 export const TestEmailResponseSchema = z.object({
   to: z.string(),
+  subject: z.string(),
 });
 
 export class EmailContentDto extends createZodDto(EmailContentSchema) {}
+export class TestEmailDto extends createZodDto(TestEmailSchema) {}
 export class RenderedEmailDto extends createZodDto(RenderedEmailSchema) {}
 export class TestEmailResponseDto extends createZodDto(
   TestEmailResponseSchema,

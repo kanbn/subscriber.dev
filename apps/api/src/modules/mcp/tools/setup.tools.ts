@@ -19,7 +19,7 @@ const GetSetupStatusSchema = z.object({
 
 const NEXT_ACTIONS: Record<NonNullable<SetupResponse["next"]>, string> = {
   email_provider:
-    "Ask which email provider they send with. Resend, Postmark and Amazon SES are built in and opt people out on bounces and spam complaints; Cloudflare Email suits a domain on Cloudflare; anything else connects over SMTP. Ask for its credentials and the address to send from, then call set_integration (its description lists each type's fields). It checks the credentials before saving. For Resend, Postmark and SES, help them add the webhook it returns in their provider.",
+    "Ask which email provider they send with. Resend, Postmark and Amazon SES are built in and opt people out on bounces and spam complaints; Cloudflare Email suits a domain on Cloudflare; anything else connects over SMTP. Ask for its credentials and the address to send from, then call set_integration (its description lists each type's fields). It checks the credentials before saving. Then call send_test_email with a short subject and body to confirm it sends, and ask them to check their inbox. For Resend, Postmark and SES, help them add the webhook set_integration returns in their provider.",
   first_workflow:
     'Suggest a welcome email for new signups. Ask what their product does and the tone they want, then call create_workflow with a key such as "welcome" and one email step. Share the editUrl it returns, so they can tweak the copy in the web editor.',
   first_email_sent:

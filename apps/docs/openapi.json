@@ -2191,7 +2191,7 @@
     },
     "/environments/{environmentId}/emails/test": {
       "post": {
-        "description": "Sends a subject and body to your own email address through the environment's email integration, with your details as the sample subscriber. Subject lines are prefixed with [Test].",
+        "description": "Sends a subject and body through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.",
         "operationId": "sendTestEmail",
         "parameters": [
           {
@@ -2208,7 +2208,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmailContentDto"
+                "$ref": "#/components/schemas/TestEmailDto"
               }
             }
           }
@@ -2236,7 +2236,7 @@
             "bearer": []
           }
         ],
-        "summary": "Send a test email to yourself",
+        "summary": "Send a test email",
         "tags": [
           "Workflows"
         ]
@@ -6241,15 +6241,73 @@
           "html"
         ]
       },
+      "TestEmailDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "body": {
+            "type": "string"
+          },
+          "layout": {
+            "default": "default",
+            "type": "string",
+            "enum": [
+              "default",
+              "none"
+            ]
+          },
+          "previewText": {
+            "description": "Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.",
+            "type": "string",
+            "maxLength": 255
+          },
+          "fromName": {
+            "description": "Sender name for every email in this workflow, e.g. \"Jane from Acme\". Defaults to the email integration's fromName. The from address always comes from the integration.",
+            "type": "string",
+            "maxLength": 255
+          },
+          "replyTo": {
+            "description": "Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.",
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "to": {
+            "description": "Who to send it to. Defaults to your own address.",
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "data": {
+            "description": "Sample data for the template, like a trigger payload: {\"plan\": \"pro\"} is {{ plan }}. Put subscriber fields under \"subscriber\", e.g. {\"subscriber\": {\"firstName\": \"Ada\"}}. Defaults to your own details as the subscriber.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "subject",
+          "body"
+        ]
+      },
       "TestEmailResponseDto": {
         "type": "object",
         "properties": {
           "to": {
             "type": "string"
+          },
+          "subject": {
+            "type": "string"
           }
         },
         "required": [
-          "to"
+          "to",
+          "subject"
         ]
       },
       "UpsertIntegrationDto": {

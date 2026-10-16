@@ -1546,8 +1546,51 @@ export interface RenderedEmailDto {
   html: string;
 }
 
+export type TestEmailDtoLayout = typeof TestEmailDtoLayout[keyof typeof TestEmailDtoLayout];
+
+
+export const TestEmailDtoLayout = {
+  default: 'default',
+  none: 'none',
+} as const;
+
+/**
+ * Sample data for the template, like a trigger payload: {"plan": "pro"} is {{ plan }}. Put subscriber fields under "subscriber", e.g. {"subscriber": {"firstName": "Ada"}}. Defaults to your own details as the subscriber.
+ */
+export type TestEmailDtoData = {[key: string]: unknown};
+
+export interface TestEmailDto {
+  /** @maxLength 500 */
+  subject: string;
+  body: string;
+  layout?: TestEmailDtoLayout;
+  /**
+     * Short summary inboxes show next to the subject. Supports Liquid. Only used with the default layout.
+     * @maxLength 255
+     */
+  previewText?: string;
+  /**
+     * Sender name for every email in this workflow, e.g. "Jane from Acme". Defaults to the email integration's fromName. The from address always comes from the integration.
+     * @maxLength 255
+     */
+  fromName?: string;
+  /**
+     * Where replies to this workflow's emails go. Defaults to the email integration's replyTo, or the from address.
+     * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+     */
+  replyTo?: string;
+  /**
+     * Who to send it to. Defaults to your own address.
+     * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+     */
+  to?: string;
+  /** Sample data for the template, like a trigger payload: {"plan": "pro"} is {{ plan }}. Put subscriber fields under "subscriber", e.g. {"subscriber": {"firstName": "Ada"}}. Defaults to your own details as the subscriber. */
+  data?: TestEmailDtoData;
+}
+
 export interface TestEmailResponseDto {
   to: string;
+  subject: string;
 }
 
 export interface UpsertIntegrationDto {[key: string]: unknown}
@@ -6646,11 +6689,11 @@ export const getSendTestEmailUrl = (environmentId: string,) => {
 }
 
 /**
- * Sends a subject and body to your own email address through the environment's email integration, with your details as the sample subscriber. Subject lines are prefixed with [Test].
- * @summary Send a test email to yourself
+ * Sends a subject and body through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.
+ * @summary Send a test email
  */
 export const sendTestEmail = async (environmentId: string,
-    emailContentDto: EmailContentDto, options?: Parameters<typeof customFetch>[1]): Promise<sendTestEmailResponse> => {
+    testEmailDto: TestEmailDto, options?: Parameters<typeof customFetch>[1]): Promise<sendTestEmailResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -6672,7 +6715,7 @@ return customFetch<sendTestEmailResponse>(getSendTestEmailUrl(environmentId),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(emailContentDto)
+    body: JSON.stringify(testEmailDto)
   }
 );}
 
@@ -6710,12 +6753,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type SendTestEmailMutationResult = NonNullable<Awaited<ReturnType<typeof sendTestEmail>>>
-    export type SendTestEmailMutationBody = EmailContentDto
+    export type SendTestEmailMutationBody = TestEmailDto
     export type SendTestEmailMutationError = void
-    export type SendTestEmailMutationVariables = {environmentId: string;data: EmailContentDto}
+    export type SendTestEmailMutationVariables = {environmentId: string;data: TestEmailDto}
 
     /**
- * @summary Send a test email to yourself
+ * @summary Send a test email
  */
 export const useSendTestEmail = <TError = void,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendTestEmail>>, TError,SendTestEmailMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
