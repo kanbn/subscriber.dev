@@ -1,6 +1,5 @@
 import { Box, Text, useInput } from "ink";
 import SelectInput from "ink-select-input";
-import TextInput from "ink-text-input";
 import { useState } from "react";
 
 import { createWorkspace, getWorkspaces } from "@subscriber.dev/api-client/cli";
@@ -8,6 +7,7 @@ import { createWorkspace, getWorkspaces } from "@subscriber.dev/api-client/cli";
 import type { WorkspaceSummary } from "../navigation.js";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
+import TextInput from "../components/TextInput.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 const ACCOUNT_VALUE = "__account__";

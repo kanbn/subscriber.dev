@@ -2,6 +2,7 @@ import { Box, Text, useApp, useInput } from "ink";
 import { useState } from "react";
 
 import type { Screen } from "./navigation.js";
+import { isTyping } from "./components/TextInput.js";
 import { AnalyticsScreen } from "./screens/AnalyticsScreen.js";
 import { BillingScreen } from "./screens/BillingScreen.js";
 import { BroadcastsScreen } from "./screens/BroadcastsScreen.js";
@@ -27,7 +28,7 @@ export function App() {
   const pop = () => setStack((s) => (s.length > 1 ? s.slice(0, -1) : s));
 
   useInput((input, key) => {
-    if (input === "q") {
+    if (input === "q" && !isTyping()) {
       exit();
       return;
     }

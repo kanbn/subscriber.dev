@@ -1,6 +1,5 @@
 import { Box, Text, useInput } from "ink";
 import SelectInput from "ink-select-input";
-import TextInput from "ink-text-input";
 import { useState } from "react";
 
 import type { UpdateSubscriberDto } from "@subscriber.dev/api-client/cli";
@@ -18,6 +17,7 @@ import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
 import { SubscriberFieldsForm } from "../components/SubscriberFieldsForm.js";
+import TextInput from "../components/TextInput.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";

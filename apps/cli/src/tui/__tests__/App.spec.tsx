@@ -1,6 +1,6 @@
 import type * as Ink from "ink";
-import { render } from "ink-testing-library";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, render } from "ink-testing-library";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   getCurrentUser,
@@ -53,6 +53,8 @@ vi.mock("ink", async (importOriginal) => {
     useApp: () => ({ exit: exitMock }),
   };
 });
+
+afterEach(cleanup);
 
 const testWorkspace = {
   id: 1,
@@ -281,6 +283,34 @@ describe("App navigation", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("No workspaces yet");
     });
+  });
+
+  it("doesn't quit on 'q' while typing in a text field", async () => {
+    vi.mocked(getWorkspaces).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: [testWorkspace],
+    } as never);
+
+    const { lastFrame, stdin } = render(<App />);
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Test Workspace");
+    });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    stdin.write("n");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New workspace");
+    });
+
+    for (const character of "Aqua") {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      stdin.write(character);
+    }
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Name: Aqua");
+    });
+    expect(exitMock).not.toHaveBeenCalled();
   });
 
   it("quits on 'q'", async () => {

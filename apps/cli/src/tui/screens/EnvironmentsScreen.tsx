@@ -1,6 +1,5 @@
 import { Box, Text, useInput } from "ink";
 import SelectInput from "ink-select-input";
-import TextInput from "ink-text-input";
 import { useState } from "react";
 
 import {
@@ -12,6 +11,7 @@ import {
 import type { EnvironmentSummary, WorkspaceSummary } from "../navigation.js";
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
+import TextInput from "../components/TextInput.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 type Mode = "list" | "creating" | "submitting";

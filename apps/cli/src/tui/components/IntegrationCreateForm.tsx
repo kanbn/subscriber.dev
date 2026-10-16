@@ -1,7 +1,8 @@
 import { Box, Text } from "ink";
 import SelectInput from "ink-select-input";
-import TextInput from "ink-text-input";
 import { useState } from "react";
+
+import TextInput from "./TextInput.js";
 
 export interface IntegrationCreateValues {
   host: string;

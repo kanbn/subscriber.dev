@@ -1,6 +1,8 @@
 import { Text, useInput } from "ink";
 import { useState } from "react";
 
+import { useTyping } from "./TextInput.js";
+
 function moveVertically(value: string, offset: number, delta: number): number {
   const lines = value.split("\n");
 
@@ -33,6 +35,7 @@ export function MultilineTextInput({
   onSubmit: (value: string) => void;
 }) {
   const [cursorOffset, setCursorOffset] = useState(value.length);
+  useTyping();
 
   useInput((input, key) => {
     if (key.ctrl && input === "d") {

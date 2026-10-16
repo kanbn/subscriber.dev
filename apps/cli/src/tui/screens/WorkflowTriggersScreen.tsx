@@ -1,6 +1,5 @@
 import { Box, Text } from "ink";
 import SelectInput from "ink-select-input";
-import TextInput from "ink-text-input";
 import { useEffect, useState } from "react";
 
 import type {
@@ -16,6 +15,7 @@ import {
 import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
+import TextInput from "../components/TextInput.js";
 import { useAsyncData } from "../useAsyncData.js";
 
 interface Trigger {
