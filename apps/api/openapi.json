@@ -1123,8 +1123,7 @@
         "summary": "Unsubscribe",
         "tags": [
           "Unsubscribe"
-        ],
-        "x-excluded": true
+        ]
       }
     },
     "/environments/{environmentId}/workflows/trigger": {
@@ -2135,8 +2134,7 @@
         "summary": "Record an inbound bounce event",
         "tags": [
           "Bounces"
-        ],
-        "x-excluded": true
+        ]
       }
     },
     "/environments/{environmentId}/emails/preview": {
@@ -2824,8 +2822,7 @@
         },
         "tags": [
           "StreamableHttp"
-        ],
-        "x-excluded": true
+        ]
       },
       "get": {
         "operationId": "StreamableHttpController_handleGetRequest",
@@ -2837,8 +2834,7 @@
         },
         "tags": [
           "StreamableHttp"
-        ],
-        "x-excluded": true
+        ]
       },
       "delete": {
         "operationId": "StreamableHttpController_handleDeleteRequest",
@@ -2850,14 +2846,13 @@
         },
         "tags": [
           "StreamableHttp"
-        ],
-        "x-excluded": true
+        ]
       }
     }
   },
   "info": {
-    "title": "Subscriber API",
-    "description": "REST API for Subscriber - Customer.io alternative",
+    "title": "subscriber.dev API",
+    "description": "Trigger workflows, manage subscribers and send broadcasts. Authenticate with an API key in the X-API-Key header. Docs: https://docs.subscriber.dev",
     "version": "1.0",
     "contact": {}
   },
@@ -2872,15 +2867,14 @@
     "securitySchemes": {
       "bearer": {
         "scheme": "bearer",
-        "bearerFormat": "JWT",
         "type": "http",
-        "description": "Enter JWT token"
+        "description": "A session token from signing in, used by subscriber.dev's own apps. From your own code, use an API key."
       },
       "api-key": {
         "type": "apiKey",
         "in": "header",
         "name": "X-API-Key",
-        "description": "Enter API key"
+        "description": "An API key, from `subscriber login`. Keep it on your server."
       }
     },
     "schemas": {
