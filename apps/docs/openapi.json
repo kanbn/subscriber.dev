@@ -2605,6 +2605,46 @@
         ]
       }
     },
+    "/environments/{environmentId}/setup": {
+      "get": {
+        "description": "What's left to go from a new environment to the first email sent: connect an email provider, create a workflow, then trigger it.",
+        "operationId": "getSetup",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the environment's setup checklist",
+        "tags": [
+          "Environments"
+        ]
+      }
+    },
     "/environments/{environmentId}/analytics": {
       "get": {
         "description": "Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.",
@@ -6315,6 +6355,91 @@
           "src",
           "href",
           "title"
+        ]
+      },
+      "SetupResponseDto": {
+        "type": "object",
+        "properties": {
+          "complete": {
+            "type": "boolean",
+            "description": "Every step is done."
+          },
+          "next": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "email_provider",
+                  "first_workflow",
+                  "first_email_sent"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The first step that isn't done yet, or null when complete."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "email_provider",
+                    "first_workflow",
+                    "first_email_sent"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "done": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "key",
+                "title",
+                "done"
+              ]
+            }
+          },
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "postal_address",
+                    "stripe"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "done": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "key",
+                "title",
+                "done"
+              ]
+            },
+            "description": "Optional extras, worth offering once the steps are done."
+          }
+        },
+        "required": [
+          "complete",
+          "next",
+          "steps",
+          "suggestions"
         ]
       },
       "AnalyticsResponseDto": {

@@ -1590,6 +1590,57 @@ export interface VideoResponseDto {
   title: string;
 }
 
+/**
+ * The first step that isn't done yet, or null when complete.
+ */
+export type SetupResponseDtoNext = typeof SetupResponseDtoNext[keyof typeof SetupResponseDtoNext] | null;
+
+
+export const SetupResponseDtoNext = {
+  email_provider: 'email_provider',
+  first_workflow: 'first_workflow',
+  first_email_sent: 'first_email_sent',
+} as const;
+
+export type SetupResponseDtoStepsItemKey = typeof SetupResponseDtoStepsItemKey[keyof typeof SetupResponseDtoStepsItemKey];
+
+
+export const SetupResponseDtoStepsItemKey = {
+  email_provider: 'email_provider',
+  first_workflow: 'first_workflow',
+  first_email_sent: 'first_email_sent',
+} as const;
+
+export type SetupResponseDtoStepsItem = {
+  key: SetupResponseDtoStepsItemKey;
+  title: string;
+  done: boolean;
+};
+
+export type SetupResponseDtoSuggestionsItemKey = typeof SetupResponseDtoSuggestionsItemKey[keyof typeof SetupResponseDtoSuggestionsItemKey];
+
+
+export const SetupResponseDtoSuggestionsItemKey = {
+  postal_address: 'postal_address',
+  stripe: 'stripe',
+} as const;
+
+export type SetupResponseDtoSuggestionsItem = {
+  key: SetupResponseDtoSuggestionsItemKey;
+  title: string;
+  done: boolean;
+};
+
+export interface SetupResponseDto {
+  /** Every step is done. */
+  complete: boolean;
+  /** The first step that isn't done yet, or null when complete. */
+  next: SetupResponseDtoNext;
+  steps: SetupResponseDtoStepsItem[];
+  /** Optional extras, worth offering once the steps are done. */
+  suggestions: SetupResponseDtoSuggestionsItem[];
+}
+
 export type AnalyticsResponseDtoSubscribers = {
   total: number;
   newInPeriod: number;
@@ -7446,6 +7497,121 @@ export const useUploadVideoThumbnail = <TError = void,
       > => {
       return useMutation(getUploadVideoThumbnailMutationOptions(options), queryClient);
     }
+
+export type getSetupResponse200 = {
+  data: SetupResponseDto
+  status: 200
+}
+
+export type getSetupResponseSuccess = (getSetupResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getSetupResponse = (getSetupResponseSuccess)
+
+export const getGetSetupUrl = (environmentId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/setup`
+}
+
+/**
+ * What's left to go from a new environment to the first email sent: connect an email provider, create a workflow, then trigger it.
+ * @summary Get the environment's setup checklist
+ */
+export const getSetup = async (environmentId: string, options?: Parameters<typeof customFetch>[1]): Promise<getSetupResponse> => {
+
+  return customFetch<getSetupResponse>(getGetSetupUrl(environmentId),
+  {
+      credentials: 'include',
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSetupQueryKey = (environmentId: string,) => {
+    return [
+    `/environments/${environmentId}/setup`
+    ] as const;
+    }
+
+
+export const getGetSetupQueryOptions = <TData = Awaited<ReturnType<typeof getSetup>>, TError = unknown>(environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSetup>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSetupQueryKey(environmentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSetup>>> = ({ signal }) => getSetup(environmentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: environmentId !== null && environmentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSetup>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSetupQueryResult = NonNullable<Awaited<ReturnType<typeof getSetup>>>
+export type GetSetupQueryError = unknown
+
+
+export function useGetSetup<TData = Awaited<ReturnType<typeof getSetup>>, TError = unknown>(
+ environmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSetup>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSetup>>,
+          TError,
+          Awaited<ReturnType<typeof getSetup>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSetup<TData = Awaited<ReturnType<typeof getSetup>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSetup>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSetup>>,
+          TError,
+          Awaited<ReturnType<typeof getSetup>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSetup<TData = Awaited<ReturnType<typeof getSetup>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSetup>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get the environment's setup checklist
+ */
+
+export function useGetSetup<TData = Awaited<ReturnType<typeof getSetup>>, TError = unknown>(
+ environmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSetup>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSetupQueryOptions(environmentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export type getAnalyticsResponse200 = {
   data: AnalyticsResponseDto

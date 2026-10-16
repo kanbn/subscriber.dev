@@ -65,7 +65,9 @@ The key is saved in `~/.config/subscriber/config.json` as `apiKey`. Send it in t
 
 ## 3. Try it
 
-Start with something like:
+New to subscriber.dev? Say "set me up". Your agent walks you through creating a workspace, connecting your email provider, and writing and sending a first welcome email to yourself.
+
+Or start with something like:
 
 - "Which workspaces and environments do I have?"
 - "Connect my Resend SMTP account to production."
@@ -81,7 +83,7 @@ These are the tools your agent can call. You don't need to name them; just say w
 
 | Area | Tools |
 | --- | --- |
-| Account | `get_current_user`, `update_user` |
+| Account | `get_current_user`, `update_user`, `get_setup_status` |
 | Workspaces | `list_workspaces`, `create_workspace`, `update_workspace`, `list_environments`, `create_environment` |
 | Subscribers | `list_subscribers`, `get_subscriber`, `create_subscriber`, `update_subscriber`, `delete_subscriber`, `bulk_upsert_subscribers`, `update_subscriber_preferences`, `list_subscriber_tags`, `add_subscriber_tag`, `remove_subscriber_tag` |
 | Workflows | `list_workflows`, `get_workflow`, `create_workflow`, `update_workflow`, `delete_workflow`, `trigger_workflow`, `list_workflow_runs`, `list_environment_runs`, `list_trigger_sources` |

@@ -1571,6 +1571,57 @@ export interface VideoResponseDto {
   title: string;
 }
 
+/**
+ * The first step that isn't done yet, or null when complete.
+ */
+export type SetupResponseDtoNext = typeof SetupResponseDtoNext[keyof typeof SetupResponseDtoNext] | null;
+
+
+export const SetupResponseDtoNext = {
+  email_provider: 'email_provider',
+  first_workflow: 'first_workflow',
+  first_email_sent: 'first_email_sent',
+} as const;
+
+export type SetupResponseDtoStepsItemKey = typeof SetupResponseDtoStepsItemKey[keyof typeof SetupResponseDtoStepsItemKey];
+
+
+export const SetupResponseDtoStepsItemKey = {
+  email_provider: 'email_provider',
+  first_workflow: 'first_workflow',
+  first_email_sent: 'first_email_sent',
+} as const;
+
+export type SetupResponseDtoStepsItem = {
+  key: SetupResponseDtoStepsItemKey;
+  title: string;
+  done: boolean;
+};
+
+export type SetupResponseDtoSuggestionsItemKey = typeof SetupResponseDtoSuggestionsItemKey[keyof typeof SetupResponseDtoSuggestionsItemKey];
+
+
+export const SetupResponseDtoSuggestionsItemKey = {
+  postal_address: 'postal_address',
+  stripe: 'stripe',
+} as const;
+
+export type SetupResponseDtoSuggestionsItem = {
+  key: SetupResponseDtoSuggestionsItemKey;
+  title: string;
+  done: boolean;
+};
+
+export interface SetupResponseDto {
+  /** Every step is done. */
+  complete: boolean;
+  /** The first step that isn't done yet, or null when complete. */
+  next: SetupResponseDtoNext;
+  steps: SetupResponseDtoStepsItem[];
+  /** Optional extras, worth offering once the steps are done. */
+  suggestions: SetupResponseDtoSuggestionsItem[];
+}
+
 export type AnalyticsResponseDtoSubscribers = {
   total: number;
   newInPeriod: number;
@@ -4350,6 +4401,43 @@ return cliFetch<uploadVideoThumbnailResponse>(getUploadVideoThumbnailUrl(environ
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(videoInputDto)
+  }
+);}
+
+
+
+export type getSetupResponse200 = {
+  data: SetupResponseDto
+  status: 200
+}
+
+export type getSetupResponseSuccess = (getSetupResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getSetupResponse = (getSetupResponseSuccess)
+
+export const getGetSetupUrl = (environmentId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/setup`
+}
+
+/**
+ * What's left to go from a new environment to the first email sent: connect an email provider, create a workflow, then trigger it.
+ * @summary Get the environment's setup checklist
+ */
+export const getSetup = async (environmentId: string, options?: Parameters<typeof cliFetch>[1]): Promise<getSetupResponse> => {
+
+  return cliFetch<getSetupResponse>(getGetSetupUrl(environmentId),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

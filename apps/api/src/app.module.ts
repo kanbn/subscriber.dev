@@ -9,6 +9,7 @@ import { BillingModule } from "./modules/billing/billing.module.js";
 import { InboundModule } from "./modules/inbound/inbound.module.js";
 import { IntegrationsModule } from "./modules/integrations/integrations.module.js";
 import { SubscriberMcpModule } from "./modules/mcp/mcp.module.js";
+import { SetupModule } from "./modules/setup/setup.module.js";
 import { SubscriberModule } from "./modules/subscriber/subscriber.module.js";
 import { UploadsModule } from "./modules/uploads/uploads.module.js";
 import { UserModule } from "./modules/user/user.module.js";
@@ -28,6 +29,7 @@ import { throttlerOptions } from "./throttle.js";
     WorkflowModule,
     IntegrationsModule,
     UploadsModule,
+    SetupModule,
     AnalyticsModule,
     InboundModule,
     SubscriberMcpModule,

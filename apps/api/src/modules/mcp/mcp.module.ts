@@ -6,6 +6,7 @@ import { BillingModule } from "../billing/billing.module.js";
 import { billingEnabled } from "../billing/billing.service.js";
 import { InboundModule } from "../inbound/inbound.module.js";
 import { IntegrationsModule } from "../integrations/integrations.module.js";
+import { SetupModule } from "../setup/setup.module.js";
 import { SubscriberModule } from "../subscriber/subscriber.module.js";
 import { UploadsModule } from "../uploads/uploads.module.js";
 import { UserModule } from "../user/user.module.js";
@@ -17,6 +18,7 @@ import { AnalyticsTools } from "./tools/analytics.tools.js";
 import { BillingTools } from "./tools/billing.tools.js";
 import { InboundTools } from "./tools/inbound.tools.js";
 import { IntegrationsTools } from "./tools/integrations.tools.js";
+import { SetupTools } from "./tools/setup.tools.js";
 import { SubscriberTools } from "./tools/subscriber.tools.js";
 import { UploadsTools } from "./tools/uploads.tools.js";
 import { UserTools } from "./tools/user.tools.js";
@@ -34,6 +36,7 @@ const TOOL_PROVIDERS = [
   InboundTools,
   WorkspaceTools,
   UploadsTools,
+  SetupTools,
   ...(billingEnabled() ? [BillingTools] : []),
 ];
 
@@ -42,6 +45,8 @@ const TOOL_PROVIDERS = [
     McpModule.forRoot({
       name: SERVER_NAME,
       version: "0.1.0",
+      instructions:
+        "subscriber.dev sends lifecycle email: workflows triggered by your app or by Stripe, and broadcasts, through the user's own email provider. When the user is new, asks to get started or set up, or nothing seems configured yet, call get_setup_status and follow its nextAction until it's complete.",
       transport: [McpTransportType.STREAMABLE_HTTP],
       guards: [McpAuthGuard],
     }),
@@ -54,6 +59,7 @@ const TOOL_PROVIDERS = [
     WorkspaceModule,
     BillingModule,
     UploadsModule,
+    SetupModule,
   ],
   controllers: [OAuthMetadataController],
   providers: TOOL_PROVIDERS,
