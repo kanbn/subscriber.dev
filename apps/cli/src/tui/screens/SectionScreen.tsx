@@ -1,8 +1,11 @@
 import { Box, Text } from "ink";
 import SelectInput from "ink-select-input";
 
+import { getSetup } from "@subscriber.dev/api-client/cli";
+
 import type { EnvironmentSummary, WorkspaceSummary } from "../navigation.js";
 import { Hints } from "../components/Hints.js";
+import { useAsyncData } from "../useAsyncData.js";
 
 export function SectionScreen({
   workspace,
@@ -18,9 +21,16 @@ export function SectionScreen({
       | "broadcastWorkflows"
       | "runHistory"
       | "integrations"
-      | "analytics",
+      | "analytics"
+      | "setup",
   ) => void;
 }) {
+  const setup = useAsyncData(async () => {
+    const response = await getSetup(environment.publicId);
+    return response.data;
+  }, [environment.publicId]);
+  const incomplete = setup.status === "ready" && !setup.data.complete;
+
   return (
     <Box flexDirection="column">
       <Text bold>
@@ -28,6 +38,9 @@ export function SectionScreen({
       </Text>
       <SelectInput
         items={[
+          ...(incomplete
+            ? [{ label: "★ Get started", value: "setup" as const }]
+            : []),
           { label: "Subscribers", value: "subscribers" as const },
           { label: "Workflows", value: "workflows" as const },
           { label: "Broadcasts", value: "broadcastWorkflows" as const },

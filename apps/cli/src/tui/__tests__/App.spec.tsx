@@ -252,7 +252,7 @@ describe("App navigation", () => {
     vi.mocked(getWorkspaces).mockResolvedValue({
       status: 200,
       headers: new Headers(),
-      data: [],
+      data: [testWorkspace],
     } as never);
     vi.mocked(getCurrentUser).mockResolvedValue({
       status: 200,
@@ -269,10 +269,12 @@ describe("App navigation", () => {
 
     const { lastFrame, stdin } = render(<App />);
 
-    // With no workspaces, "My Account" is the only (and default) item.
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("My Account");
     });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    stdin.write("\u001B[B");
+    await new Promise((resolve) => setTimeout(resolve, 50));
     stdin.write("\r");
 
     await vi.waitFor(() => {
@@ -281,8 +283,23 @@ describe("App navigation", () => {
 
     stdin.write("\u001B");
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain("No workspaces yet");
+      expect(lastFrame()).toContain("Test Workspace");
     });
+  });
+
+  it("opens setup when there are no workspaces yet", async () => {
+    vi.mocked(getWorkspaces).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: [],
+    } as never);
+
+    const { lastFrame } = render(<App />);
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Get started");
+    });
+    expect(lastFrame()).toContain("Name your workspace");
   });
 
   it("doesn't quit on 'q' while typing in a text field", async () => {

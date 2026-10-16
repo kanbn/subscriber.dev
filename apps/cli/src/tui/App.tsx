@@ -11,6 +11,7 @@ import { IntegrationDetailScreen } from "./screens/IntegrationDetailScreen.js";
 import { IntegrationsScreen } from "./screens/IntegrationsScreen.js";
 import { RunHistoryScreen } from "./screens/RunHistoryScreen.js";
 import { SectionScreen } from "./screens/SectionScreen.js";
+import { SetupScreen } from "./screens/SetupScreen.js";
 import { SubscriberDetailScreen } from "./screens/SubscriberDetailScreen.js";
 import { SubscribersScreen } from "./screens/SubscribersScreen.js";
 import { UserScreen } from "./screens/UserScreen.js";
@@ -51,6 +52,28 @@ export function App() {
             push({ kind: "environments", workspace })
           }
           onSelectAccount={() => push({ kind: "users" })}
+          onGetStarted={() => push({ kind: "setup" })}
+          onSetUp={(workspace, environment) =>
+            setStack([
+              { kind: "workspaces" },
+              { kind: "environments", workspace },
+              { kind: "setup", workspace, environment },
+            ])
+          }
+        />
+      )}
+
+      {screen.kind === "setup" && (
+        <SetupScreen
+          workspace={screen.workspace}
+          environment={screen.environment}
+          onDone={(workspace, environment) =>
+            setStack([
+              { kind: "workspaces" },
+              { kind: "environments", workspace },
+              { kind: "section", workspace, environment },
+            ])
+          }
         />
       )}
 
@@ -81,6 +104,14 @@ export function App() {
           workspace={screen.workspace}
           environment={screen.environment}
           onSelect={(section) => {
+            if (section === "setup") {
+              push({
+                kind: "setup",
+                workspace: screen.workspace,
+                environment: screen.environment,
+              });
+              return;
+            }
             if (section === "workflows" || section === "broadcastWorkflows") {
               push({
                 kind: "workflows",

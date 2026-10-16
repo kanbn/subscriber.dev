@@ -17,14 +17,23 @@ const testWorkspace = {
   slug: "test-workspace",
 };
 
-function renderScreen(onSelectWorkspace = vi.fn(), onSelectAccount = vi.fn()) {
+function renderScreen(
+  onSelectWorkspace = vi.fn(),
+  onSelectAccount = vi.fn(),
+  onGetStarted = vi.fn(),
+  onSetUp = vi.fn(),
+) {
   return {
     onSelectWorkspace,
     onSelectAccount,
+    onGetStarted,
+    onSetUp,
     ...render(
       <WorkspacesScreen
         onSelectWorkspace={onSelectWorkspace}
         onSelectAccount={onSelectAccount}
+        onGetStarted={onGetStarted}
+        onSetUp={onSetUp}
       />,
     ),
   };
@@ -75,12 +84,28 @@ describe("WorkspacesScreen", () => {
       data: [],
     } as never);
 
-    const { lastFrame } = renderScreen();
+    const { lastFrame, onGetStarted } = renderScreen();
 
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("No workspaces yet");
     });
     expect(lastFrame()).toContain("My Account");
+    expect(onGetStarted).toHaveBeenCalledOnce();
+  });
+
+  it("doesn't open setup when there are workspaces", async () => {
+    vi.mocked(getWorkspaces).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: [testWorkspace],
+    } as never);
+
+    const { lastFrame, onGetStarted } = renderScreen();
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Test Workspace");
+    });
+    expect(onGetStarted).not.toHaveBeenCalled();
   });
 });
 
@@ -143,12 +168,58 @@ describe("WorkspacesScreen create", () => {
     stdin.write("\r");
 
     await vi.waitFor(() => {
-      expect(onSelectWorkspace).toHaveBeenCalledWith({
-        publicId: "new-workspace-1",
-        name: "New Workspace",
-      });
+      expect(lastFrame()).toContain("Set it up now?");
     });
     expect(createWorkspace).toHaveBeenCalledWith({ name: "New Workspace" });
+
+    await tick();
+    stdin.write("n");
+    expect(onSelectWorkspace).toHaveBeenCalledWith({
+      publicId: "new-workspace-1",
+      name: "New Workspace",
+    });
+  });
+
+  it("opens setup for the new workspace on 'y'", async () => {
+    vi.mocked(getWorkspaces).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: [testWorkspace],
+    } as never);
+    vi.mocked(createWorkspace).mockResolvedValue({
+      status: 201,
+      headers: new Headers(),
+      data: {
+        workspace: { publicId: "new-workspace-1", name: "New Workspace" },
+        environment: { publicId: "new-environment-1", name: "Production" },
+      },
+    } as never);
+
+    const { lastFrame, stdin, onSetUp, onSelectWorkspace } = renderScreen();
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Test Workspace");
+    });
+
+    await tick();
+    stdin.write("n");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("New workspace");
+    });
+    await tick();
+    stdin.write("New Workspace");
+    await tick();
+    stdin.write("\r");
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Set it up now?");
+    });
+
+    await tick();
+    stdin.write("y");
+    expect(onSetUp).toHaveBeenCalledWith(
+      { publicId: "new-workspace-1", name: "New Workspace" },
+      { publicId: "new-environment-1", name: "Production" },
+    );
+    expect(onSelectWorkspace).not.toHaveBeenCalled();
   });
 
   it("shows an error and does not navigate when creation fails", async () => {
