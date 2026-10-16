@@ -11,7 +11,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponseDto"
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }
@@ -60,7 +60,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+                "$ref": "#/components/schemas/UpdateUserRequest"
               }
             }
           }
@@ -71,7 +71,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateUserResponseDto"
+                  "$ref": "#/components/schemas/UpdateUserResponse"
                 }
               }
             }
@@ -123,7 +123,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AgentResponseDto"
+                    "$ref": "#/components/schemas/AgentResponse"
                   }
                 }
               }
@@ -291,7 +291,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WorkspaceDto"
+                    "$ref": "#/components/schemas/Workspace"
                   }
                 }
               }
@@ -339,7 +339,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateWorkspaceDto"
+                "$ref": "#/components/schemas/CreateWorkspaceRequest"
               }
             }
           }
@@ -350,7 +350,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateWorkspaceResponseDto"
+                  "$ref": "#/components/schemas/CreateWorkspaceResponse"
                 }
               }
             }
@@ -408,7 +408,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateWorkspaceDto"
+                "$ref": "#/components/schemas/UpdateWorkspaceRequest"
               }
             }
           }
@@ -419,7 +419,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkspaceDto"
+                  "$ref": "#/components/schemas/Workspace"
                 }
               }
             }
@@ -488,7 +488,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListEnvironmentsResponseDto"
+                  "$ref": "#/components/schemas/ListEnvironmentsResponse"
                 }
               }
             }
@@ -554,7 +554,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateEnvironmentDto"
+                "$ref": "#/components/schemas/CreateEnvironmentRequest"
               }
             }
           }
@@ -565,7 +565,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EnvironmentDto"
+                  "$ref": "#/components/schemas/Environment"
                 }
               }
             }
@@ -634,7 +634,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BillingResponseDto"
+                  "$ref": "#/components/schemas/BillingResponse"
                 }
               }
             }
@@ -692,7 +692,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateCheckoutDto"
+                "$ref": "#/components/schemas/CreateCheckoutRequest"
               }
             }
           }
@@ -703,7 +703,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BillingLinkResponseDto"
+                  "$ref": "#/components/schemas/BillingLinkResponse"
                 }
               }
             }
@@ -762,7 +762,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BillingLinkResponseDto"
+                  "$ref": "#/components/schemas/BillingLinkResponse"
                 }
               }
             }
@@ -887,7 +887,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListSubscribersResponseDto"
+                  "$ref": "#/components/schemas/ListSubscribersResponse"
                 }
               }
             }
@@ -954,7 +954,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateSubscriberDto"
+                "$ref": "#/components/schemas/CreateSubscriberRequest"
               }
             }
           }
@@ -965,7 +965,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateSubscriberResponseDto"
+                  "$ref": "#/components/schemas/CreateSubscriberResponse"
                 }
               }
             }
@@ -1045,7 +1045,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListTagsResponseDto"
+                  "$ref": "#/components/schemas/ListTagsResponse"
                 }
               }
             }
@@ -1123,7 +1123,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetSubscriberResponseDto"
+                  "$ref": "#/components/schemas/GetSubscriberResponse"
                 }
               }
             }
@@ -1198,7 +1198,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateSubscriberDto"
+                "$ref": "#/components/schemas/UpdateSubscriberRequest"
               }
             }
           }
@@ -1209,7 +1209,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateSubscriberResponseDto"
+                  "$ref": "#/components/schemas/UpdateSubscriberResponse"
                 }
               }
             }
@@ -1347,7 +1347,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BulkUpsertSubscribersDto"
+                "$ref": "#/components/schemas/BulkUpsertSubscribersRequest"
               }
             }
           }
@@ -1358,7 +1358,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BulkUpsertSubscribersResponseDto"
+                  "$ref": "#/components/schemas/BulkUpsertSubscribersResponse"
                 }
               }
             }
@@ -1435,7 +1435,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdatePreferencesDto"
+                "$ref": "#/components/schemas/UpdatePreferencesRequest"
               }
             }
           }
@@ -1446,7 +1446,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdatePreferencesResponseDto"
+                  "$ref": "#/components/schemas/UpdatePreferencesResponse"
                 }
               }
             }
@@ -1523,7 +1523,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddTagDto"
+                "$ref": "#/components/schemas/AddTagRequest"
               }
             }
           }
@@ -1534,7 +1534,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TagResponseDto"
+                  "$ref": "#/components/schemas/TagResponse"
                 }
               }
             }
@@ -1681,7 +1681,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TriggerWorkflowDto"
+                "$ref": "#/components/schemas/TriggerWorkflowRequest"
               }
             }
           }
@@ -1692,7 +1692,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TriggerWorkflowResponseDto"
+                  "$ref": "#/components/schemas/TriggerWorkflowResponse"
                 }
               }
             }
@@ -1761,7 +1761,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateWorkflowDto"
+                "$ref": "#/components/schemas/CreateWorkflowRequest"
               }
             }
           }
@@ -1772,7 +1772,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowResponseDto"
+                  "$ref": "#/components/schemas/WorkflowResponse"
                 }
               }
             }
@@ -1874,7 +1874,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListWorkflowsResponseDto"
+                  "$ref": "#/components/schemas/ListWorkflowsResponse"
                 }
               }
             }
@@ -1966,7 +1966,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListEnvironmentRunsResponseDto"
+                  "$ref": "#/components/schemas/ListEnvironmentRunsResponse"
                 }
               }
             }
@@ -2044,7 +2044,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowDetailResponseDto"
+                  "$ref": "#/components/schemas/WorkflowDetailResponse"
                 }
               }
             }
@@ -2119,7 +2119,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateWorkflowDto"
+                "$ref": "#/components/schemas/UpdateWorkflowRequest"
               }
             }
           }
@@ -2130,7 +2130,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowResponseDto"
+                  "$ref": "#/components/schemas/WorkflowResponse"
                 }
               }
             }
@@ -2299,7 +2299,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListRunsResponseDto"
+                  "$ref": "#/components/schemas/ListRunsResponse"
                 }
               }
             }
@@ -2376,7 +2376,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TriggerBroadcastDto"
+                "$ref": "#/components/schemas/TriggerBroadcastRequest"
               }
             }
           }
@@ -2387,7 +2387,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PreviewBroadcastResponseDto"
+                  "$ref": "#/components/schemas/PreviewBroadcastResponse"
                 }
               }
             }
@@ -2474,7 +2474,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TriggerBroadcastDto"
+                "$ref": "#/components/schemas/TriggerBroadcastRequest"
               }
             }
           }
@@ -2485,7 +2485,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TriggerBroadcastResponseDto"
+                  "$ref": "#/components/schemas/TriggerBroadcastResponse"
                 }
               }
             }
@@ -2595,7 +2595,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListBroadcastsResponseDto"
+                  "$ref": "#/components/schemas/ListBroadcastsResponse"
                 }
               }
             }
@@ -2681,7 +2681,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BroadcastDetailResponseDto"
+                  "$ref": "#/components/schemas/BroadcastDetailResponse"
                 }
               }
             }
@@ -2767,7 +2767,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                  "$ref": "#/components/schemas/BroadcastSummary"
                 }
               }
             }
@@ -2863,7 +2863,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                  "$ref": "#/components/schemas/BroadcastSummary"
                 }
               }
             }
@@ -2959,7 +2959,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                  "$ref": "#/components/schemas/BroadcastSummary"
                 }
               }
             }
@@ -3055,7 +3055,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BroadcastSummaryDto"
+                  "$ref": "#/components/schemas/BroadcastSummary"
                 }
               }
             }
@@ -3134,7 +3134,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmailContentDto"
+                "$ref": "#/components/schemas/EmailContentRequest"
               }
             }
           }
@@ -3145,7 +3145,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RenderedEmailDto"
+                  "$ref": "#/components/schemas/RenderedEmail"
                 }
               }
             }
@@ -3204,7 +3204,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TestEmailDto"
+                "$ref": "#/components/schemas/TestEmailRequest"
               }
             }
           }
@@ -3215,7 +3215,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TestEmailResponseDto"
+                  "$ref": "#/components/schemas/TestEmailResponse"
                 }
               }
             }
@@ -3302,7 +3302,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpsertIntegrationDto"
+                "$ref": "#/components/schemas/UpsertIntegrationRequest"
               }
             }
           }
@@ -3313,7 +3313,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IntegrationResponseDto"
+                  "$ref": "#/components/schemas/IntegrationResponse"
                 }
               }
             }
@@ -3399,7 +3399,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IntegrationResponseDto"
+                  "$ref": "#/components/schemas/IntegrationResponse"
                 }
               }
             }
@@ -3545,7 +3545,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IntegrationResponseDto"
+                  "$ref": "#/components/schemas/IntegrationResponse"
                 }
               }
             }
@@ -3615,7 +3615,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListIntegrationsResponseDto"
+                  "$ref": "#/components/schemas/ListIntegrationsResponse"
                 }
               }
             }
@@ -3704,7 +3704,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadResponseDto"
+                  "$ref": "#/components/schemas/UploadResponse"
                 }
               }
             }
@@ -3773,7 +3773,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VideoInputDto"
+                "$ref": "#/components/schemas/VideoInputRequest"
               }
             }
           }
@@ -3784,7 +3784,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VideoResponseDto"
+                  "$ref": "#/components/schemas/VideoResponse"
                 }
               }
             }
@@ -3854,7 +3854,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SetupResponseDto"
+                  "$ref": "#/components/schemas/SetupResponse"
                 }
               }
             }
@@ -3925,7 +3925,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponseDto"
+                  "$ref": "#/components/schemas/AnalyticsResponse"
                 }
               }
             }
@@ -4026,7 +4026,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListInboundEventsResponseDto"
+                  "$ref": "#/components/schemas/ListInboundEventsResponse"
                 }
               }
             }
@@ -4086,7 +4086,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListTriggerSourcesResponseDto"
+                  "$ref": "#/components/schemas/ListTriggerSourcesResponse"
                 }
               }
             }
@@ -4155,7 +4155,7 @@
       }
     },
     "schemas": {
-      "UserResponseDto": {
+      "UserResponse": {
         "type": "object",
         "properties": {
           "publicId": {
@@ -4214,7 +4214,60 @@
           "apiKeys"
         ]
       },
-      "UpdateUserDto": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "example": 404
+          },
+          "message": {
+            "type": "string",
+            "example": "Workflow not found"
+          },
+          "error": {
+            "type": "string",
+            "example": "Not Found"
+          },
+          "errors": {
+            "description": "Which fields failed validation, on a 400.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  }
+                },
+                "message": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "message"
+              ]
+            }
+          }
+        },
+        "required": [
+          "statusCode",
+          "message"
+        ]
+      },
+      "UpdateUserRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -4225,7 +4278,7 @@
           }
         }
       },
-      "UpdateUserResponseDto": {
+      "UpdateUserResponse": {
         "type": "object",
         "properties": {
           "publicId": {
@@ -4258,7 +4311,7 @@
           "image"
         ]
       },
-      "AgentResponseDto": {
+      "AgentResponse": {
         "type": "object",
         "properties": {
           "clientId": {
@@ -4286,7 +4339,7 @@
           "connectedAt"
         ]
       },
-      "WorkspaceDto": {
+      "Workspace": {
         "type": "object",
         "properties": {
           "id": {
@@ -4320,7 +4373,7 @@
           "postalAddress"
         ]
       },
-      "CreateWorkspaceDto": {
+      "CreateWorkspaceRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -4333,7 +4386,7 @@
           "name"
         ]
       },
-      "CreateWorkspaceResponseDto": {
+      "CreateWorkspaceResponse": {
         "type": "object",
         "properties": {
           "workspace": {
@@ -4388,7 +4441,7 @@
           "environment"
         ]
       },
-      "UpdateWorkspaceDto": {
+      "UpdateWorkspaceRequest": {
         "type": "object",
         "properties": {
           "postalAddress": {
@@ -4408,7 +4461,7 @@
           "postalAddress"
         ]
       },
-      "ListEnvironmentsResponseDto": {
+      "ListEnvironmentsResponse": {
         "type": "object",
         "properties": {
           "environments": {
@@ -4442,7 +4495,7 @@
           "environments"
         ]
       },
-      "CreateEnvironmentDto": {
+      "CreateEnvironmentRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -4455,7 +4508,7 @@
           "name"
         ]
       },
-      "EnvironmentDto": {
+      "Environment": {
         "type": "object",
         "properties": {
           "id": {
@@ -4478,7 +4531,7 @@
           "slug"
         ]
       },
-      "BillingResponseDto": {
+      "BillingResponse": {
         "type": "object",
         "properties": {
           "enabled": {
@@ -4616,7 +4669,7 @@
           "planAtRenewal"
         ]
       },
-      "CreateCheckoutDto": {
+      "CreateCheckoutRequest": {
         "type": "object",
         "properties": {
           "plan": {
@@ -4643,7 +4696,7 @@
           "plan"
         ]
       },
-      "BillingLinkResponseDto": {
+      "BillingLinkResponse": {
         "type": "object",
         "properties": {
           "url": {
@@ -4665,7 +4718,7 @@
           "kind"
         ]
       },
-      "ListSubscribersResponseDto": {
+      "ListSubscribersResponse": {
         "type": "object",
         "properties": {
           "subscribers": {
@@ -4772,7 +4825,186 @@
           "offset"
         ]
       },
-      "ListTagsResponseDto": {
+      "CreateSubscriberRequest": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "description": "Bring your own identifier for this subscriber. Must be unique within the environment. If omitted, one is generated automatically.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "preferences": {
+            "default": {
+              "email": true
+            },
+            "type": "object",
+            "properties": {
+              "email": {
+                "default": true,
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "CreateSubscriberResponse": {
+        "type": "object",
+        "properties": {
+          "subscriber": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "externalId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "firstName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lastName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "attributes": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "createdVia": {
+                "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "unsubscribeUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "publicId",
+              "email",
+              "phone",
+              "externalId",
+              "firstName",
+              "lastName",
+              "name",
+              "attributes",
+              "createdVia",
+              "createdAt",
+              "updatedAt",
+              "unsubscribeUrl"
+            ]
+          },
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "number"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              }
+            },
+            "required": [
+              "publicId",
+              "email",
+              "version",
+              "createdAt"
+            ]
+          }
+        },
+        "required": [
+          "subscriber",
+          "preferences"
+        ]
+      },
+      "ListTagsResponse": {
         "type": "object",
         "properties": {
           "tags": {
@@ -4786,7 +5018,7 @@
           "tags"
         ]
       },
-      "GetSubscriberResponseDto": {
+      "GetSubscriberResponse": {
         "type": "object",
         "properties": {
           "subscriber": {
@@ -4929,57 +5161,88 @@
           "preferences"
         ]
       },
-      "CreateSubscriberDto": {
+      "UpdateSubscriberRequest": {
         "type": "object",
         "properties": {
-          "publicId": {
-            "description": "Bring your own identifier for this subscriber. Must be unique within the environment. If omitted, one is generated automatically.",
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255
-          },
           "email": {
-            "type": "string",
-            "format": "email",
-            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "phone": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "externalId": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "firstName": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "lastName": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "name": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "attributes": {
-            "type": "object",
-            "propertyNames": {
-              "type": "string"
-            },
-            "additionalProperties": {}
-          },
-          "preferences": {
-            "default": {
-              "email": true
-            },
-            "type": "object",
-            "properties": {
-              "email": {
-                "default": true,
-                "type": "boolean"
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
               }
-            }
+            ]
           }
         }
       },
-      "CreateSubscriberResponseDto": {
+      "UpdateSubscriberResponse": {
         "type": "object",
         "properties": {
           "subscriber": {
@@ -5076,39 +5339,13 @@
               "updatedAt",
               "unsubscribeUrl"
             ]
-          },
-          "preferences": {
-            "type": "object",
-            "properties": {
-              "publicId": {
-                "type": "string"
-              },
-              "email": {
-                "type": "boolean"
-              },
-              "version": {
-                "type": "number"
-              },
-              "createdAt": {
-                "type": "string",
-                "format": "date-time",
-                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-              }
-            },
-            "required": [
-              "publicId",
-              "email",
-              "version",
-              "createdAt"
-            ]
           }
         },
         "required": [
-          "subscriber",
-          "preferences"
+          "subscriber"
         ]
       },
-      "BulkUpsertSubscribersDto": {
+      "BulkUpsertSubscribersRequest": {
         "type": "object",
         "properties": {
           "subscribers": {
@@ -5168,7 +5405,7 @@
           "subscribers"
         ]
       },
-      "BulkUpsertSubscribersResponseDto": {
+      "BulkUpsertSubscribersResponse": {
         "type": "object",
         "properties": {
           "results": {
@@ -5342,191 +5579,7 @@
           "summary"
         ]
       },
-      "UpdateSubscriberDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "email",
-                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "phone": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "externalId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "firstName": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "lastName": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "attributes": {
-            "anyOf": [
-              {
-                "type": "object",
-                "propertyNames": {
-                  "type": "string"
-                },
-                "additionalProperties": {}
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        }
-      },
-      "UpdateSubscriberResponseDto": {
-        "type": "object",
-        "properties": {
-          "subscriber": {
-            "type": "object",
-            "properties": {
-              "publicId": {
-                "type": "string"
-              },
-              "email": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "phone": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "externalId": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "firstName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "lastName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "name": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "attributes": {
-                "anyOf": [
-                  {
-                    "type": "object",
-                    "propertyNames": {
-                      "type": "string"
-                    },
-                    "additionalProperties": {}
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "createdVia": {
-                "description": "How the subscriber was created: \"api\", \"mcp\", or an inbound source such as \"stripe\".",
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "createdAt": {
-                "type": "string",
-                "format": "date-time",
-                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-              },
-              "updatedAt": {
-                "type": "string",
-                "format": "date-time",
-                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-              },
-              "unsubscribeUrl": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              }
-            },
-            "required": [
-              "publicId",
-              "email",
-              "phone",
-              "externalId",
-              "firstName",
-              "lastName",
-              "name",
-              "attributes",
-              "createdVia",
-              "createdAt",
-              "updatedAt",
-              "unsubscribeUrl"
-            ]
-          }
-        },
-        "required": [
-          "subscriber"
-        ]
-      },
-      "UpdatePreferencesDto": {
+      "UpdatePreferencesRequest": {
         "type": "object",
         "properties": {
           "email": {
@@ -5534,7 +5587,7 @@
           }
         }
       },
-      "UpdatePreferencesResponseDto": {
+      "UpdatePreferencesResponse": {
         "type": "object",
         "properties": {
           "preferences": {
@@ -5571,7 +5624,7 @@
           "preferences"
         ]
       },
-      "AddTagDto": {
+      "AddTagRequest": {
         "type": "object",
         "properties": {
           "tag": {
@@ -5584,7 +5637,7 @@
           "tag"
         ]
       },
-      "TagResponseDto": {
+      "TagResponse": {
         "type": "object",
         "properties": {
           "tag": {
@@ -5595,30 +5648,7 @@
           "tag"
         ]
       },
-      "UnsubscribeBodyDto": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "token"
-        ]
-      },
-      "UnsubscribeResponseDto": {
-        "type": "object",
-        "properties": {
-          "unsubscribed": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "unsubscribed"
-        ]
-      },
-      "TriggerWorkflowDto": {
+      "TriggerWorkflowRequest": {
         "type": "object",
         "properties": {
           "key": {
@@ -5656,7 +5686,7 @@
           "subscriber"
         ]
       },
-      "TriggerWorkflowResponseDto": {
+      "TriggerWorkflowResponse": {
         "type": "object",
         "properties": {
           "triggered": {
@@ -5673,7 +5703,7 @@
           "triggered"
         ]
       },
-      "CreateWorkflowDto": {
+      "CreateWorkflowRequest": {
         "type": "object",
         "properties": {
           "key": {
@@ -5865,7 +5895,7 @@
           "steps"
         ]
       },
-      "WorkflowResponseDto": {
+      "WorkflowResponse": {
         "type": "object",
         "properties": {
           "publicId": {
@@ -6062,7 +6092,7 @@
           "updatedAt"
         ]
       },
-      "ListWorkflowsResponseDto": {
+      "ListWorkflowsResponse": {
         "type": "object",
         "properties": {
           "workflows": {
@@ -6274,7 +6304,7 @@
           "offset"
         ]
       },
-      "ListEnvironmentRunsResponseDto": {
+      "ListEnvironmentRunsResponse": {
         "type": "object",
         "properties": {
           "runs": {
@@ -6457,7 +6487,7 @@
           "offset"
         ]
       },
-      "WorkflowDetailResponseDto": {
+      "WorkflowDetailResponse": {
         "type": "object",
         "properties": {
           "publicId": {
@@ -6693,7 +6723,7 @@
           "successRate"
         ]
       },
-      "UpdateWorkflowDto": {
+      "UpdateWorkflowRequest": {
         "type": "object",
         "properties": {
           "key": {
@@ -6893,7 +6923,7 @@
           }
         }
       },
-      "ListRunsResponseDto": {
+      "ListRunsResponse": {
         "type": "object",
         "properties": {
           "runs": {
@@ -7056,129 +7086,11 @@
           "offset"
         ]
       },
-      "TriggerBroadcastDto__schema0": {
-        "anyOf": [
-          {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "const": "optedIn"
-              }
-            },
-            "required": [
-              "type"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "const": "tag"
-              },
-              "tag": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "required": [
-              "type",
-              "tag"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "const": "attribute"
-              },
-              "field": {
-                "type": "string",
-                "minLength": 1
-              },
-              "op": {
-                "type": "string",
-                "enum": [
-                  "equals",
-                  "contains",
-                  "exists"
-                ]
-              },
-              "value": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "type",
-              "field",
-              "op"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "const": "and"
-              },
-              "clauses": {
-                "minItems": 1,
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
-                }
-              }
-            },
-            "required": [
-              "type",
-              "clauses"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "const": "or"
-              },
-              "clauses": {
-                "minItems": 1,
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
-                }
-              }
-            },
-            "required": [
-              "type",
-              "clauses"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "const": "not"
-              },
-              "clause": {
-                "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
-              }
-            },
-            "required": [
-              "type",
-              "clause"
-            ]
-          }
-        ]
-      },
-      "TriggerBroadcastDto": {
+      "TriggerBroadcastRequest": {
         "type": "object",
         "properties": {
           "audience": {
-            "$ref": "#/components/schemas/TriggerBroadcastDto__schema0"
+            "$ref": "#/components/schemas/AudienceCondition"
           },
           "sendOverHours": {
             "description": "Spread sends evenly over this many hours (max 168) instead of sending as fast as possible. Gentler on sender reputation for large audiences, and leaves time to pause or cancel.",
@@ -7195,7 +7107,7 @@
           "audience"
         ]
       },
-      "PreviewBroadcastResponseDto": {
+      "PreviewBroadcastResponse": {
         "type": "object",
         "properties": {
           "matchedCount": {
@@ -7206,7 +7118,7 @@
           "matchedCount"
         ]
       },
-      "TriggerBroadcastResponseDto": {
+      "TriggerBroadcastResponse": {
         "type": "object",
         "properties": {
           "broadcastId": {
@@ -7228,7 +7140,7 @@
           "status"
         ]
       },
-      "ListBroadcastsResponseDto": {
+      "ListBroadcastsResponse": {
         "type": "object",
         "properties": {
           "broadcasts": {
@@ -7291,7 +7203,7 @@
           "offset"
         ]
       },
-      "BroadcastDetailResponseDto": {
+      "BroadcastDetailResponse": {
         "type": "object",
         "properties": {
           "publicId": {
@@ -7382,7 +7294,7 @@
           "successRate"
         ]
       },
-      "BroadcastSummaryDto": {
+      "BroadcastSummary": {
         "type": "object",
         "properties": {
           "publicId": {
@@ -7434,33 +7346,7 @@
           "createdAt"
         ]
       },
-      "BounceWebhookBodyDto": {
-        "type": "object",
-        "properties": {
-          "runStepPublicId": {
-            "type": "string",
-            "minLength": 1
-          },
-          "bounceType": {
-            "type": "string",
-            "enum": [
-              "hard",
-              "soft"
-            ]
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 2000
-          }
-        },
-        "required": [
-          "runStepPublicId",
-          "bounceType",
-          "reason"
-        ]
-      },
-      "EmailContentDto": {
+      "EmailContentRequest": {
         "type": "object",
         "properties": {
           "subject": {
@@ -7500,7 +7386,7 @@
           "body"
         ]
       },
-      "RenderedEmailDto": {
+      "RenderedEmail": {
         "type": "object",
         "properties": {
           "subject": {
@@ -7515,7 +7401,7 @@
           "html"
         ]
       },
-      "TestEmailDto": {
+      "TestEmailRequest": {
         "type": "object",
         "properties": {
           "subject": {
@@ -7575,7 +7461,7 @@
           }
         }
       },
-      "TestEmailResponseDto": {
+      "TestEmailResponse": {
         "type": "object",
         "properties": {
           "to": {
@@ -7590,12 +7476,12 @@
           "subject"
         ]
       },
-      "UpsertIntegrationDto": {
+      "UpsertIntegrationRequest": {
         "type": "object",
         "properties": {},
         "additionalProperties": {}
       },
-      "IntegrationResponseDto": {
+      "IntegrationResponse": {
         "type": "object",
         "properties": {
           "type": {
@@ -7616,7 +7502,7 @@
           "updatedAt"
         ]
       },
-      "ListIntegrationsResponseDto": {
+      "ListIntegrationsResponse": {
         "type": "object",
         "properties": {
           "integrations": {
@@ -7649,7 +7535,7 @@
           "integrations"
         ]
       },
-      "UploadResponseDto": {
+      "UploadResponse": {
         "type": "object",
         "properties": {
           "url": {
@@ -7661,7 +7547,7 @@
           "url"
         ]
       },
-      "VideoInputDto": {
+      "VideoInputRequest": {
         "type": "object",
         "properties": {
           "url": {
@@ -7673,7 +7559,7 @@
           "url"
         ]
       },
-      "VideoResponseDto": {
+      "VideoResponse": {
         "type": "object",
         "properties": {
           "src": {
@@ -7695,7 +7581,7 @@
           "title"
         ]
       },
-      "SetupResponseDto": {
+      "SetupResponse": {
         "type": "object",
         "properties": {
           "complete": {
@@ -7780,7 +7666,7 @@
           "suggestions"
         ]
       },
-      "AnalyticsResponseDto": {
+      "AnalyticsResponse": {
         "type": "object",
         "properties": {
           "days": {
@@ -7866,7 +7752,7 @@
           "bounces"
         ]
       },
-      "ListInboundEventsResponseDto": {
+      "ListInboundEventsResponse": {
         "type": "object",
         "properties": {
           "events": {
@@ -7968,7 +7854,7 @@
           "offset"
         ]
       },
-      "ListTriggerSourcesResponseDto": {
+      "ListTriggerSourcesResponse": {
         "type": "object",
         "properties": {
           "sources": {
@@ -8020,57 +7906,140 @@
           "sources"
         ]
       },
-      "ErrorResponse": {
+      "AudienceCondition": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/OptedInCondition"
+          },
+          {
+            "$ref": "#/components/schemas/TagCondition"
+          },
+          {
+            "$ref": "#/components/schemas/AttributeCondition"
+          },
+          {
+            "$ref": "#/components/schemas/AndCondition"
+          },
+          {
+            "$ref": "#/components/schemas/OrCondition"
+          },
+          {
+            "$ref": "#/components/schemas/NotCondition"
+          }
+        ]
+      },
+      "OptedInCondition": {
         "type": "object",
         "properties": {
-          "statusCode": {
-            "type": "integer",
-            "example": 404
-          },
-          "message": {
+          "type": {
             "type": "string",
-            "example": "Workflow not found"
-          },
-          "error": {
+            "const": "optedIn"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "TagCondition": {
+        "type": "object",
+        "properties": {
+          "type": {
             "type": "string",
-            "example": "Not Found"
+            "const": "tag"
           },
-          "errors": {
-            "description": "Which fields failed validation, on a 400.",
+          "tag": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "type",
+          "tag"
+        ]
+      },
+      "AttributeCondition": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "attribute"
+          },
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "equals",
+              "contains",
+              "exists"
+            ]
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "field",
+          "op"
+        ]
+      },
+      "AndCondition": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "and"
+          },
+          "clauses": {
+            "minItems": 1,
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "path": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ]
-                  }
-                },
-                "message": {
-                  "type": "string"
-                },
-                "code": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "path",
-                "message"
-              ]
+              "$ref": "#/components/schemas/AudienceCondition"
             }
           }
         },
         "required": [
-          "statusCode",
-          "message"
+          "type",
+          "clauses"
+        ]
+      },
+      "OrCondition": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "or"
+          },
+          "clauses": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AudienceCondition"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "clauses"
+        ]
+      },
+      "NotCondition": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "not"
+          },
+          "clause": {
+            "$ref": "#/components/schemas/AudienceCondition"
+          }
+        },
+        "required": [
+          "type",
+          "clause"
         ]
       }
     }

@@ -6,21 +6,27 @@ import type { dbClient } from "@subscriber.dev/db/client";
 import { latestOptedInOrOutSubscriberIds } from "@subscriber.dev/db/repository/subscriber.repo";
 import { subscribers, subscriberTags } from "@subscriber.dev/db/schema";
 
-const OptedInConditionSchema = z.object({
-  type: z.literal("optedIn"),
-});
+const OptedInConditionSchema = z
+  .object({
+    type: z.literal("optedIn"),
+  })
+  .meta({ id: "OptedInCondition" });
 
-const TagConditionSchema = z.object({
-  type: z.literal("tag"),
-  tag: z.string().min(1),
-});
+const TagConditionSchema = z
+  .object({
+    type: z.literal("tag"),
+    tag: z.string().min(1),
+  })
+  .meta({ id: "TagCondition" });
 
-const AttributeConditionSchema = z.object({
-  type: z.literal("attribute"),
-  field: z.string().min(1),
-  op: z.enum(["equals", "contains", "exists"]),
-  value: z.string().optional(),
-});
+const AttributeConditionSchema = z
+  .object({
+    type: z.literal("attribute"),
+    field: z.string().min(1),
+    op: z.enum(["equals", "contains", "exists"]),
+    value: z.string().optional(),
+  })
+  .meta({ id: "AttributeCondition" });
 
 export interface AudienceAndCondition {
   type: "and";
@@ -45,26 +51,33 @@ export type AudienceCondition =
   | AudienceOrCondition
   | AudienceNotCondition;
 
-export const AudienceConditionSchema: z.ZodType<AudienceCondition> = z.lazy(
-  () =>
+export const AudienceConditionSchema: z.ZodType<AudienceCondition> = z
+  .lazy(() =>
     z.union([
       OptedInConditionSchema,
       TagConditionSchema,
       AttributeConditionSchema,
-      z.object({
-        type: z.literal("and"),
-        clauses: z.array(AudienceConditionSchema).min(1),
-      }),
-      z.object({
-        type: z.literal("or"),
-        clauses: z.array(AudienceConditionSchema).min(1),
-      }),
-      z.object({
-        type: z.literal("not"),
-        clause: AudienceConditionSchema,
-      }),
+      z
+        .object({
+          type: z.literal("and"),
+          clauses: z.array(AudienceConditionSchema).min(1),
+        })
+        .meta({ id: "AndCondition" }),
+      z
+        .object({
+          type: z.literal("or"),
+          clauses: z.array(AudienceConditionSchema).min(1),
+        })
+        .meta({ id: "OrCondition" }),
+      z
+        .object({
+          type: z.literal("not"),
+          clause: AudienceConditionSchema,
+        })
+        .meta({ id: "NotCondition" }),
     ]),
-);
+  )
+  .meta({ id: "AudienceCondition" });
 
 function buildAttributeCondition(
   condition: z.infer<typeof AttributeConditionSchema>,

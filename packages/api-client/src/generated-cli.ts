@@ -1325,33 +1325,55 @@ export interface ListRunsResponseDto {
   offset: number;
 }
 
-export type TriggerBroadcastDtoSchema0 = {
-  type: 'optedIn';
-} | {
+export const OptedInConditionValue = {
+  type: 'optedIn',
+} as const;
+export type OptedInCondition = typeof OptedInConditionValue;
+
+export interface TagCondition {
   type: 'tag';
   /** @minLength 1 */
   tag: string;
-} | {
+}
+
+export type AttributeConditionOp = typeof AttributeConditionOp[keyof typeof AttributeConditionOp];
+
+
+export const AttributeConditionOp = {
+  equals: 'equals',
+  contains: 'contains',
+  exists: 'exists',
+} as const;
+
+export interface AttributeCondition {
   type: 'attribute';
   /** @minLength 1 */
   field: string;
-  op: 'equals' | 'contains' | 'exists';
+  op: AttributeConditionOp;
   value?: string;
-} | {
+}
+
+export interface AndCondition {
   type: 'and';
   /** @minItems 1 */
-  clauses: TriggerBroadcastDtoSchema0[];
-} | {
+  clauses: AudienceCondition[];
+}
+
+export interface OrCondition {
   type: 'or';
   /** @minItems 1 */
-  clauses: TriggerBroadcastDtoSchema0[];
-} | {
+  clauses: AudienceCondition[];
+}
+
+export interface NotCondition {
   type: 'not';
-  clause: TriggerBroadcastDtoSchema0;
-};
+  clause: AudienceCondition;
+}
+
+export type AudienceCondition = OptedInCondition | TagCondition | AttributeCondition | AndCondition | OrCondition | NotCondition;
 
 export interface TriggerBroadcastDto {
-  audience: TriggerBroadcastDtoSchema0;
+  audience: AudienceCondition;
   /**
      * Spread sends evenly over this many hours (max 168) instead of sending as fast as possible. Gentler on sender reputation for large audiences, and leaves time to pause or cancel.
      * @maximum 168

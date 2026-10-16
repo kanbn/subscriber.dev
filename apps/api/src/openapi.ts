@@ -117,5 +117,56 @@ export function openApiDocuments(app: INestApplication) {
     }
   }
 
-  return { document, publicDocument };
+  return { document, publicDocument: withPublicSchemaNames(publicDocument) };
+}
+
+const SCHEMA_REF = /"#\/components\/schemas\/([^"]+)"/g;
+
+function schemaRefs(value: unknown) {
+  return [...JSON.stringify(value ?? null).matchAll(SCHEMA_REF)].map(
+    (match) => match[1],
+  );
+}
+
+function withPublicSchemaNames(document: OpenAPIObject): OpenAPIObject {
+  const schemas = document.components?.schemas ?? {};
+  const used = new Set(schemaRefs(document.paths));
+  for (const name of used) {
+    for (const ref of schemaRefs(schemas[name])) used.add(ref);
+  }
+  const requestBodies = new Set(
+    schemaRefs(
+      Object.values(document.paths).flatMap((pathItem) =>
+        METHODS.map((method) => pathItem[method]?.requestBody),
+      ),
+    ),
+  );
+
+  const names = new Map<string, string>();
+  for (const name of used) {
+    const renamed = requestBodies.has(name)
+      ? name.replace(/(Body)?Dto$/, "Request")
+      : name.replace(/Dto$/, "");
+    if ([...names.values()].includes(renamed)) {
+      throw new Error(`Two OpenAPI schemas would both be named ${renamed}`);
+    }
+    names.set(name, renamed);
+  }
+
+  const renamed = JSON.parse(
+    JSON.stringify(document).replace(
+      SCHEMA_REF,
+      (_, name: string) => `"#/components/schemas/${names.get(name) ?? name}"`,
+    ),
+  ) as OpenAPIObject;
+  renamed.components = {
+    ...renamed.components,
+    schemas: Object.fromEntries(
+      [...names].map(([name, publicName]) => [
+        publicName,
+        renamed.components?.schemas?.[name] ?? {},
+      ]),
+    ),
+  };
+  return renamed;
 }
