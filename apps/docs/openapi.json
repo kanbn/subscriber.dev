@@ -534,7 +534,7 @@
         ],
         "summary": "List a workspace's environments",
         "tags": [
-          "Workspaces"
+          "Environments"
         ]
       },
       "post": {
@@ -611,7 +611,7 @@
         ],
         "summary": "Create a new environment in a workspace",
         "tags": [
-          "Workspaces"
+          "Environments"
         ]
       }
     },
@@ -2443,7 +2443,7 @@
         ],
         "summary": "Preview a broadcast's audience size",
         "tags": [
-          "Workflows"
+          "Broadcasts"
         ]
       }
     },
@@ -2541,7 +2541,7 @@
         ],
         "summary": "Trigger a broadcast",
         "tags": [
-          "Workflows"
+          "Broadcasts"
         ]
       }
     },
@@ -2641,7 +2641,7 @@
         ],
         "summary": "List broadcasts for a workflow",
         "tags": [
-          "Workflows"
+          "Broadcasts"
         ]
       }
     },
@@ -2727,7 +2727,7 @@
         ],
         "summary": "Get a broadcast",
         "tags": [
-          "Workflows"
+          "Broadcasts"
         ]
       }
     },
@@ -2823,7 +2823,7 @@
         ],
         "summary": "Pause a broadcast",
         "tags": [
-          "Workflows"
+          "Broadcasts"
         ]
       }
     },
@@ -2919,7 +2919,7 @@
         ],
         "summary": "Resume a paused broadcast",
         "tags": [
-          "Workflows"
+          "Broadcasts"
         ]
       }
     },
@@ -3015,7 +3015,7 @@
         ],
         "summary": "Cancel a broadcast",
         "tags": [
-          "Workflows"
+          "Broadcasts"
         ]
       }
     },
@@ -3111,7 +3111,7 @@
         ],
         "summary": "Re-dispatch a broadcast",
         "tags": [
-          "Workflows"
+          "Broadcasts"
         ]
       }
     },

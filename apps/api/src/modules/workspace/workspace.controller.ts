@@ -108,6 +108,7 @@ export class WorkspaceController {
   }
 
   @Get(":workspaceId/environments")
+  @ApiTags("Environments")
   @ApiOperation({
     operationId: "listEnvironments",
     summary: "List a workspace's environments",
@@ -139,6 +140,7 @@ export class WorkspaceController {
   }
 
   @Post(":workspaceId/environments")
+  @ApiTags("Environments")
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     operationId: "createEnvironment",

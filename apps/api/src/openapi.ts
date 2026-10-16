@@ -78,6 +78,13 @@ export function openApiDocuments(app: INestApplication) {
   // like orval can't resolve the raw document's local $defs refs.
   const document = cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
 
+  for (const pathItem of Object.values(document.paths)) {
+    for (const method of METHODS) {
+      const operation = pathItem[method];
+      if (operation?.tags) operation.tags = operation.tags.slice(-1);
+    }
+  }
+
   const publicDocument: OpenAPIObject = structuredClone({
     ...document,
     paths: Object.fromEntries(

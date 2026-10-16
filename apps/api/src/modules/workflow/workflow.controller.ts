@@ -290,6 +290,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcast/preview")
+  @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "previewBroadcast",
@@ -321,6 +322,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcast")
+  @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "triggerBroadcast",
@@ -358,6 +360,7 @@ export class WorkflowController {
   }
 
   @Get(":workflowId/broadcasts")
+  @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listBroadcasts",
@@ -385,6 +388,7 @@ export class WorkflowController {
   }
 
   @Get(":workflowId/broadcasts/:broadcastId")
+  @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "getBroadcast",
@@ -413,6 +417,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcasts/:broadcastId/pause")
+  @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "pauseBroadcast",
@@ -445,6 +450,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcasts/:broadcastId/resume")
+  @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "resumeBroadcast",
@@ -477,6 +483,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcasts/:broadcastId/cancel")
+  @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "cancelBroadcast",
@@ -509,6 +516,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcasts/:broadcastId/redispatch")
+  @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "redispatchBroadcast",
