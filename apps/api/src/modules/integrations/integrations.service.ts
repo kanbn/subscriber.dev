@@ -34,7 +34,7 @@ export class IntegrationsService {
     environmentId: number,
     type: string,
     body: Record<string, unknown>,
-    updatedBy: number,
+    updatedBy: number | null,
   ) {
     const provider = CONFIGURABLE_INTEGRATIONS[type];
     if (!provider) {

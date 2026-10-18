@@ -16,7 +16,7 @@ export const createBroadcast = async (
     environmentId: number;
     audienceQuery: Record<string, unknown>;
     sendOverMs?: number | null;
-    createdBy: number;
+    createdBy: number | null;
   },
 ) => {
   const [result] = await db

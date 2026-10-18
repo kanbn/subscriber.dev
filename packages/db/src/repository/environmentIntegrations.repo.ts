@@ -63,7 +63,7 @@ export const upsertIntegration = async (
   type: string,
   config: Record<string, unknown>,
   encryptedSecret: string | null,
-  updatedBy: number,
+  updatedBy: number | null,
   // Only applied on insert - reconfiguring an existing integration must
   // never change its place in the failover order.
   priorityIfNew: number,

@@ -56,7 +56,7 @@ interface UpdateSubscriberData {
   lastName?: string | null;
   name?: string | null;
   attributes?: Record<string, unknown> | null;
-  updatedBy: number;
+  updatedBy: number | null;
 }
 
 interface SubscriberRow {
@@ -212,7 +212,7 @@ export class SubscriberService {
     db: dbClient,
     environmentId: number,
     rows: BulkUpsertSubscriberItem[],
-    actorUserId: number,
+    actorUserId: number | null,
     createdVia: string,
   ) {
     const results: {
@@ -536,7 +536,7 @@ export class SubscriberService {
     environmentId: number,
     subscriberPublicId: string,
     tag: string,
-    createdBy: number,
+    createdBy: number | null,
   ) {
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,
@@ -635,7 +635,7 @@ export class SubscriberService {
     db: dbClient,
     environmentId: number,
     subscriberPublicId: string,
-    deletedBy: number,
+    deletedBy: number | null,
   ) {
     const subscriber = await subscriberRepo.getSubscriberByPublicId(
       db,

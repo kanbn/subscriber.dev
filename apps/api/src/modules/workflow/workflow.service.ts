@@ -89,7 +89,7 @@ interface CreateWorkflowData {
   steps: WorkflowStepInput[];
   triggers?: WorkflowTriggerInput[];
   exitConditions?: WorkflowTriggerInput[];
-  createdBy: number;
+  createdBy: number | null;
 }
 
 interface UpdateWorkflowData {
@@ -101,7 +101,7 @@ interface UpdateWorkflowData {
   steps?: WorkflowStepInput[];
   triggers?: WorkflowTriggerInput[];
   exitConditions?: WorkflowTriggerInput[];
-  updatedBy: number;
+  updatedBy: number | null;
 }
 
 interface TriggerWorkflowData {
@@ -704,7 +704,7 @@ export class WorkflowService {
     db: dbClient,
     environmentId: number,
     workflowPublicId: string,
-    deletedBy: number,
+    deletedBy: number | null,
   ) {
     const existing = await workflowRepo.getWorkflowByPublicId(
       db,
@@ -969,7 +969,7 @@ export class WorkflowService {
     environmentId: number,
     workflowPublicId: string,
     audience: AudienceCondition,
-    triggeredBy: number,
+    triggeredBy: number | null,
     opts: { sendOverHours?: number; allowOverPlan?: boolean } = {},
   ) {
     const workflow = await this.getWorkflowReadyForBroadcast(

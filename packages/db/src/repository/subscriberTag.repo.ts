@@ -9,7 +9,7 @@ export const addTag = async (
     subscriberId: number;
     environmentId: number;
     tag: string;
-    createdBy: number;
+    createdBy: number | null;
   },
 ) => {
   const [result] = await db

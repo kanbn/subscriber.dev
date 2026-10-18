@@ -96,7 +96,7 @@ export const createWorkflow = async (
     steps: WorkflowStepInput[];
     triggers?: WorkflowTriggerInput[];
     exitConditions?: WorkflowTriggerInput[];
-    createdBy: number;
+    createdBy: number | null;
   },
 ) => {
   return await db.transaction(async (tx) => {
@@ -192,7 +192,7 @@ export const updateWorkflow = async (
     description?: string | null;
     status?: "active" | "paused";
     channels?: WorkflowChannels | null;
-    updatedBy: number;
+    updatedBy: number | null;
   },
 ) => {
   const [result] = await db
@@ -207,7 +207,7 @@ export const updateWorkflow = async (
 export const softDeleteWorkflow = async (
   db: dbClient,
   id: number,
-  deletedBy: number,
+  deletedBy: number | null,
 ) => {
   const [result] = await db
     .update(workflows)

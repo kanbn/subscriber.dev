@@ -380,7 +380,7 @@ export const updateSubscriber = async (
     lastName?: string | null;
     name?: string | null;
     attributes?: Record<string, unknown> | null;
-    updatedBy: number;
+    updatedBy: number | null;
   },
 ) => {
   const [result] = await db
@@ -395,7 +395,7 @@ export const updateSubscriber = async (
 export const softDeleteSubscriber = async (
   db: dbClient,
   id: number,
-  deletedBy: number,
+  deletedBy: number | null,
 ) => {
   const [result] = await db
     .update(subscribers)
