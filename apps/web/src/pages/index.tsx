@@ -77,8 +77,8 @@ const STEPS: Step[] = [
         ],
       },
       api: {
-        shell: "subscriber keys create --name production",
-        output: ["✓ sk_live_•••• · add it to your app's environment"],
+        shell: 'subscriber keys create "production"',
+        output: ["✓ sk_env_•••• · store it as SUBSCRIBER_API_KEY"],
       },
       cli: {
         shell: "subscriber login",
