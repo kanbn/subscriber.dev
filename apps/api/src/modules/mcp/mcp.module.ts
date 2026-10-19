@@ -4,6 +4,7 @@ import { McpModule, McpTransportType } from "@rekog/mcp-nest";
 import { AnalyticsModule } from "../analytics/analytics.module.js";
 import { BillingModule } from "../billing/billing.module.js";
 import { billingEnabled } from "../billing/billing.service.js";
+import { EnvironmentKeysModule } from "../environmentKeys/environmentKeys.module.js";
 import { InboundModule } from "../inbound/inbound.module.js";
 import { IntegrationsModule } from "../integrations/integrations.module.js";
 import { SetupModule } from "../setup/setup.module.js";
@@ -17,6 +18,7 @@ import { OAuthMetadataController } from "./oauth-metadata.controller.js";
 import { AnalyticsTools } from "./tools/analytics.tools.js";
 import { BillingTools } from "./tools/billing.tools.js";
 import { EmailTools } from "./tools/email.tools.js";
+import { EnvironmentKeysTools } from "./tools/environmentKeys.tools.js";
 import { InboundTools } from "./tools/inbound.tools.js";
 import { IntegrationsTools } from "./tools/integrations.tools.js";
 import { SetupTools } from "./tools/setup.tools.js";
@@ -39,6 +41,7 @@ const TOOL_PROVIDERS = [
   UploadsTools,
   SetupTools,
   EmailTools,
+  EnvironmentKeysTools,
   ...(billingEnabled() ? [BillingTools] : []),
 ];
 
@@ -62,6 +65,7 @@ const TOOL_PROVIDERS = [
     BillingModule,
     UploadsModule,
     SetupModule,
+    EnvironmentKeysModule,
   ],
   controllers: [OAuthMetadataController],
   providers: TOOL_PROVIDERS,
