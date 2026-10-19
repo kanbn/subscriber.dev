@@ -29,40 +29,6 @@ The first time your agent uses subscriber.dev, it opens your browser. Sign in wi
 
 To disconnect an agent, run `subscriber agents list` to find it, then `subscriber agents disconnect <clientId>`.
 
-### Use an API key instead
-
-To skip the browser, use an API key. Get one by signing in with the [CLI](/quickstart#1-sign-in):
-
-```bash
-npm install -g @subscriber.dev/cli
-subscriber login
-```
-
-The key is saved in `~/.config/subscriber/config.json` as `apiKey`. Send it in the `x-api-key` header:
-
-<Tabs>
-  <Tab title="Claude Code">
-    ```bash
-    claude mcp add --transport http subscriber https://mcp.subscriber.dev/mcp \
-      --header "x-api-key: YOUR_API_KEY"
-    ```
-  </Tab>
-  <Tab title="Cursor">
-    Add this to `~/.cursor/mcp.json`:
-
-    ```json
-    {
-      "mcpServers": {
-        "subscriber": {
-          "url": "https://mcp.subscriber.dev/mcp",
-          "headers": { "x-api-key": "YOUR_API_KEY" }
-        }
-      }
-    }
-    ```
-  </Tab>
-</Tabs>
-
 ## 3. Try it
 
 New to subscriber.dev? Say "set me up". Your agent walks you through creating a workspace, connecting your email provider, and writing and sending a first welcome email to yourself.

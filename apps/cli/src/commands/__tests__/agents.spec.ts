@@ -22,7 +22,7 @@ function buildProgram() {
 }
 
 beforeEach(() => {
-  vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+  vi.mocked(readCliConfig).mockReturnValue({ token: "test-token" });
   process.exitCode = undefined;
 });
 

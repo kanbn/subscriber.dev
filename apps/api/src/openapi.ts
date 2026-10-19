@@ -55,7 +55,7 @@ export function openApiDocuments(app: INestApplication) {
         scheme: "bearer",
         bearerFormat: undefined,
         description:
-          "A session token from signing in, used by subscriber.dev's own apps. From your own code, use an API key.",
+          "A session token from `subscriber login`, used by subscriber.dev's own apps. From your own code, use an API key.",
       },
       "bearer",
     )
@@ -65,7 +65,7 @@ export function openApiDocuments(app: INestApplication) {
         in: "header",
         name: "X-API-Key",
         description:
-          "An API key, from `subscriber login`. Keep it on your server.",
+          "An environment API key. Keep it on your server.",
       },
       "api-key",
     )

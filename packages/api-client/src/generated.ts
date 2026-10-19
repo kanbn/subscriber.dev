@@ -25,18 +25,11 @@ import type {
 } from '@tanstack/react-query';
 
 import { customFetch } from './mutator/custom-fetch';
-export type UserResponseDtoApiKeysItem = {
-  id: number;
-  /** @nullable */
-  prefix: string | null;
-};
-
 export interface UserResponseDto {
   publicId: string;
   name: string | null;
   email: string;
   image: string | null;
-  apiKeys: UserResponseDtoApiKeysItem[];
 }
 
 export interface UpdateUserDto {
@@ -2358,39 +2351,39 @@ export const useDisconnectAgent = <TError = void,
       return useMutation(getDisconnectAgentMutationOptions(options), queryClient);
     }
 
-export type revokeCurrentApiKeyResponse204 = {
+export type signOutResponse204 = {
   data: void
   status: 204
 }
 
-export type revokeCurrentApiKeyResponse400 = {
+export type signOutResponse401 = {
   data: void
-  status: 400
+  status: 401
 }
 
-export type revokeCurrentApiKeyResponseSuccess = (revokeCurrentApiKeyResponse204) & {
+export type signOutResponseSuccess = (signOutResponse204) & {
   headers: Headers;
 };
-export type revokeCurrentApiKeyResponseError = (revokeCurrentApiKeyResponse400) & {
+export type signOutResponseError = (signOutResponse401) & {
   headers: Headers;
 };
 
-export type revokeCurrentApiKeyResponse = (revokeCurrentApiKeyResponseSuccess | revokeCurrentApiKeyResponseError)
+export type signOutResponse = (signOutResponseSuccess | signOutResponseError)
 
-export const getRevokeCurrentApiKeyUrl = () => {
-
-
+export const getSignOutUrl = () => {
 
 
-  return `/users/me/api-key`
+
+
+  return `/users/me/session`
 }
 
 /**
- * @summary Revoke the API key this request was made with
+ * @summary Sign out the session this request was made with
  */
-export const revokeCurrentApiKey = async ( options?: Parameters<typeof customFetch>[1]): Promise<revokeCurrentApiKeyResponse> => {
+export const signOut = async ( options?: Parameters<typeof customFetch>[1]): Promise<signOutResponse> => {
 
-  return customFetch<revokeCurrentApiKeyResponse>(getRevokeCurrentApiKeyUrl(),
+  return customFetch<signOutResponse>(getSignOutUrl(),
   {
       credentials: 'include',
     ...options,
@@ -2404,13 +2397,13 @@ export const revokeCurrentApiKey = async ( options?: Parameters<typeof customFet
 
 
 
-export const getRevokeCurrentApiKeyMutationKey = () => ['revokeCurrentApiKey'] as const;
+export const getSignOutMutationKey = () => ['signOut'] as const;
 
-export const getRevokeCurrentApiKeyMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeCurrentApiKey>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof revokeCurrentApiKey>>, TError,void, TContext> => {
+export const getSignOutMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signOut>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof signOut>>, TError,void, TContext> => {
 
-const mutationKey = getRevokeCurrentApiKeyMutationKey();
+const mutationKey = getSignOutMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -2420,10 +2413,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeCurrentApiKey>>, void> = () => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof signOut>>, void> = () => {
 
 
-          return  revokeCurrentApiKey(requestOptions)
+          return  signOut(requestOptions)
         }
 
 
@@ -2433,23 +2426,23 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type RevokeCurrentApiKeyMutationResult = NonNullable<Awaited<ReturnType<typeof revokeCurrentApiKey>>>
+    export type SignOutMutationResult = NonNullable<Awaited<ReturnType<typeof signOut>>>
 
-    export type RevokeCurrentApiKeyMutationError = void
+    export type SignOutMutationError = void
 
 
     /**
- * @summary Revoke the API key this request was made with
+ * @summary Sign out the session this request was made with
  */
-export const useRevokeCurrentApiKey = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeCurrentApiKey>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+export const useSignOut = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signOut>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof revokeCurrentApiKey>>,
+        Awaited<ReturnType<typeof signOut>>,
         TError,
         void,
         TContext
       > => {
-      return useMutation(getRevokeCurrentApiKeyMutationOptions(options), queryClient);
+      return useMutation(getSignOutMutationOptions(options), queryClient);
     }
 
 export type getWorkspacesResponse200 = {

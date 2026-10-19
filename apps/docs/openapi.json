@@ -226,26 +226,16 @@
         ]
       }
     },
-    "/users/me/api-key": {
+    "/users/me/session": {
       "delete": {
-        "operationId": "revokeCurrentApiKey",
+        "operationId": "signOut",
         "parameters": [],
         "responses": {
           "204": {
             "description": ""
           },
-          "400": {
-            "description": "Not signed in with an API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "401": {
-            "description": "Missing or invalid API key",
+            "description": "Not signed in",
             "content": {
               "application/json": {
                 "schema": {
@@ -273,7 +263,7 @@
             "bearer": []
           }
         ],
-        "summary": "Revoke the API key this request was made with",
+        "summary": "Sign out the session this request was made with",
         "tags": [
           "Users"
         ]
@@ -4145,13 +4135,13 @@
       "bearer": {
         "scheme": "bearer",
         "type": "http",
-        "description": "A session token from signing in, used by subscriber.dev's own apps. From your own code, use an API key."
+        "description": "A session token from `subscriber login`, used by subscriber.dev's own apps. From your own code, use an API key."
       },
       "api-key": {
         "type": "apiKey",
         "in": "header",
         "name": "X-API-Key",
-        "description": "An API key, from `subscriber login`. Keep it on your server."
+        "description": "An environment API key. Keep it on your server."
       }
     },
     "schemas": {
@@ -4183,35 +4173,13 @@
                 "type": "null"
               }
             ]
-          },
-          "apiKeys": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "number"
-                },
-                "prefix": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "required": [
-                "id",
-                "prefix"
-              ]
-            }
           }
         },
         "required": [
           "publicId",
           "name",
           "email",
-          "image",
-          "apiKeys"
+          "image"
         ]
       },
       "ErrorResponse": {

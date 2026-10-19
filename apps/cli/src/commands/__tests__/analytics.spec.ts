@@ -37,7 +37,7 @@ function buildProgram() {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(readCliConfig).mockReturnValue({
-    apiKey: "test-key",
+    token: "test-token",
     currentEnvironmentId: "test-environment-1",
   });
 });

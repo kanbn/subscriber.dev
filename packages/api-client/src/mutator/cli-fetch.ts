@@ -19,8 +19,8 @@ export const cliFetch = async <T>(
   const config = readCliConfig();
   const baseUrl = config.apiBaseUrl ?? "https://api.subscriber.dev";
   const headers = new Headers(options.headers);
-  if (config.apiKey) {
-    headers.set("x-api-key", config.apiKey);
+  if (config.token) {
+    headers.set("authorization", `Bearer ${config.token}`);
   }
 
   let response = await fetch(`${baseUrl}${url}`, { ...options, headers });

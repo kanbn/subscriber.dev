@@ -24,7 +24,6 @@ const testUser = {
   email: "test@example.com",
   image: null,
   stripeCustomerId: null,
-  apiKeys: [],
 };
 
 describe("UserScreen", () => {
@@ -38,7 +37,6 @@ describe("UserScreen", () => {
         email: "test@example.com",
         image: null,
         stripeCustomerId: null,
-        apiKeys: [],
       },
     } as never);
 
@@ -62,7 +60,6 @@ describe("UserScreen", () => {
         email: "test@example.com",
         image: null,
         stripeCustomerId: null,
-        apiKeys: [],
       },
     } as never);
 
@@ -145,17 +142,17 @@ describe("UserScreen log out", () => {
 
     stdin.write("l");
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain("Log out and revoke");
+      expect(lastFrame()).toContain("Log out of this machine");
     });
     stdin.write("n");
     await vi.waitFor(() => {
-      expect(lastFrame()).not.toContain("Log out and revoke");
+      expect(lastFrame()).not.toContain("Log out of this machine");
     });
     expect(logout).not.toHaveBeenCalled();
 
     stdin.write("l");
     await vi.waitFor(() => {
-      expect(lastFrame()).toContain("Log out and revoke");
+      expect(lastFrame()).toContain("Log out of this machine");
     });
     stdin.write("y");
     await vi.waitFor(() => {

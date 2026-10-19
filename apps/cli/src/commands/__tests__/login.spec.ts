@@ -1,13 +1,17 @@
 import { Command } from "commander";
 import { describe, expect, it, vi } from "vitest";
 
-import { revokeCurrentApiKey } from "@subscriber.dev/api-client/cli";
+import { signOut } from "@subscriber.dev/api-client/cli";
 import { readCliConfig, updateCliConfig } from "@subscriber.dev/shared";
 
 import { registerLoginCommand } from "../login.js";
 
 vi.mock("@subscriber.dev/api-client/cli", () => ({
-  revokeCurrentApiKey: vi.fn(),
+  signOut: vi.fn(),
+}));
+
+vi.mock("child_process", () => ({
+  spawn: () => ({ on: () => ({ unref: () => undefined }) }),
 }));
 
 vi.mock("@subscriber.dev/shared", () => ({
@@ -21,23 +25,42 @@ function buildProgram() {
   return program;
 }
 
+function mockDeviceFlow() {
+  const responses = [
+    {
+      device_code: "device_1",
+      user_code: "ABCD1234",
+      verification_uri: "http://app/auth",
+      verification_uri_complete: "http://app/auth?code=ABCD1234",
+      interval: 0,
+    },
+    { error: "authorization_pending" },
+    { access_token: "session_token" },
+  ];
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => {
+      const body = responses.shift();
+      return Promise.resolve({
+        ok: !(body && "error" in body),
+        json: () => Promise.resolve(body),
+      });
+    }),
+  );
+}
+
 describe("login", () => {
-  it("stores the API key and base URL", async () => {
+  it("stores the session token and base URL", async () => {
+    mockDeviceFlow();
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
     await buildProgram().parseAsync(
-      [
-        "login",
-        "--api-key",
-        "sub_test_key",
-        "--base-url",
-        "http://localhost:4000",
-      ],
+      ["login", "--base-url", "http://localhost:4000"],
       { from: "user" },
     );
 
     expect(updateCliConfig).toHaveBeenCalledWith({
-      apiKey: "sub_test_key",
+      token: "session_token",
       apiBaseUrl: "http://localhost:4000",
     });
     expect(logSpy).toHaveBeenCalledWith(
@@ -46,40 +69,39 @@ describe("login", () => {
   });
 
   it("defaults the base URL to the production API", async () => {
+    mockDeviceFlow();
     vi.spyOn(console, "log").mockImplementation(() => undefined);
 
-    await buildProgram().parseAsync(["login", "--api-key", "sub_test_key"], {
-      from: "user",
-    });
+    await buildProgram().parseAsync(["login"], { from: "user" });
 
     expect(updateCliConfig).toHaveBeenCalledWith({
-      apiKey: "sub_test_key",
+      token: "session_token",
       apiBaseUrl: "https://api.subscriber.dev",
     });
   });
 });
 
 describe("logout", () => {
-  it("revokes the API key, then clears it", async () => {
-    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "sub_test_key" });
-    vi.mocked(revokeCurrentApiKey).mockResolvedValue({ status: 204 } as never);
+  it("signs out, then clears the token", async () => {
+    vi.mocked(readCliConfig).mockReturnValue({ token: "session_token" });
+    vi.mocked(signOut).mockResolvedValue({ status: 204 } as never);
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
     await buildProgram().parseAsync(["logout"], { from: "user" });
 
-    expect(revokeCurrentApiKey).toHaveBeenCalledOnce();
-    expect(updateCliConfig).toHaveBeenCalledWith({ apiKey: undefined });
+    expect(signOut).toHaveBeenCalledOnce();
+    expect(updateCliConfig).toHaveBeenCalledWith({ token: undefined });
     expect(logSpy).toHaveBeenCalledWith("Logged out.");
   });
 
-  it("still clears the key when the API can't be reached", async () => {
-    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "sub_test_key" });
-    vi.mocked(revokeCurrentApiKey).mockRejectedValue(new Error("offline"));
+  it("still clears the token when the API can't be reached", async () => {
+    vi.mocked(readCliConfig).mockReturnValue({ token: "session_token" });
+    vi.mocked(signOut).mockRejectedValue(new Error("offline"));
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
     await buildProgram().parseAsync(["logout"], { from: "user" });
 
-    expect(updateCliConfig).toHaveBeenCalledWith({ apiKey: undefined });
+    expect(updateCliConfig).toHaveBeenCalledWith({ token: undefined });
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining("couldn't reach the API"),
     );
@@ -89,7 +111,7 @@ describe("logout", () => {
 describe("whoami", () => {
   it("reports loggedIn: true and the stored config", async () => {
     vi.mocked(readCliConfig).mockReturnValue({
-      apiKey: "sub_test_key",
+      token: "session_token",
       apiBaseUrl: "https://api.subscriber.dev",
       currentWorkspaceId: "test-workspace-1",
       currentEnvironmentId: "test-environment-1",
@@ -112,7 +134,7 @@ describe("whoami", () => {
     );
   });
 
-  it("reports loggedIn: false when there is no stored API key", async () => {
+  it("reports loggedIn: false when there is no stored session", async () => {
     vi.mocked(readCliConfig).mockReturnValue({});
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 

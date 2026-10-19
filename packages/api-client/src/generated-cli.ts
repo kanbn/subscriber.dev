@@ -6,18 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 import { cliFetch } from './mutator/cli-fetch.js';
-export type UserResponseDtoApiKeysItem = {
-  id: number;
-  /** @nullable */
-  prefix: string | null;
-};
-
 export interface UserResponseDto {
   publicId: string;
   name: string | null;
   email: string;
   image: string | null;
-  apiKeys: UserResponseDtoApiKeysItem[];
 }
 
 export interface UpdateUserDto {
@@ -2062,39 +2055,39 @@ export const disconnectAgent = async (clientId: string, options?: Parameters<typ
 
 
 
-export type revokeCurrentApiKeyResponse204 = {
+export type signOutResponse204 = {
   data: void
   status: 204
 }
 
-export type revokeCurrentApiKeyResponse400 = {
+export type signOutResponse401 = {
   data: void
-  status: 400
+  status: 401
 }
 
-export type revokeCurrentApiKeyResponseSuccess = (revokeCurrentApiKeyResponse204) & {
+export type signOutResponseSuccess = (signOutResponse204) & {
   headers: Headers;
 };
-export type revokeCurrentApiKeyResponseError = (revokeCurrentApiKeyResponse400) & {
+export type signOutResponseError = (signOutResponse401) & {
   headers: Headers;
 };
 
-export type revokeCurrentApiKeyResponse = (revokeCurrentApiKeyResponseSuccess | revokeCurrentApiKeyResponseError)
+export type signOutResponse = (signOutResponseSuccess | signOutResponseError)
 
-export const getRevokeCurrentApiKeyUrl = () => {
-
-
+export const getSignOutUrl = () => {
 
 
-  return `/users/me/api-key`
+
+
+  return `/users/me/session`
 }
 
 /**
- * @summary Revoke the API key this request was made with
+ * @summary Sign out the session this request was made with
  */
-export const revokeCurrentApiKey = async ( options?: Parameters<typeof cliFetch>[1]): Promise<revokeCurrentApiKeyResponse> => {
+export const signOut = async ( options?: Parameters<typeof cliFetch>[1]): Promise<signOutResponse> => {
 
-  return cliFetch<revokeCurrentApiKeyResponse>(getRevokeCurrentApiKeyUrl(),
+  return cliFetch<signOutResponse>(getSignOutUrl(),
   {
     ...options,
     method: 'DELETE'

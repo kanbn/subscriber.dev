@@ -9,13 +9,13 @@ vi.mock("@subscriber.dev/shared", () => ({
 }));
 
 describe("ensureLoggedIn", () => {
-  it("does nothing when an API key is stored", () => {
-    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+  it("does nothing when a session is stored", () => {
+    vi.mocked(readCliConfig).mockReturnValue({ token: "test-token" });
 
     expect(() => ensureLoggedIn()).not.toThrow();
   });
 
-  it("errors and exits when no API key is stored", () => {
+  it("errors and exits when no session is stored", () => {
     vi.mocked(readCliConfig).mockReturnValue({});
     const exitSpy = vi.spyOn(process, "exit").mockImplementation((code) => {
       throw new Error(`process.exit(${code})`);

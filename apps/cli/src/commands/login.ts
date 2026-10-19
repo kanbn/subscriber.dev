@@ -1,5 +1,4 @@
 import { spawn } from "child_process";
-import { hostname } from "os";
 import type { Command } from "commander";
 
 import { readCliConfig, updateCliConfig } from "@subscriber.dev/shared";
@@ -10,27 +9,26 @@ import { printResult } from "../output.js";
 export function registerLoginCommand(program: Command): void {
   program
     .command("login")
-    .description("Sign in through the browser, or with an existing API key")
-    .option("--api-key <key>", "use an existing API key instead")
+    .description("Sign in through the browser")
     .option("--base-url <url>", "API base URL", "https://api.subscriber.dev")
     .option("--app-url <url>", "web app URL", "https://subscriber.dev")
     .action(
-      async (opts: { apiKey?: string; baseUrl: string; appUrl: string }) => {
-        const apiKey = opts.apiKey ?? (await deviceLogin(opts.appUrl));
-        updateCliConfig({ apiKey, apiBaseUrl: opts.baseUrl });
+      async (opts: { baseUrl: string; appUrl: string }) => {
+        const token = await deviceLogin(opts.appUrl);
+        updateCliConfig({ token, apiBaseUrl: opts.baseUrl });
         console.log(`Logged in. API base URL set to ${opts.baseUrl}`);
       },
     );
 
   program
     .command("logout")
-    .description("Revoke and clear the stored API key")
+    .description("Sign out and clear the stored session")
     .action(async () => {
       const { revoked } = await logout();
       console.log(
         revoked
           ? "Logged out."
-          : "Logged out here, but couldn't reach the API to revoke the key, so it still works until revoked.",
+          : "Logged out here, but couldn't reach the API to sign out, so the session still works until it expires.",
       );
     });
 
@@ -42,7 +40,7 @@ export function registerLoginCommand(program: Command): void {
       const config = readCliConfig();
       printResult(
         {
-          loggedIn: Boolean(config.apiKey),
+          loggedIn: Boolean(config.token),
           apiBaseUrl: config.apiBaseUrl,
           currentWorkspaceId: config.currentWorkspaceId,
           currentEnvironmentId: config.currentEnvironmentId,
@@ -65,11 +63,10 @@ interface DeviceCodeResponse {
 async function postJson<T>(
   url: string,
   body: unknown,
-  headers: Record<string, string> = {},
 ): Promise<{ ok: boolean; data: T }> {
   const res = await fetch(url, {
     method: "POST",
-    headers: { "content-type": "application/json", ...headers },
+    headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
   });
   return { ok: res.ok, data: (await res.json()) as T };
@@ -88,8 +85,8 @@ export function openBrowser(url: string): void {
     .unref();
 }
 
-// OAuth device flow (RFC 8628) against better-auth, then swap the session
-// for a long-lived API key, which is what the CLI sends.
+// OAuth device flow (RFC 8628) against better-auth. The access token is a
+// session token, which the CLI sends as a bearer.
 async function deviceLogin(appUrl: string): Promise<string> {
   const auth = `${appUrl.replace(/\/$/, "")}/api/auth`;
   const { ok, data: code } = await postJson<DeviceCodeResponse>(
@@ -117,15 +114,7 @@ async function deviceLogin(appUrl: string): Promise<string> {
       device_code: code.device_code,
       client_id: CLIENT_ID,
     });
-    if (ok && data.access_token) {
-      const { ok: created, data: key } = await postJson<{ key?: string }>(
-        `${auth}/api-key/create`,
-        { name: `cli · ${hostname()}` },
-        { authorization: `Bearer ${data.access_token}` },
-      );
-      if (!created || !key.key) throw new Error("Couldn't create an API key.");
-      return key.key;
-    }
+    if (ok && data.access_token) return data.access_token;
     if (data.error === "slow_down") interval += 5000;
     else if (data.error === "access_denied") throw new Error("Sign-in denied.");
     else if (data.error === "expired_token")

@@ -263,7 +263,6 @@ describe("App navigation", () => {
         email: "test@example.com",
         image: null,
         stripeCustomerId: null,
-        apiKeys: [],
       },
     } as never);
 

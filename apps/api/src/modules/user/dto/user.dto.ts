@@ -6,17 +6,11 @@ export const UpdateUserSchema = z.object({
   image: z.string().optional(),
 });
 
-const UserApiKeySchema = z.object({
-  id: z.number(),
-  prefix: z.string().nullable(),
-});
-
 export const UserResponseSchema = z.object({
   publicId: z.string(),
   name: z.string().nullable(),
   email: z.string(),
   image: z.string().nullable(),
-  apiKeys: z.array(UserApiKeySchema),
 });
 
 export const UpdateUserResponseSchema = z.object({

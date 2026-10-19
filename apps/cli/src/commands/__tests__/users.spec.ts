@@ -23,7 +23,6 @@ const testUser = {
   name: "Test User",
   email: "test@example.com",
   image: null,
-  apiKeys: [],
 };
 
 function buildProgram() {
@@ -33,7 +32,7 @@ function buildProgram() {
 }
 
 beforeEach(() => {
-  vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+  vi.mocked(readCliConfig).mockReturnValue({ token: "test-token" });
 });
 
 describe("users get", () => {

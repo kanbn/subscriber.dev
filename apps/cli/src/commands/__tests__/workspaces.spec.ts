@@ -25,7 +25,7 @@ const testWorkspace = {
 
 describe("workspaces list", () => {
   beforeEach(() => {
-    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+    vi.mocked(readCliConfig).mockReturnValue({ token: "test-token" });
   });
 
   it("prints workspaces as JSON with --json", async () => {
@@ -72,7 +72,7 @@ describe("workspaces list", () => {
 
 describe("workspaces create", () => {
   beforeEach(() => {
-    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+    vi.mocked(readCliConfig).mockReturnValue({ token: "test-token" });
   });
 
   it("creates a workspace with the given name", async () => {

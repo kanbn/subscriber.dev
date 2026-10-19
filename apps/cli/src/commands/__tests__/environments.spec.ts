@@ -34,7 +34,7 @@ function buildProgram() {
 
 describe("environments list", () => {
   beforeEach(() => {
-    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+    vi.mocked(readCliConfig).mockReturnValue({ token: "test-token" });
   });
 
   it("uses the --workspace flag when passed", async () => {
@@ -55,7 +55,7 @@ describe("environments list", () => {
 
   it("falls back to the stored current workspace", async () => {
     vi.mocked(readCliConfig).mockReturnValue({
-      apiKey: "test-key",
+      token: "test-token",
       currentWorkspaceId: "stored-workspace",
     });
     vi.mocked(listEnvironments).mockResolvedValue({
@@ -74,7 +74,7 @@ describe("environments list", () => {
 
   it("prints an error and exits when the workspace isn't found", async () => {
     vi.mocked(readCliConfig).mockReturnValue({
-      apiKey: "test-key",
+      token: "test-token",
       currentWorkspaceId: "stored-workspace",
     });
     vi.mocked(listEnvironments).mockResolvedValue({
@@ -98,7 +98,7 @@ describe("environments list", () => {
   });
 
   it("exits before calling the API when no workspace can be resolved", async () => {
-    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+    vi.mocked(readCliConfig).mockReturnValue({ token: "test-token" });
     const exitSpy = vi.spyOn(process, "exit").mockImplementation((code) => {
       throw new Error(`process.exit(${code})`);
     });
@@ -117,7 +117,7 @@ describe("environments list", () => {
 
 describe("environments create", () => {
   beforeEach(() => {
-    vi.mocked(readCliConfig).mockReturnValue({ apiKey: "test-key" });
+    vi.mocked(readCliConfig).mockReturnValue({ token: "test-token" });
   });
 
   it("uses the --workspace flag when passed", async () => {
@@ -151,7 +151,7 @@ describe("environments create", () => {
 
   it("falls back to the stored current workspace", async () => {
     vi.mocked(readCliConfig).mockReturnValue({
-      apiKey: "test-key",
+      token: "test-token",
       currentWorkspaceId: "stored-workspace",
     });
     vi.mocked(createEnvironment).mockResolvedValue({
@@ -177,7 +177,7 @@ describe("environments create", () => {
 
   it("prints an error and exits when the workspace isn't found", async () => {
     vi.mocked(readCliConfig).mockReturnValue({
-      apiKey: "test-key",
+      token: "test-token",
       currentWorkspaceId: "stored-workspace",
     });
     vi.mocked(createEnvironment).mockResolvedValue({

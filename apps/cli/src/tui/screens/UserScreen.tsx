@@ -129,7 +129,7 @@ export function UserScreen() {
 
       {editMode === "confirm-logout" && (
         <Text color="yellow">
-          Log out and revoke this machine&apos;s API key? (y/n)
+          Log out of this machine? (y/n)
         </Text>
       )}
 

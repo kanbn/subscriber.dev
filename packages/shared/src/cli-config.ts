@@ -3,7 +3,7 @@ import { homedir } from "os";
 import { dirname, join } from "path";
 
 export interface CliConfig {
-  apiKey?: string;
+  token?: string;
   apiBaseUrl?: string;
   currentWorkspaceId?: string;
   currentEnvironmentId?: string;
