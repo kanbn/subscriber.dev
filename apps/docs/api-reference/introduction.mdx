@@ -15,13 +15,46 @@ If you self-host, use your own API URL instead.
 
 ## Authentication
 
-An API key proves the request comes from you. Every endpoint needs one in the `x-api-key` header.
+Send an API key in the `x-api-key` header.
 
 ```
 x-api-key: <your API key>
 ```
 
-To get one, run `subscriber login` with the [CLI](/quickstart). It signs you in through the browser and saves the key in `~/.config/subscriber/config.json`.
+Create one with the [CLI](/cli#api-keys), or ask your [agent](/mcp):
+
+```bash
+subscriber keys create "Acme app"
+```
+
+The key is only shown once, so store it as a secret straight away, for example as `SUBSCRIBER_API_KEY`. Keep it on your server: never put it in frontend code or commit it.
+
+Each key belongs to one environment, so a staging key can't touch production. To find its environment's ID, call `GET /keys/me`. Any key can call it.
+
+### Access
+
+By default a key is `limited`: it can trigger workflows and create or update subscribers, which is what your app needs. That keeps a leaked key from reading your subscribers or changing your workflows. Pass `--access full` for a key that can call every endpoint below, or pick scopes yourself with `--scope`:
+
+| Scope | Allows |
+| --- | --- |
+| `workflows:trigger` | Trigger workflows |
+| `workflows:read` | List workflows, their runs and trigger sources |
+| `workflows:write` | Create, update and delete workflows |
+| `broadcasts:read` | List broadcasts and preview their audience |
+| `broadcasts:write` | Send, pause, resume and cancel broadcasts |
+| `subscribers:read` | List and get subscribers and tags |
+| `subscribers:write` | Create, update and delete subscribers, their tags and preferences |
+| `emails:test` | Preview emails and send test emails |
+| `integrations:read` | List email providers and other integrations |
+| `integrations:write` | Connect, change and remove integrations |
+| `uploads:write` | Upload images for emails |
+| `events:read` | List inbound events |
+| `analytics:read` | Read analytics and the setup checklist |
+| `billing:read` | Read the workspace's plan and usage |
+
+A few endpoints need you signed in, not an API key: managing workspaces, environments, API keys and your plan. Use the CLI or your agent for those.
+
+To revoke a key, run `subscriber keys revoke <keyId>`. Requests made with it fail straight away.
 
 ## Response codes
 
@@ -34,6 +67,7 @@ In general, `2xx` HTTP codes correspond to success, `4xx` codes are for user-rel
 | `200`  | Success                       |
 | `400`  | Invalid parameters            |
 | `401`  | Missing or invalid API key    |
+| `403`  | The key doesn't have the scope this endpoint needs |
 | `404`  | Resource not found            |
 | `429`  | Too many requests             |
 | `500`  | Error with our infrastructure |

@@ -34,6 +34,16 @@ Options that take a file, such as `--file`, accept `-` to read from stdin.
 | `agents list` | List the AI agents you've connected through [MCP](/mcp) sign-in. |
 | `agents disconnect <clientId>` | Disconnect an agent. It loses access straight away. |
 
+## API keys
+
+API keys are for your app to call the [REST API](/api-reference/introduction#authentication). Each belongs to one environment.
+
+| Command | Description |
+| --- | --- |
+| `keys create <name>` | Create a key and print it. It's only shown once. `--access limited` (the default) can trigger workflows and create or update subscribers; `--access full` can do everything a key can. Or pick scopes with `--scope <scope...>`. |
+| `keys list` | List keys, with the first characters of each, their scopes and when they were last used. |
+| `keys revoke <keyId>` | Revoke a key. Requests made with it fail straight away. |
+
 ## Workspaces and environments
 
 | Command | Description |

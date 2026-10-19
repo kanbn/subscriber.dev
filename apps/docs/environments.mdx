@@ -23,11 +23,7 @@ Every workspace starts with **Production**. Add as many others as you like, such
     Choose a workspace, then pick an environment, or press `n` to create one.
   </Tab>
   <Tab title="API">
-    ```bash
-    curl -X POST https://api.subscriber.dev/workspaces/$WORKSPACE/environments \
-      -H "x-api-key: $KEY" -H "content-type: application/json" \
-      -d '{"name": "Staging"}'
-    ```
+    Each API key belongs to one environment, so it can't create environments. Create them with the CLI or your agent, then create a key in each: `subscriber keys create "Acme app" --environment <environmentId>`.
 
     Every endpoint takes the environment's ID in its path.
   </Tab>

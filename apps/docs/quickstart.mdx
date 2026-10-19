@@ -18,7 +18,7 @@ npm install -g @subscriber.dev/cli
 subscriber login
 ```
 
-The CLI stores an API key in `~/.config/subscriber/config.json`. The REST API uses the same key. It needs Node.js 22.12 or later.
+The CLI saves your session in `~/.config/subscriber/config.json`. It needs Node.js 22.12 or later.
 
 Your AI agent doesn't need it: [the MCP server](/mcp) signs in through your browser. To use the TUI, run `subscriber` with no arguments.
 
@@ -41,12 +41,14 @@ A workspace is your team's account. Inside it, environments keep separate sets o
     Run `subscriber`, then choose a workspace and an environment. Press `n` to create either.
   </Tab>
   <Tab title="API">
+    Pick the environment with the CLI, as in the CLI tab, then create an API key for it. A `full` key can do every step below:
+
     ```bash
-    curl https://api.subscriber.dev/workspaces -H "x-api-key: $KEY"
-    curl https://api.subscriber.dev/workspaces/$WORKSPACE/environments -H "x-api-key: $KEY"
+    KEY=$(subscriber keys create "Quickstart" --access full)
+    curl https://api.subscriber.dev/keys/me -H "x-api-key: $KEY"
     ```
 
-    Most endpoints take the environment's ID in the path.
+    The response includes the environment's ID, which most endpoints take in the path. See [Authentication](/api-reference/introduction#authentication) for what keys can do.
   </Tab>
 </Tabs>
 
@@ -147,7 +149,7 @@ A subscriber is someone you email. Triggering a workflow starts it for one subsc
     Open **Subscribers** and press `n` to add Jane. Then open **Workflows**, choose **Welcome**, press `t` and enter her email.
   </Tab>
   <Tab title="API">
-    In production you'll usually do this from your app's code, right after signup:
+    In production you'll usually do this from your app's code, right after signup. Give your app a `limited` key, which can only add subscribers and trigger workflows: `subscriber keys create "Acme app"`.
 
     ```ts
     const api = `https://api.subscriber.dev/environments/${ENV}`;

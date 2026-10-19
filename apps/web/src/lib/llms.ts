@@ -31,8 +31,8 @@ const intro = () => `# subscriber.dev
 - MCP server (streamable HTTP): ${MCP_URL}
   - Claude Code: \`${MCP_ADD_COMMAND}\`
   - The first connection opens a browser to sign in. Signing in creates the account.
-- CLI: \`${LOGIN_COMMAND}\` prints a code and opens the browser to approve it, then stores an API key. Run \`subscriber\` with no arguments for the TUI.
-- REST API: https://api.subscriber.dev, authenticated with an \`x-api-key\` header. Routes are scoped to an environment: /environments/{environmentId}/...
+- CLI: \`${LOGIN_COMMAND}\` prints a code and opens the browser to approve it. Run \`subscriber\` with no arguments for the TUI.
+- REST API: https://api.subscriber.dev, authenticated with an API key in the \`x-api-key\` header. Each key belongs to one environment; create one with MCP \`create_api_key\` or \`subscriber keys create <name>\`. Keys are limited by default (trigger workflows, create or update subscribers); pass access "full" for everything else. Routes are scoped to an environment: /environments/{environmentId}/..., and GET /keys/me returns a key's environment ID.
 
 ## Typical setup
 
