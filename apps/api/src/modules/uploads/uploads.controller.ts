@@ -15,7 +15,6 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
@@ -36,7 +35,7 @@ import { UploadsService } from "./uploads.service.js";
 
 @ApiTags("Uploads")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/uploads")
+@Controller("uploads")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
@@ -63,7 +62,6 @@ export class UploadsController {
     description:
       "Uploads a PNG, JPEG, GIF or WebP image (up to 5 MB) and returns its public URL to use in an email.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 201, type: UploadResponseDto })
   @ApiResponse({ status: 400, description: "Not an image, or too large" })
   async upload(
@@ -83,7 +81,6 @@ export class UploadsController {
     description:
       "Email clients can't play video, so emails show a thumbnail with a play button that links to the video. Give a YouTube, Vimeo or Loom link and this stores the thumbnail and returns what to put in the email.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 201, type: VideoResponseDto })
   @ApiResponse({ status: 400, description: "Not a supported video link" })
   async video(

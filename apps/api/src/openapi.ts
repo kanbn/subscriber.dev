@@ -47,7 +47,7 @@ export function openApiDocuments(app: INestApplication) {
     .setOpenAPIVersion("3.1.0")
     .setTitle("subscriber.dev API")
     .setDescription(
-      "Trigger workflows, manage subscribers and send broadcasts. Authenticate with an API key in the X-API-Key header. Docs: https://docs.subscriber.dev",
+      "Trigger workflows, manage subscribers and send broadcasts. Authenticate with an API key in the X-API-Key header: the key decides the environment. Docs: https://docs.subscriber.dev",
     )
     .setVersion("1.0")
     .addBearerAuth(
@@ -56,7 +56,7 @@ export function openApiDocuments(app: INestApplication) {
         scheme: "bearer",
         bearerFormat: undefined,
         description:
-          "A session token from `subscriber login`, used by subscriber.dev's own apps. From your own code, use an API key.",
+          "A session token from `subscriber login`, used by subscriber.dev's own apps. Requests about an environment also need its ID in the `x-environment-id` header. From your own code, use an API key.",
       },
       "bearer",
     )

@@ -9,7 +9,6 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
@@ -33,7 +32,7 @@ import { EmailTestService } from "./emailTest.service.js";
 
 @ApiTags("Emails")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/emails")
+@Controller("emails")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class EmailController {
   constructor(private readonly emailTest: EmailTestService) {}
@@ -47,7 +46,6 @@ export class EmailController {
     description:
       "Renders a subject and body the way they'd send, filling in variables with your own details as the sample subscriber. Nothing is sent.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: RenderedEmailDto })
   async preview(
     @CurrentUser() user: User | null,
@@ -71,7 +69,6 @@ export class EmailController {
     description:
       "Sends one of a workflow's email steps (workflowId, and optionally step), or a subject and body, through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: TestEmailResponseDto })
   @ApiResponse({
     status: 400,

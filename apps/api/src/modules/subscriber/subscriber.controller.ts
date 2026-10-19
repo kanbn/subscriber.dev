@@ -61,7 +61,7 @@ import { SubscriberService } from "./subscriber.service.js";
 
 @ApiTags("Subscribers")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/subscribers")
+@Controller("subscribers")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class SubscriberController {
   constructor(private readonly subscriberService: SubscriberService) {}
@@ -75,7 +75,6 @@ export class SubscriberController {
     description:
       "Returns a paginated list of active subscribers in the environment",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
   @ApiQuery({
@@ -131,7 +130,6 @@ export class SubscriberController {
     description:
       "Returns every distinct tag currently in use across subscribers in the environment",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: ListTagsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async listTags(
@@ -150,7 +148,6 @@ export class SubscriberController {
     summary: "Get a subscriber",
     description: "Returns a single subscriber with their latest preferences",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "subscriberId", type: "string" })
   @ApiResponse({ status: 200, type: GetSubscriberResponseDto })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
@@ -176,7 +173,6 @@ export class SubscriberController {
     description:
       "Creates a new subscriber in the specified environment and initialises their preferences",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({
     status: 201,
     type: CreateSubscriberResponseDto,
@@ -219,7 +215,6 @@ export class SubscriberController {
     description:
       "Upserts up to 500 subscribers per request. Each row is matched to an existing subscriber by publicId, then externalId, then email (in that order); if none match, a new subscriber is created. Rows are processed independently, so one failing row does not fail the batch.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: BulkUpsertSubscribersResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async bulkUpsertSubscribers(
@@ -246,7 +241,6 @@ export class SubscriberController {
     summary: "Update a subscriber",
     description: "Updates subscriber fields. All fields are optional.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "subscriberId", type: "string" })
   @ApiResponse({ status: 200, type: UpdateSubscriberResponseDto })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
@@ -289,7 +283,6 @@ export class SubscriberController {
     description:
       "Soft-deletes a subscriber. The record is retained but excluded from all queries.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "subscriberId", type: "string" })
   @ApiResponse({ status: 204, description: "Subscriber deleted" })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
@@ -317,7 +310,6 @@ export class SubscriberController {
     description:
       "Creates a new preference record with updated values (immutable pattern)",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "subscriberId", type: "string" })
   @ApiResponse({
     status: 200,
@@ -359,7 +351,6 @@ export class SubscriberController {
     description:
       "Adds a tag to the subscriber. Adding a tag that's already present is a no-op.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "subscriberId", type: "string" })
   @ApiResponse({ status: 200, type: TagResponseDto })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
@@ -387,7 +378,6 @@ export class SubscriberController {
     operationId: "removeSubscriberTag",
     summary: "Remove a tag from a subscriber",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "subscriberId", type: "string" })
   @ApiParam({ name: "tag", type: "string" })
   @ApiResponse({ status: 204, description: "Tag removed" })

@@ -61,7 +61,7 @@ import { WorkflowService } from "./workflow.service.js";
 
 @ApiTags("Workflows")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/workflows")
+@Controller("workflows")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class WorkflowController {
   constructor(private readonly workflowService: WorkflowService) {}
@@ -75,7 +75,6 @@ export class WorkflowController {
     description:
       "Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: TriggerWorkflowResponseDto })
   @ApiResponse({
     status: 404,
@@ -105,7 +104,6 @@ export class WorkflowController {
     description:
       "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started, and `exitConditions` stop a person's active run on others.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 201, type: WorkflowResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async createWorkflow(
@@ -136,7 +134,6 @@ export class WorkflowController {
     summary: "List workflows",
     description: "Returns a paginated list of workflows in the environment",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
   @ApiQuery({
@@ -168,7 +165,6 @@ export class WorkflowController {
     description:
       "Returns a paginated list of trigger runs across every workflow in the environment, most recent first",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
   @ApiResponse({ status: 200, type: ListEnvironmentRunsResponseDto })
@@ -193,7 +189,6 @@ export class WorkflowController {
     summary: "Get a workflow",
     description: "Returns a single workflow with its steps",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiResponse({ status: 200, type: WorkflowDetailResponseDto })
   @ApiResponse({ status: 404, description: "Workflow not found" })
@@ -215,7 +210,6 @@ export class WorkflowController {
     description:
       "Updates workflow fields. If `steps` is provided, it replaces ALL existing steps; likewise for `triggers` and `exitConditions`.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiResponse({ status: 200, type: WorkflowResponseDto })
   @ApiResponse({ status: 404, description: "Workflow not found" })
@@ -249,7 +243,6 @@ export class WorkflowController {
     description:
       "Soft-deletes a workflow. Existing in-flight runs are unaffected.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiResponse({ status: 204, description: "Workflow deleted" })
   @ApiResponse({ status: 404, description: "Workflow not found" })
@@ -277,7 +270,6 @@ export class WorkflowController {
     description:
       "Returns a paginated list of trigger runs for this workflow, most recent first",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
@@ -306,7 +298,6 @@ export class WorkflowController {
     description:
       "Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiResponse({ status: 200, type: PreviewBroadcastResponseDto })
   @ApiResponse({
@@ -339,7 +330,6 @@ export class WorkflowController {
     description:
       "Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiResponse({ status: 200, type: TriggerBroadcastResponseDto })
   @ApiResponse({
@@ -378,7 +368,6 @@ export class WorkflowController {
     description:
       "Returns a paginated list of broadcasts triggered for this workflow, most recent first",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "offset", required: false, type: Number })
@@ -407,7 +396,6 @@ export class WorkflowController {
     description:
       "Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiParam({ name: "broadcastId", type: "string" })
   @ApiResponse({ status: 200, type: BroadcastDetailResponseDto })
@@ -437,7 +425,6 @@ export class WorkflowController {
     description:
       "Holds every send that hasn't gone out yet until the broadcast is resumed. Already-sent emails are unaffected.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiParam({ name: "broadcastId", type: "string" })
   @ApiResponse({ status: 200, type: BroadcastSummaryDto })
@@ -471,7 +458,6 @@ export class WorkflowController {
     description:
       "Lets a paused broadcast carry on sending. The remaining sends keep their original spacing, pushed back by however long it was paused.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiParam({ name: "broadcastId", type: "string" })
   @ApiResponse({ status: 200, type: BroadcastSummaryDto })
@@ -505,7 +491,6 @@ export class WorkflowController {
     description:
       "Permanently stops a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiParam({ name: "broadcastId", type: "string" })
   @ApiResponse({ status: 200, type: BroadcastSummaryDto })
@@ -539,7 +524,6 @@ export class WorkflowController {
     description:
       "Re-runs setup for every matching subscriber who hasn't been set up yet (for example after setup jobs failed), spread over a fresh send window. Subscribers already set up are skipped, so nobody receives the email twice.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "workflowId", type: "string" })
   @ApiParam({ name: "broadcastId", type: "string" })
   @ApiResponse({ status: 200, type: BroadcastSummaryDto })

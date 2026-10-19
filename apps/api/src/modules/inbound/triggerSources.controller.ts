@@ -8,7 +8,6 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
@@ -25,7 +24,7 @@ import { InboundService } from "./inbound.service.js";
 
 @ApiTags("Inbound events")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/trigger-sources")
+@Controller("trigger-sources")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class TriggerSourcesController {
   constructor(private readonly inboundService: InboundService) {}
@@ -39,7 +38,6 @@ export class TriggerSourcesController {
     description:
       "Integrations whose events can trigger workflows (e.g. Stripe), whether each is connected in this environment, and the events each offers.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: ListTriggerSourcesResponseDto })
   async listTriggerSources(
     @CurrentEnvironment() environment: EnvironmentForUser,

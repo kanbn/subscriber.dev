@@ -35,7 +35,7 @@ import { IntegrationsService } from "./integrations.service.js";
 
 @ApiTags("Integrations")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/integrations")
+@Controller("integrations")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
@@ -49,7 +49,6 @@ export class IntegrationsController {
     description:
       'Creates or updates the integration of the given type for this environment (e.g. "smtp"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full.',
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "type", type: "string" })
   @ApiResponse({
     status: 200,
@@ -90,7 +89,6 @@ export class IntegrationsController {
     description:
       "Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "type", type: "string" })
   @ApiResponse({
     status: 200,
@@ -119,7 +117,6 @@ export class IntegrationsController {
     description:
       "Returns every integration configured for this environment, sanitized (no secrets).",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: ListIntegrationsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async list(
@@ -139,7 +136,6 @@ export class IntegrationsController {
     description:
       "Returns the sanitized config for a single integration type (no secrets).",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "type", type: "string" })
   @ApiResponse({ status: 200, type: IntegrationResponseDto })
   @ApiResponse({
@@ -162,7 +158,6 @@ export class IntegrationsController {
     operationId: "deleteIntegration",
     summary: "Remove an integration",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "type", type: "string" })
   @ApiResponse({ status: 204, description: "Integration deleted" })
   @ApiResponse({

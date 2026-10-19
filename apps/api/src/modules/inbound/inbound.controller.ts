@@ -9,7 +9,6 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
@@ -29,7 +28,7 @@ import { InboundService } from "./inbound.service.js";
 
 @ApiTags("Inbound events")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/inbound-events")
+@Controller("inbound-events")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class InboundController {
   constructor(private readonly inboundService: InboundService) {}
@@ -43,7 +42,6 @@ export class InboundController {
     description:
       "Webhook events received from inbound sources (e.g. Stripe) for this environment, most recent first, with the events they matched and what happened (workflow triggered, no workflow triggered by it, person not found, etc.).",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: ListInboundEventsResponseDto })
   async listEvents(
     @CurrentEnvironment() environment: EnvironmentForUser,

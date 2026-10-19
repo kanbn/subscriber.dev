@@ -23,7 +23,7 @@ const NEXT_ACTIONS: Record<NonNullable<SetupResponse["next"]>, string> = {
   first_workflow:
     'Suggest a welcome email for new signups. Ask what their product does and the tone they want, then call create_workflow with a key such as "welcome" and one email step. Share the editUrl it returns, so they can tweak the copy in the web editor.',
   first_email_sent:
-    'Send it to the user themselves: get their email with get_current_user, add them with create_subscriber, then call trigger_workflow with the workflow\'s key and that email. Check list_workflow_runs to confirm it sent, and ask them to check their inbox. Then show how their app triggers it, with POST /environments/{environmentId}/workflows/trigger and {"key": "welcome", "subscriber": {"email": "..."}}.',
+    'Send it to the user themselves: get their email with get_current_user, add them with create_subscriber, then call trigger_workflow with the workflow\'s key and that email. Check list_workflow_runs to confirm it sent, and ask them to check their inbox. Then show how their app triggers it, with POST /workflows/trigger, an API key from create_api_key in the x-api-key header, and {"key": "welcome", "subscriber": {"email": "..."}}.',
 };
 
 const COMPLETE_ACTION =

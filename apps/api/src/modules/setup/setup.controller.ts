@@ -2,7 +2,6 @@ import { Controller, Get, UseGuards } from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
@@ -19,7 +18,7 @@ import { SetupService } from "./setup.service.js";
 
 @ApiTags("Environments")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/setup")
+@Controller("setup")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class SetupController {
   constructor(private readonly setupService: SetupService) {}
@@ -32,7 +31,6 @@ export class SetupController {
     description:
       "What's left to go from a new environment to the first email sent: connect an email provider, create a workflow, then trigger it.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: SetupResponseDto })
   async getSetup(
     @CurrentEnvironment() environment: EnvironmentForUser,

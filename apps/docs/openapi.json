@@ -39,9 +39,6 @@
         },
         "security": [
           {
-            "api-key": []
-          },
-          {
             "bearer": []
           }
         ],
@@ -99,9 +96,6 @@
         },
         "security": [
           {
-            "api-key": []
-          },
-          {
             "bearer": []
           }
         ],
@@ -151,9 +145,6 @@
           }
         },
         "security": [
-          {
-            "api-key": []
-          },
           {
             "bearer": []
           }
@@ -214,9 +205,6 @@
         },
         "security": [
           {
-            "api-key": []
-          },
-          {
             "bearer": []
           }
         ],
@@ -256,9 +244,6 @@
           }
         },
         "security": [
-          {
-            "api-key": []
-          },
           {
             "bearer": []
           }
@@ -309,9 +294,6 @@
           }
         },
         "security": [
-          {
-            "api-key": []
-          },
           {
             "bearer": []
           }
@@ -367,9 +349,6 @@
           }
         },
         "security": [
-          {
-            "api-key": []
-          },
           {
             "bearer": []
           }
@@ -447,9 +426,6 @@
         },
         "security": [
           {
-            "api-key": []
-          },
-          {
             "bearer": []
           }
         ],
@@ -515,9 +491,6 @@
           }
         },
         "security": [
-          {
-            "api-key": []
-          },
           {
             "bearer": []
           }
@@ -593,9 +566,6 @@
         },
         "security": [
           {
-            "api-key": []
-          },
-          {
             "bearer": []
           }
         ],
@@ -652,10 +622,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "billing:read"
+            ]
           }
         ],
         "summary": "Get a workspace's plan and usage",
@@ -721,9 +693,6 @@
         },
         "security": [
           {
-            "api-key": []
-          },
-          {
             "bearer": []
           }
         ],
@@ -780,9 +749,6 @@
         },
         "security": [
           {
-            "api-key": []
-          },
-          {
             "bearer": []
           }
         ],
@@ -792,7 +758,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/subscribers": {
+    "/subscribers": {
       "get": {
         "description": "Returns a paginated list of active subscribers in the environment",
         "operationId": "listSubscribers",
@@ -861,14 +827,6 @@
                 "false"
               ]
             }
-          },
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -915,10 +873,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:read"
+            ]
           }
         ],
         "summary": "List subscribers",
@@ -929,16 +889,7 @@
       "post": {
         "description": "Creates a new subscriber in the specified environment and initialises their preferences",
         "operationId": "createSubscriber",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -1003,10 +954,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:write"
+            ]
           }
         ],
         "summary": "Create a new subscriber",
@@ -1015,20 +968,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/subscribers/tags": {
+    "/subscribers/tags": {
       "get": {
         "description": "Returns every distinct tag currently in use across subscribers in the environment",
         "operationId": "listTags",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -1073,10 +1017,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:read"
+            ]
           }
         ],
         "summary": "List distinct tags",
@@ -1085,21 +1031,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/subscribers/{subscriberId}": {
+    "/subscribers/{subscriberId}": {
       "get": {
         "description": "Returns a single subscriber with their latest preferences",
         "operationId": "getSubscriber",
         "parameters": [
           {
             "name": "subscriberId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1151,10 +1089,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:read"
+            ]
           }
         ],
         "summary": "Get a subscriber",
@@ -1168,14 +1108,6 @@
         "parameters": [
           {
             "name": "subscriberId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1237,10 +1169,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:write"
+            ]
           }
         ],
         "summary": "Update a subscriber",
@@ -1254,14 +1188,6 @@
         "parameters": [
           {
             "name": "subscriberId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1306,10 +1232,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:write"
+            ]
           }
         ],
         "summary": "Delete a subscriber",
@@ -1318,20 +1246,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/subscribers/bulk": {
+    "/subscribers/bulk": {
       "post": {
         "description": "Upserts up to 500 subscribers per request. Each row is matched to an existing subscriber by publicId, then externalId, then email (in that order); if none match, a new subscriber is created. Rows are processed independently, so one failing row does not fail the batch.",
         "operationId": "bulkUpsertSubscribers",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -1386,10 +1305,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:write"
+            ]
           }
         ],
         "summary": "Bulk create or update subscribers",
@@ -1398,21 +1319,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/subscribers/{subscriberId}/preferences": {
+    "/subscribers/{subscriberId}/preferences": {
       "patch": {
         "description": "Creates a new preference record with updated values (immutable pattern)",
         "operationId": "updateSubscriberPreferences",
         "parameters": [
           {
             "name": "subscriberId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1474,10 +1387,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:write"
+            ]
           }
         ],
         "summary": "Update subscriber preferences",
@@ -1486,21 +1401,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/subscribers/{subscriberId}/tags": {
+    "/subscribers/{subscriberId}/tags": {
       "post": {
         "description": "Adds a tag to the subscriber. Adding a tag that's already present is a no-op.",
         "operationId": "addSubscriberTag",
         "parameters": [
           {
             "name": "subscriberId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1562,10 +1469,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:write"
+            ]
           }
         ],
         "summary": "Add a tag to a subscriber",
@@ -1574,7 +1483,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/subscribers/{subscriberId}/tags/{tag}": {
+    "/subscribers/{subscriberId}/tags/{tag}": {
       "delete": {
         "operationId": "removeSubscriberTag",
         "parameters": [
@@ -1588,14 +1497,6 @@
           },
           {
             "name": "tag",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -1640,10 +1541,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "subscribers:write"
+            ]
           }
         ],
         "summary": "Remove a tag from a subscriber",
@@ -1652,20 +1555,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/trigger": {
+    "/workflows/trigger": {
       "post": {
         "description": "Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.",
         "operationId": "triggerWorkflow",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -1720,10 +1614,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:trigger"
+            ]
           }
         ],
         "summary": "Trigger a workflow",
@@ -1732,20 +1628,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows": {
+    "/workflows": {
       "post": {
         "description": "Creates a workflow definition: a named, ordered sequence of steps (email or webhook), each with a delay relative to the previous step. Optional `triggers` start it automatically on events from connected integrations, e.g. Stripe's trial_started, and `exitConditions` stop a person's active run on others.",
         "operationId": "createWorkflow",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -1800,10 +1687,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:write"
+            ]
           }
         ],
         "summary": "Create a new workflow",
@@ -1846,14 +1735,6 @@
                 "automation",
                 "broadcast"
               ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
               "type": "string"
             }
           }
@@ -1902,10 +1783,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:read"
+            ]
           }
         ],
         "summary": "List workflows",
@@ -1914,7 +1797,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/runs": {
+    "/workflows/runs": {
       "get": {
         "description": "Returns a paginated list of trigger runs across every workflow in the environment, most recent first",
         "operationId": "listEnvironmentRuns",
@@ -1939,14 +1822,6 @@
               "maximum": 9007199254740991,
               "default": 0,
               "type": "number"
-            }
-          },
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1994,10 +1869,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:read"
+            ]
           }
         ],
         "summary": "List all workflow runs",
@@ -2006,21 +1883,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}": {
+    "/workflows/{workflowId}": {
       "get": {
         "description": "Returns a single workflow with its steps",
         "operationId": "getWorkflow",
         "parameters": [
           {
             "name": "workflowId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2072,10 +1941,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:read"
+            ]
           }
         ],
         "summary": "Get a workflow",
@@ -2089,14 +1960,6 @@
         "parameters": [
           {
             "name": "workflowId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2158,10 +2021,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:write"
+            ]
           }
         ],
         "summary": "Update a workflow",
@@ -2175,14 +2040,6 @@
         "parameters": [
           {
             "name": "workflowId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2227,10 +2084,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:write"
+            ]
           }
         ],
         "summary": "Delete a workflow",
@@ -2239,7 +2098,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/runs": {
+    "/workflows/{workflowId}/runs": {
       "get": {
         "description": "Returns a paginated list of trigger runs for this workflow, most recent first",
         "operationId": "listWorkflowRuns",
@@ -2272,14 +2131,6 @@
               "maximum": 9007199254740991,
               "default": 0,
               "type": "number"
-            }
-          },
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -2327,10 +2178,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:read"
+            ]
           }
         ],
         "summary": "List runs for a workflow",
@@ -2339,21 +2192,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/broadcast/preview": {
+    "/workflows/{workflowId}/broadcast/preview": {
       "post": {
         "description": "Resolves the audience query and returns how many subscribers currently match, without creating or sending anything. Intended for confirming a broadcast's blast radius before triggering it.",
         "operationId": "previewBroadcast",
         "parameters": [
           {
             "name": "workflowId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2425,10 +2270,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "broadcasts:read"
+            ]
           }
         ],
         "summary": "Preview a broadcast's audience size",
@@ -2437,21 +2284,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/broadcast": {
+    "/workflows/{workflowId}/broadcast": {
       "post": {
         "description": "Fans this workflow out to every subscriber matching the audience query. Resolving the audience and scheduling sends happens asynchronously — poll the returned broadcast (via listBroadcasts/getBroadcast) for progress.",
         "operationId": "triggerBroadcast",
         "parameters": [
           {
             "name": "workflowId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2523,10 +2362,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "broadcasts:write"
+            ]
           }
         ],
         "summary": "Trigger a broadcast",
@@ -2535,7 +2376,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/broadcasts": {
+    "/workflows/{workflowId}/broadcasts": {
       "get": {
         "description": "Returns a paginated list of broadcasts triggered for this workflow, most recent first",
         "operationId": "listBroadcasts",
@@ -2568,14 +2409,6 @@
               "maximum": 9007199254740991,
               "default": 0,
               "type": "number"
-            }
-          },
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -2623,10 +2456,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "broadcasts:read"
+            ]
           }
         ],
         "summary": "List broadcasts for a workflow",
@@ -2635,7 +2470,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}": {
+    "/workflows/{workflowId}/broadcasts/{broadcastId}": {
       "get": {
         "description": "Returns a single broadcast with its resolved audience size and derived step-outcome counts (sent/failed/skipped/pending)",
         "operationId": "getBroadcast",
@@ -2650,14 +2485,6 @@
           },
           {
             "name": "broadcastId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2709,10 +2536,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "broadcasts:read"
+            ]
           }
         ],
         "summary": "Get a broadcast",
@@ -2721,7 +2550,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/pause": {
+    "/workflows/{workflowId}/broadcasts/{broadcastId}/pause": {
       "post": {
         "description": "Holds every send that hasn't gone out yet until the broadcast is resumed. Already-sent emails are unaffected.",
         "operationId": "pauseBroadcast",
@@ -2736,14 +2565,6 @@
           },
           {
             "name": "broadcastId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2805,10 +2626,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "broadcasts:write"
+            ]
           }
         ],
         "summary": "Pause a broadcast",
@@ -2817,7 +2640,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/resume": {
+    "/workflows/{workflowId}/broadcasts/{broadcastId}/resume": {
       "post": {
         "description": "Lets a paused broadcast carry on sending. The remaining sends keep their original spacing, pushed back by however long it was paused.",
         "operationId": "resumeBroadcast",
@@ -2832,14 +2655,6 @@
           },
           {
             "name": "broadcastId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2901,10 +2716,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "broadcasts:write"
+            ]
           }
         ],
         "summary": "Resume a paused broadcast",
@@ -2913,7 +2730,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/cancel": {
+    "/workflows/{workflowId}/broadcasts/{broadcastId}/cancel": {
       "post": {
         "description": "Permanently stops a broadcast: every send that hasn't gone out yet is cancelled. Already-sent emails are unaffected. Cannot be undone.",
         "operationId": "cancelBroadcast",
@@ -2928,14 +2745,6 @@
           },
           {
             "name": "broadcastId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -2997,10 +2806,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "broadcasts:write"
+            ]
           }
         ],
         "summary": "Cancel a broadcast",
@@ -3009,7 +2820,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/workflows/{workflowId}/broadcasts/{broadcastId}/redispatch": {
+    "/workflows/{workflowId}/broadcasts/{broadcastId}/redispatch": {
       "post": {
         "description": "Re-runs setup for every matching subscriber who hasn't been set up yet (for example after setup jobs failed), spread over a fresh send window. Subscribers already set up are skipped, so nobody receives the email twice.",
         "operationId": "redispatchBroadcast",
@@ -3024,14 +2835,6 @@
           },
           {
             "name": "broadcastId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -3093,10 +2896,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "broadcasts:write"
+            ]
           }
         ],
         "summary": "Re-dispatch a broadcast",
@@ -3105,20 +2910,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/emails/preview": {
+    "/emails/preview": {
       "post": {
         "description": "Renders a subject and body the way they'd send, filling in variables with your own details as the sample subscriber. Nothing is sent.",
         "operationId": "previewEmail",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -3163,10 +2959,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "emails:test"
+            ]
           }
         ],
         "summary": "Render an email",
@@ -3175,20 +2973,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/emails/test": {
+    "/emails/test": {
       "post": {
         "description": "Sends one of a workflow's email steps (workflowId, and optionally step), or a subject and body, through the environment's email integration, to you or another address, without creating a subscriber or a run. Your details are the sample subscriber unless you pass data. Subject lines are prefixed with [Test], and test emails don't count towards analytics or usage.",
         "operationId": "sendTestEmail",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -3253,10 +3042,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "emails:test"
+            ]
           }
         ],
         "summary": "Send a test email",
@@ -3265,21 +3056,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/integrations/{type}": {
+    "/integrations/{type}": {
       "patch": {
         "description": "Creates or updates the integration of the given type for this environment (e.g. \"smtp\"). Body shape depends on the integration type; secret fields (e.g. password) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full.",
         "operationId": "upsertIntegration",
         "parameters": [
           {
             "name": "type",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -3351,10 +3134,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "integrations:write"
+            ]
           }
         ],
         "summary": "Configure an integration",
@@ -3368,14 +3153,6 @@
         "parameters": [
           {
             "name": "type",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -3427,10 +3204,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "integrations:read"
+            ]
           }
         ],
         "summary": "Get an integration",
@@ -3443,14 +3222,6 @@
         "parameters": [
           {
             "name": "type",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -3495,10 +3266,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "integrations:write"
+            ]
           }
         ],
         "summary": "Remove an integration",
@@ -3507,21 +3280,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/integrations/{type}/primary": {
+    "/integrations/{type}/primary": {
       "patch": {
         "description": "Moves this integration to the front of the environment's failover order (tried first on send). The rest keep their relative order as fallbacks.",
         "operationId": "setPrimaryIntegration",
         "parameters": [
           {
             "name": "type",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -3573,10 +3338,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "integrations:write"
+            ]
           }
         ],
         "summary": "Set an integration as primary",
@@ -3585,20 +3352,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/integrations": {
+    "/integrations": {
       "get": {
         "description": "Returns every integration configured for this environment, sanitized (no secrets).",
         "operationId": "listIntegrations",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -3643,10 +3401,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "integrations:read"
+            ]
           }
         ],
         "summary": "List configured integrations",
@@ -3655,20 +3415,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/uploads": {
+    "/uploads": {
       "post": {
         "description": "Uploads a PNG, JPEG, GIF or WebP image (up to 5 MB) and returns its public URL to use in an email.",
         "operationId": "uploadImage",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -3732,10 +3483,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "uploads:write"
+            ]
           }
         ],
         "summary": "Upload an image for your emails",
@@ -3744,20 +3497,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/uploads/video": {
+    "/uploads/video": {
       "post": {
         "description": "Email clients can't play video, so emails show a thumbnail with a play button that links to the video. Give a YouTube, Vimeo or Loom link and this stores the thumbnail and returns what to put in the email.",
         "operationId": "uploadVideoThumbnail",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -3812,10 +3556,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "uploads:write"
+            ]
           }
         ],
         "summary": "Turn a video link into a thumbnail",
@@ -3824,20 +3570,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/setup": {
+    "/setup": {
       "get": {
         "description": "What's left to go from a new environment to the first email sent: connect an email provider, create a workflow, then trigger it.",
         "operationId": "getSetup",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -3872,10 +3609,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "analytics:read"
+            ]
           }
         ],
         "summary": "Get the environment's setup checklist",
@@ -3884,7 +3623,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/analytics": {
+    "/analytics": {
       "get": {
         "description": "Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.",
         "operationId": "getAnalytics",
@@ -3898,14 +3637,6 @@
               "maximum": 365,
               "default": 30,
               "type": "number"
-            }
-          },
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -3953,10 +3684,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "analytics:read"
+            ]
           }
         ],
         "summary": "Get environment-wide analytics",
@@ -3965,7 +3698,7 @@
         ]
       }
     },
-    "/environments/{environmentId}/inbound-events": {
+    "/inbound-events": {
       "get": {
         "description": "Webhook events received from inbound sources (e.g. Stripe) for this environment, most recent first, with the events they matched and what happened (workflow triggered, no workflow triggered by it, person not found, etc.).",
         "operationId": "listInboundEvents",
@@ -3999,14 +3732,6 @@
               "maximum": 9007199254740991,
               "default": 0,
               "type": "integer"
-            }
-          },
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -4044,10 +3769,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "events:read"
+            ]
           }
         ],
         "summary": "List inbound webhook events",
@@ -4056,20 +3783,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/trigger-sources": {
+    "/trigger-sources": {
       "get": {
         "description": "Integrations whose events can trigger workflows (e.g. Stripe), whether each is connected in this environment, and the events each offers.",
         "operationId": "listTriggerSources",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -4104,10 +3822,12 @@
         },
         "security": [
           {
-            "api-key": []
+            "bearer": []
           },
           {
-            "bearer": []
+            "api-key": [
+              "workflows:read"
+            ]
           }
         ],
         "summary": "List workflow trigger sources",
@@ -4116,20 +3836,11 @@
         ]
       }
     },
-    "/environments/{environmentId}/keys": {
+    "/keys": {
       "post": {
         "description": "Creates an API key for this environment. The key is only returned once. Signed-in users only: an API key can't create keys.",
         "operationId": "createEnvironmentKey",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -4194,16 +3905,7 @@
       },
       "get": {
         "operationId": "listEnvironmentKeys",
-        "parameters": [
-          {
-            "name": "environmentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -4257,21 +3959,13 @@
         ]
       }
     },
-    "/environments/{environmentId}/keys/{keyId}": {
+    "/keys/{keyId}": {
       "delete": {
         "description": "Requests made with the key fail straight away.",
         "operationId": "revokeEnvironmentKey",
         "parameters": [
           {
             "name": "keyId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "environmentId",
             "required": true,
             "in": "path",
             "schema": {
@@ -4386,7 +4080,7 @@
   },
   "info": {
     "title": "subscriber.dev API",
-    "description": "Trigger workflows, manage subscribers and send broadcasts. Authenticate with an API key in the X-API-Key header. Docs: https://docs.subscriber.dev",
+    "description": "Trigger workflows, manage subscribers and send broadcasts. Authenticate with an API key in the X-API-Key header: the key decides the environment. Docs: https://docs.subscriber.dev",
     "version": "1.0",
     "contact": {}
   },
@@ -4402,7 +4096,7 @@
       "bearer": {
         "scheme": "bearer",
         "type": "http",
-        "description": "A session token from `subscriber login`, used by subscriber.dev's own apps. From your own code, use an API key."
+        "description": "A session token from `subscriber login`, used by subscriber.dev's own apps. Requests about an environment also need its ID in the `x-environment-id` header. From your own code, use an API key."
       },
       "api-key": {
         "type": "apiKey",

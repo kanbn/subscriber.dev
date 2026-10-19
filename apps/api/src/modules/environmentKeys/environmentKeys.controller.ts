@@ -42,7 +42,7 @@ import { EnvironmentKeysService } from "./environmentKeys.service.js";
 
 @ApiTags("API keys")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/keys")
+@Controller("keys")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class EnvironmentKeysController {
   constructor(
@@ -56,7 +56,6 @@ export class EnvironmentKeysController {
     description:
       "Creates an API key for this environment. The key is only returned once. Signed-in users only: an API key can't create keys.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 201, type: CreatedEnvironmentKeyDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async create(
@@ -77,7 +76,6 @@ export class EnvironmentKeysController {
     operationId: "listEnvironmentKeys",
     summary: "List API keys",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: ListEnvironmentKeysResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async list(
@@ -96,7 +94,6 @@ export class EnvironmentKeysController {
     summary: "Revoke an API key",
     description: "Requests made with the key fail straight away.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiParam({ name: "keyId", type: "string" })
   @ApiResponse({ status: 204 })
   @ApiResponse({ status: 404, description: "Environment or API key not found" })

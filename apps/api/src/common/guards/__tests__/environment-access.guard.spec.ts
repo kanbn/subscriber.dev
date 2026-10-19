@@ -1,4 +1,5 @@
-import { ExecutionContext, NotFoundException } from "@nestjs/common";
+import type { ExecutionContext } from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
@@ -11,7 +12,13 @@ vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
 
 const mockUser = { id: 1, email: "user@example.com" };
 const mockDb = {};
-const mockEnvironment = { id: 10, publicId: "env_abc" };
+const mockEnvironment = {
+  id: 10,
+  publicId: "env_abc",
+  workspaceId: 5,
+  name: "Production",
+  slug: "production",
+};
 
 function makeContext(request: Record<string, unknown>): ExecutionContext {
   return {
@@ -28,21 +35,19 @@ beforeEach(() => {
   guard = new EnvironmentAccessGuard();
 });
 
-describe("EnvironmentAccessGuard", () => {
-  it("attaches the resolved environment to the request and allows the call through", async () => {
+describe("EnvironmentAccessGuard with a session", () => {
+  it("uses the environment in the x-environment-id header", async () => {
     vi.mocked(subscriberRepo.getEnvironmentForUser).mockResolvedValue(
-      mockEnvironment as any,
+      mockEnvironment,
     );
 
     const request: Record<string, unknown> = {
-      params: { environmentId: "env_abc" },
+      headers: { "x-environment-id": "env_abc" },
       user: mockUser,
       db: mockDb,
     };
 
-    const result = await guard.canActivate(makeContext(request));
-
-    expect(result).toBe(true);
+    await expect(guard.canActivate(makeContext(request))).resolves.toBe(true);
     expect(request.environment).toBe(mockEnvironment);
     expect(subscriberRepo.getEnvironmentForUser).toHaveBeenCalledWith(
       mockDb,
@@ -51,58 +56,59 @@ describe("EnvironmentAccessGuard", () => {
     );
   });
 
-  it("throws NotFoundException when the user doesn't have access to the environment", async () => {
+  it("404s when the user isn't a member of the environment", async () => {
     vi.mocked(subscriberRepo.getEnvironmentForUser).mockResolvedValue(
       undefined,
     );
 
-    const request: Record<string, unknown> = {
-      params: { environmentId: "env_other_tenant" },
-      user: mockUser,
-      db: mockDb,
-    };
-
-    await expect(guard.canActivate(makeContext(request))).rejects.toThrow(
-      NotFoundException,
-    );
-  });
-
-  it("throws NotFoundException when the route has no environmentId param", async () => {
-    const request: Record<string, unknown> = {
-      params: {},
-      user: mockUser,
-      db: mockDb,
-    };
-
-    await expect(guard.canActivate(makeContext(request))).rejects.toThrow(
-      NotFoundException,
-    );
-    expect(subscriberRepo.getEnvironmentForUser).not.toHaveBeenCalled();
-  });
-
-  it("uses an environment key's own environment, and only that one", async () => {
-    const keyEnvironment = { id: 10, publicId: "env_abc" };
-    const environmentKey = { environment: keyEnvironment };
-
-    const request: Record<string, unknown> = {
-      params: { environmentId: "env_abc" },
-      user: null,
-      environmentKey,
-      db: mockDb,
-    };
-    await expect(guard.canActivate(makeContext(request))).resolves.toBe(true);
-    expect(request.environment).toBe(keyEnvironment);
-
     await expect(
       guard.canActivate(
         makeContext({
-          params: { environmentId: "env_other" },
+          headers: { "x-environment-id": "env_other_tenant" },
+          user: mockUser,
+          db: mockDb,
+        }),
+      ),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it("asks for the header when it's missing", async () => {
+    await expect(
+      guard.canActivate(
+        makeContext({ headers: {}, user: mockUser, db: mockDb }),
+      ),
+    ).rejects.toThrow(BadRequestException);
+    expect(subscriberRepo.getEnvironmentForUser).not.toHaveBeenCalled();
+  });
+});
+
+describe("EnvironmentAccessGuard with an environment key", () => {
+  const environmentKey = { environment: mockEnvironment };
+
+  it("uses the key's environment, with or without the header", async () => {
+    for (const headers of [{}, { "x-environment-id": "env_abc" }]) {
+      const request: Record<string, unknown> = {
+        headers,
+        user: null,
+        environmentKey,
+        db: mockDb,
+      };
+      await expect(guard.canActivate(makeContext(request))).resolves.toBe(true);
+      expect(request.environment).toBe(mockEnvironment);
+    }
+    expect(subscriberRepo.getEnvironmentForUser).not.toHaveBeenCalled();
+  });
+
+  it("404s when the header names another environment", async () => {
+    await expect(
+      guard.canActivate(
+        makeContext({
+          headers: { "x-environment-id": "env_other" },
           user: null,
           environmentKey,
           db: mockDb,
         }),
       ),
     ).rejects.toThrow(NotFoundException);
-    expect(subscriberRepo.getEnvironmentForUser).not.toHaveBeenCalled();
   });
 });

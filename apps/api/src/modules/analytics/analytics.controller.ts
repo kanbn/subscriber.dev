@@ -9,7 +9,6 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -30,7 +29,7 @@ import {
 
 @ApiTags("Analytics")
 @ApiBearerAuth("bearer")
-@Controller("environments/:environmentId/analytics")
+@Controller("analytics")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
@@ -44,7 +43,6 @@ export class AnalyticsController {
     description:
       "Subscriber counts, opt-outs, send outcomes, and bounce breakdown for an environment. `days` scopes the new-subscriber and recently-opted-out counts; send/bounce totals are all-time.",
   })
-  @ApiParam({ name: "environmentId", type: "string" })
   @ApiQuery({ name: "days", required: false, type: Number })
   @ApiResponse({ status: 200, type: AnalyticsResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
