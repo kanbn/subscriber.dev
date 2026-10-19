@@ -11,7 +11,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -30,7 +29,6 @@ import { InboundService } from "./inbound.service.js";
 
 @ApiTags("Inbound events")
 @ApiBearerAuth("bearer")
-@ApiSecurity("api-key")
 @Controller("environments/:environmentId/inbound-events")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class InboundController {

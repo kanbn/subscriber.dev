@@ -1,6 +1,11 @@
 import { createHash, randomBytes } from "crypto";
 import type { ExecutionContext } from "@nestjs/common";
-import { createParamDecorator, SetMetadata } from "@nestjs/common";
+import {
+  applyDecorators,
+  createParamDecorator,
+  SetMetadata,
+} from "@nestjs/common";
+import { ApiSecurity } from "@nestjs/swagger";
 
 import type { EnvironmentKeyForRequest } from "@subscriber.dev/db/repository/environmentKey.repo";
 import type { EnvironmentKeyScope } from "@subscriber.dev/shared/environmentKeys";
@@ -14,7 +19,10 @@ export const REQUIRED_SCOPE = "environmentKeyScope";
 export const ANY_SCOPE = "*";
 
 export const RequiresScope = (scope: EnvironmentKeyScope | typeof ANY_SCOPE) =>
-  SetMetadata(REQUIRED_SCOPE, scope);
+  applyDecorators(
+    SetMetadata(REQUIRED_SCOPE, scope),
+    ApiSecurity("api-key", scope === ANY_SCOPE ? [] : [scope]),
+  );
 
 export function generateEnvironmentKey() {
   const key = `${PREFIX}${randomBytes(32).toString("base64url")}`;

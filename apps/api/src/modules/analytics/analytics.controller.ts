@@ -12,7 +12,6 @@ import {
   ApiParam,
   ApiQuery,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -31,7 +30,6 @@ import {
 
 @ApiTags("Analytics")
 @ApiBearerAuth("bearer")
-@ApiSecurity("api-key")
 @Controller("environments/:environmentId/analytics")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class AnalyticsController {

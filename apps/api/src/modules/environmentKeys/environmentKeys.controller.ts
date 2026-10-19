@@ -15,7 +15,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -114,7 +113,6 @@ export class EnvironmentKeysController {
 }
 
 @ApiTags("API keys")
-@ApiSecurity("api-key")
 @Controller("keys")
 @UseGuards(AuthGuard)
 export class CurrentEnvironmentKeyController {

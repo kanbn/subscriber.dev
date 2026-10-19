@@ -4,7 +4,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -20,7 +19,6 @@ import { SetupService } from "./setup.service.js";
 
 @ApiTags("Environments")
 @ApiBearerAuth("bearer")
-@ApiSecurity("api-key")
 @Controller("environments/:environmentId/setup")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class SetupController {

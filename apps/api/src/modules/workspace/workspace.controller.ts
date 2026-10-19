@@ -15,7 +15,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -40,7 +39,6 @@ import { WorkspaceService } from "./workspace.service.js";
 
 @ApiTags("Workspaces")
 @ApiBearerAuth("bearer")
-@ApiSecurity("api-key")
 @Controller("workspaces")
 @UseGuards(AuthGuard)
 export class WorkspaceController {

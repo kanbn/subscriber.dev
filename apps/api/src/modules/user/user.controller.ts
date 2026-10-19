@@ -15,7 +15,6 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -24,10 +23,7 @@ import { createDrizzleClient } from "@subscriber.dev/db/client";
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
-import {
-  getAuth,
-  headersFromRaw,
-} from "../../common/guards/session.util.js";
+import { getAuth, headersFromRaw } from "../../common/guards/session.util.js";
 import {
   AgentResponseDto,
   UpdateUserDto,
@@ -38,7 +34,6 @@ import { UserService } from "./user.service.js";
 
 @ApiTags("Users")
 @ApiBearerAuth("bearer")
-@ApiSecurity("api-key")
 @Controller("users")
 @UseGuards(AuthGuard)
 export class UserController {

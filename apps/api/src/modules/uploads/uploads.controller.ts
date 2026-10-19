@@ -17,7 +17,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -37,7 +36,6 @@ import { UploadsService } from "./uploads.service.js";
 
 @ApiTags("Uploads")
 @ApiBearerAuth("bearer")
-@ApiSecurity("api-key")
 @Controller("environments/:environmentId/uploads")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class UploadsController {

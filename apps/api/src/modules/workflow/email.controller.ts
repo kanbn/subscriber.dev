@@ -11,7 +11,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -34,7 +33,6 @@ import { EmailTestService } from "./emailTest.service.js";
 
 @ApiTags("Emails")
 @ApiBearerAuth("bearer")
-@ApiSecurity("api-key")
 @Controller("environments/:environmentId/emails")
 @UseGuards(AuthGuard, EnvironmentAccessGuard)
 export class EmailController {
