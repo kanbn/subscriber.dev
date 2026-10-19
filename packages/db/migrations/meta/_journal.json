@@ -197,6 +197,13 @@
       "when": 1792095478541,
       "tag": "20261015201758_AddWorkspacePostalAddress",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1792358160225,
+      "tag": "20261018211600_AddEnvironmentKeys",
+      "breakpoints": true
     }
   ]
 }

@@ -23,6 +23,11 @@
       "types": "./dist/plans.d.ts",
       "import": "./dist/plans.js",
       "default": "./src/plans.ts"
+    },
+    "./environmentKeys": {
+      "types": "./dist/environmentKeys.d.ts",
+      "import": "./dist/environmentKeys.js",
+      "default": "./src/environmentKeys.ts"
     }
   },
   "license": "AGPL-3.0",
