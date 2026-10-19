@@ -79,4 +79,30 @@ describe("EnvironmentAccessGuard", () => {
     );
     expect(subscriberRepo.getEnvironmentForUser).not.toHaveBeenCalled();
   });
+
+  it("uses an environment key's own environment, and only that one", async () => {
+    const keyEnvironment = { id: 10, publicId: "env_abc" };
+    const environmentKey = { environment: keyEnvironment };
+
+    const request: Record<string, unknown> = {
+      params: { environmentId: "env_abc" },
+      user: null,
+      environmentKey,
+      db: mockDb,
+    };
+    await expect(guard.canActivate(makeContext(request))).resolves.toBe(true);
+    expect(request.environment).toBe(keyEnvironment);
+
+    await expect(
+      guard.canActivate(
+        makeContext({
+          params: { environmentId: "env_other" },
+          user: null,
+          environmentKey,
+          db: mockDb,
+        }),
+      ),
+    ).rejects.toThrow(NotFoundException);
+    expect(subscriberRepo.getEnvironmentForUser).not.toHaveBeenCalled();
+  });
 });
