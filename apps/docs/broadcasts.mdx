@@ -25,11 +25,11 @@ Or ask [your agent](/mcp): "How many opted-in subscribers would the changelog br
     Preview the audience, then send:
 
     ```bash
-    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW/broadcast/preview \
+    curl -X POST https://api.subscriber.dev/workflows/$WORKFLOW/broadcast/preview \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"audience": {"type": "optedIn"}}'
 
-    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW/broadcast \
+    curl -X POST https://api.subscriber.dev/workflows/$WORKFLOW/broadcast \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"audience": {"type": "optedIn"}, "sendOverHours": 48}'
     ```
@@ -54,7 +54,7 @@ While a broadcast is still sending, you can pause it, carry on later, or stop it
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW/broadcasts/$BROADCAST/pause \
+    curl -X POST https://api.subscriber.dev/workflows/$WORKFLOW/broadcasts/$BROADCAST/pause \
       -H "x-api-key: $KEY"
     ```
 

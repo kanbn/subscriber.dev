@@ -26,7 +26,7 @@ Or ask [your agent](/mcp): "Connect Cloudflare Email, sending from hello@acme.co
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/cloudflare \
+    curl -X PATCH https://api.subscriber.dev/integrations/cloudflare \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"accountId": "<account ID>", "zoneId": "<zone ID>", "apiToken": "<API token>", "fromEmail": "hello@acme.com", "fromName": "Acme"}'
     ```

@@ -57,7 +57,7 @@ Or ask [your agent](/mcp): "Create a trial onboarding workflow: an email when th
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows \
+    curl -X POST https://api.subscriber.dev/workflows \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d @trial.json
     ```
@@ -155,7 +155,7 @@ Triggering a workflow starts it for one subscriber. Workflows run for one subscr
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows/trigger \
+    curl -X POST https://api.subscriber.dev/workflows/trigger \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"key": "welcome", "subscriber": {"email": "jane@acme.com"}, "payload": {"plan": "pro"}}'
     ```

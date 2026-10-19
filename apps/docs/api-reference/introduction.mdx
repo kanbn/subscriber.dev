@@ -29,7 +29,7 @@ subscriber keys create "Acme app"
 
 The key is only shown once, so store it as a secret straight away, for example as `SUBSCRIBER_API_KEY`. Keep it on your server: never put it in frontend code or commit it.
 
-Each key belongs to one environment, so a staging key can't touch production. To find its environment's ID, call `GET /keys/me`. Any key can call it.
+Each key belongs to one environment, and requests made with it use that environment, so you never pass its ID. A staging key can't touch production. To check which environment a key belongs to, call `GET /keys/me`. Any key can call it.
 
 ### Access
 

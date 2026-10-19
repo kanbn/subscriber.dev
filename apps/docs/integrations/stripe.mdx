@@ -26,7 +26,7 @@ Add them to an automation workflow, or ask [your agent](/mcp) to "start the tria
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X PATCH https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW \
+    curl -X PATCH https://api.subscriber.dev/workflows/$WORKFLOW \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"triggers": [{"source": "stripe", "event": "trial_started"}], "exitConditions": [{"source": "stripe", "event": "trial_converted"}]}'
     ```
@@ -70,7 +70,7 @@ Connecting lets subscriber.dev look up who each Stripe event is about, and lets 
      </Tab>
      <Tab title="API">
        ```bash
-       curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/stripe \
+       curl -X PATCH https://api.subscriber.dev/integrations/stripe \
          -H "x-api-key: $KEY" -H "content-type: application/json" \
          -d '{"apiKey": "rk_live_..."}'
        ```

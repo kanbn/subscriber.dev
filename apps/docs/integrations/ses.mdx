@@ -33,7 +33,7 @@ Or ask [your agent](/mcp): "Connect Amazon SES in eu-west-2, sending from hello@
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/ses \
+    curl -X PATCH https://api.subscriber.dev/integrations/ses \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"region": "eu-west-2", "accessKeyId": "<access key ID>", "secretAccessKey": "<secret access key>", "fromEmail": "hello@acme.com", "fromName": "Acme"}'
     ```

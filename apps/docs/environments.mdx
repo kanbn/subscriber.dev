@@ -25,7 +25,7 @@ Every workspace starts with **Production**. Add as many others as you like, such
   <Tab title="API">
     Each API key belongs to one environment, so it can't create environments. Create them with the CLI or your agent, then create a key in each: `subscriber keys create "Acme app" --environment <environmentId>`.
 
-    Every endpoint takes the environment's ID in its path.
+    Requests made with a key use its environment, so you never pass the ID.
   </Tab>
 </Tabs>
 

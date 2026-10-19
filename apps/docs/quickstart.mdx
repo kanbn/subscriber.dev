@@ -45,10 +45,9 @@ A workspace is your team's account. Inside it, environments keep separate sets o
 
     ```bash
     KEY=$(subscriber keys create "Quickstart" --access full)
-    curl https://api.subscriber.dev/keys/me -H "x-api-key: $KEY"
     ```
 
-    The response includes the environment's ID, which most endpoints take in the path. See [Authentication](/api-reference/introduction#authentication) for what keys can do.
+    The key decides the environment, so requests don't name it. See [Authentication](/api-reference/introduction#authentication) for what keys can do.
   </Tab>
 </Tabs>
 
@@ -77,7 +76,7 @@ Subscriber.dev sends through your own provider, so you keep your sending reputat
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/smtp \
+    curl -X PATCH https://api.subscriber.dev/integrations/smtp \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"host": "smtp.resend.com", "port": 465, "secure": true, "fromEmail": "hello@acme.com", "fromName": "Acme", "user": "resend", "password": "re_..."}'
     ```
@@ -125,7 +124,7 @@ This one sends a welcome email straight away and a follow-up two days later.
     With the same `welcome.json` as the CLI tab:
 
     ```bash
-    curl -X POST https://api.subscriber.dev/environments/$ENV/workflows \
+    curl -X POST https://api.subscriber.dev/workflows \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d @welcome.json
     ```
@@ -152,7 +151,7 @@ A subscriber is someone you email. Triggering a workflow starts it for one subsc
     In production you'll usually do this from your app's code, right after signup. Give your app a `limited` key, which can only add subscribers and trigger workflows: `subscriber keys create "Acme app"`.
 
     ```ts
-    const api = `https://api.subscriber.dev/environments/${ENV}`;
+    const api = "https://api.subscriber.dev";
     const headers = {
       "x-api-key": process.env.SUBSCRIBER_API_KEY,
       "content-type": "application/json",
@@ -190,7 +189,7 @@ Each time a workflow is triggered it creates a run, which records what sent and 
   </Tab>
   <Tab title="API">
     ```bash
-    curl https://api.subscriber.dev/environments/$ENV/workflows/$WORKFLOW/runs -H "x-api-key: $KEY"
+    curl https://api.subscriber.dev/workflows/$WORKFLOW/runs -H "x-api-key: $KEY"
     ```
   </Tab>
 </Tabs>

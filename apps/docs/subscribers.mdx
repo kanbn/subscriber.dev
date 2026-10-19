@@ -40,12 +40,12 @@ Or ask [your agent](/mcp): "Add jane@acme.com, first name Jane, plan pro."
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X POST https://api.subscriber.dev/environments/$ENV/subscribers \
+    curl -X POST https://api.subscriber.dev/subscribers \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"email": "jane@acme.com", "firstName": "Jane", "externalId": "user_123", "attributes": {"plan": "pro"}}'
     ```
 
-    Update with `PATCH /environments/$ENV/subscribers/$SUBSCRIBER`. Only the fields you send change.
+    Update with `PATCH /subscribers/$SUBSCRIBER`. Only the fields you send change.
   </Tab>
 </Tabs>
 
@@ -74,7 +74,7 @@ Bulk import creates new subscribers and updates existing ones, up to 500 per req
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X POST https://api.subscriber.dev/environments/$ENV/subscribers/bulk \
+    curl -X POST https://api.subscriber.dev/subscribers/bulk \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"subscribers": [{"email": "jane@acme.com", "firstName": "Jane"}]}'
     ```
@@ -101,12 +101,12 @@ Tags are labels, such as `beta` or `vip`, that you use to pick who gets a [broad
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X POST https://api.subscriber.dev/environments/$ENV/subscribers/$SUBSCRIBER/tags \
+    curl -X POST https://api.subscriber.dev/subscribers/$SUBSCRIBER/tags \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"tag": "beta"}'
     ```
 
-    Remove one with `DELETE .../tags/beta`. `GET /environments/$ENV/subscribers/tags` lists every tag in use.
+    Remove one with `DELETE .../tags/beta`. `GET /subscribers/tags` lists every tag in use.
   </Tab>
 </Tabs>
 
@@ -134,7 +134,7 @@ You can also change it yourself, for example to respect an opt-out from your own
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X PATCH https://api.subscriber.dev/environments/$ENV/subscribers/$SUBSCRIBER/preferences \
+    curl -X PATCH https://api.subscriber.dev/subscribers/$SUBSCRIBER/preferences \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"email": false}'
     ```

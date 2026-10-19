@@ -23,7 +23,7 @@ Or ask [your agent](/mcp): "Why didn't jane@acme.com get the welcome email?"
   </Tab>
   <Tab title="API">
     ```bash
-    curl https://api.subscriber.dev/environments/$ENV/workflows/runs -H "x-api-key: $KEY"
+    curl https://api.subscriber.dev/workflows/runs -H "x-api-key: $KEY"
     ```
 
     Each step has a `status` and an `errorMessage`.
@@ -90,7 +90,7 @@ Subscriber.dev keeps every event Stripe sends it, and what it did with it.
   </Tab>
   <Tab title="API">
     ```bash
-    curl https://api.subscriber.dev/environments/$ENV/inbound-events -H "x-api-key: $KEY"
+    curl https://api.subscriber.dev/inbound-events -H "x-api-key: $KEY"
     ```
   </Tab>
 </Tabs>

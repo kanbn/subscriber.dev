@@ -46,7 +46,7 @@ Or ask [your agent](/mcp): "Which integrations are connected to production?"
   </Tab>
   <Tab title="API">
     ```bash
-    curl https://api.subscriber.dev/environments/$ENV/integrations -H "x-api-key: $KEY"
+    curl https://api.subscriber.dev/integrations -H "x-api-key: $KEY"
     ```
 
     Connect or update one with `PATCH .../integrations/<type>`, and remove it with `DELETE`.

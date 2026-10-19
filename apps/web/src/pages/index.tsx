@@ -105,7 +105,7 @@ const STEPS: Step[] = [
         chat: ["connect Resend", "set_integration", "resend connected"],
       },
       api: {
-        shell: `curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/resend \\
+        shell: `curl -X PATCH https://api.subscriber.dev/integrations/resend \\
   -H "x-api-key: $KEY" -d '{…}'`,
       },
       cli: { shell: "subscriber integrations set resend --body '{…}'" },
@@ -125,7 +125,7 @@ const STEPS: Step[] = [
         ],
       },
       api: {
-        shell: `curl -X POST https://api.subscriber.dev/environments/$ENV/workflows \\
+        shell: `curl -X POST https://api.subscriber.dev/workflows \\
   -H "x-api-key: $KEY" -d @onboarding.json`,
       },
       cli: { shell: "subscriber workflows create --file onboarding.json" },
@@ -146,7 +146,7 @@ const STEPS: Step[] = [
       },
       api: {
         code: `// in your app, e.g. after signup
-await fetch(\`https://api.subscriber.dev/environments/\${ENV}/workflows/trigger\`, {
+await fetch(\`https://api.subscriber.dev/workflows/trigger\`, {
   method: "POST",
   headers: { "x-api-key": KEY, "content-type": "application/json" },
   body: JSON.stringify({ key: "welcome", subscriber: { email: user.email } }),
@@ -797,7 +797,7 @@ function BroadcastTerminal() {
         <span hidden={mode !== "api"}>
           <Comment>
             {
-              "# changelog workflow\n# API=https://api.subscriber.dev/environments/$ENV/workflows/p7d2nx9c4kwe\n"
+              "# changelog workflow\n# API=https://api.subscriber.dev/workflows/p7d2nx9c4kwe\n"
             }
           </Comment>
           <Prompt />

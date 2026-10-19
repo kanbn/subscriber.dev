@@ -32,7 +32,7 @@ Or ask [your agent](/mcp): "Connect my Postmark account over SMTP, sending from 
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/smtp \
+    curl -X PATCH https://api.subscriber.dev/integrations/smtp \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"host": "smtp.postmarkapp.com", "port": 587, "secure": false, "fromEmail": "hello@acme.com", "user": "<server token>", "password": "<server token>"}'
     ```

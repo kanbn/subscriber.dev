@@ -26,7 +26,7 @@ Or ask [your agent](/mcp): "Connect Postmark, sending from hello@acme.com."
   </Tab>
   <Tab title="API">
     ```bash
-    curl -X PATCH https://api.subscriber.dev/environments/$ENV/integrations/postmark \
+    curl -X PATCH https://api.subscriber.dev/integrations/postmark \
       -H "x-api-key: $KEY" -H "content-type: application/json" \
       -d '{"serverToken": "<server API token>", "fromEmail": "hello@acme.com", "fromName": "Acme"}'
     ```
