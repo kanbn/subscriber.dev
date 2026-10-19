@@ -40,7 +40,6 @@
   },
   "prettier": "@subscriber.dev/prettier-config",
   "dependencies": {
-    "@better-auth/api-key": "^1.7.7",
     "@better-auth/oauth-provider": "^1.7.7",
     "@subscriber.dev/db": "workspace:*",
     "@subscriber.dev/email": "workspace:*",

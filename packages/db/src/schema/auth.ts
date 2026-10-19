@@ -1,8 +1,6 @@
-import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
-  boolean,
   integer,
   pgTable,
   text,
@@ -50,41 +48,6 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("createdAt"),
   updatedAt: timestamp("updatedAt"),
 }).enableRLS();
-
-export const apikey = pgTable("apiKey", {
-  id: bigserial("id", { mode: "number" }).primaryKey(),
-  name: text("name"),
-  start: text("start"),
-  prefix: text("prefix"),
-  key: text("key").notNull(),
-  configId: text("configId").notNull().default("default"),
-  referenceId: bigserial("referenceId", { mode: "number" })
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  refillInterval: integer("refillInterval"),
-  refillAmount: integer("refillAmount"),
-  lastRefillAt: timestamp("lastRefillAt"),
-  enabled: boolean("enabled"),
-  rateLimitEnabled: boolean("rateLimitEnabled"),
-  rateLimitTimeWindow: integer("rateLimitTimeWindow"),
-  rateLimitMax: integer("rateLimitMax"),
-  requestCount: integer("requestCount"),
-  remaining: integer("remaining"),
-  lastRequest: timestamp("lastRequest"),
-  expiresAt: timestamp("expiresAt"),
-  createdAt: timestamp("createdAt").notNull(),
-  updatedAt: timestamp("updatedAt").notNull(),
-  permissions: text("permissions"),
-  metadata: text("metadata"),
-}).enableRLS();
-
-export const apiKeyRelations = relations(apikey, ({ one }) => ({
-  user: one(users, {
-    fields: [apikey.referenceId],
-    references: [users.id],
-    relationName: "apiKeyUser",
-  }),
-}));
 
 // better-auth device-authorization plugin: `subscriber login` in the CLI.
 export const deviceCode = pgTable("deviceCode", {

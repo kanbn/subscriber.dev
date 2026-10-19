@@ -10,7 +10,6 @@ import {
 
 import { generateUID } from "@subscriber.dev/shared/utils";
 
-import { apikey } from "./auth.js";
 import { workspaceMembers } from "./workspaces.js";
 
 export const users = pgTable("users", {
@@ -28,6 +27,5 @@ export const users = pgTable("users", {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  apiKeys: many(apikey),
   workspaceMemberships: many(workspaceMembers),
 }));

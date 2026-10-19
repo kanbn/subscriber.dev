@@ -1,4 +1,3 @@
-import { apiKey } from "@better-auth/api-key";
 import { oauthProvider } from "@better-auth/oauth-provider";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -100,8 +99,7 @@ export const initAuth = (db: dbClient) => {
     },
     plugins: [
       // `subscriber login`: the CLI gets a code, the user approves it on
-      // /auth, and the CLI swaps the session token (sent as a bearer) for an
-      // API key.
+      // /auth, and the CLI keeps the session token and sends it as a bearer.
       deviceAuthorization({
         verificationUri: "/auth",
         validateClient: (clientId) => clientId === "subscriber-cli",
@@ -109,10 +107,6 @@ export const initAuth = (db: dbClient) => {
         schema: {},
       }),
       bearer(),
-      apiKey({
-        enableSessionForAPIKeys: true,
-        rateLimit: { enabled: false },
-      }),
       jwt(),
       oauthProvider({
         loginPage: "/auth",

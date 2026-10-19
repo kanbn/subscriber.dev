@@ -2,7 +2,6 @@ import { and, desc, eq } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import {
-  apikey,
   oauthAccessToken,
   oauthClient,
   oauthConsent,
@@ -17,16 +16,6 @@ export const getById = async (db: dbClient, id: number) => {
       name: true,
       email: true,
       image: true,
-    },
-    with: {
-      apiKeys: {
-        columns: {
-          id: true,
-          prefix: true,
-        },
-        orderBy: desc(apikey.createdAt),
-        limit: 1,
-      },
     },
     where: eq(users.id, id),
   });
@@ -100,14 +89,4 @@ export const disconnectAgent = async (
       );
     return true;
   });
-};
-
-export const deleteApiKey = async (
-  db: dbClient,
-  userId: number,
-  keyId: number,
-) => {
-  await db
-    .delete(apikey)
-    .where(and(eq(apikey.id, keyId), eq(apikey.referenceId, userId)));
 };
