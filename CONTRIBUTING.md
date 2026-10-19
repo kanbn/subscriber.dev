@@ -37,8 +37,9 @@ Thank you for your interest in contributing to Subscriber.dev! This document pro
 
 ## Need Help?
 
-- Join our [Discord server](https://discord.gg/e6ejRb6CmT) for questions
+- Ask questions in [GitHub Discussions](https://github.com/kanbn/subscriber.dev/discussions)
 - Check existing issues and pull requests
+- Open an issue before starting a large change, so we can agree on the approach first
 - Email [henry@subscriber.dev](mailto:henry@subscriber.dev) for major concerns
 
 ## Code of Conduct
