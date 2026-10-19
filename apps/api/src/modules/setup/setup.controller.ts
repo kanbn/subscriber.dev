@@ -12,6 +12,7 @@ import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscribe
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
+import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import { SetupResponseDto } from "./dto/setup.dto.js";
@@ -26,6 +27,7 @@ export class SetupController {
   constructor(private readonly setupService: SetupService) {}
 
   @Get()
+  @RequiresScope("analytics:read")
   @ApiOperation({
     operationId: "getSetup",
     summary: "Get the environment's setup checklist",

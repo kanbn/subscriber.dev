@@ -21,6 +21,7 @@ import { createDrizzleClient } from "@subscriber.dev/db/client";
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
+import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
@@ -40,6 +41,7 @@ export class EmailController {
   constructor(private readonly emailTest: EmailTestService) {}
 
   @Post("preview")
+  @RequiresScope("emails:test")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "previewEmail",
@@ -50,7 +52,7 @@ export class EmailController {
   @ApiParam({ name: "environmentId", type: "string" })
   @ApiResponse({ status: 200, type: RenderedEmailDto })
   async preview(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: EmailContentDto,
   ): Promise<RenderedEmailDto> {
@@ -63,6 +65,7 @@ export class EmailController {
   }
 
   @Post("test")
+  @RequiresScope("emails:test")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "sendTestEmail",
@@ -79,7 +82,7 @@ export class EmailController {
   })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async sendTest(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: TestEmailDto,
   ): Promise<TestEmailResponseDto> {

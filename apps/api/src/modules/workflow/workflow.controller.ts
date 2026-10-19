@@ -27,6 +27,7 @@ import { createDrizzleClient } from "@subscriber.dev/db/client";
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
+import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
@@ -68,6 +69,7 @@ export class WorkflowController {
   constructor(private readonly workflowService: WorkflowService) {}
 
   @Post("trigger")
+  @RequiresScope("workflows:trigger")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "triggerWorkflow",
@@ -82,7 +84,7 @@ export class WorkflowController {
     description: "Environment, workflow, or subscriber not found",
   })
   async triggerWorkflow(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: TriggerWorkflowDto,
   ): Promise<TriggerWorkflowResponseDto> {
@@ -92,11 +94,12 @@ export class WorkflowController {
       key: input.key,
       subscriber: input.subscriber,
       payload: input.payload,
-      triggeredBy: user.id,
+      triggeredBy: user?.id ?? null,
     });
   }
 
   @Post()
+  @RequiresScope("workflows:write")
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     operationId: "createWorkflow",
@@ -108,7 +111,7 @@ export class WorkflowController {
   @ApiResponse({ status: 201, type: WorkflowResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async createWorkflow(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: CreateWorkflowDto,
   ) {
@@ -123,11 +126,12 @@ export class WorkflowController {
       steps: input.steps,
       triggers: input.triggers,
       exitConditions: input.exitConditions,
-      createdBy: user.id,
+      createdBy: user?.id ?? null,
     });
   }
 
   @Get()
+  @RequiresScope("workflows:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listWorkflows",
@@ -158,6 +162,7 @@ export class WorkflowController {
   }
 
   @Get("runs")
+  @RequiresScope("workflows:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listEnvironmentRuns",
@@ -183,6 +188,7 @@ export class WorkflowController {
   }
 
   @Get(":workflowId")
+  @RequiresScope("workflows:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "getWorkflow",
@@ -203,6 +209,7 @@ export class WorkflowController {
   }
 
   @Patch(":workflowId")
+  @RequiresScope("workflows:write")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "updateWorkflow",
@@ -215,7 +222,7 @@ export class WorkflowController {
   @ApiResponse({ status: 200, type: WorkflowResponseDto })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async updateWorkflow(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
     @Body() input: UpdateWorkflowDto,
@@ -231,11 +238,12 @@ export class WorkflowController {
       steps: input.steps,
       triggers: input.triggers,
       exitConditions: input.exitConditions,
-      updatedBy: user.id,
+      updatedBy: user?.id ?? null,
     });
   }
 
   @Delete(":workflowId")
+  @RequiresScope("workflows:write")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     operationId: "deleteWorkflow",
@@ -248,7 +256,7 @@ export class WorkflowController {
   @ApiResponse({ status: 204, description: "Workflow deleted" })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async deleteWorkflow(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
   ): Promise<void> {
@@ -258,11 +266,12 @@ export class WorkflowController {
       db,
       environment.id,
       workflowId,
-      user.id,
+      user?.id ?? null,
     );
   }
 
   @Get(":workflowId/runs")
+  @RequiresScope("workflows:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listWorkflowRuns",
@@ -290,6 +299,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcast/preview")
+  @RequiresScope("broadcasts:read")
   @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -322,6 +332,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcast")
+  @RequiresScope("broadcasts:write")
   @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -339,7 +350,7 @@ export class WorkflowController {
   })
   @ApiResponse({ status: 404, description: "Workflow not found" })
   async triggerBroadcast(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("workflowId") workflowId: string,
     @Body() input: TriggerBroadcastDto,
@@ -351,7 +362,7 @@ export class WorkflowController {
       environment.id,
       workflowId,
       input.audience,
-      user.id,
+      user?.id ?? null,
       {
         sendOverHours: input.sendOverHours,
         allowOverPlan: input.allowOverPlan,
@@ -360,6 +371,7 @@ export class WorkflowController {
   }
 
   @Get(":workflowId/broadcasts")
+  @RequiresScope("broadcasts:read")
   @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -388,6 +400,7 @@ export class WorkflowController {
   }
 
   @Get(":workflowId/broadcasts/:broadcastId")
+  @RequiresScope("broadcasts:read")
   @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -417,6 +430,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcasts/:broadcastId/pause")
+  @RequiresScope("broadcasts:write")
   @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -450,6 +464,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcasts/:broadcastId/resume")
+  @RequiresScope("broadcasts:write")
   @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -483,6 +498,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcasts/:broadcastId/cancel")
+  @RequiresScope("broadcasts:write")
   @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -516,6 +532,7 @@ export class WorkflowController {
   }
 
   @Post(":workflowId/broadcasts/:broadcastId/redispatch")
+  @RequiresScope("broadcasts:write")
   @ApiTags("Broadcasts")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

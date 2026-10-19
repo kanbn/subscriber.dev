@@ -65,6 +65,26 @@ describe("send", () => {
   });
 });
 
+describe("send with an API key", () => {
+  it("needs a recipient, since there's no person to send to", async () => {
+    await expect(
+      service.send(db, null, 1, { subject: "Hi", body: "<p>Hi</p>" }),
+    ).rejects.toThrow("Pass to");
+    await expect(
+      service.send(
+        db,
+        null,
+        1,
+        { subject: "Hi {{ subscriber.email }}", body: "<p>Hi</p>" },
+        { to: "ada@acme.com" },
+      ),
+    ).resolves.toEqual({
+      to: "ada@acme.com",
+      subject: "[Test] Hi ada@acme.com",
+    });
+  });
+});
+
 describe("workflowStep", () => {
   const steps = [
     { type: "webhook", config: { url: "https://acme.com/hook" } },

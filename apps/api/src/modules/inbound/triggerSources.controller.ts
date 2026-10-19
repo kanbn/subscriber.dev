@@ -18,6 +18,7 @@ import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscribe
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
+import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import { ListTriggerSourcesResponseDto } from "./dto/trigger-sources.dto.js";
@@ -32,6 +33,7 @@ export class TriggerSourcesController {
   constructor(private readonly inboundService: InboundService) {}
 
   @Get()
+  @RequiresScope("workflows:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listTriggerSources",

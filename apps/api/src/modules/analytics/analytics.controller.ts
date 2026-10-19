@@ -20,6 +20,7 @@ import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscribe
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
+import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import { AnalyticsService } from "./analytics.service.js";
@@ -37,6 +38,7 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get()
+  @RequiresScope("analytics:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "getAnalytics",

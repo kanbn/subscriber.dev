@@ -22,14 +22,17 @@ export interface TestEmailContent extends EmailContent {
   replyTo?: string;
 }
 
-function sampleContext(user: User, data: Record<string, unknown> = {}) {
-  const name: string | null = user.name;
+function sampleContext(
+  person: { email: string; name: string | null },
+  data: Record<string, unknown> = {},
+) {
+  const name = person.name;
   const [firstName, ...rest] = (name ?? "").trim().split(/\s+/);
   const { subscriber, ...payload } = data;
   return {
     ...payload,
     subscriber: {
-      email: user.email,
+      email: person.email,
       firstName: firstName || null,
       lastName: rest.join(" ") || null,
       name: name ?? null,
@@ -52,13 +55,13 @@ export class EmailTestService {
 
   async preview(
     db: dbClient,
-    user: User,
+    user: User | null,
     environmentId: number,
     content: EmailContent,
   ) {
     const { subject, html } = await renderEmail(
       content,
-      sampleContext(user),
+      sampleContext(user ?? { email: "subscriber@example.com", name: null }),
       "#",
       await this.footer(db, environmentId),
     ).catch((error: unknown) => {
@@ -71,16 +74,21 @@ export class EmailTestService {
 
   async send(
     db: dbClient,
-    user: User,
+    user: User | null,
     environmentId: number,
     content: TestEmailContent,
     options: { to?: string; data?: Record<string, unknown> } = {},
   ) {
-    const to = options.to ?? user.email;
+    const to = options.to ?? user?.email;
+    if (!to) {
+      throw new BadRequestException(
+        "Pass to: an API key has no email address to send the test to",
+      );
+    }
     try {
       const email = await renderEmail(
         content,
-        sampleContext(user, options.data),
+        sampleContext(user ?? { email: to, name: null }, options.data),
         "#",
         await this.footer(db, environmentId),
       );

@@ -24,6 +24,7 @@ import { createDrizzleClient } from "@subscriber.dev/db/client";
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
+import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
@@ -42,6 +43,7 @@ export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
 
   @Patch(":type")
+  @RequiresScope("integrations:write")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "upsertIntegration",
@@ -65,7 +67,7 @@ export class IntegrationsController {
     description: "Environment or integration type not found",
   })
   async upsert(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("type") type: string,
     @Body() body: UpsertIntegrationDto,
@@ -77,11 +79,12 @@ export class IntegrationsController {
       environment.id,
       type,
       body,
-      user.id,
+      user?.id ?? null,
     );
   }
 
   @Patch(":type/primary")
+  @RequiresScope("integrations:write")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "setPrimaryIntegration",
@@ -110,6 +113,7 @@ export class IntegrationsController {
   }
 
   @Get()
+  @RequiresScope("integrations:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listIntegrations",
@@ -129,6 +133,7 @@ export class IntegrationsController {
   }
 
   @Get(":type")
+  @RequiresScope("integrations:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "getIntegration",
@@ -153,6 +158,7 @@ export class IntegrationsController {
   }
 
   @Delete(":type")
+  @RequiresScope("integrations:write")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     operationId: "deleteIntegration",

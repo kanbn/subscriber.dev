@@ -12,6 +12,7 @@ import {
   Param,
   Post,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -24,10 +25,15 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import type { EnvironmentKeyForRequest } from "@subscriber.dev/db/repository/environmentKey.repo";
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
+import {
+  CurrentEnvironmentKey,
+  RequiresScope,
+} from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { WorkspaceService } from "../workspace/workspace.service.js";
 import { BillingService } from "./billing.service.js";
@@ -60,6 +66,7 @@ export class BillingController {
   }
 
   @Get()
+  @RequiresScope("billing:read")
   @ApiOperation({
     operationId: "getBilling",
     summary: "Get a workspace's plan and usage",
@@ -67,9 +74,19 @@ export class BillingController {
   @ApiParam({ name: "workspaceId", type: "string" })
   @ApiResponse({ status: 200, type: BillingResponseDto })
   async getBilling(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
+    @CurrentEnvironmentKey() key: EnvironmentKeyForRequest | null,
     @Param("workspaceId") workspaceId: string,
   ): Promise<BillingResponseDto> {
+    if (key) {
+      if (key.workspacePublicId !== workspaceId)
+        throw new NotFoundException("Workspace not found");
+      return this.billingService.getBilling(
+        createDrizzleClient(),
+        key.environment.workspaceId,
+      );
+    }
+    if (!user) throw new UnauthorizedException("User not authenticated");
     const { db, workspace } = await this.workspace(user.id, workspaceId);
     return this.billingService.getBilling(db, workspace.id);
   }

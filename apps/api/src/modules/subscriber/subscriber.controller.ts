@@ -29,6 +29,7 @@ import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
+import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
@@ -68,6 +69,7 @@ export class SubscriberController {
   constructor(private readonly subscriberService: SubscriberService) {}
 
   @Get()
+  @RequiresScope("subscribers:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listSubscribers",
@@ -123,6 +125,7 @@ export class SubscriberController {
   }
 
   @Get("tags")
+  @RequiresScope("subscribers:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listTags",
@@ -142,6 +145,7 @@ export class SubscriberController {
   }
 
   @Get(":subscriberId")
+  @RequiresScope("subscribers:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "getSubscriber",
@@ -166,6 +170,7 @@ export class SubscriberController {
   }
 
   @Post()
+  @RequiresScope("subscribers:write")
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     operationId: "createSubscriber",
@@ -185,7 +190,7 @@ export class SubscriberController {
   })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async createSubscriber(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: CreateSubscriberDto,
   ): Promise<CreateSubscriberResponseDto> {
@@ -202,12 +207,13 @@ export class SubscriberController {
       name: input.name,
       attributes: input.attributes ?? null,
       emailPreference: input.preferences?.email ?? true,
-      createdBy: user.id,
+      createdBy: user?.id ?? null,
       createdVia: "api",
     });
   }
 
   @Post("bulk")
+  @RequiresScope("subscribers:write")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "bulkUpsertSubscribers",
@@ -219,7 +225,7 @@ export class SubscriberController {
   @ApiResponse({ status: 200, type: BulkUpsertSubscribersResponseDto })
   @ApiResponse({ status: 404, description: "Environment not found" })
   async bulkUpsertSubscribers(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: BulkUpsertSubscribersDto,
   ): Promise<BulkUpsertSubscribersResponseDto> {
@@ -229,12 +235,13 @@ export class SubscriberController {
       db,
       environment.id,
       input.subscribers,
-      user.id,
+      user?.id ?? null,
       "api",
     );
   }
 
   @Patch(":subscriberId")
+  @RequiresScope("subscribers:write")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "updateSubscriber",
@@ -246,7 +253,7 @@ export class SubscriberController {
   @ApiResponse({ status: 200, type: UpdateSubscriberResponseDto })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
   async updateSubscriber(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
     @Body() input: UpdateSubscriberDto,
@@ -271,11 +278,12 @@ export class SubscriberController {
       lastName: input.lastName,
       name: input.name,
       attributes: input.attributes,
-      updatedBy: user.id,
+      updatedBy: user?.id ?? null,
     });
   }
 
   @Delete(":subscriberId")
+  @RequiresScope("subscribers:write")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     operationId: "deleteSubscriber",
@@ -288,7 +296,7 @@ export class SubscriberController {
   @ApiResponse({ status: 204, description: "Subscriber deleted" })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
   async deleteSubscriber(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
   ): Promise<void> {
@@ -298,11 +306,12 @@ export class SubscriberController {
       db,
       environment.id,
       subscriberId,
-      user.id,
+      user?.id ?? null,
     );
   }
 
   @Patch(":subscriberId/preferences")
+  @RequiresScope("subscribers:write")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "updateSubscriberPreferences",
@@ -344,6 +353,7 @@ export class SubscriberController {
   }
 
   @Post(":subscriberId/tags")
+  @RequiresScope("subscribers:write")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "addSubscriberTag",
@@ -356,7 +366,7 @@ export class SubscriberController {
   @ApiResponse({ status: 200, type: TagResponseDto })
   @ApiResponse({ status: 404, description: "Subscriber not found" })
   async addTag(
-    @CurrentUser() user: User,
+    @CurrentUser() user: User | null,
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Param("subscriberId") subscriberId: string,
     @Body() input: AddTagDto,
@@ -368,11 +378,12 @@ export class SubscriberController {
       environment.id,
       subscriberId,
       input.tag,
-      user.id,
+      user?.id ?? null,
     );
   }
 
   @Delete(":subscriberId/tags/:tag")
+  @RequiresScope("subscribers:write")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     operationId: "removeSubscriberTag",

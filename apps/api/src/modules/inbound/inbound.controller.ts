@@ -19,6 +19,7 @@ import type { EnvironmentForUser } from "@subscriber.dev/db/repository/subscribe
 import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 import { CurrentEnvironment } from "../../common/decorators/current-environment.decorator.js";
+import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
 import {
@@ -36,6 +37,7 @@ export class InboundController {
   constructor(private readonly inboundService: InboundService) {}
 
   @Get()
+  @RequiresScope("events:read")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     operationId: "listInboundEvents",
