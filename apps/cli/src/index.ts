@@ -7,6 +7,7 @@ import { registerAnalyticsCommand } from "./commands/analytics.js";
 import { registerBillingCommand } from "./commands/billing.js";
 import { registerEnvironmentsCommand } from "./commands/environments.js";
 import { registerIntegrationsCommand } from "./commands/integrations.js";
+import { registerKeysCommand } from "./commands/keys.js";
 import { registerLoginCommand } from "./commands/login.js";
 import { registerSubscribersCommand } from "./commands/subscribers.js";
 import { registerUploadsCommand } from "./commands/uploads.js";
@@ -32,6 +33,7 @@ if (process.argv.length <= 2) {
   registerUsersCommand(program);
   registerAgentsCommand(program);
   registerIntegrationsCommand(program);
+  registerKeysCommand(program);
   registerAnalyticsCommand(program);
   registerBillingCommand(program);
 
