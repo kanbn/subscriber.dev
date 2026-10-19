@@ -11,7 +11,9 @@ const PREFIX = "sk_env_";
 
 export const REQUIRED_SCOPE = "environmentKeyScope";
 
-export const RequiresScope = (scope: EnvironmentKeyScope) =>
+export const ANY_SCOPE = "*";
+
+export const RequiresScope = (scope: EnvironmentKeyScope | typeof ANY_SCOPE) =>
   SetMetadata(REQUIRED_SCOPE, scope);
 
 export function generateEnvironmentKey() {

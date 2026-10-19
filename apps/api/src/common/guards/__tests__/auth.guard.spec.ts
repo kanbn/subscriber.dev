@@ -7,7 +7,11 @@ import type { EnvironmentKeyScope } from "@subscriber.dev/shared/environmentKeys
 import * as environmentKeyRepo from "@subscriber.dev/db/repository/environmentKey.repo";
 import { ALL_ENVIRONMENT_KEY_SCOPES } from "@subscriber.dev/shared/environmentKeys";
 
-import { hashEnvironmentKey, REQUIRED_SCOPE } from "../../environmentKey.js";
+import {
+  ANY_SCOPE,
+  hashEnvironmentKey,
+  REQUIRED_SCOPE,
+} from "../../environmentKey.js";
 import { AuthGuard } from "../auth.guard.js";
 import { resolveSessionFromHeaders } from "../session.util.js";
 
@@ -23,10 +27,12 @@ vi.mock("../session.util.js", () => ({
 }));
 
 const routes = {
+  anyKey: () => undefined,
   trigger: () => undefined,
   editWorkflows: () => undefined,
   people: () => undefined,
 };
+Reflect.defineMetadata(REQUIRED_SCOPE, ANY_SCOPE, routes.anyKey);
 Reflect.defineMetadata(REQUIRED_SCOPE, "workflows:trigger", routes.trigger);
 Reflect.defineMetadata(REQUIRED_SCOPE, "workflows:write", routes.editWorkflows);
 
@@ -41,6 +47,9 @@ const environment = {
 function key(scopes: EnvironmentKeyScope[], lastUsedAt: Date | null = null) {
   return {
     id: 1,
+    publicId: "key_1",
+    name: "Production app",
+    start: "sk_env_abcde",
     scopes,
     lastUsedAt,
     environment,
@@ -108,6 +117,16 @@ describe("AuthGuard with an environment key", () => {
     await expect(
       call("editWorkflows", { "x-api-key": "sk_env_app" }).result,
     ).rejects.toThrow("doesn't have the workflows:write scope");
+  });
+
+  it("lets any key call a route open to every key", async () => {
+    vi.mocked(environmentKeyRepo.getEnvironmentKeyByHash).mockResolvedValue(
+      key([]),
+    );
+
+    await expect(
+      call("anyKey", { "x-api-key": "sk_env_none" }).result,
+    ).resolves.toBe(true);
   });
 
   it("rejects any key on routes without a scope", async () => {

@@ -13,6 +13,7 @@ import * as environmentKeyRepo from "@subscriber.dev/db/repository/environmentKe
 import type { AuthenticatedRequest } from "../interfaces/request.interface.js";
 import type { User } from "../interfaces/user.interface.js";
 import {
+  ANY_SCOPE,
   hashEnvironmentKey,
   isEnvironmentKey,
   REQUIRED_SCOPE,
@@ -42,14 +43,14 @@ export class AuthGuard implements CanActivate {
       if (!key) throw new UnauthorizedException("Invalid API key");
 
       const scope = this.reflector.getAllAndOverride<
-        EnvironmentKeyScope | undefined
+        EnvironmentKeyScope | typeof ANY_SCOPE | undefined
       >(REQUIRED_SCOPE, [context.getHandler(), context.getClass()]);
       if (!scope) {
         throw new ForbiddenException(
           "API keys can't call this endpoint. Sign in instead.",
         );
       }
-      if (!key.scopes.includes(scope)) {
+      if (scope !== ANY_SCOPE && !key.scopes.includes(scope)) {
         throw new ForbiddenException(
           `This API key doesn't have the ${scope} scope.`,
         );
