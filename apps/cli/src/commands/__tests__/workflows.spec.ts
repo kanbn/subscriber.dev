@@ -95,7 +95,7 @@ describe("workflows list", () => {
       { from: "user" },
     );
 
-    expect(listWorkflows).toHaveBeenCalledWith("test-environment-1", {
+    expect(listWorkflows).toHaveBeenCalledWith({
       limit: 10,
       offset: 5,
     });
@@ -115,7 +115,6 @@ describe("workflows list", () => {
     );
 
     expect(listWorkflows).toHaveBeenCalledWith(
-      "test-environment-1",
       expect.objectContaining({ type: "broadcast" }),
     );
   });
@@ -153,10 +152,7 @@ describe("workflows get", () => {
       from: "user",
     });
 
-    expect(getWorkflow).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-    );
+    expect(getWorkflow).toHaveBeenCalledWith("test-workflow-1");
     expect(logSpy).toHaveBeenCalledWith(testWorkflow);
   });
 
@@ -206,7 +202,7 @@ describe("workflows test", () => {
       { from: "user" },
     );
 
-    expect(sendTestEmail).toHaveBeenCalledWith("test-environment-1", {
+    expect(sendTestEmail).toHaveBeenCalledWith({
       workflowId: "wf-1",
       step: 3,
       to: "ada@acme.com",
@@ -264,7 +260,7 @@ describe("workflows trigger", () => {
       { from: "user" },
     );
 
-    expect(triggerWorkflow).toHaveBeenCalledWith("test-environment-1", {
+    expect(triggerWorkflow).toHaveBeenCalledWith({
       key: "test-signup",
       subscriber: {
         publicId: undefined,
@@ -365,7 +361,7 @@ describe("workflows create", () => {
     );
 
     expect(readFileSync).toHaveBeenCalledWith("workflow.json", "utf-8");
-    expect(createWorkflow).toHaveBeenCalledWith("test-environment-1", {
+    expect(createWorkflow).toHaveBeenCalledWith({
       key: "test-signup",
       name: "Test Signup",
       steps: [{ type: "email", delayMs: 0, subject: "hi", body: "hi" }],
@@ -434,11 +430,9 @@ describe("workflows update", () => {
       { from: "user" },
     );
 
-    expect(updateWorkflow).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-      { status: "paused" },
-    );
+    expect(updateWorkflow).toHaveBeenCalledWith("test-workflow-1", {
+      status: "paused",
+    });
   });
 
   it("errors without calling the API when the file can't be read", async () => {
@@ -502,10 +496,7 @@ describe("workflows delete", () => {
       { from: "user" },
     );
 
-    expect(deleteWorkflow).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-    );
+    expect(deleteWorkflow).toHaveBeenCalledWith("test-workflow-1");
     expect(logSpy).toHaveBeenCalledWith("Deleted workflow test-workflow-1.");
   });
 
@@ -560,11 +551,10 @@ describe("workflows runs", () => {
       { from: "user" },
     );
 
-    expect(listWorkflowRuns).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-      { limit: 10, offset: 5 },
-    );
+    expect(listWorkflowRuns).toHaveBeenCalledWith("test-workflow-1", {
+      limit: 10,
+      offset: 5,
+    });
   });
 
   it("prints an error and exits on a 404", async () => {
@@ -615,7 +605,7 @@ describe("workflows run-history", () => {
       { from: "user" },
     );
 
-    expect(listEnvironmentRuns).toHaveBeenCalledWith("test-environment-1", {
+    expect(listEnvironmentRuns).toHaveBeenCalledWith({
       limit: 10,
       offset: 5,
     });
@@ -667,11 +657,9 @@ describe("workflows broadcast", () => {
     );
 
     expect(readFileSync).toHaveBeenCalledWith("audience.json", "utf-8");
-    expect(triggerBroadcast).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-      { audience: { type: "optedIn" } },
-    );
+    expect(triggerBroadcast).toHaveBeenCalledWith("test-workflow-1", {
+      audience: { type: "optedIn" },
+    });
   });
 
   it("errors without calling the API when the file isn't valid JSON", async () => {
@@ -783,11 +771,10 @@ describe("workflows broadcast --send-over-hours", () => {
       { from: "user" },
     );
 
-    expect(triggerBroadcast).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-      { audience: { type: "optedIn" }, sendOverHours: 48 },
-    );
+    expect(triggerBroadcast).toHaveBeenCalledWith("test-workflow-1", {
+      audience: { type: "optedIn" },
+      sendOverHours: 48,
+    });
   });
 
   it("rejects an out-of-range window without calling the API", async () => {
@@ -840,11 +827,7 @@ describe.each([
       { from: "user" },
     );
 
-    expect(fn).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-      "bc_1",
-    );
+    expect(fn).toHaveBeenCalledWith("test-workflow-1", "bc_1");
     expect(logSpy).toHaveBeenCalledWith(`${past} broadcast bc_1.`);
   });
 
@@ -900,11 +883,10 @@ describe("workflows broadcasts", () => {
       { from: "user" },
     );
 
-    expect(listBroadcasts).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-      { limit: 10, offset: 5 },
-    );
+    expect(listBroadcasts).toHaveBeenCalledWith("test-workflow-1", {
+      limit: 10,
+      offset: 5,
+    });
   });
 
   it("prints an error and exits on a 404", async () => {

@@ -1,3 +1,4 @@
+import { setEnvironmentId } from "@subscriber.dev/api-client/environment";
 import { readCliConfig } from "@subscriber.dev/shared";
 
 export function requireWorkspaceId(opts: { workspace?: string }): string {
@@ -20,5 +21,6 @@ export function requireEnvironmentId(opts: { environment?: string }): string {
     );
     process.exit(1);
   }
+  setEnvironmentId(environmentId);
   return environmentId;
 }

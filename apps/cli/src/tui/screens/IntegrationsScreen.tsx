@@ -73,7 +73,7 @@ export function IntegrationsScreen({
   onCancelCreate?: () => void;
 }) {
   const state = useAsyncData(async () => {
-    const response = await listIntegrations(environmentId);
+    const response = await listIntegrations();
     if (response.status !== 200) {
       throw new Error("Environment not found.");
     }
@@ -101,7 +101,6 @@ export function IntegrationsScreen({
     try {
       const body = smtpIntegrationBody(values);
       const response = await upsertIntegration(
-        environmentId,
         "smtp",
         body as unknown as UpsertIntegrationDto,
       );
@@ -123,7 +122,6 @@ export function IntegrationsScreen({
   ): Promise<string | undefined> => {
     try {
       const response = await upsertIntegration(
-        environmentId,
         "stripe",
         stripeIntegrationBody(values) as unknown as UpsertIntegrationDto,
       );
@@ -146,7 +144,6 @@ export function IntegrationsScreen({
     try {
       const body = cloudflareIntegrationBody(values);
       const response = await upsertIntegration(
-        environmentId,
         "cloudflare",
         body as unknown as UpsertIntegrationDto,
       );
@@ -168,7 +165,6 @@ export function IntegrationsScreen({
     async (values: ProviderValues): Promise<string | undefined> => {
       try {
         const response = await upsertIntegration(
-          environmentId,
           type,
           providerIntegrationBody(
             providerFields(type),

@@ -9,7 +9,9 @@ import type {
   ListWorkflowsResponseDtoWorkflowsItemStepsItem,
   UpdateWorkflowDtoStepsItem,
 } from "@subscriber.dev/api-client/hooks";
+import { setEnvironmentId } from "@subscriber.dev/api-client/environment";
 import {
+  getListIntegrationsQueryKey,
   getListWorkflowsQueryKey,
   uploadImage,
   uploadVideoThumbnail,
@@ -53,6 +55,7 @@ export default function EditorPage() {
     typeof router.query.environmentId === "string"
       ? router.query.environmentId
       : "";
+  setEnvironmentId(environmentId || undefined);
   const workflowId = Array.isArray(router.query.workflowId)
     ? router.query.workflowId[0]
     : undefined;
@@ -66,9 +69,13 @@ export default function EditorPage() {
   }, [router, isPending, session]);
 
   const workflows = useListWorkflows(
-    environmentId,
     { limit: 100 },
-    { query: { enabled: Boolean(environmentId && session) } },
+    {
+      query: {
+        enabled: Boolean(environmentId && session),
+        queryKey: [environmentId, ...getListWorkflowsQueryKey({ limit: 100 })],
+      },
+    },
   );
   const list = (
     workflows.data?.status === 200 ? workflows.data.data.workflows : []
@@ -183,7 +190,9 @@ function EmailPane({
   const update = useUpdateWorkflow();
   const preview = usePreviewEmail();
   const sendTest = useSendTestEmail();
-  const integrations = useListIntegrations(environmentId);
+  const integrations = useListIntegrations({
+    query: { queryKey: [environmentId, ...getListIntegrationsQueryKey()] },
+  });
   const sender = (
     integrations.data?.status === 200 ? integrations.data.data.integrations : []
   )
@@ -252,7 +261,6 @@ function EmailPane({
     });
     try {
       await update.mutateAsync({
-        environmentId,
         workflowId: workflow.publicId,
         data: {
           steps: nextSteps,
@@ -264,7 +272,7 @@ function EmailPane({
       setSaved({ subject, body, previewText, fromName, replyTo });
       setNotice({ ok: true, text: "saved." });
       await queryClient.invalidateQueries({
-        queryKey: getListWorkflowsQueryKey(environmentId),
+        queryKey: [environmentId, ...getListWorkflowsQueryKey()],
       });
     } catch (error) {
       setNotice({
@@ -299,14 +307,14 @@ function EmailPane({
   }, [save]);
 
   const showPreview = (show: boolean) => {
-    if (show && !previewing) preview.mutate({ environmentId, data: content });
+    if (show && !previewing) preview.mutate({ data: content });
     setPreviewing(show);
   };
 
   const test = async () => {
     setNotice(null);
     try {
-      await sendTest.mutateAsync({ environmentId, data: content });
+      await sendTest.mutateAsync({ data: content });
       setNotice({ ok: true, text: `test sent to ${userEmail}.` });
     } catch (error) {
       setNotice({
@@ -320,7 +328,7 @@ function EmailPane({
     () => ({
       upload: async (file) => {
         try {
-          const response = await uploadImage(environmentId, { file });
+          const response = await uploadImage({ file });
           if (response.status !== 201) {
             throw new Error("Couldn't upload that image");
           }
@@ -331,7 +339,7 @@ function EmailPane({
       },
       video: async (url) => {
         try {
-          const response = await uploadVideoThumbnail(environmentId, { url });
+          const response = await uploadVideoThumbnail({ url });
           if (response.status !== 201) {
             throw new Error("Couldn't add that video");
           }
@@ -346,7 +354,7 @@ function EmailPane({
       },
       onError: (message) => setNotice({ ok: false, text: message }),
     }),
-    [environmentId],
+    [],
   );
 
   const confirmLeave = (event: React.MouseEvent<HTMLAnchorElement>) => {

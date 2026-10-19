@@ -24,10 +24,7 @@ import { useAsyncData } from "../useAsyncData.js";
 type Broadcast = ListBroadcastsResponseDtoBroadcastsItem;
 type Mode = "list" | "loading-detail" | "detail";
 type ActionStatus =
-  | "idle"
-  | "confirming-cancel"
-  | "confirming-redispatch"
-  | "working";
+  "idle" | "confirming-cancel" | "confirming-redispatch" | "working";
 
 const ACTIONS = {
   pause: { call: pauseBroadcast, done: "Paused." },
@@ -59,7 +56,7 @@ export function BroadcastsScreen({
   workflowId: string;
 }) {
   const state = useAsyncData(async () => {
-    const response = await listBroadcasts(environmentId, workflowId, {
+    const response = await listBroadcasts(workflowId, {
       limit: 50,
     });
     if (response.status !== 200) {
@@ -78,11 +75,7 @@ export function BroadcastsScreen({
     if (!detail) return;
     setActionStatus("working");
     try {
-      const response = await ACTIONS[action].call(
-        environmentId,
-        workflowId,
-        detail.publicId,
-      );
+      const response = await ACTIONS[action].call(workflowId, detail.publicId);
       if (response.status === 409) {
         setActionMessage(
           `Can't ${action} a broadcast that's ${detail.status}.`,
@@ -118,11 +111,7 @@ export function BroadcastsScreen({
   });
 
   const loadDetail = async (broadcastPublicId: string) => {
-    const response = await getBroadcast(
-      environmentId,
-      workflowId,
-      broadcastPublicId,
-    );
+    const response = await getBroadcast(workflowId, broadcastPublicId);
     if (response.status !== 200) {
       setDetailError("Broadcast not found.");
       return false;
@@ -134,11 +123,7 @@ export function BroadcastsScreen({
   const handleSelect = async (broadcast: Broadcast) => {
     setMode("loading-detail");
     try {
-      const response = await getBroadcast(
-        environmentId,
-        workflowId,
-        broadcast.publicId,
-      );
+      const response = await getBroadcast(workflowId, broadcast.publicId);
       if (response.status !== 200) {
         setDetailError("Broadcast not found.");
         setMode("detail");

@@ -59,8 +59,8 @@ export function registerWorkflowsCommand(program: Command): void {
           json?: boolean;
         }) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await listWorkflows(environmentId, {
+          requireEnvironmentId(opts);
+          const response = await listWorkflows({
             type: opts.type,
             limit: opts.limit ? Number(opts.limit) : undefined,
             offset: opts.offset ? Number(opts.offset) : undefined,
@@ -90,8 +90,8 @@ export function registerWorkflowsCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await getWorkflow(environmentId, workflowId);
+          requireEnvironmentId(opts);
+          const response = await getWorkflow(workflowId);
           if (response.status === 404) {
             console.error("Workflow not found.");
             process.exitCode = 1;
@@ -112,8 +112,8 @@ export function registerWorkflowsCommand(program: Command): void {
     .action(
       run(async (workflowId: string, opts: { environment?: string }) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
-        const response = await getWorkflow(environmentId, workflowId);
+        requireEnvironmentId(opts);
+        const response = await getWorkflow(workflowId);
         if (response.status !== 200 || !response.data.editUrl) {
           console.error("Workflow not found.");
           process.exitCode = 1;
@@ -153,7 +153,7 @@ export function registerWorkflowsCommand(program: Command): void {
           },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
 
           if (!opts.subscriberId && !opts.externalId && !opts.email) {
             console.error(
@@ -172,7 +172,7 @@ export function registerWorkflowsCommand(program: Command): void {
             return;
           }
 
-          const response = await triggerWorkflow(environmentId, {
+          const response = await triggerWorkflow({
             key,
             subscriber: {
               publicId: opts.subscriberId,
@@ -223,7 +223,7 @@ export function registerWorkflowsCommand(program: Command): void {
           },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
 
           let data: Record<string, unknown> | undefined;
           if (opts.data) {
@@ -242,7 +242,7 @@ export function registerWorkflowsCommand(program: Command): void {
             return;
           }
 
-          const response = await sendTestEmail(environmentId, {
+          const response = await sendTestEmail({
             workflowId,
             step,
             to: opts.to,
@@ -292,7 +292,7 @@ export function registerWorkflowsCommand(program: Command): void {
           json?: boolean;
         }) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
 
           const result = readJsonFile(opts.file);
           if (!result.ok) {
@@ -302,7 +302,6 @@ export function registerWorkflowsCommand(program: Command): void {
           }
 
           const response = await createWorkflow(
-            environmentId,
             result.data as CreateWorkflowDto,
           );
           if (response.status === 404) {
@@ -337,7 +336,7 @@ export function registerWorkflowsCommand(program: Command): void {
           opts: { file: string; environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
 
           const result = readJsonFile(opts.file);
           if (!result.ok) {
@@ -347,7 +346,6 @@ export function registerWorkflowsCommand(program: Command): void {
           }
 
           const response = await updateWorkflow(
-            environmentId,
             workflowId,
             result.data as UpdateWorkflowDto,
           );
@@ -371,8 +369,8 @@ export function registerWorkflowsCommand(program: Command): void {
     .action(
       run(async (workflowId: string, opts: { environment?: string }) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
-        const response = await deleteWorkflow(environmentId, workflowId);
+        requireEnvironmentId(opts);
+        const response = await deleteWorkflow(workflowId);
         if (response.status === 404) {
           console.error("Workflow not found.");
           process.exitCode = 1;
@@ -404,8 +402,8 @@ export function registerWorkflowsCommand(program: Command): void {
           },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await listWorkflowRuns(environmentId, workflowId, {
+          requireEnvironmentId(opts);
+          const response = await listWorkflowRuns(workflowId, {
             limit: opts.limit ? Number(opts.limit) : undefined,
             offset: opts.offset ? Number(opts.offset) : undefined,
           });
@@ -438,8 +436,8 @@ export function registerWorkflowsCommand(program: Command): void {
           json?: boolean;
         }) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await listEnvironmentRuns(environmentId, {
+          requireEnvironmentId(opts);
+          const response = await listEnvironmentRuns({
             limit: opts.limit ? Number(opts.limit) : undefined,
             offset: opts.offset ? Number(opts.offset) : undefined,
           });
@@ -488,7 +486,7 @@ export function registerWorkflowsCommand(program: Command): void {
           },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
 
           const sendOverHours =
             opts.sendOverHours === undefined
@@ -510,7 +508,7 @@ export function registerWorkflowsCommand(program: Command): void {
             return;
           }
 
-          const response = await triggerBroadcast(environmentId, workflowId, {
+          const response = await triggerBroadcast(workflowId, {
             audience: result.data,
             sendOverHours,
             allowOverPlan: opts.allowOverPlan,
@@ -562,8 +560,8 @@ export function registerWorkflowsCommand(program: Command): void {
           },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await listBroadcasts(environmentId, workflowId, {
+          requireEnvironmentId(opts);
+          const response = await listBroadcasts(workflowId, {
             limit: opts.limit ? Number(opts.limit) : undefined,
             offset: opts.offset ? Number(opts.offset) : undefined,
           });
@@ -593,12 +591,8 @@ export function registerWorkflowsCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await pauseBroadcast(
-            environmentId,
-            workflowId,
-            broadcastId,
-          );
+          requireEnvironmentId(opts);
+          const response = await pauseBroadcast(workflowId, broadcastId);
           if (response.status === 404) {
             console.error("Workflow or broadcast not found.");
             process.exitCode = 1;
@@ -634,12 +628,8 @@ export function registerWorkflowsCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await resumeBroadcast(
-            environmentId,
-            workflowId,
-            broadcastId,
-          );
+          requireEnvironmentId(opts);
+          const response = await resumeBroadcast(workflowId, broadcastId);
           if (response.status === 404) {
             console.error("Workflow or broadcast not found.");
             process.exitCode = 1;
@@ -677,12 +667,8 @@ export function registerWorkflowsCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await cancelBroadcast(
-            environmentId,
-            workflowId,
-            broadcastId,
-          );
+          requireEnvironmentId(opts);
+          const response = await cancelBroadcast(workflowId, broadcastId);
           if (response.status === 404) {
             console.error("Workflow or broadcast not found.");
             process.exitCode = 1;
@@ -720,12 +706,8 @@ export function registerWorkflowsCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await redispatchBroadcast(
-            environmentId,
-            workflowId,
-            broadcastId,
-          );
+          requireEnvironmentId(opts);
+          const response = await redispatchBroadcast(workflowId, broadcastId);
           if (response.status === 404) {
             console.error("Workflow or broadcast not found.");
             process.exitCode = 1;

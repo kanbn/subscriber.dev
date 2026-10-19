@@ -21,7 +21,7 @@ function runRowLabel(run: Run): string {
 
 export function RunHistoryScreen({ environmentId }: { environmentId: string }) {
   const state = useAsyncData(async () => {
-    const response = await listEnvironmentRuns(environmentId, { limit: 50 });
+    const response = await listEnvironmentRuns({ limit: 50 });
     if (response.status !== 200) {
       throw new Error("Environment not found.");
     }

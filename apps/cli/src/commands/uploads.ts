@@ -47,9 +47,9 @@ export function registerUploadsCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
           const file = new Blob([await readFile(path)]);
-          const response = await uploadImage(environmentId, { file });
+          const response = await uploadImage({ file });
           if (response.status !== 201) {
             fail(response.data);
             return;
@@ -74,8 +74,8 @@ export function registerUploadsCommand(program: Command): void {
       run(
         async (url: string, opts: { environment?: string; json?: boolean }) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await uploadVideoThumbnail(environmentId, { url });
+          requireEnvironmentId(opts);
+          const response = await uploadVideoThumbnail({ url });
           if (response.status !== 201) {
             fail(response.data);
             return;

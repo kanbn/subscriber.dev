@@ -1,6 +1,8 @@
 import { Box, Text, useApp, useInput } from "ink";
 import { useState } from "react";
 
+import { setEnvironmentId } from "@subscriber.dev/api-client/environment";
+
 import type { Screen } from "./navigation.js";
 import { isTyping } from "./components/TextInput.js";
 import { AnalyticsScreen } from "./screens/AnalyticsScreen.js";
@@ -39,6 +41,9 @@ export function App() {
   });
 
   const screen = stack[stack.length - 1];
+  setEnvironmentId(
+    "environment" in screen ? screen.environment?.publicId : undefined,
+  );
 
   return (
     <Box flexDirection="column" padding={1}>

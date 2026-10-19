@@ -26,7 +26,7 @@ export function SubscribersScreen({
 }) {
   const [search, setSearch] = useState("");
   const state = useAsyncData(async () => {
-    const response = await listSubscribers(environmentId, {
+    const response = await listSubscribers({
       limit: 100,
       q: search || undefined,
     });
@@ -58,10 +58,7 @@ export function SubscribersScreen({
     patch: Partial<Record<SubscriberFieldKey, string>>,
   ): Promise<string | undefined> => {
     try {
-      const response = await createSubscriber(
-        environmentId,
-        patch as CreateSubscriberDto,
-      );
+      const response = await createSubscriber(patch as CreateSubscriberDto);
       if (response.status !== 201 || !response.data.subscriber.publicId) {
         return "Failed to create subscriber.";
       }

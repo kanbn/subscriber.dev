@@ -242,7 +242,6 @@ describe("App navigation", () => {
 
     await vi.waitFor(() => expect(lastFrame()).toContain("[ ] Trial started"));
     expect(upsertIntegration).toHaveBeenCalledWith(
-      "test-environment-1",
       "stripe",
       expect.objectContaining({ apiKey: "rk_test_1" }),
     );

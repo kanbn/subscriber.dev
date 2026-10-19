@@ -13,6 +13,7 @@ import {
   sendTestEmail,
   triggerWorkflow,
 } from "@subscriber.dev/api-client/cli";
+import { setEnvironmentId } from "@subscriber.dev/api-client/environment";
 import { readCliConfig } from "@subscriber.dev/shared";
 
 import type { EnvironmentSummary, WorkspaceSummary } from "../navigation.js";
@@ -72,12 +73,12 @@ export function mcpServerUrl(apiBaseUrl: string | undefined): string {
     : `${base}/mcp`;
 }
 
-async function nextStep(environmentId: string): Promise<Step> {
-  const response = await getSetup(environmentId);
+async function nextStep(): Promise<Step> {
+  const response = await getSetup();
   const { next } = response.data;
   if (next === "email_provider") return { kind: "provider" };
   if (next === "first_workflow") return { kind: "product" };
-  const workflows = await listWorkflows(environmentId, { limit: 1 });
+  const workflows = await listWorkflows({ limit: 1 });
   const workflow =
     workflows.status === 200 ? workflows.data.workflows[0] : undefined;
   if (!workflow) return { kind: "done" };
@@ -111,11 +112,12 @@ export function SetupScreen({
   const [result, setResult] = useState("");
 
   const environmentId = current?.environment.publicId;
+  if (environmentId) setEnvironmentId(environmentId);
 
   const initialEnvironmentId = environment?.publicId;
   useEffect(() => {
     if (!initialEnvironmentId) return;
-    nextStep(initialEnvironmentId)
+    nextStep()
       .then(setStep)
       .catch((err: unknown) =>
         setError(err instanceof Error ? err.message : String(err)),
@@ -158,7 +160,7 @@ export function SetupScreen({
   const handleTest = () => {
     if (!environmentId) return;
     void run("Sending a test email…", async () => {
-      const response = await sendTestEmail(environmentId, {
+      const response = await sendTestEmail({
         subject: "Your first email from subscriber.dev",
         body: "<p>It works. Your email provider is connected and sending.</p>",
       });
@@ -177,7 +179,7 @@ export function SetupScreen({
     const product = value.trim();
     if (!product || !environmentId) return;
     void run("Creating your welcome email…", async () => {
-      const response = await createWorkflow(environmentId, {
+      const response = await createWorkflow({
         key: WELCOME_KEY,
         name: "Welcome",
         description: "Sent when someone signs up.",
@@ -187,7 +189,7 @@ export function SetupScreen({
         setStep({ kind: "trigger", workflow: response.data });
         return;
       }
-      const existing = await listWorkflows(environmentId, { limit: 100 });
+      const existing = await listWorkflows({ limit: 100 });
       const workflow =
         existing.status === 200
           ? existing.data.workflows.find((w) => w.key === WELCOME_KEY)
@@ -203,10 +205,10 @@ export function SetupScreen({
       const me = await getCurrentUser();
       const email = me.data.email;
       const [firstName] = (me.data.name ?? "").trim().split(/\s+/);
-      await bulkUpsertSubscribers(environmentId, {
+      await bulkUpsertSubscribers({
         subscribers: [{ email, ...(firstName ? { firstName } : {}) }],
       });
-      const triggered = await triggerWorkflow(environmentId, {
+      const triggered = await triggerWorkflow({
         key: workflow.key,
         subscriber: { email },
       });
@@ -215,7 +217,7 @@ export function SetupScreen({
       }
       for (let attempt = 0; attempt < 30; attempt++) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const runs = await listWorkflowRuns(environmentId, workflow.publicId, {
+        const runs = await listWorkflowRuns(workflow.publicId, {
           limit: 1,
         });
         const sent =

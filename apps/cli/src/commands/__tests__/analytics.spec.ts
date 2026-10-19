@@ -53,7 +53,7 @@ describe("analytics", () => {
 
     await buildProgram().parseAsync(["analytics"], { from: "user" });
 
-    expect(getAnalytics).toHaveBeenCalledWith("test-environment-1", {
+    expect(getAnalytics).toHaveBeenCalledWith({
       days: undefined,
     });
     expect(logSpy).toHaveBeenCalledWith(testAnalytics);
@@ -71,7 +71,7 @@ describe("analytics", () => {
       from: "user",
     });
 
-    expect(getAnalytics).toHaveBeenCalledWith("test-environment-1", {
+    expect(getAnalytics).toHaveBeenCalledWith({
       days: 7,
     });
   });

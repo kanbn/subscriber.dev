@@ -86,7 +86,7 @@ describe("subscribers list", () => {
       { from: "user" },
     );
 
-    expect(listSubscribers).toHaveBeenCalledWith("test-environment-1", {
+    expect(listSubscribers).toHaveBeenCalledWith({
       email: "test@example.com",
       externalId: undefined,
       emailOptedIn: "true",
@@ -109,7 +109,6 @@ describe("subscribers list", () => {
     );
 
     expect(listSubscribers).toHaveBeenCalledWith(
-      "test-environment-1",
       expect.objectContaining({ q: "ali" }),
     );
   });
@@ -127,7 +126,6 @@ describe("subscribers list", () => {
     });
 
     expect(listSubscribers).toHaveBeenCalledWith(
-      "test-environment-1",
       expect.objectContaining({ emailOptedIn: "false" }),
     );
   });
@@ -168,10 +166,7 @@ describe("subscribers get", () => {
       { from: "user" },
     );
 
-    expect(getSubscriber).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-subscriber-1",
-    );
+    expect(getSubscriber).toHaveBeenCalledWith("test-subscriber-1");
     expect(logSpy).toHaveBeenCalledWith({
       subscriber: testSubscriber,
       preferences: null,
@@ -214,7 +209,7 @@ describe("subscribers create", () => {
       { from: "user" },
     );
 
-    expect(createSubscriber).toHaveBeenCalledWith("test-environment-1", {
+    expect(createSubscriber).toHaveBeenCalledWith({
       email: "test@example.com",
       phone: undefined,
       externalId: undefined,
@@ -246,7 +241,6 @@ describe("subscribers create", () => {
     );
 
     expect(createSubscriber).toHaveBeenCalledWith(
-      "test-environment-1",
       expect.objectContaining({ attributes: { plan: "pro" } }),
     );
   });
@@ -311,11 +305,9 @@ describe("subscribers update", () => {
       { from: "user" },
     );
 
-    expect(updateSubscriber).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-subscriber-1",
-      { firstName: "Updated" },
-    );
+    expect(updateSubscriber).toHaveBeenCalledWith("test-subscriber-1", {
+      firstName: "Updated",
+    });
   });
 
   it("sends --attributes on its own", async () => {
@@ -337,11 +329,9 @@ describe("subscribers update", () => {
       { from: "user" },
     );
 
-    expect(updateSubscriber).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-subscriber-1",
-      { attributes: { plan: "pro" } },
-    );
+    expect(updateSubscriber).toHaveBeenCalledWith("test-subscriber-1", {
+      attributes: { plan: "pro" },
+    });
   });
 
   it("errors without calling the API when no fields are passed", async () => {
@@ -402,7 +392,6 @@ describe("subscribers update-preferences", () => {
     );
 
     expect(updateSubscriberPreferences).toHaveBeenCalledWith(
-      "test-environment-1",
       "test-subscriber-1",
       { email: true },
     );
@@ -422,7 +411,6 @@ describe("subscribers update-preferences", () => {
     );
 
     expect(updateSubscriberPreferences).toHaveBeenCalledWith(
-      "test-environment-1",
       "test-subscriber-1",
       { email: false },
     );
@@ -511,10 +499,7 @@ describe("subscribers delete", () => {
       { from: "user" },
     );
 
-    expect(deleteSubscriber).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-subscriber-1",
-    );
+    expect(deleteSubscriber).toHaveBeenCalledWith("test-subscriber-1");
     expect(logSpy).toHaveBeenCalledWith(
       "Deleted subscriber test-subscriber-1.",
     );
@@ -563,7 +548,7 @@ describe("subscribers bulk", () => {
     );
 
     expect(readFileSync).toHaveBeenCalledWith("rows.json", "utf-8");
-    expect(bulkUpsertSubscribers).toHaveBeenCalledWith("test-environment-1", {
+    expect(bulkUpsertSubscribers).toHaveBeenCalledWith({
       subscribers: [{ email: "a@example.com" }],
     });
   });
@@ -584,7 +569,7 @@ describe("subscribers bulk", () => {
       { from: "user" },
     );
 
-    expect(bulkUpsertSubscribers).toHaveBeenCalledWith("test-environment-1", {
+    expect(bulkUpsertSubscribers).toHaveBeenCalledWith({
       subscribers: [{ email: "a@example.com" }],
     });
   });
@@ -706,11 +691,9 @@ describe("subscribers tag", () => {
       { from: "user" },
     );
 
-    expect(addSubscriberTag).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-subscriber-1",
-      { tag: "vip" },
-    );
+    expect(addSubscriberTag).toHaveBeenCalledWith("test-subscriber-1", {
+      tag: "vip",
+    });
   });
 
   it("removes a tag with --remove", async () => {
@@ -727,7 +710,6 @@ describe("subscribers tag", () => {
     );
 
     expect(removeSubscriberTag).toHaveBeenCalledWith(
-      "test-environment-1",
       "test-subscriber-1",
       "vip",
     );

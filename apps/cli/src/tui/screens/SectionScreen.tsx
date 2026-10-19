@@ -26,7 +26,7 @@ export function SectionScreen({
   ) => void;
 }) {
   const setup = useAsyncData(async () => {
-    const response = await getSetup(environment.publicId);
+    const response = await getSetup();
     return response.data;
   }, [environment.publicId]);
   const incomplete = setup.status === "ready" && !setup.data.complete;

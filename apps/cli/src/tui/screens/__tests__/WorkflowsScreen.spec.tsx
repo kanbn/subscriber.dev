@@ -127,7 +127,6 @@ describe("WorkflowsScreen with workflowType=broadcast", () => {
     });
     expect(lastFrame()).toContain("Broadcasts");
     expect(listWorkflows).toHaveBeenCalledWith(
-      "test-environment-1",
       expect.objectContaining({ type: "broadcast" }),
     );
   });

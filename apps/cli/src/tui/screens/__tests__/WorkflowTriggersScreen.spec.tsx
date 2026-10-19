@@ -136,7 +136,7 @@ describe("WorkflowTriggersScreen", () => {
     stdin.write("\r");
 
     await vi.waitFor(() => {
-      expect(updateWorkflow).toHaveBeenCalledWith("env_1", "wf_1", {
+      expect(updateWorkflow).toHaveBeenCalledWith("wf_1", {
         triggers: [{ source: "stripe", event: "trial_ending" }],
       });
     });
@@ -257,7 +257,7 @@ describe("WorkflowTriggersScreen", () => {
     stdin.write("\r");
 
     await vi.waitFor(() => {
-      expect(updateWorkflow).toHaveBeenCalledWith("env_1", "wf_1", {
+      expect(updateWorkflow).toHaveBeenCalledWith("wf_1", {
         triggers: [{ source: "stripe", event: "payment_failed" }],
       });
     });
@@ -308,7 +308,7 @@ describe("WorkflowTriggersScreen", () => {
       stdin.write("\r");
 
       await vi.waitFor(() => {
-        expect(updateWorkflow).toHaveBeenCalledWith("env_1", "wf_1", {
+        expect(updateWorkflow).toHaveBeenCalledWith("wf_1", {
           exitConditions: [{ source: "stripe", event: "trial_started" }],
         });
       });
@@ -347,7 +347,7 @@ describe("WorkflowTriggersScreen", () => {
       stdin.write("\r");
 
       await vi.waitFor(() => {
-        expect(updateWorkflow).toHaveBeenCalledWith("env_1", "wf_1", {
+        expect(updateWorkflow).toHaveBeenCalledWith("wf_1", {
           exitConditions: [],
         });
       });

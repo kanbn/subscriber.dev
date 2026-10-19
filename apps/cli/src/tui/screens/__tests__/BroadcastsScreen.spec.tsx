@@ -134,7 +134,6 @@ describe("BroadcastsScreen detail", () => {
       expect(lastFrame()).toContain("sent: 10");
     });
     expect(getBroadcast).toHaveBeenCalledWith(
-      "test-environment-1",
       "test-workflow-1",
       "test-broadcast-1",
     );
@@ -257,7 +256,6 @@ describe("BroadcastsScreen detail", () => {
     });
     expect(lastFrame()).toContain("status: paused");
     expect(pauseBroadcast).toHaveBeenCalledWith(
-      "test-environment-1",
       "test-workflow-1",
       "test-broadcast-1",
     );
@@ -319,7 +317,6 @@ describe("BroadcastsScreen detail", () => {
       expect(lastFrame()).toContain("Cancelled.");
     });
     expect(cancelBroadcast).toHaveBeenCalledWith(
-      "test-environment-1",
       "test-workflow-1",
       "test-broadcast-1",
     );
@@ -347,7 +344,6 @@ describe("BroadcastsScreen detail", () => {
       expect(lastFrame()).toContain("Setting up remaining subscribers.");
     });
     expect(redispatchBroadcast).toHaveBeenCalledWith(
-      "test-environment-1",
       "test-workflow-1",
       "test-broadcast-1",
     );

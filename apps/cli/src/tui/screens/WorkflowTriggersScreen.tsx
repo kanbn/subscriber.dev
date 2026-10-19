@@ -73,8 +73,8 @@ export function WorkflowTriggersScreen({
   const [refreshKey, setRefreshKey] = useState(0);
   const state = useAsyncData(async () => {
     const [workflow, sources] = await Promise.all([
-      getWorkflow(environmentId, workflowId),
-      listTriggerSources(environmentId),
+      getWorkflow(workflowId),
+      listTriggerSources(),
     ]);
     if (workflow.status !== 200) throw new Error("Workflow not found.");
     if (sources.status !== 200) throw new Error("Environment not found.");
@@ -122,7 +122,7 @@ export function WorkflowTriggersScreen({
     setMode({ kind: "saving" });
     setError("");
     try {
-      const response = await updateWorkflow(environmentId, workflowId, {
+      const response = await updateWorkflow(workflowId, {
         [list]: next,
       } as UpdateWorkflowDto);
       if (response.status !== 200) {

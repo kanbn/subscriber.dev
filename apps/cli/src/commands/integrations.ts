@@ -33,8 +33,8 @@ export function registerIntegrationsCommand(program: Command): void {
     .action(
       run(async (opts: { environment?: string; json?: boolean }) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
-        const response = await listIntegrations(environmentId);
+        requireEnvironmentId(opts);
+        const response = await listIntegrations();
         if (response.status === 404) {
           console.error("Environment not found.");
           process.exitCode = 1;
@@ -67,8 +67,8 @@ export function registerIntegrationsCommand(program: Command): void {
           json?: boolean;
         }) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await listInboundEvents(environmentId, {
+          requireEnvironmentId(opts);
+          const response = await listInboundEvents({
             source: opts.source,
             limit: opts.limit ? Number(opts.limit) : undefined,
             offset: opts.offset ? Number(opts.offset) : undefined,
@@ -93,8 +93,8 @@ export function registerIntegrationsCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await getIntegration(environmentId, type);
+          requireEnvironmentId(opts);
+          const response = await getIntegration(type);
           if (response.status === 404) {
             console.error("Environment or integration not found.");
             process.exitCode = 1;
@@ -126,7 +126,7 @@ export function registerIntegrationsCommand(program: Command): void {
           opts: { body: string; environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
 
           let body: Record<string, unknown>;
           try {
@@ -142,7 +142,6 @@ export function registerIntegrationsCommand(program: Command): void {
           // OpenAPI. The real request body is the flat object itself, which
           // is what actually gets sent (cliFetch just JSON.stringifies it).
           const response = await upsertIntegration(
-            environmentId,
             type,
             body as unknown as UpsertIntegrationDto,
           );
@@ -178,8 +177,8 @@ export function registerIntegrationsCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await setPrimaryIntegration(environmentId, type);
+          requireEnvironmentId(opts);
+          const response = await setPrimaryIntegration(type);
           if (response.status === 404) {
             console.error("Environment or integration not found.");
             process.exitCode = 1;
@@ -200,8 +199,8 @@ export function registerIntegrationsCommand(program: Command): void {
     .action(
       run(async (type: string, opts: { environment?: string }) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
-        const response = await deleteIntegration(environmentId, type);
+        requireEnvironmentId(opts);
+        const response = await deleteIntegration(type);
         if (response.status === 404) {
           console.error("Environment or integration not found.");
           process.exitCode = 1;

@@ -299,7 +299,6 @@ describe("SubscriberDetailScreen preferences", () => {
 
     await vi.waitFor(() => {
       expect(updateSubscriberPreferences).toHaveBeenCalledWith(
-        "test-environment-1",
         "test-subscriber-1",
         { email: true },
       );
@@ -396,11 +395,9 @@ describe("SubscriberDetailScreen tags", () => {
     stdin.write("\r");
 
     await vi.waitFor(() => {
-      expect(addSubscriberTag).toHaveBeenCalledWith(
-        "test-environment-1",
-        "test-subscriber-1",
-        { tag: "new-tag" },
-      );
+      expect(addSubscriberTag).toHaveBeenCalledWith("test-subscriber-1", {
+        tag: "new-tag",
+      });
     });
   });
 

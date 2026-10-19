@@ -19,6 +19,11 @@
       "import": "./dist/generated-cli.js",
       "default": "./src/generated-cli.ts"
     },
+    "./environment": {
+      "types": "./dist/mutator/environment.d.ts",
+      "import": "./dist/mutator/environment.js",
+      "default": "./src/mutator/environment.ts"
+    },
     "./root": {
       "types": "./dist/root.d.ts",
       "default": "./src/root.ts"

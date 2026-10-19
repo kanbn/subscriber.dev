@@ -58,7 +58,7 @@ describe("keys create", () => {
       from: "user",
     });
 
-    expect(createEnvironmentKey).toHaveBeenCalledWith("env_1", {
+    expect(createEnvironmentKey).toHaveBeenCalledWith({
       name: "App",
       access: "limited",
     });
@@ -82,7 +82,7 @@ describe("keys create", () => {
       { from: "user" },
     );
 
-    expect(createEnvironmentKey).toHaveBeenCalledWith("env_1", {
+    expect(createEnvironmentKey).toHaveBeenCalledWith({
       name: "Reader",
       scopes: ["subscribers:read", "workflows:read"],
     });
@@ -122,7 +122,7 @@ describe("keys revoke", () => {
       from: "user",
     });
 
-    expect(revokeEnvironmentKey).toHaveBeenCalledWith("env_1", "key_missing");
+    expect(revokeEnvironmentKey).toHaveBeenCalledWith("key_missing");
     expect(process.exitCode).toBe(1);
   });
 });

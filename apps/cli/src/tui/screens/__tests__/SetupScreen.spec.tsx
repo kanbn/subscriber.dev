@@ -11,6 +11,7 @@ import {
   listWorkflows,
   triggerWorkflow,
 } from "@subscriber.dev/api-client/cli";
+import { environmentHeaders } from "@subscriber.dev/api-client/environment";
 
 import { mcpServerUrl, SetupScreen } from "../SetupScreen.js";
 
@@ -107,8 +108,8 @@ describe("SetupScreen", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("trigger the welcome workflow");
     });
+    expect(environmentHeaders()).toEqual({ "x-environment-id": "env-1" });
     expect(createWorkflow).toHaveBeenCalledWith(
-      "env-1",
       expect.objectContaining({
         key: "welcome",
         steps: [
@@ -166,10 +167,10 @@ describe("SetupScreen", () => {
       },
       { timeout: 3000 },
     );
-    expect(bulkUpsertSubscribers).toHaveBeenCalledWith("env-1", {
+    expect(bulkUpsertSubscribers).toHaveBeenCalledWith({
       subscribers: [{ email: "henry@acme.com", firstName: "Henry" }],
     });
-    expect(triggerWorkflow).toHaveBeenCalledWith("env-1", {
+    expect(triggerWorkflow).toHaveBeenCalledWith({
       key: "welcome",
       subscriber: { email: "henry@acme.com" },
     });

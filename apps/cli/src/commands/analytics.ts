@@ -28,8 +28,8 @@ export function registerAnalyticsCommand(program: Command): void {
           json?: boolean;
         }) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await getAnalytics(environmentId, {
+          requireEnvironmentId(opts);
+          const response = await getAnalytics({
             days: opts.days ? Number(opts.days) : undefined,
           });
           if (response.status === 404) {

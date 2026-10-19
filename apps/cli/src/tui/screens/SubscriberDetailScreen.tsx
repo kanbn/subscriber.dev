@@ -36,7 +36,7 @@ export function SubscriberDetailScreen({
 }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const state = useAsyncData(async () => {
-    const response = await getSubscriber(environmentId, subscriberId);
+    const response = await getSubscriber(subscriberId);
     if (response.status !== 200) {
       throw new Error("Subscriber not found.");
     }
@@ -86,7 +86,7 @@ export function SubscriberDetailScreen({
   const handleConfirmDelete = async () => {
     setDeleteStatus("deleting");
     try {
-      const response = await deleteSubscriber(environmentId, subscriberId);
+      const response = await deleteSubscriber(subscriberId);
       if (response.status === 404) {
         setDeleteError("Subscriber not found.");
         setDeleteStatus("error");
@@ -104,7 +104,6 @@ export function SubscriberDetailScreen({
   ): Promise<string | undefined> => {
     try {
       const response = await updateSubscriber(
-        environmentId,
         subscriberId,
         patch as UpdateSubscriberDto,
       );
@@ -122,11 +121,9 @@ export function SubscriberDetailScreen({
   const handleSetPreferences = async (optedIn: boolean) => {
     setPrefsStatus("saving");
     try {
-      const response = await updateSubscriberPreferences(
-        environmentId,
-        subscriberId,
-        { email: optedIn },
-      );
+      const response = await updateSubscriberPreferences(subscriberId, {
+        email: optedIn,
+      });
       if (response.status === 404) {
         setPrefsError("Subscriber not found.");
         setPrefsStatus("error");
@@ -146,7 +143,7 @@ export function SubscriberDetailScreen({
 
     setTagsStatus("saving");
     try {
-      const response = await addSubscriberTag(environmentId, subscriberId, {
+      const response = await addSubscriberTag(subscriberId, {
         tag: trimmed,
       });
       if (response.status === 404) {
@@ -165,11 +162,7 @@ export function SubscriberDetailScreen({
   const handleRemoveTag = async (tag: string) => {
     setTagsStatus("saving");
     try {
-      const response = await removeSubscriberTag(
-        environmentId,
-        subscriberId,
-        tag,
-      );
+      const response = await removeSubscriberTag(subscriberId, tag);
       if (response.status === 404) {
         setTagsError("Subscriber not found.");
         setTagsStatus("error");

@@ -269,7 +269,7 @@ describe("WorkflowDetailScreen trigger", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Triggered. Run: test-run-1");
     });
-    expect(triggerWorkflow).toHaveBeenCalledWith("test-environment-1", {
+    expect(triggerWorkflow).toHaveBeenCalledWith({
       key: "test-signup",
       subscriber: { email: "test@example.com" },
       payload: {},
@@ -569,7 +569,7 @@ describe("WorkflowDetailScreen broadcast", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Triggered. Run: test-run-1");
     });
-    expect(triggerWorkflow).toHaveBeenCalledWith("test-environment-1", {
+    expect(triggerWorkflow).toHaveBeenCalledWith({
       key: "test-signup",
       subscriber: { email: "test@example.com" },
       payload: {},
@@ -617,11 +617,9 @@ describe("WorkflowDetailScreen broadcast", () => {
         "Broadcast to 4231 matched subscribers now?",
       );
     });
-    expect(previewBroadcast).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-      { audience: { type: "optedIn" } },
-    );
+    expect(previewBroadcast).toHaveBeenCalledWith("test-workflow-1", {
+      audience: { type: "optedIn" },
+    });
     // Default-selected item is "No, cancel" — the confirm step must not
     // fire the actual broadcast on its own.
     expect(triggerBroadcast).not.toHaveBeenCalled();
@@ -706,11 +704,10 @@ describe("WorkflowDetailScreen broadcast", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Broadcast queued: bc_1");
     });
-    expect(triggerBroadcast).toHaveBeenCalledWith(
-      "test-environment-1",
-      "test-workflow-1",
-      { audience: { type: "optedIn" }, sendOverHours: 24 },
-    );
+    expect(triggerBroadcast).toHaveBeenCalledWith("test-workflow-1", {
+      audience: { type: "optedIn" },
+      sendOverHours: 24,
+    });
   });
 
   it("shows an error from the preview when the workflow is paused or has no steps", async () => {

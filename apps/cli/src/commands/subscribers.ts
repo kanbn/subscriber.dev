@@ -108,14 +108,14 @@ export function registerSubscribersCommand(program: Command): void {
           json?: boolean;
         }) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
           const emailOptedIn = opts.optedIn
             ? "true"
             : opts.optedOut
               ? "false"
               : undefined;
 
-          const response = await listSubscribers(environmentId, {
+          const response = await listSubscribers({
             email: opts.email,
             externalId: opts.externalId,
             q: opts.search,
@@ -148,8 +148,8 @@ export function registerSubscribersCommand(program: Command): void {
           opts: { environment?: string; json?: boolean },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
-          const response = await getSubscriber(environmentId, subscriberId);
+          requireEnvironmentId(opts);
+          const response = await getSubscriber(subscriberId);
           if (response.status === 404) {
             console.error("Subscriber not found.");
             process.exitCode = 1;
@@ -165,10 +165,10 @@ export function registerSubscribersCommand(program: Command): void {
     .action(
       run(async (opts: SubscriberFieldOpts) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
+        requireEnvironmentId(opts);
         const attributes = parseAttributes(opts.attributes);
         if (attributes === null) return;
-        const response = await createSubscriber(environmentId, {
+        const response = await createSubscriber({
           email: opts.email,
           phone: opts.phone,
           externalId: opts.externalId,
@@ -191,7 +191,7 @@ export function registerSubscribersCommand(program: Command): void {
     .action(
       run(async (subscriberId: string, opts: SubscriberFieldOpts) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
+        requireEnvironmentId(opts);
 
         const patch: Partial<UpdateSubscriberDto> = {};
         if (opts.email !== undefined) patch.email = opts.email;
@@ -213,7 +213,6 @@ export function registerSubscribersCommand(program: Command): void {
         }
 
         const response = await updateSubscriber(
-          environmentId,
           subscriberId,
           patch as UpdateSubscriberDto,
         );
@@ -255,12 +254,10 @@ export function registerSubscribersCommand(program: Command): void {
             return;
           }
 
-          const environmentId = requireEnvironmentId(opts);
-          const response = await updateSubscriberPreferences(
-            environmentId,
-            subscriberId,
-            { email: opts.optedIn === true },
-          );
+          requireEnvironmentId(opts);
+          const response = await updateSubscriberPreferences(subscriberId, {
+            email: opts.optedIn === true,
+          });
           if (response.status === 404) {
             console.error("Subscriber not found.");
             process.exitCode = 1;
@@ -291,7 +288,7 @@ export function registerSubscribersCommand(program: Command): void {
           json?: boolean;
         }) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
 
           const result = readJsonFile(opts.file);
           if (!result.ok) {
@@ -312,7 +309,7 @@ export function registerSubscribersCommand(program: Command): void {
             return;
           }
 
-          const response = await bulkUpsertSubscribers(environmentId, {
+          const response = await bulkUpsertSubscribers({
             subscribers:
               subscribersInput as BulkUpsertSubscribersDto["subscribers"],
           });
@@ -358,14 +355,12 @@ export function registerSubscribersCommand(program: Command): void {
             return;
           }
 
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
 
           if (tagToAdd) {
-            const response = await addSubscriberTag(
-              environmentId,
-              subscriberId,
-              { tag: tagToAdd },
-            );
+            const response = await addSubscriberTag(subscriberId, {
+              tag: tagToAdd,
+            });
             if (response.status === 404) {
               console.error("Subscriber not found.");
               process.exitCode = 1;
@@ -376,11 +371,7 @@ export function registerSubscribersCommand(program: Command): void {
           }
           if (!tagToRemove) return;
 
-          const response = await removeSubscriberTag(
-            environmentId,
-            subscriberId,
-            tagToRemove,
-          );
+          const response = await removeSubscriberTag(subscriberId, tagToRemove);
           if (response.status === 404) {
             console.error("Subscriber not found.");
             process.exitCode = 1;
@@ -401,8 +392,8 @@ export function registerSubscribersCommand(program: Command): void {
     .action(
       run(async (subscriberId: string, opts: { environment?: string }) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
-        const response = await deleteSubscriber(environmentId, subscriberId);
+        requireEnvironmentId(opts);
+        const response = await deleteSubscriber(subscriberId);
         if (response.status === 404) {
           console.error("Subscriber not found.");
           process.exitCode = 1;

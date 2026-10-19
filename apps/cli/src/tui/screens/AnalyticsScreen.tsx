@@ -10,7 +10,7 @@ const DAYS = 30;
 
 export function AnalyticsScreen({ environmentId }: { environmentId: string }) {
   const state = useAsyncData(async () => {
-    const response = await getAnalytics(environmentId, { days: DAYS });
+    const response = await getAnalytics({ days: DAYS });
     if (response.status !== 200) {
       throw new Error("Environment not found.");
     }

@@ -1,5 +1,7 @@
 import { readCliConfig } from "@subscriber.dev/shared";
 
+import { environmentHeaders } from "./environment.js";
+
 const MAX_RETRIES = 3;
 
 function retryDelayMs(response: Response): number {
@@ -19,6 +21,9 @@ export const cliFetch = async <T>(
   const config = readCliConfig();
   const baseUrl = config.apiBaseUrl ?? "https://api.subscriber.dev";
   const headers = new Headers(options.headers);
+  for (const [name, value] of Object.entries(environmentHeaders())) {
+    headers.set(name, value);
+  }
   if (config.token) {
     headers.set("authorization", `Bearer ${config.token}`);
   }

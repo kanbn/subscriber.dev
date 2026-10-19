@@ -1,8 +1,7 @@
 import { readFileSync } from "node:fs";
 
 export type JsonFileResult =
-  | { ok: true; data: unknown }
-  | { ok: false; message: string };
+  { ok: true; data: unknown } | { ok: false; message: string };
 
 /**
  * Reads and parses a JSON file, or stdin when path is "-".

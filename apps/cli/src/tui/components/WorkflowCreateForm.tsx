@@ -31,11 +31,7 @@ const SUBMIT_VALUE = "__submit__";
 const CANCEL_VALUE = "__cancel__";
 
 type Mode =
-  | "menu"
-  | "editing-text"
-  | "editing-type"
-  | "editing-body"
-  | "submitting";
+  "menu" | "editing-text" | "editing-type" | "editing-body" | "submitting";
 
 function bodyPreview(body: string): string {
   if (body.trim().length === 0) return "—";

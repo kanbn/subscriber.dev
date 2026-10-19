@@ -56,9 +56,8 @@ export function registerKeysCommand(program: Command): void {
           },
         ) => {
           ensureLoggedIn();
-          const environmentId = requireEnvironmentId(opts);
+          requireEnvironmentId(opts);
           const response = await createEnvironmentKey(
-            environmentId,
             opts.scope
               ? { name, scopes: opts.scope }
               : { name, access: opts.access },
@@ -88,8 +87,8 @@ export function registerKeysCommand(program: Command): void {
     .action(
       run(async (opts: { environment?: string; json?: boolean }) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
-        const response = await listEnvironmentKeys(environmentId);
+        requireEnvironmentId(opts);
+        const response = await listEnvironmentKeys();
         if (response.status === 404) {
           console.error("Environment not found.");
           process.exitCode = 1;
@@ -106,8 +105,8 @@ export function registerKeysCommand(program: Command): void {
     .action(
       run(async (keyId: string, opts: { environment?: string }) => {
         ensureLoggedIn();
-        const environmentId = requireEnvironmentId(opts);
-        const response = await revokeEnvironmentKey(environmentId, keyId);
+        requireEnvironmentId(opts);
+        const response = await revokeEnvironmentKey(keyId);
         if (response.status === 404) {
           console.error("API key not found.");
           process.exitCode = 1;

@@ -59,7 +59,7 @@ describe("integrations list", () => {
       from: "user",
     });
 
-    expect(listIntegrations).toHaveBeenCalledWith("test-environment-1");
+    expect(listIntegrations).toHaveBeenCalledWith();
   });
 
   it("prints an error and exits on a 404", async () => {
@@ -105,7 +105,7 @@ describe("integrations events", () => {
       { from: "user" },
     );
 
-    expect(listInboundEvents).toHaveBeenCalledWith("test-environment-1", {
+    expect(listInboundEvents).toHaveBeenCalledWith({
       source: "stripe",
       limit: 5,
       offset: undefined,
@@ -127,7 +127,7 @@ describe("integrations get", () => {
       from: "user",
     });
 
-    expect(getIntegration).toHaveBeenCalledWith("test-environment-1", "smtp");
+    expect(getIntegration).toHaveBeenCalledWith("smtp");
     expect(logSpy).toHaveBeenCalledWith(testIntegration);
   });
 
@@ -175,11 +175,10 @@ describe("integrations set", () => {
       { from: "user" },
     );
 
-    expect(upsertIntegration).toHaveBeenCalledWith(
-      "test-environment-1",
-      "smtp",
-      { host: "smtp.example.com", port: 587 },
-    );
+    expect(upsertIntegration).toHaveBeenCalledWith("smtp", {
+      host: "smtp.example.com",
+      port: 587,
+    });
   });
 
   it("errors without calling the API when --body isn't valid JSON", async () => {
@@ -239,10 +238,7 @@ describe("integrations set-primary", () => {
       { from: "user" },
     );
 
-    expect(setPrimaryIntegration).toHaveBeenCalledWith(
-      "test-environment-1",
-      "cloudflare",
-    );
+    expect(setPrimaryIntegration).toHaveBeenCalledWith("cloudflare");
     expect(logSpy).toHaveBeenCalledWith({ ...testIntegration, priority: 1 });
   });
 
@@ -284,10 +280,7 @@ describe("integrations remove", () => {
       from: "user",
     });
 
-    expect(deleteIntegration).toHaveBeenCalledWith(
-      "test-environment-1",
-      "smtp",
-    );
+    expect(deleteIntegration).toHaveBeenCalledWith("smtp");
     expect(logSpy).toHaveBeenCalledWith('Removed integration "smtp".');
   });
 

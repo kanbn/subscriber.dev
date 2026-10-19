@@ -160,10 +160,7 @@ describe("IntegrationDetailScreen set primary", () => {
     stdin.write("p");
 
     await vi.waitFor(() => {
-      expect(setPrimaryIntegration).toHaveBeenCalledWith(
-        "test-environment-1",
-        "smtp",
-      );
+      expect(setPrimaryIntegration).toHaveBeenCalledWith("smtp");
     });
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("priority: 1");
@@ -264,9 +261,7 @@ describe("IntegrationDetailScreen edit", () => {
     await vi.waitFor(() => {
       expect(upsertIntegration).toHaveBeenCalled();
     });
-    const [environmentId, type, body] =
-      vi.mocked(upsertIntegration).mock.calls[0]!;
-    expect(environmentId).toBe("test-environment-1");
+    const [type, body] = vi.mocked(upsertIntegration).mock.calls[0]!;
     expect(type).toBe("smtp");
     expect(body).toEqual(
       expect.objectContaining({

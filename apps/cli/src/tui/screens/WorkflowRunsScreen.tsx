@@ -27,7 +27,7 @@ export function WorkflowRunsScreen({
   workflowId: string;
 }) {
   const state = useAsyncData(async () => {
-    const response = await listWorkflowRuns(environmentId, workflowId, {
+    const response = await listWorkflowRuns(workflowId, {
       limit: 50,
     });
     if (response.status !== 200) {

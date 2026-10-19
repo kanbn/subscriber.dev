@@ -12,13 +12,11 @@ export function registerLoginCommand(program: Command): void {
     .description("Sign in through the browser")
     .option("--base-url <url>", "API base URL", "https://api.subscriber.dev")
     .option("--app-url <url>", "web app URL", "https://subscriber.dev")
-    .action(
-      async (opts: { baseUrl: string; appUrl: string }) => {
-        const token = await deviceLogin(opts.appUrl);
-        updateCliConfig({ token, apiBaseUrl: opts.baseUrl });
-        console.log(`Logged in. API base URL set to ${opts.baseUrl}`);
-      },
-    );
+    .action(async (opts: { baseUrl: string; appUrl: string }) => {
+      const token = await deviceLogin(opts.appUrl);
+      updateCliConfig({ token, apiBaseUrl: opts.baseUrl });
+      console.log(`Logged in. API base URL set to ${opts.baseUrl}`);
+    });
 
   program
     .command("logout")

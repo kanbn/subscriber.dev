@@ -128,9 +128,7 @@ export function UserScreen() {
       {editMode === "submitting" && <Text color="gray">Saving…</Text>}
 
       {editMode === "confirm-logout" && (
-        <Text color="yellow">
-          Log out of this machine? (y/n)
-        </Text>
+        <Text color="yellow">Log out of this machine? (y/n)</Text>
       )}
 
       {editMode === "logging-out" && <Text color="gray">Logging out…</Text>}

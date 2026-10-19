@@ -23,7 +23,7 @@ export function WorkflowsScreen({
   onSelect: (workflowId: string) => void;
 }) {
   const state = useAsyncData(async () => {
-    const response = await listWorkflows(environmentId, {
+    const response = await listWorkflows({
       limit: 100,
       type: workflowType,
     });
@@ -56,7 +56,7 @@ export function WorkflowsScreen({
             }
           : { type: "webhook", url: values.url.trim(), body: values.body };
 
-      const response = await createWorkflow(environmentId, {
+      const response = await createWorkflow({
         key: values.key.trim(),
         name: values.name.trim(),
         description: values.description.trim() || undefined,

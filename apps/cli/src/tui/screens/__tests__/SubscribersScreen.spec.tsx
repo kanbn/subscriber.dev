@@ -227,7 +227,6 @@ describe("SubscribersScreen search", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain('search: "ali"');
       expect(listSubscribers).toHaveBeenLastCalledWith(
-        "test-environment-1",
         expect.objectContaining({ q: "ali" }),
       );
     });

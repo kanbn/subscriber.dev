@@ -64,7 +64,7 @@ export function IntegrationDetailScreen({
   const [refreshKey, setRefreshKey] = useState(0);
 
   const state = useAsyncData(async () => {
-    const response = await getIntegration(environmentId, type);
+    const response = await getIntegration(type);
     if (response.status !== 200) {
       throw new Error("Integration not found.");
     }
@@ -72,7 +72,7 @@ export function IntegrationDetailScreen({
   }, [environmentId, type, refreshKey]);
 
   const inboundEvents = useAsyncData(async () => {
-    const response = await listInboundEvents(environmentId, {
+    const response = await listInboundEvents({
       source: type,
       limit: 10,
     });
@@ -119,7 +119,7 @@ export function IntegrationDetailScreen({
   const handleSetPrimary = async () => {
     setPrimaryStatus("setting");
     try {
-      const response = await setPrimaryIntegration(environmentId, type);
+      const response = await setPrimaryIntegration(type);
       if (response.status !== 200) {
         setPrimaryError("Integration not found.");
         setPrimaryStatus("error");
@@ -138,7 +138,6 @@ export function IntegrationDetailScreen({
   ): Promise<string | undefined> => {
     try {
       const response = await upsertIntegration(
-        environmentId,
         type,
         body as unknown as UpsertIntegrationDto,
       );
@@ -232,7 +231,7 @@ export function IntegrationDetailScreen({
   const handleConfirmDelete = async () => {
     setDeleteStatus("deleting");
     try {
-      const response = await deleteIntegration(environmentId, type);
+      const response = await deleteIntegration(type);
       if (response.status === 404) {
         setDeleteError("Integration not found.");
         setDeleteStatus("error");

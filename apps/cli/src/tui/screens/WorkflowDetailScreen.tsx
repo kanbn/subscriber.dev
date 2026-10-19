@@ -32,11 +32,7 @@ const SEND_WINDOW_OPTIONS: { label: string; value: number | null }[] = [
 
 type DeleteStatus = "idle" | "confirming" | "deleting" | "error";
 type TriggerStatus =
-  | "idle"
-  | "entering-email"
-  | "triggering"
-  | "success"
-  | "error";
+  "idle" | "entering-email" | "triggering" | "success" | "error";
 type MetaMode = "idle" | "editing";
 type BroadcastStatus =
   | "idle"
@@ -66,7 +62,7 @@ export function WorkflowDetailScreen({
 }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const state = useAsyncData(async () => {
-    const response = await getWorkflow(environmentId, workflowId);
+    const response = await getWorkflow(workflowId);
     if (response.status !== 200) {
       throw new Error("Workflow not found.");
     }
@@ -142,7 +138,7 @@ export function WorkflowDetailScreen({
     values: WorkflowMetaValues,
   ): Promise<string | undefined> => {
     try {
-      const response = await updateWorkflow(environmentId, workflowId, {
+      const response = await updateWorkflow(workflowId, {
         name: values.name.trim(),
         description: values.description.trim() || null,
         status: values.status,
@@ -161,7 +157,7 @@ export function WorkflowDetailScreen({
   const handleConfirmDelete = async () => {
     setDeleteStatus("deleting");
     try {
-      const response = await deleteWorkflow(environmentId, workflowId);
+      const response = await deleteWorkflow(workflowId);
       if (response.status === 404) {
         setDeleteError("Workflow not found.");
         setDeleteStatus("error");
@@ -180,7 +176,7 @@ export function WorkflowDetailScreen({
 
     setTriggerStatus("triggering");
     try {
-      const response = await triggerWorkflow(environmentId, {
+      const response = await triggerWorkflow({
         key: workflow.key,
         subscriber: { email: trimmed },
         payload: {},
@@ -208,7 +204,7 @@ export function WorkflowDetailScreen({
     setPendingAudience(audience);
     setBroadcastStatus("previewing");
     try {
-      const response = await previewBroadcast(environmentId, workflowId, {
+      const response = await previewBroadcast(workflowId, {
         audience,
       } as TriggerBroadcastDto);
       if (response.status === 400) {
@@ -234,7 +230,7 @@ export function WorkflowDetailScreen({
 
     setBroadcastStatus("triggering");
     try {
-      const response = await triggerBroadcast(environmentId, workflowId, {
+      const response = await triggerBroadcast(workflowId, {
         audience: pendingAudience,
         sendOverHours: pendingWindowHours ?? undefined,
       } as TriggerBroadcastDto);
