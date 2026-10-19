@@ -2811,6 +2811,165 @@
         ]
       }
     },
+    "/environments/{environmentId}/keys": {
+      "post": {
+        "description": "Creates an API key for this environment. The key is only returned once. Signed-in users only: an API key can't create keys.",
+        "operationId": "createEnvironmentKey",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnvironmentKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedEnvironmentKeyDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create an API key",
+        "tags": [
+          "API keys"
+        ]
+      },
+      "get": {
+        "operationId": "listEnvironmentKeys",
+        "parameters": [
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListEnvironmentKeysResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Environment not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List API keys",
+        "tags": [
+          "API keys"
+        ]
+      }
+    },
+    "/environments/{environmentId}/keys/{keyId}": {
+      "delete": {
+        "description": "Requests made with the key fail straight away.",
+        "operationId": "revokeEnvironmentKey",
+        "parameters": [
+          {
+            "name": "keyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "environmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "Environment or API key not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke an API key",
+        "tags": [
+          "API keys"
+        ]
+      }
+    },
+    "/keys/me": {
+      "get": {
+        "description": "Any API key can call this, whatever its scopes. Use it to find the key's environment ID.",
+        "operationId": "getCurrentEnvironmentKey",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentEnvironmentKeyDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not called with an API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get the API key this request was made with",
+        "tags": [
+          "API keys"
+        ]
+      }
+    },
     "/mcp": {
       "post": {
         "operationId": "StreamableHttpController_handlePostRequest",
@@ -6737,6 +6896,257 @@
         },
         "required": [
           "sources"
+        ]
+      },
+      "CreateEnvironmentKeyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "access": {
+            "description": "limited (the default) can trigger workflows and create or update subscribers. full can call every endpoint an API key can.",
+            "type": "string",
+            "enum": [
+              "limited",
+              "full"
+            ]
+          },
+          "scopes": {
+            "description": "Pick scopes yourself instead of access.",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "workflows:trigger",
+                "workflows:read",
+                "workflows:write",
+                "broadcasts:read",
+                "broadcasts:write",
+                "subscribers:read",
+                "subscribers:write",
+                "emails:test",
+                "integrations:read",
+                "integrations:write",
+                "uploads:write",
+                "events:read",
+                "analytics:read",
+                "billing:read"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "CreatedEnvironmentKeyDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "description": "The first characters of the key, to recognise it"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "workflows:trigger",
+                "workflows:read",
+                "workflows:write",
+                "broadcasts:read",
+                "broadcasts:write",
+                "subscribers:read",
+                "subscribers:write",
+                "emails:test",
+                "integrations:read",
+                "integrations:write",
+                "uploads:write",
+                "events:read",
+                "analytics:read",
+                "billing:read"
+              ]
+            }
+          },
+          "lastUsedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "key": {
+            "type": "string",
+            "description": "The API key. It's only shown this once."
+          }
+        },
+        "required": [
+          "publicId",
+          "name",
+          "start",
+          "scopes",
+          "lastUsedAt",
+          "createdAt",
+          "key"
+        ]
+      },
+      "ListEnvironmentKeysResponseDto": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publicId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "start": {
+                  "type": "string",
+                  "description": "The first characters of the key, to recognise it"
+                },
+                "scopes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "workflows:trigger",
+                      "workflows:read",
+                      "workflows:write",
+                      "broadcasts:read",
+                      "broadcasts:write",
+                      "subscribers:read",
+                      "subscribers:write",
+                      "emails:test",
+                      "integrations:read",
+                      "integrations:write",
+                      "uploads:write",
+                      "events:read",
+                      "analytics:read",
+                      "billing:read"
+                    ]
+                  }
+                },
+                "lastUsedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "publicId",
+                "name",
+                "start",
+                "scopes",
+                "lastUsedAt",
+                "createdAt"
+              ]
+            }
+          }
+        },
+        "required": [
+          "keys"
+        ]
+      },
+      "CurrentEnvironmentKeyDto": {
+        "type": "object",
+        "properties": {
+          "publicId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "workflows:trigger",
+                "workflows:read",
+                "workflows:write",
+                "broadcasts:read",
+                "broadcasts:write",
+                "subscribers:read",
+                "subscribers:write",
+                "emails:test",
+                "integrations:read",
+                "integrations:write",
+                "uploads:write",
+                "events:read",
+                "analytics:read",
+                "billing:read"
+              ]
+            }
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "environment": {
+            "type": "object",
+            "properties": {
+              "publicId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "publicId",
+              "name",
+              "slug"
+            ]
+          }
+        },
+        "required": [
+          "publicId",
+          "name",
+          "start",
+          "scopes",
+          "workspaceId",
+          "environment"
         ]
       }
     }

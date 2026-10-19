@@ -1769,6 +1769,155 @@ export interface ListTriggerSourcesResponseDto {
   sources: ListTriggerSourcesResponseDtoSourcesItem[];
 }
 
+/**
+ * limited (the default) can trigger workflows and create or update subscribers. full can call every endpoint an API key can.
+ */
+export type CreateEnvironmentKeyDtoAccess = typeof CreateEnvironmentKeyDtoAccess[keyof typeof CreateEnvironmentKeyDtoAccess];
+
+
+export const CreateEnvironmentKeyDtoAccess = {
+  limited: 'limited',
+  full: 'full',
+} as const;
+
+export type CreateEnvironmentKeyDtoScopesItem = typeof CreateEnvironmentKeyDtoScopesItem[keyof typeof CreateEnvironmentKeyDtoScopesItem];
+
+
+export const CreateEnvironmentKeyDtoScopesItem = {
+  'workflows:trigger': 'workflows:trigger',
+  'workflows:read': 'workflows:read',
+  'workflows:write': 'workflows:write',
+  'broadcasts:read': 'broadcasts:read',
+  'broadcasts:write': 'broadcasts:write',
+  'subscribers:read': 'subscribers:read',
+  'subscribers:write': 'subscribers:write',
+  'emails:test': 'emails:test',
+  'integrations:read': 'integrations:read',
+  'integrations:write': 'integrations:write',
+  'uploads:write': 'uploads:write',
+  'events:read': 'events:read',
+  'analytics:read': 'analytics:read',
+  'billing:read': 'billing:read',
+} as const;
+
+export interface CreateEnvironmentKeyDto {
+  /**
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /** limited (the default) can trigger workflows and create or update subscribers. full can call every endpoint an API key can. */
+  access?: CreateEnvironmentKeyDtoAccess;
+  /**
+     * Pick scopes yourself instead of access.
+     * @minItems 1
+     */
+  scopes?: CreateEnvironmentKeyDtoScopesItem[];
+}
+
+export type CreatedEnvironmentKeyDtoScopesItem = typeof CreatedEnvironmentKeyDtoScopesItem[keyof typeof CreatedEnvironmentKeyDtoScopesItem];
+
+
+export const CreatedEnvironmentKeyDtoScopesItem = {
+  'workflows:trigger': 'workflows:trigger',
+  'workflows:read': 'workflows:read',
+  'workflows:write': 'workflows:write',
+  'broadcasts:read': 'broadcasts:read',
+  'broadcasts:write': 'broadcasts:write',
+  'subscribers:read': 'subscribers:read',
+  'subscribers:write': 'subscribers:write',
+  'emails:test': 'emails:test',
+  'integrations:read': 'integrations:read',
+  'integrations:write': 'integrations:write',
+  'uploads:write': 'uploads:write',
+  'events:read': 'events:read',
+  'analytics:read': 'analytics:read',
+  'billing:read': 'billing:read',
+} as const;
+
+export interface CreatedEnvironmentKeyDto {
+  publicId: string;
+  name: string;
+  /** The first characters of the key, to recognise it */
+  start: string;
+  scopes: CreatedEnvironmentKeyDtoScopesItem[];
+  lastUsedAt: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** The API key. It's only shown this once. */
+  key: string;
+}
+
+export type ListEnvironmentKeysResponseDtoKeysItemScopesItem = typeof ListEnvironmentKeysResponseDtoKeysItemScopesItem[keyof typeof ListEnvironmentKeysResponseDtoKeysItemScopesItem];
+
+
+export const ListEnvironmentKeysResponseDtoKeysItemScopesItem = {
+  'workflows:trigger': 'workflows:trigger',
+  'workflows:read': 'workflows:read',
+  'workflows:write': 'workflows:write',
+  'broadcasts:read': 'broadcasts:read',
+  'broadcasts:write': 'broadcasts:write',
+  'subscribers:read': 'subscribers:read',
+  'subscribers:write': 'subscribers:write',
+  'emails:test': 'emails:test',
+  'integrations:read': 'integrations:read',
+  'integrations:write': 'integrations:write',
+  'uploads:write': 'uploads:write',
+  'events:read': 'events:read',
+  'analytics:read': 'analytics:read',
+  'billing:read': 'billing:read',
+} as const;
+
+export type ListEnvironmentKeysResponseDtoKeysItem = {
+  publicId: string;
+  name: string;
+  /** The first characters of the key, to recognise it */
+  start: string;
+  scopes: ListEnvironmentKeysResponseDtoKeysItemScopesItem[];
+  lastUsedAt: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+};
+
+export interface ListEnvironmentKeysResponseDto {
+  keys: ListEnvironmentKeysResponseDtoKeysItem[];
+}
+
+export type CurrentEnvironmentKeyDtoScopesItem = typeof CurrentEnvironmentKeyDtoScopesItem[keyof typeof CurrentEnvironmentKeyDtoScopesItem];
+
+
+export const CurrentEnvironmentKeyDtoScopesItem = {
+  'workflows:trigger': 'workflows:trigger',
+  'workflows:read': 'workflows:read',
+  'workflows:write': 'workflows:write',
+  'broadcasts:read': 'broadcasts:read',
+  'broadcasts:write': 'broadcasts:write',
+  'subscribers:read': 'subscribers:read',
+  'subscribers:write': 'subscribers:write',
+  'emails:test': 'emails:test',
+  'integrations:read': 'integrations:read',
+  'integrations:write': 'integrations:write',
+  'uploads:write': 'uploads:write',
+  'events:read': 'events:read',
+  'analytics:read': 'analytics:read',
+  'billing:read': 'billing:read',
+} as const;
+
+export type CurrentEnvironmentKeyDtoEnvironment = {
+  publicId: string;
+  name: string;
+  slug: string;
+};
+
+export interface CurrentEnvironmentKeyDto {
+  publicId: string;
+  name: string;
+  start: string;
+  scopes: CurrentEnvironmentKeyDtoScopesItem[];
+  workspaceId: string;
+  environment: CurrentEnvironmentKeyDtoEnvironment;
+}
+
 export type ListSubscribersParams = {
 /**
  * @minimum 1
@@ -4640,6 +4789,198 @@ export const getListTriggerSourcesUrl = (environmentId: string,) => {
 export const listTriggerSources = async (environmentId: string, options?: Parameters<typeof cliFetch>[1]): Promise<listTriggerSourcesResponse> => {
 
   return cliFetch<listTriggerSourcesResponse>(getListTriggerSourcesUrl(environmentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type createEnvironmentKeyResponse201 = {
+  data: CreatedEnvironmentKeyDto
+  status: 201
+}
+
+export type createEnvironmentKeyResponse404 = {
+  data: void
+  status: 404
+}
+
+export type createEnvironmentKeyResponseSuccess = (createEnvironmentKeyResponse201) & {
+  headers: Headers;
+};
+export type createEnvironmentKeyResponseError = (createEnvironmentKeyResponse404) & {
+  headers: Headers;
+};
+
+export type createEnvironmentKeyResponse = (createEnvironmentKeyResponseSuccess | createEnvironmentKeyResponseError)
+
+export const getCreateEnvironmentKeyUrl = (environmentId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/keys`
+}
+
+/**
+ * Creates an API key for this environment. The key is only returned once. Signed-in users only: an API key can't create keys.
+ * @summary Create an API key
+ */
+export const createEnvironmentKey = async (environmentId: string,
+    createEnvironmentKeyDto: CreateEnvironmentKeyDto, options?: Parameters<typeof cliFetch>[1]): Promise<createEnvironmentKeyResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return cliFetch<createEnvironmentKeyResponse>(getCreateEnvironmentKeyUrl(environmentId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createEnvironmentKeyDto)
+  }
+);}
+
+
+
+export type listEnvironmentKeysResponse200 = {
+  data: ListEnvironmentKeysResponseDto
+  status: 200
+}
+
+export type listEnvironmentKeysResponse404 = {
+  data: void
+  status: 404
+}
+
+export type listEnvironmentKeysResponseSuccess = (listEnvironmentKeysResponse200) & {
+  headers: Headers;
+};
+export type listEnvironmentKeysResponseError = (listEnvironmentKeysResponse404) & {
+  headers: Headers;
+};
+
+export type listEnvironmentKeysResponse = (listEnvironmentKeysResponseSuccess | listEnvironmentKeysResponseError)
+
+export const getListEnvironmentKeysUrl = (environmentId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/keys`
+}
+
+/**
+ * @summary List API keys
+ */
+export const listEnvironmentKeys = async (environmentId: string, options?: Parameters<typeof cliFetch>[1]): Promise<listEnvironmentKeysResponse> => {
+
+  return cliFetch<listEnvironmentKeysResponse>(getListEnvironmentKeysUrl(environmentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type revokeEnvironmentKeyResponse204 = {
+  data: void
+  status: 204
+}
+
+export type revokeEnvironmentKeyResponse404 = {
+  data: void
+  status: 404
+}
+
+export type revokeEnvironmentKeyResponseSuccess = (revokeEnvironmentKeyResponse204) & {
+  headers: Headers;
+};
+export type revokeEnvironmentKeyResponseError = (revokeEnvironmentKeyResponse404) & {
+  headers: Headers;
+};
+
+export type revokeEnvironmentKeyResponse = (revokeEnvironmentKeyResponseSuccess | revokeEnvironmentKeyResponseError)
+
+export const getRevokeEnvironmentKeyUrl = (environmentId: string,
+    keyId: string,) => {
+
+
+
+
+  return `/environments/${environmentId}/keys/${keyId}`
+}
+
+/**
+ * Requests made with the key fail straight away.
+ * @summary Revoke an API key
+ */
+export const revokeEnvironmentKey = async (environmentId: string,
+    keyId: string, options?: Parameters<typeof cliFetch>[1]): Promise<revokeEnvironmentKeyResponse> => {
+
+  return cliFetch<revokeEnvironmentKeyResponse>(getRevokeEnvironmentKeyUrl(environmentId,keyId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export type getCurrentEnvironmentKeyResponse200 = {
+  data: CurrentEnvironmentKeyDto
+  status: 200
+}
+
+export type getCurrentEnvironmentKeyResponse400 = {
+  data: void
+  status: 400
+}
+
+export type getCurrentEnvironmentKeyResponseSuccess = (getCurrentEnvironmentKeyResponse200) & {
+  headers: Headers;
+};
+export type getCurrentEnvironmentKeyResponseError = (getCurrentEnvironmentKeyResponse400) & {
+  headers: Headers;
+};
+
+export type getCurrentEnvironmentKeyResponse = (getCurrentEnvironmentKeyResponseSuccess | getCurrentEnvironmentKeyResponseError)
+
+export const getGetCurrentEnvironmentKeyUrl = () => {
+
+
+
+
+  return `/keys/me`
+}
+
+/**
+ * Any API key can call this, whatever its scopes. Use it to find the key's environment ID.
+ * @summary Get the API key this request was made with
+ */
+export const getCurrentEnvironmentKey = async ( options?: Parameters<typeof cliFetch>[1]): Promise<getCurrentEnvironmentKeyResponse> => {
+
+  return cliFetch<getCurrentEnvironmentKeyResponse>(getGetCurrentEnvironmentKeyUrl(),
   {
     ...options,
     method: 'GET'

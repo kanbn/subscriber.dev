@@ -1,4 +1,4 @@
-import { and, eq, isNull, lt, or } from "drizzle-orm";
+import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import type { EnvironmentKeyScope } from "@subscriber.dev/shared/environmentKeys";
@@ -24,6 +24,43 @@ export const createEnvironmentKey = async (
   return key;
 };
 
+const listColumns = {
+  publicId: environmentKeys.publicId,
+  name: environmentKeys.name,
+  start: environmentKeys.start,
+  scopes: environmentKeys.scopes,
+  lastUsedAt: environmentKeys.lastUsedAt,
+  createdAt: environmentKeys.createdAt,
+};
+
+export const listEnvironmentKeys = async (
+  db: dbClient,
+  environmentId: number,
+) => {
+  return db
+    .select(listColumns)
+    .from(environmentKeys)
+    .where(eq(environmentKeys.environmentId, environmentId))
+    .orderBy(desc(environmentKeys.createdAt));
+};
+
+export const deleteEnvironmentKey = async (
+  db: dbClient,
+  environmentId: number,
+  publicId: string,
+) => {
+  const deleted = await db
+    .delete(environmentKeys)
+    .where(
+      and(
+        eq(environmentKeys.environmentId, environmentId),
+        eq(environmentKeys.publicId, publicId),
+      ),
+    )
+    .returning({ id: environmentKeys.id });
+  return deleted.length > 0;
+};
+
 export const getEnvironmentKeyByHash = async (
   db: dbClient,
   keyHash: string,
@@ -31,6 +68,9 @@ export const getEnvironmentKeyByHash = async (
   const [result] = await db
     .select({
       id: environmentKeys.id,
+      publicId: environmentKeys.publicId,
+      name: environmentKeys.name,
+      start: environmentKeys.start,
       scopes: environmentKeys.scopes,
       lastUsedAt: environmentKeys.lastUsedAt,
       environment: {

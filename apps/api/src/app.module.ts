@@ -6,6 +6,7 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { HealthController } from "./health.controller.js";
 import { AnalyticsModule } from "./modules/analytics/analytics.module.js";
 import { BillingModule } from "./modules/billing/billing.module.js";
+import { EnvironmentKeysModule } from "./modules/environmentKeys/environmentKeys.module.js";
 import { InboundModule } from "./modules/inbound/inbound.module.js";
 import { IntegrationsModule } from "./modules/integrations/integrations.module.js";
 import { SubscriberMcpModule } from "./modules/mcp/mcp.module.js";
@@ -32,6 +33,7 @@ import { throttlerOptions } from "./throttle.js";
     SetupModule,
     AnalyticsModule,
     InboundModule,
+    EnvironmentKeysModule,
     SubscriberMcpModule,
   ],
   controllers: [HealthController],
