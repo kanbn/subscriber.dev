@@ -1,3 +1,4 @@
+import { existsSync, writeFileSync } from "fs";
 import type { INestApplication } from "@nestjs/common";
 import type { OpenAPIObject } from "@nestjs/swagger";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
@@ -64,8 +65,7 @@ export function openApiDocuments(app: INestApplication) {
         type: "apiKey",
         in: "header",
         name: "X-API-Key",
-        description:
-          "An environment API key. Keep it on your server.",
+        description: "An environment API key. Keep it on your server.",
       },
       "api-key",
     )
@@ -176,4 +176,16 @@ function withPublicSchemaNames(document: OpenAPIObject): OpenAPIObject {
     ),
   };
   return renamed;
+}
+
+export function writeOpenApiDocuments(app: INestApplication) {
+  const documents = openApiDocuments(app);
+  writeFileSync("./openapi.json", JSON.stringify(documents.document, null, 2));
+  if (existsSync("../docs")) {
+    writeFileSync(
+      "../docs/openapi.json",
+      JSON.stringify(documents.publicDocument, null, 2),
+    );
+  }
+  return documents;
 }

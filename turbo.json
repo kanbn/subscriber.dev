@@ -29,6 +29,10 @@
     "test": {
       "dependsOn": ["^topo", "^build"]
     },
+    "openapi": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
     "clean": {
       "cache": false
     },

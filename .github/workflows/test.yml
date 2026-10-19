@@ -34,3 +34,12 @@ jobs:
 
       - name: Run unit tests
         run: pnpm turbo run test
+
+      - name: Check the OpenAPI spec and clients are up to date
+        run: |
+          pnpm turbo run openapi --filter=@subscriber.dev/api
+          pnpm --filter @subscriber.dev/api-client generate
+          git diff --exit-code -- apps/api/openapi.json apps/docs/openapi.json packages/api-client/src || {
+            echo "::error::The OpenAPI spec or generated clients are out of date. Run: pnpm --filter @subscriber.dev/api openapi && pnpm --filter @subscriber.dev/api-client generate"
+            exit 1
+          }

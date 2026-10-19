@@ -1,12 +1,11 @@
 import "reflect-metadata";
 
-import { existsSync, writeFileSync } from "fs";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import { NestFactory } from "@nestjs/core";
 import { ZodValidationPipe } from "nestjs-zod";
 
 import { AppModule } from "./app.module.js";
-import { openApiDocuments } from "./openapi.js";
+import { writeOpenApiDocuments } from "./openapi.js";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
@@ -27,14 +26,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ZodValidationPipe());
 
-  const { document, publicDocument } = openApiDocuments(app);
-  writeFileSync("./openapi.json", JSON.stringify(document, null, 2));
-  if (existsSync("../docs")) {
-    writeFileSync(
-      "../docs/openapi.json",
-      JSON.stringify(publicDocument, null, 2),
-    );
-  }
+  const { publicDocument } = writeOpenApiDocuments(app);
   console.log("📄 OpenAPI spec written to openapi.json");
 
   app.getHttpAdapter().get("/openapi.json", (req, res) => {

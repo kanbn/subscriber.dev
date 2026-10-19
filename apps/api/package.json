@@ -10,6 +10,7 @@
     "start": "pnpm with-env node dist/main.js",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
+    "openapi": "node --import @swc-node/register/esm-register src/openapi.generate.ts",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "with-env": "dotenv -e ../../.env --",
     "test": "vitest run",
