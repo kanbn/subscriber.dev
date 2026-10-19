@@ -1,0 +1,45 @@
+{
+  "name": "@subscriber.dev/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the subscriber.dev API",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kanbn/subscriber.dev",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://docs.subscriber.dev",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
+    "generate": "openapi-ts",
+    "lint": "eslint",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.99.0",
+    "@subscriber.dev/eslint-config": "workspace:*",
+    "@subscriber.dev/prettier-config": "workspace:*",
+    "@types/node": "^22.20.5",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "^5.0.3"
+  },
+  "prettier": "@subscriber.dev/prettier-config"
+}
