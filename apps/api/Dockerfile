@@ -10,6 +10,7 @@ RUN corepack enable && corepack prepare pnpm@12.10.1 --activate
 
 # Copy package files
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
+COPY patches ./patches
 COPY packages ./packages
 COPY tooling ./tooling
 COPY apps/api ./apps/api
