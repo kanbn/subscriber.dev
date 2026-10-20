@@ -1,6 +1,6 @@
 import {
-  bigint,
   bigserial,
+  customType,
   integer,
   pgTable,
   text,
@@ -8,6 +8,10 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { users } from "./users.js";
+
+const bigintAsString = customType<{ data: string; driverData: string }>({
+  dataType: () => "bigint",
+});
 
 export const session = pgTable("session", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -54,7 +58,7 @@ export const deviceCode = pgTable("deviceCode", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
   deviceCode: text("deviceCode").notNull(),
   userCode: text("userCode").notNull(),
-  userId: bigint("userId", { mode: "number" }).references(() => users.id, {
+  userId: bigintAsString("userId").references(() => users.id, {
     onDelete: "cascade",
   }),
   expiresAt: timestamp("expiresAt").notNull(),

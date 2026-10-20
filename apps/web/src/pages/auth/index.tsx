@@ -202,6 +202,14 @@ function Approve({
     setPending(true);
     setError(null);
     const userCode = code.trim().toUpperCase();
+    const claimed = await authClient.device({
+      query: { user_code: userCode },
+    });
+    if (claimed.error) {
+      setPending(false);
+      setError(claimed.error.error_description);
+      return;
+    }
     const { error } = approve
       ? await authClient.device.approve({ userCode })
       : await authClient.device.deny({ userCode });
