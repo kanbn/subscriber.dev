@@ -7,8 +7,16 @@ import { authIssuer, mcpResourceUrls } from "@subscriber.dev/auth/server";
 const origin = (request: Request) =>
   `${request.get("x-forwarded-proto")?.split(",")[0] ?? request.protocol}://${request.get("x-forwarded-host") ?? request.get("host") ?? ""}`;
 
+const resourceFor = (request: Request) => {
+  const resources = mcpResourceUrls();
+  return (
+    resources.find((url) => new URL(url).origin === origin(request)) ??
+    resources[0]
+  );
+};
+
 export const protectedResourceMetadataUrl = (request: Request) =>
-  `${origin(request)}/.well-known/oauth-protected-resource/mcp`;
+  `${origin(request)}/.well-known/oauth-protected-resource${new URL(resourceFor(request)).pathname.replace(/\/$/, "")}`;
 
 @ApiExcludeController()
 @Controller(".well-known/oauth-protected-resource")
@@ -17,10 +25,8 @@ export class OAuthMetadataController {
   @Header("Access-Control-Allow-Origin", "*")
   @Header("Cache-Control", "public, max-age=3600")
   getProtectedResourceMetadata(@Req() request: Request) {
-    const resources = mcpResourceUrls();
-    const requested = `${origin(request)}/mcp`;
     return {
-      resource: resources.includes(requested) ? requested : resources[0],
+      resource: resourceFor(request),
       authorization_servers: [authIssuer()],
       bearer_methods_supported: ["header"],
       resource_name: "subscriber.dev",

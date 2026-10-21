@@ -40,6 +40,7 @@ These settings go in `.env`.
 | --- | --- | --- |
 | `NEXT_PUBLIC_BASE_URL` | Yes | Public URL of the web app |
 | `NEXT_PUBLIC_API_BASE_URL` | Yes | Public URL of the API |
+| `MCP_URL` | No | Public URL of the MCP server, if it's on its own host (e.g. `https://mcp.acme.com`). Defaults to the API URL plus `/mcp`. Set it on the API and the web app |
 | `BETTER_AUTH_SECRET` | Yes | Random secret for sessions. Generate with `openssl rand -base64 32` |
 | `EMAIL_UNSUBSCRIBE_SECRET` | Yes | Random secret that signs unsubscribe links |
 | `INTEGRATIONS_ENCRYPTION_KEY` | Yes | Encrypts provider credentials at rest. Generate with `openssl rand -base64 32` |

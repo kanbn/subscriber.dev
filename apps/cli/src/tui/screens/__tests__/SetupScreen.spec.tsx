@@ -175,7 +175,7 @@ describe("SetupScreen", () => {
       subscriber: { email: "henry@acme.com" },
     });
     expect(lastFrame()).toContain("Sent to henry@acme.com");
-    expect(lastFrame()).toContain("https://mcp.subscriber.dev/mcp");
+    expect(lastFrame()).toContain("https://mcp.subscriber.dev");
 
     stdin.write("\r");
     expect(onDone).toHaveBeenCalledWith(workspace, environment);
@@ -184,7 +184,7 @@ describe("SetupScreen", () => {
 
 describe("mcpServerUrl", () => {
   it("uses mcp.subscriber.dev for cloud and /mcp on a self-hosted API", () => {
-    expect(mcpServerUrl(undefined)).toBe("https://mcp.subscriber.dev/mcp");
+    expect(mcpServerUrl(undefined)).toBe("https://mcp.subscriber.dev");
     expect(mcpServerUrl("https://api.acme.com/")).toBe(
       "https://api.acme.com/mcp",
     );

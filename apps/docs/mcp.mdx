@@ -7,19 +7,19 @@ MCP (Model Context Protocol) is how AI agents like Claude and Cursor connect to 
 
 ## 1. Add the server
 
-The server URL is `https://mcp.subscriber.dev/mcp`.
+The server URL is `https://mcp.subscriber.dev`.
 
 <Tabs>
   <Tab title="Claude Code">
     ```bash
-    claude mcp add --transport http subscriber https://mcp.subscriber.dev/mcp
+    claude mcp add --transport http subscriber https://mcp.subscriber.dev
     ```
   </Tab>
   <Tab title="Claude app">
-    Add a custom connector in Claude's settings, with the URL `https://mcp.subscriber.dev/mcp`.
+    Add a custom connector in Claude's settings, with the URL `https://mcp.subscriber.dev`.
   </Tab>
   <Tab title="Other clients">
-    Add a streamable HTTP server with the URL `https://mcp.subscriber.dev/mcp`.
+    Add a streamable HTTP server with the URL `https://mcp.subscriber.dev`.
   </Tab>
 </Tabs>
 

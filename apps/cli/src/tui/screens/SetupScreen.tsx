@@ -69,7 +69,7 @@ function welcomeEmail(product: string) {
 export function mcpServerUrl(apiBaseUrl: string | undefined): string {
   const base = (apiBaseUrl ?? "https://api.subscriber.dev").replace(/\/$/, "");
   return base === "https://api.subscriber.dev"
-    ? "https://mcp.subscriber.dev/mcp"
+    ? "https://mcp.subscriber.dev"
     : `${base}/mcp`;
 }
 

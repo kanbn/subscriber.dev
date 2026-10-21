@@ -20,7 +20,7 @@ npx @subscriber.dev/cli login
 Or add the MCP server to your agent and ask it to set things up:
 
 ```bash
-claude mcp add --transport http subscriber https://mcp.subscriber.dev/mcp
+claude mcp add --transport http subscriber https://mcp.subscriber.dev
 ```
 
 The [quickstart](https://docs.subscriber.dev/quickstart) takes you from sign-in to your first workflow email.
