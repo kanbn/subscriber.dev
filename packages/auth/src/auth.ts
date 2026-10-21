@@ -31,7 +31,12 @@ export const mcpResourceUrls = () => [
       process.env.MCP_URL,
       process.env.NEXT_PUBLIC_API_BASE_URL &&
         `${process.env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, "")}/mcp`,
-    ].filter((url): url is string => !!url),
+    ]
+      .filter((url): url is string => !!url)
+      .flatMap((url) => {
+        const trimmed = url.replace(/\/$/, "");
+        return [trimmed, `${trimmed}/`];
+      }),
   ),
 ];
 
