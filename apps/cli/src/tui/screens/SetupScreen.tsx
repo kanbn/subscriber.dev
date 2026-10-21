@@ -354,8 +354,8 @@ export function SetupScreen({
             <Text>Edit the email: {step.workflow.editUrl}</Text>
           )}
           <Text>
-            Trigger it from your app: POST /environments/{environmentId}
-            /workflows/trigger
+            Trigger it from your app: subscriber keys create &quot;production&quot;,
+            then POST /workflows/trigger with the key in x-api-key
           </Text>
           <Text>
             Add your AI agent: claude mcp add --transport http subscriber{" "}
