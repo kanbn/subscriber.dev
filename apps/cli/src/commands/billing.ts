@@ -147,7 +147,11 @@ export function registerBillingCommand(program: Command): void {
             process.exitCode = 1;
             return;
           }
-          const workspaceId = requireWorkspaceId(opts);
+          const workspaceId = requireWorkspaceId({
+            workspace:
+              opts.workspace ??
+              billing.opts<{ workspace?: string }>().workspace,
+          });
           const current =
             opts.annual || opts.monthly
               ? undefined
@@ -178,7 +182,13 @@ export function registerBillingCommand(program: Command): void {
       run(async (opts: { workspace?: string }) => {
         ensureLoggedIn();
         const data = ok(
-          await createBillingPortalLink(requireWorkspaceId(opts)),
+          await createBillingPortalLink(
+            requireWorkspaceId({
+              workspace:
+                opts.workspace ??
+                billing.opts<{ workspace?: string }>().workspace,
+            }),
+          ),
         );
         if (data) openLink(data);
       }),
