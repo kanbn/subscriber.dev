@@ -4,3 +4,4 @@ export {
   mcpResourceUrls,
   verifyMcpAccessToken,
 } from "./auth.js";
+export { posthog } from "./posthog.js";

@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Tool } from "@rekog/mcp-nest";
 import { z } from "zod";
 
+import { track } from "../../../posthog.js";
 import {
   ListBroadcastsQuerySchema,
   TriggerBroadcastSchema,
@@ -41,12 +42,22 @@ export class WorkflowTools {
       args.environmentId,
     );
 
-    return this.workflowService.triggerWorkflow(db, environment.id, {
-      key: args.key,
-      subscriber: args.subscriber,
-      payload: args.payload,
-      triggeredBy: user.id,
-    });
+    const result = await this.workflowService.triggerWorkflow(
+      db,
+      environment.id,
+      {
+        key: args.key,
+        subscriber: args.subscriber,
+        payload: args.payload,
+        triggeredBy: user.id,
+      },
+    );
+    track(
+      "workflow_triggered",
+      { via: "mcp", userId: user.id, workspaceId: environment.workspaceId },
+      { triggered: result.triggered },
+    );
+    return result;
   }
 
   @Tool({
@@ -68,17 +79,27 @@ export class WorkflowTools {
       args.environmentId,
     );
 
-    return this.workflowService.createWorkflow(db, environment, {
-      key: args.key,
-      name: args.name,
-      description: args.description,
-      type: args.type,
-      channels: args.channels,
-      steps: args.steps,
-      triggers: args.triggers,
-      exitConditions: args.exitConditions,
-      createdBy: user.id,
-    });
+    const workflow = await this.workflowService.createWorkflow(
+      db,
+      environment,
+      {
+        key: args.key,
+        name: args.name,
+        description: args.description,
+        type: args.type,
+        channels: args.channels,
+        steps: args.steps,
+        triggers: args.triggers,
+        exitConditions: args.exitConditions,
+        createdBy: user.id,
+      },
+    );
+    track(
+      "workflow_created",
+      { via: "mcp", userId: user.id, workspaceId: environment.workspaceId },
+      { workflow_type: args.type, step_count: args.steps.length },
+    );
+    return workflow;
   }
 
   @Tool({
@@ -318,7 +339,7 @@ export class WorkflowTools {
       args.environmentId,
     );
 
-    return this.workflowService.triggerBroadcast(
+    const broadcast = await this.workflowService.triggerBroadcast(
       db,
       environment.id,
       args.workflowId,
@@ -326,6 +347,12 @@ export class WorkflowTools {
       user.id,
       { sendOverHours: args.sendOverHours, allowOverPlan: args.allowOverPlan },
     );
+    track("broadcast_triggered", {
+      via: "mcp",
+      userId: user.id,
+      workspaceId: environment.workspaceId,
+    });
+    return broadcast;
   }
 
   @Tool({

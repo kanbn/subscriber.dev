@@ -44,7 +44,7 @@ const SECTIONS: LegalSection[] = [
   {
     heading: "who we share data with",
     paragraphs: [
-      "Service providers who help us run subscriber.dev, such as hosting, infrastructure and payment providers (Stripe). They may only use the data to provide their service to us.",
+      "Service providers who help us run subscriber.dev, such as hosting, infrastructure, payment (Stripe) and product analytics (PostHog) providers. They may only use the data to provide their service to us.",
       "Email providers and integrations that you choose to connect. Their own terms and privacy policies apply to the data they receive.",
       "Authorities, where we're legally required to, and a successor if the business is ever sold, under the same protections.",
     ],
@@ -71,7 +71,7 @@ const SECTIONS: LegalSection[] = [
   {
     heading: "cookies",
     paragraphs: [
-      "We only use cookies that are essential for signing in. We don't use advertising or tracking cookies.",
+      "We only use cookies that are essential for signing in. We don't use advertising or tracking cookies. Our website analytics (PostHog) count visits without cookies or storing anything on your device, and we record which features accounts use, such as creating a workflow, to improve the product.",
     ],
   },
   {
@@ -100,7 +100,7 @@ export default function Privacy() {
     <LegalPage
       title="Privacy Policy"
       description="How subscriber.dev handles your data and your subscribers' data."
-      updated="6 October 2026"
+      updated="29 October 2026"
       intro="This policy explains what data we collect, why, and what we do with it. The short version: we only use your data to run subscriber.dev, we never sell it, and your subscribers' data is yours."
       sections={SECTIONS}
     />

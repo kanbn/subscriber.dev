@@ -32,6 +32,7 @@ import {
 } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
+import { track } from "../../posthog.js";
 import {
   CreatedEnvironmentKeyDto,
   CreateEnvironmentKeyDto,
@@ -63,12 +64,18 @@ export class EnvironmentKeysController {
     @CurrentEnvironment() environment: EnvironmentForUser,
     @Body() input: CreateEnvironmentKeyDto,
   ): Promise<CreatedEnvironmentKeyDto> {
-    return this.environmentKeysService.create(
+    const key = await this.environmentKeysService.create(
       createDrizzleClient(),
       environment.id,
       input,
       user.id,
     );
+    track("api_key_created", {
+      via: "api",
+      userId: user.id,
+      workspaceId: environment.workspaceId,
+    });
+    return key;
   }
 
   @Get()

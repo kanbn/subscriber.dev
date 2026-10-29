@@ -11,6 +11,8 @@ import type { dbClient } from "@subscriber.dev/db/client";
 import * as schema from "@subscriber.dev/db/schema";
 import { sendEmail } from "@subscriber.dev/email";
 
+import { posthog } from "./posthog.js";
+
 // GitHub is the only social sign-in; everything else is an email link.
 const configuredProviders =
   process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
@@ -91,6 +93,19 @@ export const initAuth = (db: dbClient) => {
       freshAge: 0,
     },
     socialProviders: configuredProviders,
+    databaseHooks: {
+      user: {
+        create: {
+          after: (user) => {
+            posthog?.capture({
+              distinctId: String(user.id),
+              event: "user_signed_up",
+            });
+            return Promise.resolve();
+          },
+        },
+      },
+    },
     user: {
       deleteUser: {
         enabled: true,

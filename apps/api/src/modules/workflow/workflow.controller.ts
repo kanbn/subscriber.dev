@@ -29,6 +29,7 @@ import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
+import { track } from "../../posthog.js";
 import {
   BroadcastDetailResponseDto,
   BroadcastSummaryDto,
@@ -87,12 +88,22 @@ export class WorkflowController {
   ): Promise<TriggerWorkflowResponseDto> {
     const db = createDrizzleClient();
 
-    return this.workflowService.triggerWorkflow(db, environment.id, {
-      key: input.key,
-      subscriber: input.subscriber,
-      payload: input.payload,
-      triggeredBy: user?.id ?? null,
-    });
+    const result = await this.workflowService.triggerWorkflow(
+      db,
+      environment.id,
+      {
+        key: input.key,
+        subscriber: input.subscriber,
+        payload: input.payload,
+        triggeredBy: user?.id ?? null,
+      },
+    );
+    track(
+      "workflow_triggered",
+      { via: "api", userId: user?.id, workspaceId: environment.workspaceId },
+      { triggered: result.triggered },
+    );
+    return result;
   }
 
   @Post()
@@ -113,17 +124,27 @@ export class WorkflowController {
   ) {
     const db = createDrizzleClient();
 
-    return this.workflowService.createWorkflow(db, environment, {
-      key: input.key,
-      name: input.name,
-      description: input.description,
-      type: input.type,
-      channels: input.channels,
-      steps: input.steps,
-      triggers: input.triggers,
-      exitConditions: input.exitConditions,
-      createdBy: user?.id ?? null,
-    });
+    const workflow = await this.workflowService.createWorkflow(
+      db,
+      environment,
+      {
+        key: input.key,
+        name: input.name,
+        description: input.description,
+        type: input.type,
+        channels: input.channels,
+        steps: input.steps,
+        triggers: input.triggers,
+        exitConditions: input.exitConditions,
+        createdBy: user?.id ?? null,
+      },
+    );
+    track(
+      "workflow_created",
+      { via: "api", userId: user?.id, workspaceId: environment.workspaceId },
+      { workflow_type: input.type, step_count: input.steps.length },
+    );
+    return workflow;
   }
 
   @Get()
@@ -345,7 +366,7 @@ export class WorkflowController {
   ): Promise<TriggerBroadcastResponseDto> {
     const db = createDrizzleClient();
 
-    return this.workflowService.triggerBroadcast(
+    const broadcast = await this.workflowService.triggerBroadcast(
       db,
       environment.id,
       workflowId,
@@ -356,6 +377,12 @@ export class WorkflowController {
         allowOverPlan: input.allowOverPlan,
       },
     );
+    track("broadcast_triggered", {
+      via: "api",
+      userId: user?.id,
+      workspaceId: environment.workspaceId,
+    });
+    return broadcast;
   }
 
   @Get(":workflowId/broadcasts")

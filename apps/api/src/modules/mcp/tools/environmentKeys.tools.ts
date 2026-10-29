@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { ENVIRONMENT_KEY_SCOPES } from "@subscriber.dev/shared/environmentKeys";
 
+import { track } from "../../../posthog.js";
 import { CreateEnvironmentKeySchema } from "../../environmentKeys/dto/environmentKey.dto.js";
 import { EnvironmentKeysService } from "../../environmentKeys/environmentKeys.service.js";
 import { requireEnvironment } from "../mcp-environment.util.js";
@@ -37,12 +38,18 @@ export class EnvironmentKeysTools {
     const db = requireMcpDb(rawRequest);
     const { environmentId, ...input } = args;
     const environment = await requireEnvironment(db, user.id, environmentId);
-    return this.environmentKeysService.create(
+    const key = await this.environmentKeysService.create(
       db,
       environment.id,
       input,
       user.id,
     );
+    track("api_key_created", {
+      via: "mcp",
+      userId: user.id,
+      workspaceId: environment.workspaceId,
+    });
+    return key;
   }
 
   @Tool({

@@ -26,6 +26,7 @@ import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { RequiresScope } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
 import { EnvironmentAccessGuard } from "../../common/guards/environment-access.guard.js";
+import { track } from "../../posthog.js";
 import {
   IntegrationResponseDto,
   ListIntegrationsResponseDto,
@@ -71,13 +72,19 @@ export class IntegrationsController {
   ): Promise<IntegrationResponseDto> {
     const db = createDrizzleClient();
 
-    return this.integrationsService.upsert(
+    const integration = await this.integrationsService.upsert(
       db,
       environment.id,
       type,
       body,
       user?.id ?? null,
     );
+    track(
+      "integration_configured",
+      { via: "api", userId: user?.id, workspaceId: environment.workspaceId },
+      { integration_type: type },
+    );
+    return integration;
   }
 
   @Patch(":type/primary")

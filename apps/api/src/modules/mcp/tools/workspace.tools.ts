@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { Tool } from "@rekog/mcp-nest";
 import { z } from "zod";
 
+import { track } from "../../../posthog.js";
 import { CreateEnvironmentSchema } from "../../workspace/dto/create-environment.dto.js";
 import { CreateWorkspaceSchema } from "../../workspace/dto/create-workspace.dto.js";
 import { UpdateWorkspaceSchema } from "../../workspace/dto/update-workspace.dto.js";
@@ -41,9 +42,15 @@ export class WorkspaceTools {
     const user = requireMcpUser(rawRequest);
     const db = requireMcpDb(rawRequest);
 
-    return this.workspaceService.createWorkspace(db, user.id, {
+    const result = await this.workspaceService.createWorkspace(db, user.id, {
       name: args.name,
     });
+    track("workspace_created", {
+      via: "mcp",
+      userId: user.id,
+      workspaceId: result.workspace.id,
+    });
+    return result;
   }
 
   @Tool({

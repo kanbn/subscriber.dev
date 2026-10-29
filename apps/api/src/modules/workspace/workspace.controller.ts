@@ -23,6 +23,7 @@ import { createDrizzleClient } from "@subscriber.dev/db/client";
 import type { User } from "../../common/interfaces/user.interface.js";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
+import { track } from "../../posthog.js";
 import { UserService } from "../user/user.service.js";
 import { CreateEnvironmentDto } from "./dto/create-environment.dto.js";
 import {
@@ -72,9 +73,15 @@ export class WorkspaceController {
     const db = createDrizzleClient();
     const userRecord = await this.userService.getUser(db, user.id);
 
-    return this.workspaceService.createWorkspace(db, user.id, {
+    const result = await this.workspaceService.createWorkspace(db, user.id, {
       name: input.name,
     });
+    track("workspace_created", {
+      via: "api",
+      userId: user.id,
+      workspaceId: result.workspace.id,
+    });
+    return result;
   }
 
   @Patch(":workspaceId")

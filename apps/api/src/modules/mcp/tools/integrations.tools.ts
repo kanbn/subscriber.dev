@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Tool } from "@rekog/mcp-nest";
 import { z } from "zod";
 
+import { track } from "../../../posthog.js";
 import { UpsertIntegrationSchema } from "../../integrations/dto/integration.dto.js";
 import { IntegrationsService } from "../../integrations/integrations.service.js";
 import { CONFIGURABLE_INTEGRATIONS } from "../../integrations/providers/index.js";
@@ -57,13 +58,19 @@ export class IntegrationsTools {
 
     const { environmentId, type, ...body } = args;
 
-    return this.integrationsService.upsert(
+    const integration = await this.integrationsService.upsert(
       db,
       environment.id,
       type,
       body,
       user.id,
     );
+    track(
+      "integration_configured",
+      { via: "mcp", userId: user.id, workspaceId: environment.workspaceId },
+      { integration_type: type },
+    );
+    return integration;
   }
 
   @Tool({

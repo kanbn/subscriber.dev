@@ -4,9 +4,11 @@ import type { NestExpressApplication } from "@nestjs/platform-express";
 import type { Request } from "express";
 import { NestFactory } from "@nestjs/core";
 import { ZodValidationPipe } from "nestjs-zod";
+import { PostHogInterceptor } from "posthog-node/nestjs";
 
 import { AppModule } from "./app.module.js";
 import { writeOpenApiDocuments } from "./openapi.js";
+import { posthog } from "./posthog.js";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
@@ -36,6 +38,10 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ZodValidationPipe());
+  if (posthog)
+    app.useGlobalInterceptors(
+      new PostHogInterceptor(posthog, { captureExceptions: true }),
+    );
 
   const { publicDocument } = writeOpenApiDocuments(app);
   console.log("📄 OpenAPI spec written to openapi.json");

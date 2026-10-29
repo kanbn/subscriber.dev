@@ -44,6 +44,7 @@
     "@subscriber.dev/db": "workspace:*",
     "@subscriber.dev/email": "workspace:*",
     "better-auth": "^1.7.7",
-    "next-runtime-env": "^1.8.0"
+    "next-runtime-env": "^1.8.0",
+    "posthog-node": "^5.59.0"
   }
 }
