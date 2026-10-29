@@ -121,6 +121,7 @@ export const initAuth = (db: dbClient) => {
         resources: mcpResources,
         clientRegistrationDefaultResources: mcpResources,
         enforcePerClientResources: false,
+        refreshTokenReuseInterval: 60,
       }),
       magicLink({
         expiresIn: 60 * 60 * 24 * 7, // 7 days
