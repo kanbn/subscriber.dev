@@ -1,16 +1,26 @@
 {
   "name": "@subscriber.dev/cli",
   "version": "0.1.0",
-  "private": true,
+  "description": "The subscriber.dev CLI and TUI",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://docs.subscriber.dev/cli",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kanbn/subscriber.dev",
+    "directory": "apps/cli"
+  },
   "type": "module",
   "bin": {
     "subscriber": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=22.12"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && esbuild src/index.ts --bundle --platform=node --format=esm --target=node22 --jsx=automatic --outfile=dist/index.js --external:commander --external:date-fns --external:ink --external:ink-select-input --external:ink-text-input --external:react",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc --watch --preserveWatchOutput",
     "format": "prettier --check . --ignore-path ../../.gitignore",
@@ -20,8 +30,6 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@subscriber.dev/api-client": "workspace:*",
-    "@subscriber.dev/shared": "workspace:^",
     "commander": "^15.0.0",
     "date-fns": "^4.4.0",
     "ink": "^8.0.0",
@@ -30,12 +38,15 @@
     "react": "catalog:react19"
   },
   "devDependencies": {
+    "@subscriber.dev/api-client": "workspace:*",
     "@subscriber.dev/eslint-config": "workspace:*",
     "@subscriber.dev/prettier-config": "workspace:*",
+    "@subscriber.dev/shared": "workspace:^",
     "@subscriber.dev/tsconfig": "workspace:*",
     "@swc-node/register": "^1.12.1",
     "@types/node": "^22.20.5",
     "@types/react": "catalog:react19",
+    "esbuild": "^0.28.2",
     "eslint": "catalog:",
     "ink-testing-library": "^4.0.0",
     "prettier": "catalog:",

@@ -365,12 +365,6 @@ importers:
 
   apps/cli:
     dependencies:
-      '@subscriber.dev/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api-client
-      '@subscriber.dev/shared':
-        specifier: workspace:^
-        version: link:../../packages/shared
       commander:
         specifier: ^15.0.0
         version: 15.0.0
@@ -390,12 +384,18 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0
     devDependencies:
+      '@subscriber.dev/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
       '@subscriber.dev/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
       '@subscriber.dev/prettier-config':
         specifier: workspace:*
         version: link:../../tooling/prettier
+      '@subscriber.dev/shared':
+        specifier: workspace:^
+        version: link:../../packages/shared
       '@subscriber.dev/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript
@@ -408,6 +408,9 @@ importers:
       '@types/react':
         specifier: catalog:react19
         version: 19.3.0
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
       eslint:
         specifier: 'catalog:'
         version: 9.39.5(jiti@2.7.0)(supports-color@7.2.0)
