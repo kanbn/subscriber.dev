@@ -162,7 +162,7 @@ export const initAuth = (db: dbClient) => {
         })(),
       },
       defaultCookieAttributes: {
-        sameSite: "none",
+        sameSite: "lax",
         secure: true,
       },
       database: {

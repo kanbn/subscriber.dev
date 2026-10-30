@@ -24,6 +24,21 @@ const config = {
     "@subscriber.dev/auth",
   ],
 
+  poweredByHeader: false,
+
+  headers: async () => [
+    {
+      source: "/:path*",
+      headers: [
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+        { key: "Strict-Transport-Security", value: "max-age=31536000" },
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      ],
+    },
+  ],
+
   rewrites: async () =>
     ["oauth-authorization-server", "openid-configuration"].flatMap(
       (document) => [

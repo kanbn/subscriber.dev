@@ -674,6 +674,8 @@ describe("webhook steps", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: '{"content": "alice@example.com just signed up!"}',
+      redirect: "error",
+      signal: expect.any(AbortSignal),
     });
     expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
       expect.anything(),

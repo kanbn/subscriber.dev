@@ -89,6 +89,8 @@ export async function processRunStepJob(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: payload,
+        redirect: "error",
+        signal: AbortSignal.timeout(10_000),
       });
       if (!response.ok) {
         throw new Error(`Webhook responded with ${response.status}`);
