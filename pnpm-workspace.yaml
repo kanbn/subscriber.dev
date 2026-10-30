@@ -32,6 +32,7 @@ overrides:
 allowBuilds:
   "@scarf/scarf": false
   "@swc/core": true
+  core-js: false
   esbuild: true
   keytar: true
   msgpackr-extract: true
