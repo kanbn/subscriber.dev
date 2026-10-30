@@ -141,7 +141,7 @@ function endedDuringTrial(subscription: Record<string, unknown>): boolean {
   );
 }
 
-function isResourceMissing(error: unknown): boolean {
+export function isResourceMissing(error: unknown): boolean {
   return (
     typeof error === "object" &&
     error !== null &&

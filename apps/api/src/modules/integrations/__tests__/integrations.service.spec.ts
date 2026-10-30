@@ -25,10 +25,20 @@ vi.mock("@subscriber.dev/email", () => ({
   verifySmtpConnection: vi.fn(),
 }));
 
+const stripeWebhookEndpoints = {
+  list: vi.fn(),
+  create: vi.fn(),
+  retrieve: vi.fn(),
+  update: vi.fn(),
+  del: vi.fn(),
+};
+
 vi.mock("@subscriber.dev/stripe", () => ({
-  createStripeClientForKey: vi.fn().mockReturnValue({
+  STRIPE_API_VERSION: "2026-09-30.endive",
+  createStripeClientForKey: vi.fn(() => ({
     customers: { list: vi.fn().mockResolvedValue({ data: [] }) },
-  }),
+    webhookEndpoints: stripeWebhookEndpoints,
+  })),
 }));
 
 vi.mock("../../../common/encryption.js", () => ({
@@ -402,6 +412,11 @@ describe("stripe integration", () => {
       priority: 2,
     } as any);
     vi.mocked(decrypt).mockReturnValue(JSON.stringify({ apiKey: "rk_1" }));
+    stripeWebhookEndpoints.list.mockResolvedValue({ data: [] });
+    stripeWebhookEndpoints.create.mockResolvedValue({
+      id: "we_1",
+      secret: "whsec_created",
+    });
     vi.mocked(environmentIntegrationsRepo.upsertIntegration).mockImplementation(
       async (_db, _env, type, config) =>
         ({ type, config, priority: 2, updatedAt: new Date(0) }) as any,
@@ -419,11 +434,96 @@ describe("stripe integration", () => {
     const [, , , savedConfig] = vi.mocked(
       environmentIntegrationsRepo.upsertIntegration,
     ).mock.calls[0]!;
-    expect(savedConfig).toEqual({ webhookToken: "existing-token" });
+    expect(savedConfig).toEqual({
+      webhookToken: "existing-token",
+      webhookEndpointId: "we_1",
+      webhookStatus: "automatic",
+    });
     expect(result).toEqual(
       expect.objectContaining({
         webhookUrl: "https://api.example.com/webhooks/stripe/existing-token",
       }),
     );
+  });
+
+  it("creates the Stripe webhook endpoint and saves its signing secret encrypted", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.example.com");
+    vi.mocked(
+      environmentIntegrationsRepo.getByEnvironmentAndType,
+    ).mockResolvedValue(undefined);
+    stripeWebhookEndpoints.list.mockResolvedValue({ data: [] });
+    stripeWebhookEndpoints.create.mockResolvedValue({
+      id: "we_1",
+      secret: "whsec_created",
+    });
+    vi.mocked(environmentIntegrationsRepo.upsertIntegration).mockImplementation(
+      async (_db, _env, type, config) =>
+        ({ type, config, priority: 1, updatedAt: new Date(0) }) as any,
+    );
+
+    const result = await service.upsert(
+      mockDb,
+      10,
+      "stripe",
+      { apiKey: "rk_1" },
+      1,
+    );
+    vi.unstubAllEnvs();
+
+    expect(encrypt).toHaveBeenCalledWith(
+      JSON.stringify({ apiKey: "rk_1", webhookSecret: "whsec_created" }),
+    );
+    expect(result).toEqual(
+      expect.objectContaining({
+        webhookEndpointId: "we_1",
+        webhookStatus: "automatic",
+      }),
+    );
+    expect(result).not.toHaveProperty("nextStep");
+    expect(JSON.stringify(result)).not.toContain("whsec_created");
+  });
+
+  it("refuses to save, saying why, when Stripe won't create the webhook", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.example.com");
+    vi.mocked(
+      environmentIntegrationsRepo.getByEnvironmentAndType,
+    ).mockResolvedValue(undefined);
+    stripeWebhookEndpoints.list.mockResolvedValue({ data: [] });
+    stripeWebhookEndpoints.create.mockRejectedValue(new Error("Invalid URL"));
+
+    await expect(
+      service.upsert(mockDb, 10, "stripe", { apiKey: "rk_1" }, 1),
+    ).rejects.toThrow(BadRequestException);
+    vi.unstubAllEnvs();
+    expect(
+      environmentIntegrationsRepo.upsertIntegration,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("deletes the Stripe webhook endpoint with the integration", async () => {
+    vi.mocked(environmentIntegrationsRepo.deleteIntegration).mockResolvedValue({
+      type: "stripe",
+      config: { webhookToken: "tok", webhookEndpointId: "we_1" },
+      encryptedSecret: "stored-blob",
+    } as any);
+    vi.mocked(decrypt).mockReturnValue(JSON.stringify({ apiKey: "rk_1" }));
+
+    await service.delete(mockDb, 10, "stripe");
+
+    expect(stripeWebhookEndpoints.del).toHaveBeenCalledWith("we_1");
+  });
+
+  it("still deletes the integration when Stripe won't delete the endpoint", async () => {
+    vi.mocked(environmentIntegrationsRepo.deleteIntegration).mockResolvedValue({
+      type: "stripe",
+      config: { webhookEndpointId: "we_1" },
+      encryptedSecret: "stored-blob",
+    } as any);
+    vi.mocked(decrypt).mockReturnValue(
+      JSON.stringify({ apiKey: "rk_revoked" }),
+    );
+    stripeWebhookEndpoints.del.mockRejectedValue(new Error("invalid api key"));
+
+    await expect(service.delete(mockDb, 10, "stripe")).resolves.toBeUndefined();
   });
 });

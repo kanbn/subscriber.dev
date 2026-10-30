@@ -50,13 +50,13 @@ These are the moments in Stripe you can start or stop a workflow on.
 | `subscription_canceled` | Subscription canceled |
 | `payment_failed` | Renewal payment failed |
 
-You can also use a raw Stripe event type, such as `checkout.session.completed`.
+You can also use a raw Stripe event type, such as `checkout.session.completed`. Enable it on the webhook endpoint in Stripe too, since Stripe only sends the events enabled there. subscriber.dev keeps events you add when it updates the endpoint.
 
 ## Connect Stripe
 
-Connecting lets subscriber.dev look up who each Stripe event is about, and lets Stripe tell subscriber.dev when something happens.
+Connecting lets subscriber.dev look up who each Stripe event is about, and sets up a webhook so Stripe tells subscriber.dev when something happens.
 
-1. In Stripe, create a restricted API key with read access to Customers.
+1. In Stripe, create a [restricted API key](https://dashboard.stripe.com/apikeys) with **Customers: Read** and **Webhook Endpoints: Write**.
 2. Connect it to subscriber.dev:
 
    <Tabs>
@@ -77,8 +77,13 @@ Connecting lets subscriber.dev look up who each Stripe event is about, and lets 
      </Tab>
    </Tabs>
 
-   You get back a webhook URL and the Stripe events to enable.
-3. In Stripe, add a webhook endpoint with that URL and those events.
-4. Give subscriber.dev the endpoint's signing secret (`whsec_...`) the same way. Your API key is kept, so send only `{"webhookSecret": "whsec_..."}`.
+That's it. subscriber.dev creates the webhook endpoint in your Stripe account and keeps its signing secret, and the response shows `"webhookStatus": "automatic"`. Saving again updates that endpoint rather than adding another, and disconnecting Stripe deletes it.
+
+### Adding the webhook yourself
+
+If you'd rather not give the key Webhook Endpoints: Write, use a key with just Customers: Read. The response then has a `webhookUrl`, the `eventsToEnable` and a `nextStep`:
+
+1. In Stripe, add a webhook endpoint with that URL and those events.
+2. Give subscriber.dev the endpoint's signing secret (`whsec_...`) the same way you saved the key. Your API key is kept, so send only `{"webhookSecret": "whsec_..."}`.
 
 To see the webhook URL again, ask your agent, run `subscriber integrations get stripe`, or open Stripe under **Integrations** in the TUI.

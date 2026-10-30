@@ -54,7 +54,7 @@ export class IntegrationsService {
       environmentId,
       type,
     );
-    const config = provider.prepareConfig
+    let config = provider.prepareConfig
       ? provider.prepareConfig(configResult.data, current?.config)
       : configResult.data;
     const storedSecret = current?.encryptedSecret
@@ -86,7 +86,23 @@ export class IntegrationsService {
       }
     }
 
-    const encryptedSecret = encrypt(JSON.stringify(secretResult.data));
+    let secret: unknown = secretResult.data;
+    if (provider.connect) {
+      let connected: { config: unknown; secret: unknown };
+      try {
+        connected = await provider.connect(config, secret);
+      } catch (error) {
+        throw new BadRequestException(
+          error instanceof Error
+            ? error.message
+            : "Failed to connect integration",
+        );
+      }
+      config = connected.config;
+      secret = connected.secret;
+    }
+
+    const encryptedSecret = encrypt(JSON.stringify(secret));
 
     const existing = await environmentIntegrationsRepo.listByEnvironment(
       db,
@@ -154,5 +170,18 @@ export class IntegrationsService {
       type,
     );
     if (!row) throw new NotFoundException("Integration not configured");
+
+    const provider = CONFIGURABLE_INTEGRATIONS[type] as
+      (typeof CONFIGURABLE_INTEGRATIONS)[string] | undefined;
+    if (provider?.disconnect && row.encryptedSecret) {
+      try {
+        await provider.disconnect(
+          row.config,
+          JSON.parse(decrypt(row.encryptedSecret)),
+        );
+      } catch {
+        return;
+      }
+    }
   }
 }

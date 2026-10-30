@@ -30,6 +30,11 @@ export interface ConfigurableIntegration<TConfig = unknown, TSecret = unknown> {
     config: TConfig,
     existing: Record<string, unknown> | undefined,
   ) => TConfig;
+  connect?: (
+    config: TConfig,
+    secret: TSecret,
+  ) => Promise<{ config: TConfig; secret: TSecret }>;
+  disconnect?: (config: TConfig, secret: TSecret) => Promise<void>;
   describe?: (config: Record<string, unknown>) => Record<string, unknown>;
 }
 

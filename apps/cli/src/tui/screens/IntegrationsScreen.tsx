@@ -226,9 +226,9 @@ export function IntegrationsScreen({
       <Box flexDirection="column">
         <Text bold>New Stripe integration</Text>
         <Text dimColor>
-          Add the signing secret after creating the webhook endpoint in Stripe
-          with the URL shown next. Choose which events start a workflow from the
-          workflow's triggers.
+          Create a restricted key in Stripe with Customers: Read and Webhook
+          Endpoints: Write, and subscriber.dev adds the webhook for you. Choose
+          which events start a workflow from the workflow's triggers.
         </Text>
         <StripeIntegrationForm
           onSubmit={handleCreateStripe}

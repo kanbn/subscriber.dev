@@ -34,7 +34,7 @@ export class IntegrationsTools {
 
   @Tool({
     name: "set_integration",
-    description: `Create or update the integration of the given type for this environment. Types and their fields (* = required): ${INTEGRATION_FIELDS}. Secret fields (keys, tokens, passwords) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full. The response may include a webhookUrl and eventsToEnable: tell the user to add that webhook in the provider, then save its signing secret as webhookSecret.`,
+    description: `Create or update the integration of the given type for this environment. Types and their fields (* = required): ${INTEGRATION_FIELDS}. Secret fields (keys, tokens, passwords) are encrypted at rest and never returned. When updating, omit secret fields to keep the stored ones; config fields are always replaced in full. For Stripe, ask for a restricted key with Customers: Read and Webhook Endpoints: Write: subscriber.dev then creates the webhook in Stripe itself (webhookStatus: automatic), and if it couldn't, the response has a nextStep to pass on. For other providers, a response with a webhookUrl means the user adds that webhook in the provider, then saves its signing secret as webhookSecret where the provider has one.`,
     parameters: UpsertIntegrationSchema.extend({
       environmentId: z.string(),
       type: z.string(),

@@ -269,8 +269,8 @@ export function IntegrationDetailScreen({
               <Text bold>Recent events</Text>
               {events.length === 0 ? (
                 <Text dimColor>
-                  None yet. Point a webhook at webhookUrl, sending the events in
-                  eventsToEnable, then add triggers to your workflows.
+                  None yet. Add triggers to your workflows, and events show up
+                  here as they happen in Stripe.
                 </Text>
               ) : (
                 events.map((event) => (

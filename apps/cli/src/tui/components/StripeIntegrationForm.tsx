@@ -10,8 +10,14 @@ export interface StripeIntegrationValues {
 }
 
 const FIELDS = [
-  { key: "apiKey", label: "Stripe API key (restricted, read Customers)" },
-  { key: "webhookSecret", label: "Webhook signing secret (whsec_…)" },
+  {
+    key: "apiKey",
+    label: "Stripe restricted key (Customers: Read, Webhook Endpoints: Write)",
+  },
+  {
+    key: "webhookSecret",
+    label: "Webhook signing secret (only if you add the webhook yourself)",
+  },
 ] as const;
 type FieldKey = (typeof FIELDS)[number]["key"];
 

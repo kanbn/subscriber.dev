@@ -99,7 +99,7 @@ Or ask [your agent](/mcp): "Show me the last Stripe events and what happened to 
 
 | What you see | What to do |
 | --- | --- |
-| No events at all | Stripe isn't sending them. Check the webhook endpoint's URL in Stripe, and that the events are enabled. See [Connect Stripe](/integrations/stripe#connect-stripe). |
+| No events at all | Stripe isn't sending them. Run `subscriber integrations get stripe`: if there's a `nextStep`, follow it. Otherwise check the webhook endpoint in Stripe (subscriber.dev's is described as "subscriber.dev workflow triggers") is enabled and has the events. See [Connect Stripe](/integrations/stripe#connect-stripe). |
 | No workflow is triggered or exited by ... | Add that event as a trigger on a workflow. |
 | Event isn't about a person | The event has no customer, so there's no one to email. |
 | Customer ... doesn't exist in Stripe, or was deleted | Check the Stripe API key belongs to the same account, and live or test mode, as the webhook. |
