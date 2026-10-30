@@ -38,7 +38,6 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_USE_STANDALONE_OUTPUT: z.string().optional(),
     NEXT_PUBLIC_BASE_URL: z.string().url().optional(),
-    NEXT_PUBLIC_SHOW_MARKETING: z.enum(["true", "false"]).optional(),
   },
   /**
    * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
@@ -48,7 +47,6 @@ export const env = createEnv({
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_USE_STANDALONE_OUTPUT:
       process.env.NEXT_PUBLIC_USE_STANDALONE_OUTPUT,
-    NEXT_PUBLIC_SHOW_MARKETING: process.env.NEXT_PUBLIC_SHOW_MARKETING,
   },
   skipValidation:
     !!process.env.CI || process.env.npm_lifecycle_event === "lint",

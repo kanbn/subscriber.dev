@@ -1,9 +1,8 @@
-import { isLaunched, siteUrl, textRoute } from "~/lib/textRoute";
+import { siteUrl, textRoute } from "~/lib/textRoute";
 
-export const getServerSideProps = textRoute("text/plain", () =>
-  isLaunched()
-    ? `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl()}/sitemap.xml\n`
-    : "User-agent: *\nDisallow: /\n",
+export const getServerSideProps = textRoute(
+  "text/plain",
+  () => `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl()}/sitemap.xml\n`,
 );
 
 export default function Robots() {

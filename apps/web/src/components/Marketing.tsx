@@ -212,7 +212,7 @@ export function MarketingLayout({
         <meta property="og:description" content={description} />
         <meta
           property="og:image"
-          content={`${env("NEXT_PUBLIC_BASE_URL") ?? ""}/og.png`}
+          content={`${env("NEXT_PUBLIC_BASE_URL") ?? "https://subscriber.dev"}/og.png`}
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -308,25 +308,6 @@ export function CopyCommand({ command }: { command: string }) {
       >
         {copied ? "copied ✓" : "copy"}
       </button>
-    </div>
-  );
-}
-
-export function Launched({ page }: { page: ReactNode }) {
-  return env("NEXT_PUBLIC_SHOW_MARKETING") === "true" ? page : <ComingSoon />;
-}
-
-function ComingSoon() {
-  return (
-    <div
-      style={{ fontFamily: monoStack }}
-      className="bg-background text-foreground dark flex min-h-screen items-center justify-center text-[13px] [color-scheme:dark]"
-    >
-      <PageHead title="subscriber.dev" />
-      <p>
-        <span className="font-semibold">subscriber.dev</span>{" "}
-        <span className="text-muted-foreground">(coming soon)</span>
-      </p>
     </div>
   );
 }

@@ -9,7 +9,6 @@ import {
   CopyCommand,
   DOCS_URL,
   FitTable,
-  Launched,
   LOGIN_COMMAND,
   MarketingLayout,
   MCP_ADD_COMMAND,
@@ -879,7 +878,7 @@ function LastMonth() {
 }
 
 export default function Home() {
-  return <Launched page={<Marketing />} />;
+  return <Marketing />;
 }
 
 const STRUCTURED_DATA = [
