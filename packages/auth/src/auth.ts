@@ -12,6 +12,7 @@ import * as schema from "@subscriber.dev/db/schema";
 import { sendEmail } from "@subscriber.dev/email";
 
 import { posthog } from "./posthog.js";
+import { startSignupWorkflow } from "./subscriber.js";
 
 // GitHub is the only social sign-in; everything else is an email link.
 const configuredProviders =
@@ -101,6 +102,9 @@ export const initAuth = (db: dbClient) => {
               distinctId: String(user.id),
               event: "user_signed_up",
             });
+            startSignupWorkflow(user).catch((error: unknown) =>
+              console.error("Failed to start the user-signup workflow", error),
+            );
             return Promise.resolve();
           },
         },
