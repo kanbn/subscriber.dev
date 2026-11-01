@@ -333,7 +333,7 @@ export class Workflows extends HeyApiClient {
     /**
      * Trigger a workflow
      *
-     * Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.
+     * Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps. If no subscriber matches and `subscriber.email` is set, the subscriber is created first.
      */
     public trigger<ThrowOnError extends boolean = true>(parameters: {
         key: string;
@@ -341,6 +341,9 @@ export class Workflows extends HeyApiClient {
             publicId?: string;
             externalId?: string;
             email?: string;
+            firstName?: string;
+            lastName?: string;
+            name?: string;
         };
         payload?: {
             [key: string]: unknown;

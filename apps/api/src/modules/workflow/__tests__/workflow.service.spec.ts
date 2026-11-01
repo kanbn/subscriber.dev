@@ -65,6 +65,8 @@ vi.mock("@subscriber.dev/db/repository/workflowRun.repo", () => ({
 
 vi.mock("@subscriber.dev/db/repository/subscriber.repo", () => ({
   findSubscriberForUpsert: vi.fn(),
+  createSubscriber: vi.fn(),
+  createSubscriberPreferences: vi.fn(),
 }));
 
 const mockDb = {} as dbClient;
@@ -174,7 +176,7 @@ describe("triggerWorkflow", () => {
     });
   });
 
-  it("throws NotFoundException when no subscriber matches", async () => {
+  it("throws NotFoundException when no subscriber matches and there's no email", async () => {
     vi.mocked(workflowRepo.getWorkflowByKey).mockResolvedValue(workflow as any);
     vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue(
       steps as any,
@@ -186,10 +188,83 @@ describe("triggerWorkflow", () => {
     await expect(
       service.triggerWorkflow(mockDb, 10, {
         key: "user-signup",
-        subscriber: { email: "a@example.com" },
+        subscriber: { externalId: "user_1" },
         triggeredBy: 1,
       }),
     ).rejects.toThrow(NotFoundException);
+    expect(subscriberRepo.createSubscriber).not.toHaveBeenCalled();
+  });
+
+  it("creates the subscriber when no one matches the email, then runs the workflow for them", async () => {
+    vi.mocked(workflowRepo.getWorkflowByKey).mockResolvedValue(workflow as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue(
+      steps as any,
+    );
+    vi.mocked(subscriberRepo.findSubscriberForUpsert).mockResolvedValue(
+      undefined,
+    );
+    vi.mocked(subscriberRepo.createSubscriber).mockResolvedValue(
+      subscriber as any,
+    );
+    vi.mocked(workflowRunRepo.createRunWithSteps).mockResolvedValue({
+      run: { id: 5, publicId: "run_abc" },
+      runSteps: [],
+    } as any);
+
+    const result = await service.triggerWorkflow(mockDb, 10, {
+      key: "user-signup",
+      subscriber: {
+        email: "a@example.com",
+        externalId: "user_1",
+        firstName: "Jane",
+      },
+      triggeredBy: 1,
+      createdVia: "mcp",
+    });
+
+    expect(result).toEqual({ triggered: true, runPublicId: "run_abc" });
+    expect(subscriberRepo.createSubscriber).toHaveBeenCalledWith(mockDb, {
+      environmentId: 10,
+      email: "a@example.com",
+      externalId: "user_1",
+      firstName: "Jane",
+      createdBy: 1,
+      createdVia: "mcp",
+    });
+    expect(subscriberRepo.createSubscriberPreferences).toHaveBeenCalledWith(
+      mockDb,
+      { subscriberId: 100, email: true },
+    );
+    expect(workflowRunRepo.createRunWithSteps).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({ subscriberId: 100 }),
+    );
+  });
+
+  it("uses the subscriber a concurrent trigger created when the insert hits a unique violation", async () => {
+    vi.mocked(workflowRepo.getWorkflowByKey).mockResolvedValue(workflow as any);
+    vi.mocked(workflowRepo.listStepsForWorkflow).mockResolvedValue(
+      steps as any,
+    );
+    vi.mocked(subscriberRepo.findSubscriberForUpsert)
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(subscriber as any);
+    vi.mocked(subscriberRepo.createSubscriber).mockRejectedValue(
+      Object.assign(new Error("duplicate"), { code: "23505" }),
+    );
+    vi.mocked(workflowRunRepo.createRunWithSteps).mockResolvedValue({
+      run: { id: 5, publicId: "run_abc" },
+      runSteps: [],
+    } as any);
+
+    const result = await service.triggerWorkflow(mockDb, 10, {
+      key: "user-signup",
+      subscriber: { email: "a@example.com" },
+      triggeredBy: 1,
+    });
+
+    expect(result).toEqual({ triggered: true, runPublicId: "run_abc" });
+    expect(subscriberRepo.createSubscriberPreferences).not.toHaveBeenCalled();
   });
 
   it("schedules each step with its cumulative delay and stores the returned BullMQ job id", async () => {

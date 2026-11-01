@@ -254,6 +254,8 @@ describe("workflows trigger", () => {
         "test-signup",
         "--email",
         "test@example.com",
+        "--first-name",
+        "Jane",
         "--payload",
         '{"plan":"pro"}',
       ],
@@ -266,6 +268,7 @@ describe("workflows trigger", () => {
         publicId: undefined,
         externalId: undefined,
         email: "test@example.com",
+        firstName: "Jane",
       },
       payload: { plan: "pro" },
     });

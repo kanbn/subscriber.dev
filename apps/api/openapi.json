@@ -1031,7 +1031,7 @@
     },
     "/workflows/trigger": {
       "post": {
-        "description": "Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.",
+        "description": "Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps. If no subscriber matches and `subscriber.email` is set, the subscriber is created first.",
         "operationId": "triggerWorkflow",
         "parameters": [],
         "requestBody": {
@@ -1056,7 +1056,7 @@
             }
           },
           "404": {
-            "description": "Environment, workflow, or subscriber not found"
+            "description": "Environment or workflow not found, or no subscriber matched and no email was given"
           }
         },
         "security": [
@@ -4193,8 +4193,18 @@
                 "type": "string",
                 "format": "email",
                 "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
               }
-            }
+            },
+            "description": "Matched by publicId, then externalId, then email. If none match and email is set, the subscriber is created with these fields; an existing subscriber isn't changed."
           },
           "payload": {
             "description": "Data for the templates, available as top-level variables: {\"plan\": \"pro\"} is {{ plan }}.",

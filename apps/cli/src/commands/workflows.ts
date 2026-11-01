@@ -133,7 +133,13 @@ export function registerWorkflowsCommand(program: Command): void {
     )
     .option("--subscriber-id <publicId>", "subscriber public ID")
     .option("--external-id <externalId>", "subscriber external ID")
-    .option("--email <email>", "subscriber email")
+    .option(
+      "--email <email>",
+      "subscriber email (creates the subscriber if no one matches)",
+    )
+    .option("--first-name <firstName>", "first name, if the subscriber is new")
+    .option("--last-name <lastName>", "last name, if the subscriber is new")
+    .option("--name <name>", "full name, if the subscriber is new")
     .option(
       "--payload <json>",
       "JSON object merged into template variables",
@@ -148,6 +154,9 @@ export function registerWorkflowsCommand(program: Command): void {
             subscriberId?: string;
             externalId?: string;
             email?: string;
+            firstName?: string;
+            lastName?: string;
+            name?: string;
             payload: string;
             json?: boolean;
           },
@@ -178,6 +187,9 @@ export function registerWorkflowsCommand(program: Command): void {
               publicId: opts.subscriberId,
               externalId: opts.externalId,
               email: opts.email,
+              firstName: opts.firstName,
+              lastName: opts.lastName,
+              name: opts.name,
             },
             payload,
           });

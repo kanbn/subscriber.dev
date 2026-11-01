@@ -375,10 +375,16 @@ export type TriggerWorkflowRequest = {
      * The workflow key, e.g. "user-signup".
      */
     key: string;
+    /**
+     * Matched by publicId, then externalId, then email. If none match and email is set, the subscriber is created with these fields; an existing subscriber isn't changed.
+     */
     subscriber: {
         publicId?: string;
         externalId?: string;
         email?: string;
+        firstName?: string;
+        lastName?: string;
+        name?: string;
     };
     /**
      * Data for the templates, available as top-level variables: {"plan": "pro"} is {{ plan }}.
@@ -1667,10 +1673,16 @@ export type PostWorkflowsTriggerData = {
          * The workflow key, e.g. "user-signup".
          */
         key: string;
+        /**
+         * Matched by publicId, then externalId, then email. If none match and email is set, the subscriber is created with these fields; an existing subscriber isn't changed.
+         */
         subscriber: {
             publicId?: string;
             externalId?: string;
             email?: string;
+            firstName?: string;
+            lastName?: string;
+            name?: string;
         };
         /**
          * Data for the templates, available as top-level variables: {"plan": "pro"} is {{ plan }}.
@@ -1690,7 +1702,7 @@ export type PostWorkflowsTriggerErrors = {
      */
     401: ErrorResponse;
     /**
-     * Environment, workflow, or subscriber not found
+     * Environment or workflow not found, or no subscriber matched and no email was given
      */
     404: ErrorResponse;
     /**

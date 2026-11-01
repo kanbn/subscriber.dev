@@ -71,7 +71,7 @@ If no run appears, the trigger itself didn't start one:
 | `{"triggered": false, "reason": "workflow_paused"}` | The workflow is paused. Set its `status` to `active`. |
 | `{"triggered": false, "reason": "workflow_has_no_steps"}` | Add at least one step. |
 | `404 Workflow not found` | Check the `key`, and that you're using the right environment. |
-| `404 Subscriber not found` | Create the subscriber first, or check you're identifying them by the right field. |
+| `404 Subscriber not found` | No subscriber matched and there was no `email` to create one with. Send an `email`, or check you're identifying them by the right field. |
 
 A common cause is using the wrong environment: workflows, subscribers and integrations in staging aren't visible in production. Run `subscriber whoami` to see which one the CLI is using.
 

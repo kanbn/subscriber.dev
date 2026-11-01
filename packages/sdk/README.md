@@ -23,11 +23,9 @@ import { Subscriber } from "@subscriber.dev/sdk";
 
 const client = new Subscriber(process.env.SUBSCRIBER_API_KEY);
 
-await client.subscribers.create({ email: "jane@acme.com", firstName: "Jane" });
-
 await client.workflows.trigger({
   key: "welcome",
-  subscriber: { email: "jane@acme.com" },
+  subscriber: { email: "jane@acme.com", firstName: "Jane" },
   payload: { plan: "pro" },
 });
 ```

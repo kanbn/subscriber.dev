@@ -23,7 +23,7 @@ export class WorkflowTools {
   @Tool({
     name: "trigger_workflow",
     description:
-      "Start a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps. Sends real email/webhooks.",
+      "Start a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps. If no subscriber matches and `subscriber.email` is set, the subscriber is created first. Sends real email/webhooks.",
     parameters: TriggerWorkflowSchema.extend({
       environmentId: z.string(),
     }),
@@ -50,6 +50,7 @@ export class WorkflowTools {
         subscriber: args.subscriber,
         payload: args.payload,
         triggeredBy: user.id,
+        createdVia: "mcp",
       },
     );
     track(

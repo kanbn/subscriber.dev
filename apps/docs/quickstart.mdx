@@ -140,8 +140,7 @@ A subscriber is someone you email. Triggering a workflow starts it for one subsc
 <Tabs>
   <Tab title="CLI">
     ```bash
-    subscriber subscribers create --email jane@acme.com --first-name Jane
-    subscriber workflows trigger welcome --email jane@acme.com
+    subscriber workflows trigger welcome --email jane@acme.com --first-name Jane
     ```
   </Tab>
   <Tab title="TUI">
@@ -157,22 +156,19 @@ A subscriber is someone you email. Triggering a workflow starts it for one subsc
       "content-type": "application/json",
     };
 
-    await fetch(`${api}/subscribers`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ email: user.email, firstName: user.firstName }),
-    });
-
     await fetch(`${api}/workflows/trigger`, {
       method: "POST",
       headers,
-      body: JSON.stringify({ key: "welcome", subscriber: { email: user.email } }),
+      body: JSON.stringify({
+        key: "welcome",
+        subscriber: { email: user.email, firstName: user.firstName },
+      }),
     });
     ```
   </Tab>
 </Tabs>
 
-The subscriber has to exist before you trigger a workflow for them. To bring in existing subscribers, use `subscriber subscribers bulk` or ask your agent to import an export.
+Triggering a workflow for an email that isn't a subscriber yet creates them. To bring in existing subscribers, use `subscriber subscribers bulk` or ask your agent to import an export.
 
 ## 6. Check it sent
 

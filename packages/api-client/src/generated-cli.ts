@@ -528,11 +528,17 @@ export interface UnsubscribeResponseDto {
   unsubscribed: boolean;
 }
 
+/**
+ * Matched by publicId, then externalId, then email. If none match and email is set, the subscriber is created with these fields; an existing subscriber isn't changed.
+ */
 export type TriggerWorkflowDtoSubscriber = {
   publicId?: string;
   externalId?: string;
   /** @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$ */
   email?: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
 };
 
 /**
@@ -546,6 +552,7 @@ export interface TriggerWorkflowDto {
      * @minLength 1
      */
   key: string;
+  /** Matched by publicId, then externalId, then email. If none match and email is set, the subscriber is created with these fields; an existing subscriber isn't changed. */
   subscriber: TriggerWorkflowDtoSubscriber;
   /** Data for the templates, available as top-level variables: {"plan": "pro"} is {{ plan }}. */
   payload?: TriggerWorkflowDtoPayload;
@@ -3227,7 +3234,7 @@ export const getTriggerWorkflowUrl = () => {
 }
 
 /**
- * Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.
+ * Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps. If no subscriber matches and `subscriber.email` is set, the subscriber is created first.
  * @summary Trigger a workflow
  */
 export const triggerWorkflow = async (triggerWorkflowDto: TriggerWorkflowDto, options?: Parameters<typeof cliFetch>[1]): Promise<triggerWorkflowResponse> => {

@@ -106,9 +106,17 @@ interface UpdateWorkflowData {
 
 interface TriggerWorkflowData {
   key: string;
-  subscriber: { publicId?: string; externalId?: string; email?: string };
+  subscriber: {
+    publicId?: string;
+    externalId?: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    name?: string;
+  };
   payload?: Record<string, unknown>;
   triggeredBy: number | null;
+  createdVia?: string;
   idempotencyKey?: string;
 }
 
@@ -742,15 +750,12 @@ export class WorkflowService {
       return { triggered: false as const, reason: "workflow_has_no_steps" };
     }
 
-    const subscriber = await subscriberRepo.findSubscriberForUpsert(
-      db,
-      environmentId,
-      {
-        publicId: input.subscriber.publicId,
-        externalId: input.subscriber.externalId,
-        email: input.subscriber.email,
-      },
-    );
+    const subscriber =
+      (await subscriberRepo.findSubscriberForUpsert(
+        db,
+        environmentId,
+        input.subscriber,
+      )) ?? (await this.createTriggeredSubscriber(db, environmentId, input));
     if (!subscriber) throw new NotFoundException("Subscriber not found");
 
     if (input.idempotencyKey) {
@@ -782,6 +787,35 @@ export class WorkflowService {
       );
       if (!existing) throw error;
       return existing;
+    }
+  }
+
+  private async createTriggeredSubscriber(
+    db: dbClient,
+    environmentId: number,
+    input: TriggerWorkflowData,
+  ) {
+    if (!input.subscriber.email) return undefined;
+    try {
+      const subscriber = await subscriberRepo.createSubscriber(db, {
+        environmentId,
+        ...input.subscriber,
+        createdBy: input.triggeredBy,
+        createdVia: input.createdVia ?? "api",
+      });
+      if (!subscriber) return undefined;
+      await subscriberRepo.createSubscriberPreferences(db, {
+        subscriberId: subscriber.id,
+        email: true,
+      });
+      return subscriber;
+    } catch (error) {
+      if (!isUniqueViolation(error)) throw error;
+      return subscriberRepo.findSubscriberForUpsert(
+        db,
+        environmentId,
+        input.subscriber,
+      );
     }
   }
 

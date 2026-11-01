@@ -162,7 +162,7 @@ Triggering a workflow starts it for one subscriber. Workflows run for one subscr
   </Tab>
 </Tabs>
 
-Identify the subscriber by `email`, `externalId` or `publicId`. They have to exist already.
+Identify the subscriber by `email`, `externalId` or `publicId`. If no one matches and you sent an `email`, the subscriber is created, with any `externalId`, `firstName`, `lastName` and `name` you sent. An existing subscriber isn't changed.
 
 If the workflow is paused, the trigger returns `{"triggered": false, "reason": "workflow_paused"}` and nothing sends.
 

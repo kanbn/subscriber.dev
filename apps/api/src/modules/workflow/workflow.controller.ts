@@ -74,12 +74,13 @@ export class WorkflowController {
     operationId: "triggerWorkflow",
     summary: "Trigger a workflow",
     description:
-      "Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps.",
+      "Starts a run of the workflow identified by `key` for the matched subscriber, scheduling all of its steps. If no subscriber matches and `subscriber.email` is set, the subscriber is created first.",
   })
   @ApiResponse({ status: 200, type: TriggerWorkflowResponseDto })
   @ApiResponse({
     status: 404,
-    description: "Environment, workflow, or subscriber not found",
+    description:
+      "Environment or workflow not found, or no subscriber matched and no email was given",
   })
   async triggerWorkflow(
     @CurrentUser() user: User | null,

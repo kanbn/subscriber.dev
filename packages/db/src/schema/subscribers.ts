@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { isNull, relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
@@ -9,6 +9,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -64,14 +65,12 @@ export const subscribers = pgTable(
       table.environmentId,
       table.publicId,
     ),
-    unique("subscribers_environment_externalId").on(
-      table.environmentId,
-      table.externalId,
-    ),
-    unique("subscribers_environment_email").on(
-      table.environmentId,
-      table.email,
-    ),
+    uniqueIndex("subscribers_environment_externalId")
+      .on(table.environmentId, table.externalId)
+      .where(isNull(table.deletedAt)),
+    uniqueIndex("subscribers_environment_email")
+      .on(table.environmentId, table.email)
+      .where(isNull(table.deletedAt)),
     index("subscribers_environmentId_idx").on(table.environmentId),
     index("subscribers_email_idx").on(table.email),
     index("subscribers_externalId_idx").on(table.externalId),
