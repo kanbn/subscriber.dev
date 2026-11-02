@@ -22,7 +22,7 @@ if (process.argv.length <= 2) {
 } else {
   const program = new Command();
 
-  program.name("subscriber").description("subscriber.dev CLI").version("0.1.0");
+  program.name("subscriber").description("subscriber.dev CLI").version("0.1.1");
 
   registerLoginCommand(program);
   registerWorkspacesCommand(program);
