@@ -32,6 +32,12 @@ services:
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
     depends_on:
       - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$$PORT/robots.txt"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     restart: unless-stopped
 
   api:
@@ -57,9 +63,10 @@ services:
       - redis
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:$$PORT/health"]
-      interval: 30s
+      interval: 5s
       timeout: 10s
       retries: 3
+      start_period: 30s
     restart: unless-stopped
 
   postgres:
