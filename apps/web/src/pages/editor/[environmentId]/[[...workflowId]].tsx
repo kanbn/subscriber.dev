@@ -175,7 +175,7 @@ function EmailPane({
   const [previewing, setPreviewing] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [loadedHtml, setLoadedHtml] = useState<string | null>(null);
-  const [leaveTo, setLeaveTo] = useState<string | null>(null);
+  const [leave, setLeave] = useState<(() => void) | null>(null);
   const router = useRouter();
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(
     null,
@@ -360,18 +360,17 @@ function EmailPane({
   const confirmLeave = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (!dirty || event.metaKey || event.ctrlKey || event.shiftKey) return;
     event.preventDefault();
-    setLeaveTo(event.currentTarget.getAttribute("href"));
+    const href = event.currentTarget.getAttribute("href") ?? "/";
+    setLeave(() => () => void router.push(href));
   };
 
   return (
     <>
-      {leaveTo && (
-        <LeaveDialog
-          onStay={() => setLeaveTo(null)}
-          onLeave={() => void router.push(leaveTo)}
-        />
-      )}
-      <EditorNav onLeave={confirmLeave}>
+      {leave && <LeaveDialog onStay={() => setLeave(null)} onLeave={leave} />}
+      <EditorNav
+        onLeave={confirmLeave}
+        onLogOut={() => (dirty ? setLeave(() => logOut) : logOut())}
+      >
         <span role="status" className="mr-auto">
           {notice ? (
             notice.ok ? (
@@ -623,11 +622,15 @@ function LeaveDialog({
   );
 }
 
+const logOut = () => void authClient.signOut();
+
 function EditorNav({
   onLeave,
+  onLogOut = logOut,
   children,
 }: {
   onLeave?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+  onLogOut?: () => void;
   children?: React.ReactNode;
 }) {
   return (
@@ -635,7 +638,16 @@ function EditorNav({
       <Link href="/" onClick={onLeave} className="font-semibold">
         subscriber.dev
       </Link>
-      <div className="flex items-baseline gap-3">{children}</div>
+      <div className="flex items-baseline gap-3">
+        {children}
+        <button
+          type="button"
+          onClick={onLogOut}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          log out
+        </button>
+      </div>
     </nav>
   );
 }
