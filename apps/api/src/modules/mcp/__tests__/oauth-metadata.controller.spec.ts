@@ -43,6 +43,13 @@ describe("OAuthMetadataController", () => {
     );
   });
 
+  it("offers offline_access so clients get a refresh token", () => {
+    expect(
+      controller.getProtectedResourceMetadata(request("mcp.example.com"))
+        .scopes_supported,
+    ).toContain("offline_access");
+  });
+
   it("falls back to the first resource on an unknown host", () => {
     expect(
       controller.getProtectedResourceMetadata(request("other.example.com"))
