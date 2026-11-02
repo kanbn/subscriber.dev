@@ -83,6 +83,7 @@ services:
     restart: unless-stopped
     networks:
       - subscriber-network
+      - dokploy-network
 
   redis:
     image: redis:7-alpine
@@ -95,6 +96,7 @@ services:
     restart: unless-stopped
     networks:
       - subscriber-network
+      - dokploy-network
 
 networks:
   subscriber-network:

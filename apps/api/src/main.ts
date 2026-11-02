@@ -12,6 +12,7 @@ import { posthog } from "./posthog.js";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
+  app.enableShutdownHooks();
   (app as NestExpressApplication).set(
     "trust proxy",
     "loopback, linklocal, uniquelocal",
