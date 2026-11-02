@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/kanbn/subscriber.dev:latest
+    image: ghcr.io/kanbn/subscriber.dev/web:latest
     container_name: ${CONTAINER_NAME:-sub-web}
     ports:
       - "${WEB_PORT:-3000}:3000"
@@ -41,6 +41,7 @@ services:
     restart: unless-stopped
 
   api:
+    image: ghcr.io/kanbn/subscriber.dev/api:latest
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
