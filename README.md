@@ -1,35 +1,64 @@
-# subscriber.dev
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/banner-dark.png">
+  <img alt="subscriber.dev" src=".github/assets/banner-light.png">
+</picture>
 
-The open source Customer.io alternative. Run lifecycle email from your terminal, your API or your AI agent.
+<div align="center">
+  <h3 align="center">subscriber.dev</h3>
+  <p>The open source Customer.io alternative. Run lifecycle email from your terminal, your API or your AI agent.</p>
+</div>
 
-- **Workflows** triggered by your app or by Stripe events, such as a trial starting or a payment failing, with delays and exit conditions.
-- **Broadcasts** to any segment of your subscribers, spread over hours if you like.
-- **Bring your own email provider.** Resend, Postmark, Amazon SES and Cloudflare Email are built in, with bounces and spam complaints handled for you. Anything else works over SMTP.
-- **No dashboard.** Everything happens through the REST API, the CLI and TUI, or your AI agent over MCP. A web editor is there for tweaking the copy.
+<p align="center">
+  <a href="https://subscriber.dev">Website</a>
+  ·
+  <a href="https://docs.subscriber.dev">Docs</a>
+  ·
+  <a href="https://subscriber.dev/#pricing">Pricing</a>
+</p>
 
-[Website](https://subscriber.dev) · [Docs](https://docs.subscriber.dev) · [Pricing](https://subscriber.dev/#pricing)
+<div align="center">
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPLv3-purple"></a>
+</div>
 
-## Get started
+## Features
 
-Sign in with the CLI. A browser opens once to confirm.
+- **Workflows**: Triggered by your app or by Stripe events, with delays and exit conditions
+- **Broadcasts**: Send to any segment, spread over hours if you like
+- **Bring your own provider**: Resend, Postmark, Amazon SES, Cloudflare Email or any SMTP server
+- **Agent-first**: The REST API, CLI and TUI, or your AI agent over MCP, plus a web editor for the copy
+
+## Get Started
 
 ```bash
 npx @subscriber.dev/cli login
 ```
 
-Or add the MCP server to your agent and ask it to set things up:
+Or add the MCP server to your agent:
 
 ```bash
 claude mcp add --transport http subscriber https://mcp.subscriber.dev
 ```
 
-The [quickstart](https://docs.subscriber.dev/quickstart) takes you from sign-in to your first workflow email.
+## Made With
 
-## Self-hosting
+- [Next.js](https://nextjs.org/?ref=subscriber.dev)
+- [NestJS](https://nestjs.com/?ref=subscriber.dev)
+- [Better Auth](https://better-auth.com/?ref=subscriber.dev)
+- [Drizzle ORM](https://orm.drizzle.team/?ref=subscriber.dev)
+- [BullMQ](https://bullmq.io/?ref=subscriber.dev)
+- [React Email](https://react.email/?ref=subscriber.dev)
 
-The community edition is free and has no limits. Emails end with a small "Powered by subscriber.dev" line. See the [self-hosting guide](https://docs.subscriber.dev/self-hosting).
+## Self Hosting
 
-## Development
+The community edition is free and unlimited, under AGPLv3. Emails end with a small "Powered by subscriber.dev" line, and a [Business license](https://docs.subscriber.dev/self-hosting) removes it. Fill in `.env` from [.env.example](.env.example), then:
+
+```bash
+docker compose up -d
+```
+
+See the [self-hosting guide](https://docs.subscriber.dev/self-hosting) for the details.
+
+## Local Development
 
 You'll need Node.js 24, Postgres and Redis.
 
@@ -41,16 +70,14 @@ pnpm db:migrate
 pnpm dev
 ```
 
-| Path | What it is |
-| --- | --- |
-| `apps/api` | REST API, MCP server and background jobs (NestJS) |
-| `apps/web` | Website, sign-in, unsubscribe pages and the email editor (Next.js) |
-| `apps/cli` | The `subscriber` CLI and TUI |
-| `apps/docs` | docs.subscriber.dev (Mintlify) |
-| `packages/*` | Shared code: database, auth, email rendering and the API client |
+## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) to send a change.
+Please read the [contribution guidelines](CONTRIBUTING.md) before opening a pull request.
 
 ## License
 
-[AGPL-3.0](LICENSE).
+subscriber.dev is licensed under the [AGPLv3 license](LICENSE).
+
+## Contact
+
+Email [henry@subscriber.dev](mailto:henry@subscriber.dev).
