@@ -27,5 +27,5 @@
 
 ## Error Handling
 
-- Use NestJS HTTP exceptions (`BadRequestException`, `NotFoundException`, `InternalServerErrorException`)
-- Never throw plain `Error` objects - use appropriate HTTP exceptions
+- In controllers and services, use NestJS HTTP exceptions (`BadRequestException`, `NotFoundException`, `InternalServerErrorException`)
+- Never throw plain `Error` objects from request handlers - use appropriate HTTP exceptions
