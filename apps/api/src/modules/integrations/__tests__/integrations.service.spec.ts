@@ -25,6 +25,10 @@ vi.mock("@subscriber.dev/email", () => ({
   verifySmtpConnection: vi.fn(),
 }));
 
+vi.mock("node:dns/promises", () => ({
+  lookup: vi.fn().mockResolvedValue([{ address: "203.0.113.10", family: 4 }]),
+}));
+
 const stripeWebhookEndpoints = {
   list: vi.fn(),
   create: vi.fn(),
@@ -142,7 +146,8 @@ describe("upsert", () => {
     const result = await service.upsert(mockDb, 10, "smtp", validSmtpBody, 1);
 
     expect(verifySmtpConnection).toHaveBeenCalledWith({
-      host: "smtp.example.com",
+      host: "203.0.113.10",
+      servername: "smtp.example.com",
       port: 587,
       secure: false,
       user: "user@example.com",

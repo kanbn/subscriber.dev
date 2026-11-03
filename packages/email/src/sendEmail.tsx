@@ -39,6 +39,7 @@ export interface SmtpConfig {
   user: string;
   password: string;
   from: string;
+  servername?: string;
 }
 
 const buildTransporter = (config: Omit<SmtpConfig, "from">) =>
@@ -47,6 +48,7 @@ const buildTransporter = (config: Omit<SmtpConfig, "from">) =>
     port: config.port,
     secure: config.secure,
     auth: { user: config.user, pass: config.password },
+    ...(config.servername && { tls: { servername: config.servername } }),
   });
 
 export const verifySmtpConnection = async (

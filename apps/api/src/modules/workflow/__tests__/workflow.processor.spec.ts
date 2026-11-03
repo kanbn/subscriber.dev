@@ -87,6 +87,7 @@ let processor: WorkflowProcessor;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubEnv("SMTP_ALLOW_PRIVATE_HOSTS", "true");
   processor = new WorkflowProcessor({
     skipSendReason: () => Promise.resolve(null),
     showsPoweredBy: () => Promise.resolve(false),
