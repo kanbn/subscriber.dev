@@ -16,7 +16,7 @@ const button =
 
 // Only same-site paths, so ?next= can't bounce people to another site.
 const safeNext = (next: unknown) =>
-  typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
+  typeof next === "string" && /^\/(?![/\\])/.test(next)
     ? next
     : null;
 
