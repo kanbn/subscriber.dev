@@ -31,9 +31,10 @@ The community edition is free and has no limits. Emails end with a small "Powere
 
 ## Development
 
-You'll need Node.js 22.12 or later, pnpm, Postgres and Redis.
+You'll need Node.js 24, Postgres and Redis.
 
 ```bash
+corepack enable
 pnpm install
 cp .env.example .env
 pnpm db:migrate
