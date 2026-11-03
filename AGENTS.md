@@ -29,3 +29,8 @@
 
 - In controllers and services, use NestJS HTTP exceptions (`BadRequestException`, `NotFoundException`, `InternalServerErrorException`)
 - Never throw plain `Error` objects from request handlers - use appropriate HTTP exceptions
+
+## Migrations and Deploys
+
+- Production deploys start the new version before stopping the old one, so every migration must work with the previous release
+- Add columns and tables first; drop or rename them in a later release once no running code uses them

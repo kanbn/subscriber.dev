@@ -1,0 +1,76 @@
+# Production stack for Docker Swarm. Self-hosters: use docker-compose.yml.
+x-app: &app
+  env_file:
+    - .env
+  networks:
+    - internal
+  stop_grace_period: 30s
+  deploy:
+    replicas: 1
+    update_config:
+      order: start-first
+      failure_action: rollback
+      monitor: 30s
+    rollback_config:
+      order: start-first
+    restart_policy:
+      condition: any
+
+services:
+  web:
+    <<: *app
+    image: ghcr.io/kanbn/subscriber.dev/web:latest
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$$PORT/robots.txt"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  api:
+    <<: *app
+    image: ghcr.io/kanbn/subscriber.dev/api:latest
+    environment:
+      - REDIS_HOST=redis
+      - PORT=3001
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:$$PORT/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  postgres:
+    image: postgres:18
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=subscriber_db
+      - POSTGRES_USER=subscriber
+    volumes:
+      - sub_postgres_data:/var/lib/postgresql
+    networks:
+      - internal
+    deploy:
+      restart_policy:
+        condition: any
+
+  redis:
+    image: redis:7-alpine
+    env_file:
+      - .env
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
+    volumes:
+      - sub_redis_data:/data
+    networks:
+      - internal
+    deploy:
+      restart_policy:
+        condition: any
+
+networks:
+  internal:
+
+volumes:
+  sub_postgres_data:
+  sub_redis_data:

@@ -66,6 +66,7 @@ You'll need Node.js 24, Postgres and Redis.
 corepack enable
 pnpm install
 cp .env.example .env
+docker compose up -d postgres redis
 pnpm db:migrate
 pnpm dev
 ```

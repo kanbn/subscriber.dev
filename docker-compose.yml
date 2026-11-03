@@ -6,7 +6,6 @@ services:
       - "${WEB_PORT:-3000}:3000"
     networks:
       - subscriber-network
-      - dokploy-network
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile
@@ -84,7 +83,6 @@ services:
     restart: unless-stopped
     networks:
       - subscriber-network
-      - dokploy-network
 
   redis:
     image: redis:7-alpine
@@ -97,12 +95,9 @@ services:
     restart: unless-stopped
     networks:
       - subscriber-network
-      - dokploy-network
 
 networks:
   subscriber-network:
-  dokploy-network:
-    external: true
 
 volumes:
   sub_postgres_data:
