@@ -6,11 +6,13 @@ import { recordBounce } from "./recordBounce.js";
 
 export async function recordBounceEvents(
   db: dbClient,
+  environmentId: number,
   events: BounceEvent[],
 ): Promise<void> {
   for (const event of events) {
     const runStep = await workflowRunRepo.getRunStepByProviderMessageId(
       db,
+      environmentId,
       event.providerMessageId,
     );
     if (!runStep) continue;

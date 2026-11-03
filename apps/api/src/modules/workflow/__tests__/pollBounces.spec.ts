@@ -111,6 +111,7 @@ describe("pollBounces", () => {
 
     expect(workflowRunRepo.getRunStepByProviderMessageId).toHaveBeenCalledWith(
       mockDb,
+      5,
       "<abc@mail.kan.bn>",
     );
     expect(recordBounce).toHaveBeenCalledWith(mockDb, {

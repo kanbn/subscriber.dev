@@ -84,7 +84,7 @@ export class InboundWebhookController {
         );
         throw new BadRequestException(error.message);
       }
-      await recordBounceEvents(db, events);
+      await recordBounceEvents(db, integration.environmentId, events);
       return { received: true };
     }
     if (!source) throw new NotFoundException("Unknown webhook");

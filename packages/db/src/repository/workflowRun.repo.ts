@@ -96,10 +96,20 @@ export const getRunStepByPublicId = async (db: dbClient, publicId: string) => {
 
 export const getRunStepByProviderMessageId = async (
   db: dbClient,
+  environmentId: number,
   providerMessageId: string,
 ) => {
   return await db.query.workflowRunSteps.findFirst({
-    where: eq(workflowRunSteps.providerMessageId, providerMessageId),
+    where: and(
+      eq(workflowRunSteps.providerMessageId, providerMessageId),
+      inArray(
+        workflowRunSteps.runId,
+        db
+          .select({ id: workflowRuns.id })
+          .from(workflowRuns)
+          .where(eq(workflowRuns.environmentId, environmentId)),
+      ),
+    ),
   });
 };
 

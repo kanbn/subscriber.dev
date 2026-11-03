@@ -257,22 +257,30 @@ describe("getRunStepByProviderMessageId", () => {
   it("returns the matching run step", async () => {
     const runStep = { id: 4, providerMessageId: "<abc@mail.kan.bn>" };
     const findFirst = vi.fn().mockResolvedValue(runStep);
+    const where = vi.fn();
     const db = {
       query: { workflowRunSteps: { findFirst } },
+      select: () => ({ from: () => ({ where }) }),
     } as unknown as dbClient;
 
-    const result = await getRunStepByProviderMessageId(db, "<abc@mail.kan.bn>");
+    const result = await getRunStepByProviderMessageId(
+      db,
+      5,
+      "<abc@mail.kan.bn>",
+    );
 
     expect(result).toEqual(runStep);
   });
 
   it("returns undefined when nothing matches", async () => {
     const findFirst = vi.fn().mockResolvedValue(undefined);
+    const where = vi.fn();
     const db = {
       query: { workflowRunSteps: { findFirst } },
+      select: () => ({ from: () => ({ where }) }),
     } as unknown as dbClient;
 
-    const result = await getRunStepByProviderMessageId(db, "<missing>");
+    const result = await getRunStepByProviderMessageId(db, 5, "<missing>");
 
     expect(result).toBeUndefined();
   });

@@ -28,7 +28,7 @@ export async function pollBounces(db: dbClient): Promise<void> {
 
       if (events === null) continue;
 
-      await recordBounceEvents(db, events);
+      await recordBounceEvents(db, integration.environmentId, events);
 
       await environmentIntegrationsRepo.updateLastBounceCheckAt(
         db,
