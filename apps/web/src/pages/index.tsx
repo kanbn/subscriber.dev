@@ -959,7 +959,7 @@ function Marketing() {
           href="https://github.com/kanbn/kan"
           className="text-foreground underline-offset-2 hover:underline"
         >
-          ★ 5.7k
+          ★ 5.9k
         </a>
         )
         <span aria-hidden className="opacity-50">

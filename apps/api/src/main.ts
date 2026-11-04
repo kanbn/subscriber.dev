@@ -56,9 +56,10 @@ async function bootstrap() {
   console.log(`🚀 API server running on http://localhost:${port}`);
 
   const drainMs = 10_000;
-  process.once("SIGTERM", () =>
-    setTimeout(() => app.close().finally(() => process.exit(0)), drainMs),
-  );
+  process.once("SIGTERM", () => {
+    console.log(`SIGTERM received, draining for ${drainMs / 1000}s`);
+    setTimeout(() => app.close().finally(() => process.exit(0)), drainMs);
+  });
 }
 
 bootstrap();
