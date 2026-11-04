@@ -61,6 +61,10 @@ services:
       - POSTGRES_USER=subscriber
     volumes:
       - sub_postgres_data:/var/lib/postgresql
+    ports:
+      - target: 5432
+        published: ${POSTGRES_PORT:?}
+        mode: host
     networks:
       - internal
     deploy:
