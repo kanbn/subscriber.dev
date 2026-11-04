@@ -40,6 +40,9 @@ export const createDrizzleClient = (): dbClient => {
     connectionString,
     max: Number(process.env.POSTGRES_POOL_MAX) || DEFAULT_POOL_MAX,
   });
+  // Idle connections error when Postgres restarts; without a listener that crashes the process.
+  // The pool drops the dead client and reconnects on the next query.
+  pool.on("error", (err) => console.error("Postgres pool error:", err.message));
 
   client = drizzlePg(pool, { schema }) as dbClient;
   return client;
