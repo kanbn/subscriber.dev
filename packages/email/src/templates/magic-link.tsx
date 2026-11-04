@@ -1,4 +1,3 @@
-import { env } from "next-runtime-env";
 import * as React from "react";
 import {
   Body,
@@ -93,7 +92,7 @@ export const MagicLinkTemplate = ({
         />
         <Text style={{ color: "#7e7e7e" }}>
           <Link
-            href={env("NEXT_PUBLIC_BASE_URL")}
+            href={process.env.NEXT_PUBLIC_BASE_URL}
             target="_blank"
             style={{ color: "#7e7e7e", textDecoration: "underline" }}
           >

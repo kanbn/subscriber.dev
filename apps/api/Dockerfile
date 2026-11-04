@@ -26,6 +26,7 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@12.10.1 --activate
 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/patches ./patches
 COPY --from=deps /app/packages ./packages
 COPY --from=deps /app/tooling ./tooling
 COPY --from=deps /app/apps/api ./apps/api
@@ -36,8 +37,10 @@ COPY turbo.json ./
 # via turbo, since apps/api's own "build" script is a bare tsc with no knowledge of
 # upstream packages whose "types" exports point at a dist/ that must exist first.
 RUN pnpm build --filter=@subscriber.dev/api
+RUN pnpm --filter=@subscriber.dev/api deploy --prod --legacy /prod/api
+# ponytail: better-auth's optional peers, resolved from web; the api never imports them
+RUN rm -rf /prod/api/node_modules/next /prod/api/node_modules/@next /prod/api/node_modules/drizzle-kit
 
-# Production image, copy all the files and run the API
 FROM base AS runner
 WORKDIR /app
 
@@ -46,17 +49,7 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@12.10.1 --activate
-
-# Copy built application. apps/api is copied whole (not just dist/) because its own
-# node_modules holds relative symlinks to workspace packages (e.g.
-# apps/api/node_modules/@subscriber.dev/db -> ../../../../packages/db) - pnpm always
-# links workspace packages into the consuming package's own node_modules, never hoisted
-# to root, so the original nested layout must be preserved for those symlinks to resolve.
-COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nestjs:nodejs /app/packages ./packages
-COPY --from=builder --chown=nestjs:nodejs /app/apps/api ./apps/api
+COPY --from=builder --chown=nestjs:nodejs /prod/api ./apps/api
 
 USER nestjs
 

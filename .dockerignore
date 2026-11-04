@@ -16,3 +16,9 @@ pnpm-debug.log
 README.md
 .next
 .git
+dist
+./**/*/dist
+.turbo
+./**/*/.turbo
+.cache
+./**/*/.cache

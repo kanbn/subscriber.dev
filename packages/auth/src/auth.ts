@@ -5,7 +5,6 @@ import { createAuthMiddleware } from "better-auth/api";
 import { verifyJwsAccessToken } from "better-auth/oauth2";
 import { bearer, deviceAuthorization, jwt } from "better-auth/plugins";
 import { magicLink } from "better-auth/plugins/magic-link";
-import { env } from "next-runtime-env";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 import * as schema from "@subscriber.dev/db/schema";
@@ -26,7 +25,7 @@ const configuredProviders =
     : {};
 
 export const authIssuer = () =>
-  `${(env("NEXT_PUBLIC_BASE_URL") ?? "").replace(/\/$/, "")}/api/auth`;
+  `${(process.env.NEXT_PUBLIC_BASE_URL ?? "").replace(/\/$/, "")}/api/auth`;
 
 export const mcpResourceUrls = () => [
   ...new Set(
@@ -74,13 +73,13 @@ export const initAuth = (db: dbClient) => {
     disabledPaths: ["/token"],
     hooks: { before: inferNativeMcpClients },
     secret: process.env.BETTER_AUTH_SECRET!,
-    baseURL: env("NEXT_PUBLIC_BASE_URL"),
+    baseURL: process.env.NEXT_PUBLIC_BASE_URL,
     trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS
       ? [
-          env("NEXT_PUBLIC_BASE_URL") ?? "",
+          process.env.NEXT_PUBLIC_BASE_URL ?? "",
           ...process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(","),
         ]
-      : [env("NEXT_PUBLIC_BASE_URL") ?? ""],
+      : [process.env.NEXT_PUBLIC_BASE_URL ?? ""],
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: {
@@ -156,7 +155,7 @@ export const initAuth = (db: dbClient) => {
       crossSubDomainCookies: {
         enabled: true,
         domain: (() => {
-          const baseUrl = env("NEXT_PUBLIC_BASE_URL");
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
           if (!baseUrl) return undefined;
           try {
             return new URL(baseUrl).hostname;
