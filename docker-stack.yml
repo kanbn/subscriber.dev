@@ -1,44 +1,56 @@
 # Production stack for Docker Swarm. Self-hosters: use docker-compose.yml.
-x-app: &app
-  env_file:
-    - .env
-  networks:
-    - internal
-  stop_grace_period: 30s
-  deploy:
-    replicas: 1
-    update_config:
-      order: start-first
-      failure_action: rollback
-      monitor: 30s
-    rollback_config:
-      order: start-first
-    restart_policy:
-      condition: any
-
+# networks and deploy are written out per service so the proxy labels and network can be added to them.
 services:
   web:
-    <<: *app
     image: ghcr.io/kanbn/subscriber.dev/web:latest
+    env_file:
+      - .env
+    stop_grace_period: 30s
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$$PORT/robots.txt"]
       interval: 5s
       timeout: 10s
       retries: 3
       start_period: 60s
+    networks:
+      - internal
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        failure_action: rollback
+        monitor: 30s
+      rollback_config:
+        order: start-first
+      restart_policy:
+        condition: any
 
   api:
-    <<: *app
     image: ghcr.io/kanbn/subscriber.dev/api:latest
+    env_file:
+      - .env
     environment:
       - REDIS_HOST=redis
       - PORT=3001
+    stop_grace_period: 30s
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:$$PORT/health"]
       interval: 5s
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - internal
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        failure_action: rollback
+        monitor: 30s
+      rollback_config:
+        order: start-first
+      restart_policy:
+        condition: any
 
   postgres:
     image: postgres:18
