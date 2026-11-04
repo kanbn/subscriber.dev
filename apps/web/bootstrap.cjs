@@ -21,4 +21,9 @@ if (process.env.POSTGRES_URL) {
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 
+const drainMs = 10_000;
+const on = process.on.bind(process);
+process.on = (event, listener) =>
+  on(event, event === "SIGTERM" ? () => setTimeout(listener, drainMs, event) : listener);
+
 require("./apps/web/server.js");

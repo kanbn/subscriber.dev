@@ -12,7 +12,7 @@ import { posthog } from "./posthog.js";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
-  app.enableShutdownHooks();
+  app.enableShutdownHooks(["SIGINT"]);
   (app as NestExpressApplication).set(
     "trust proxy",
     "loopback, linklocal, uniquelocal",
@@ -54,6 +54,11 @@ async function bootstrap() {
   const port = process.env.PORT || 4000;
   await app.listen(port);
   console.log(`🚀 API server running on http://localhost:${port}`);
+
+  const drainMs = 10_000;
+  process.once("SIGTERM", () =>
+    setTimeout(() => app.close().finally(() => process.exit(0)), drainMs),
+  );
 }
 
 bootstrap();
