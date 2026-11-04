@@ -1,5 +1,4 @@
 # Production stack for Docker Swarm. Self-hosters: use docker-compose.yml.
-# networks and deploy are written out per service so the proxy labels and network can be added to them.
 services:
   web:
     image: ghcr.io/kanbn/subscriber.dev/web:latest
