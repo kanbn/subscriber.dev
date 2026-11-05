@@ -122,13 +122,13 @@ export async function sendEmailStep(
       providerMessageId,
     );
   } catch (error) {
+    if (!(error instanceof NoEmailIntegrationError)) throw error;
     await workflowRunRepo.updateRunStepStatus(
       db,
       runStep.id,
       "failed",
-      error instanceof Error ? error.message : "Unknown error",
+      error.message,
     );
-    if (!(error instanceof NoEmailIntegrationError)) throw error;
   }
 }
 
