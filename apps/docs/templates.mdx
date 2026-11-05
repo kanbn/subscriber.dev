@@ -31,6 +31,8 @@ Hey {{ subscriber.firstName | default: "there" }}
 
 All of Liquid's tags and filters work, including `if`, `unless`, `for`, `date`, `upcase` and `default`.
 
+In email bodies, values are HTML-escaped, so a subscriber's name can't add links or markup to your email. To insert HTML you trust, such as a snippet from your own payload, use the `raw` filter: `{{ summaryHtml | raw }}`.
+
 ## Layouts
 
 The layout is the frame around your email. With the `default` layout, write only the content (`<p>`, `<h1>`, `<a>`, `<ul>`, `<img>` and so on) and subscriber.dev wraps it in a centred 600px column with a system font, and a footer with the unsubscribe link and your [postal address](/sending#postal-address).
