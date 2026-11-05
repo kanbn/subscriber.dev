@@ -223,6 +223,12 @@ export class BillingService {
         `No Stripe price with lookup key ${lookupKey}.`,
       );
 
+    const { data: open } = await stripe.checkout.sessions.list({
+      customer: customerId,
+      status: "open",
+    });
+    await Promise.all(open.map((s) => stripe.checkout.sessions.expire(s.id)));
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
