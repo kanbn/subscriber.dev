@@ -198,9 +198,12 @@ describe("WorkflowTriggersScreen", () => {
       expect(lastFrame()).toContain("Stripe · not connected — set it up");
     });
     await tick();
+    await new Promise((resolve) => setTimeout(resolve, 0));
     stdin.write("\r");
 
-    expect(onSetUp).toHaveBeenCalledWith("stripe", "triggers");
+    await vi.waitFor(() => {
+      expect(onSetUp).toHaveBeenCalledWith("stripe", "triggers");
+    });
     expect(updateWorkflow).not.toHaveBeenCalled();
   });
 
@@ -369,9 +372,12 @@ describe("WorkflowTriggersScreen", () => {
         expect(lastFrame()).toContain("not connected — set it up");
       });
       await tick();
+      await new Promise((resolve) => setTimeout(resolve, 0));
       stdin.write("\r");
 
-      expect(onSetUp).toHaveBeenCalledWith("stripe", "exitConditions");
+      await vi.waitFor(() => {
+        expect(onSetUp).toHaveBeenCalledWith("stripe", "exitConditions");
+      });
     });
   });
 });

@@ -40,8 +40,12 @@ describe("SectionScreen", () => {
 
     await tick();
 
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     stdin.write("\r");
 
-    expect(onSelect).toHaveBeenCalledWith("subscribers");
+    await vi.waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith("subscribers");
+    });
   });
 });

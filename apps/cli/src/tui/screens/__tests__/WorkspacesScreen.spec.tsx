@@ -71,9 +71,13 @@ describe("WorkspacesScreen", () => {
       expect(lastFrame()).toContain("Test Workspace");
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     stdin.write("\r");
 
-    expect(onSelectWorkspace).toHaveBeenCalledWith(testWorkspace);
+    await vi.waitFor(() => {
+      expect(onSelectWorkspace).toHaveBeenCalledWith(testWorkspace);
+    });
     expect(onSelectAccount).not.toHaveBeenCalled();
   });
 
