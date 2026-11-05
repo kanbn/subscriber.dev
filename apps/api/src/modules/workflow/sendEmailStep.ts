@@ -160,7 +160,9 @@ export async function renderEmail(
 ): Promise<{ subject: string; html: string; text: string }> {
   const context = { ...baseContext, unsubscribeUrl };
   const subject = await renderTemplate(content.subject, context);
-  const interpolatedBody = await renderTemplate(content.body, context);
+  const interpolatedBody = await renderTemplate(content.body, context, {
+    html: true,
+  });
   const bodyHasUnsubscribeToken = /\{\{-?\s*unsubscribeUrl\b/.test(
     content.body,
   );
