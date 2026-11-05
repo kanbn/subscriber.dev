@@ -59,6 +59,17 @@ export function renewalPlan(subscribers: number): Plan | null {
   return fits.monthly === 0 ? CHEAPEST_PAID : fits;
 }
 
+const isEnded = (status: string) =>
+  status === "canceled" || status === "incomplete_expired";
+
+export const isStaleSubscription = (
+  billing: Pick<WorkspaceBilling, "stripeSubscriptionId" | "status">,
+  sub: Pick<Stripe.Subscription, "id" | "status">,
+) =>
+  !!billing.stripeSubscriptionId &&
+  billing.stripeSubscriptionId !== sub.id &&
+  (isEnded(sub.status) || ACTIVE_STATUSES.includes(billing.status ?? ""));
+
 export const billingEnabled = () =>
   process.env.BILLING_ENABLED === "true" && !!process.env.STRIPE_SECRET_KEY;
 
@@ -263,7 +274,10 @@ export class BillingService {
       case "customer.subscription.created":
       case "customer.subscription.updated":
       case "customer.subscription.deleted":
-        await this.syncSubscription(db, event.data.object);
+        await this.syncSubscription(
+          db,
+          await stripe.subscriptions.retrieve(event.data.object.id),
+        );
         break;
       case "invoice.upcoming":
         await this.adjustAtRenewal(db, stripe, event.data.object);
@@ -280,10 +294,15 @@ export class BillingService {
       this.logger.warn(`No workspace for Stripe customer ${customerId}`);
       return;
     }
+    if (isStaleSubscription(billing, sub)) {
+      this.logger.warn(
+        `Ignoring ${sub.status} subscription ${sub.id} for workspace ${billing.workspaceId}, current is ${billing.stripeSubscriptionId}`,
+      );
+      return;
+    }
     const item = sub.items.data[0];
     const parsed = parseLookupKey(item?.price.lookup_key);
-    const ended =
-      sub.status === "canceled" || sub.status === "incomplete_expired";
+    const ended = isEnded(sub.status);
     await billingRepo.upsertBilling(db, billing.workspaceId, {
       stripeCustomerId: customerId,
       stripeSubscriptionId: ended ? null : sub.id,

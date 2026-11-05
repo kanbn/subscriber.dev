@@ -10,6 +10,7 @@ import {
 
 import {
   ceilingFor,
+  isStaleSubscription,
   MOVE_UP_AFTER_MS,
   moveUpTarget,
   renewalPlan,
@@ -105,5 +106,42 @@ describe("moveUpTarget", () => {
   it("needs a recorded start to the 3 days", () => {
     expect(moveUpTarget(plan("starter"), 6_000, null, now)).toBeNull();
     expect(MOVE_UP_AFTER_MS).toBe(3 * DAY);
+  });
+});
+
+describe("isStaleSubscription", () => {
+  const current = { stripeSubscriptionId: "sub_new", status: "active" };
+
+  it("ignores a late cancellation of an old subscription", () => {
+    expect(
+      isStaleSubscription(current, { id: "sub_old", status: "canceled" }),
+    ).toBe(true);
+  });
+
+  it("ignores another subscription while the current one is active", () => {
+    expect(
+      isStaleSubscription(current, { id: "sub_other", status: "active" }),
+    ).toBe(true);
+  });
+
+  it("applies events for the current subscription", () => {
+    expect(
+      isStaleSubscription(current, { id: "sub_new", status: "canceled" }),
+    ).toBe(false);
+  });
+
+  it("lets a new subscription replace a lapsed or missing one", () => {
+    expect(
+      isStaleSubscription(
+        { stripeSubscriptionId: "sub_old", status: "unpaid" },
+        { id: "sub_new", status: "active" },
+      ),
+    ).toBe(false);
+    expect(
+      isStaleSubscription(
+        { stripeSubscriptionId: null, status: "canceled" },
+        { id: "sub_new", status: "active" },
+      ),
+    ).toBe(false);
   });
 });
