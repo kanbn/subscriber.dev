@@ -32,6 +32,7 @@ import {
   stripeIntegrationBody,
 } from "../integrationBodies.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 type Mode =
   | "list"
@@ -72,6 +73,7 @@ export function IntegrationsScreen({
   createType?: string;
   onCancelCreate?: () => void;
 }) {
+  const listLimit = useListLimit();
   const state = useAsyncData(async () => {
     const response = await listIntegrations();
     if (response.status !== 200) {
@@ -199,7 +201,7 @@ export function IntegrationsScreen({
 
   if (mode === "choosing-type") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>New integration</Text>
         <SelectInput
           items={[
@@ -219,7 +221,7 @@ export function IntegrationsScreen({
 
   if (mode === "creating-smtp") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>New SMTP integration</Text>
         <IntegrationCreateForm
           onSubmit={handleCreateSmtp}
@@ -232,7 +234,7 @@ export function IntegrationsScreen({
 
   if (mode === "creating-stripe" && !stripeWebhook) {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>New Stripe integration</Text>
         <Text dimColor>
           Stripe sends events to subscriber.dev through a webhook. How should it
@@ -260,7 +262,7 @@ export function IntegrationsScreen({
 
   if (mode === "creating-stripe") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>New Stripe integration</Text>
         <Text dimColor>
           {stripeWebhook === "automatic"
@@ -284,7 +286,7 @@ export function IntegrationsScreen({
   ) {
     const type = mode.replace("creating-", "") as ProviderType;
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>New {PROVIDER_NAMES[type]} integration</Text>
         <Text dimColor>{WEBHOOK_HINTS[type]}</Text>
         <ProviderForm
@@ -299,7 +301,7 @@ export function IntegrationsScreen({
 
   if (mode === "creating-cloudflare") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>New Cloudflare Email integration</Text>
         <CloudflareEmailCreateForm
           onSubmit={handleCreateCloudflare}
@@ -311,7 +313,7 @@ export function IntegrationsScreen({
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>Integrations</Text>
       <AsyncBoundary state={state}>
         {(integrations) =>
@@ -319,7 +321,7 @@ export function IntegrationsScreen({
             <Text dimColor>No integrations configured.</Text>
           ) : (
             <SelectInput
-              limit={10}
+              limit={listLimit}
               items={integrations.map((integration, index) => ({
                 label: `${integration.type}${index === 0 ? " (primary)" : ""}`,
                 value: integration.type,

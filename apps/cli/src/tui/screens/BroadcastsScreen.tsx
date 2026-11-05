@@ -20,6 +20,7 @@ import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
 import { formatRelativeTime } from "../formatRelativeTime.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 type Broadcast = ListBroadcastsResponseDtoBroadcastsItem;
 type Mode = "list" | "loading-detail" | "detail";
@@ -55,6 +56,7 @@ export function BroadcastsScreen({
   environmentId: string;
   workflowId: string;
 }) {
+  const listLimit = useListLimit();
   const state = useAsyncData(async () => {
     const response = await listBroadcasts(workflowId, {
       limit: 50,
@@ -139,7 +141,7 @@ export function BroadcastsScreen({
 
   if (mode === "loading-detail") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text color="gray">Loading…</Text>
       </Box>
     );
@@ -147,7 +149,7 @@ export function BroadcastsScreen({
 
   if (mode === "detail") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>Broadcast</Text>
         {detail ? (
           <Box flexDirection="column">
@@ -213,7 +215,7 @@ export function BroadcastsScreen({
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>Broadcasts</Text>
       <AsyncBoundary state={state}>
         {(broadcasts) =>
@@ -221,7 +223,7 @@ export function BroadcastsScreen({
             <Text dimColor>No broadcasts yet.</Text>
           ) : (
             <SelectInput
-              limit={10}
+              limit={listLimit}
               items={broadcasts.map((broadcast) => ({
                 label: broadcastRowLabel(broadcast),
                 value: broadcast.publicId,

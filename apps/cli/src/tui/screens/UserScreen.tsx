@@ -75,7 +75,7 @@ export function UserScreen() {
   };
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>My Account</Text>
       <AsyncBoundary state={state}>
         {(loadedUser) => (

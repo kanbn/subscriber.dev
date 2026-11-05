@@ -177,7 +177,7 @@ export function SubscriberDetailScreen({
   };
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>Subscriber</Text>
       <AsyncBoundary state={state}>
         {({ subscriber: loadedSubscriber, preferences }) => {
@@ -191,7 +191,7 @@ export function SubscriberDetailScreen({
             fullName.length > 0 ? fullName : (loadedSubscriber.name ?? "—");
 
           return (
-            <Box flexDirection="column">
+            <Box flexDirection="column" flexGrow={1}>
               <Text>publicId: {loadedSubscriber.publicId}</Text>
               <Text>email: {loadedSubscriber.email ?? "—"}</Text>
               <Text>phone: {loadedSubscriber.phone ?? "—"}</Text>

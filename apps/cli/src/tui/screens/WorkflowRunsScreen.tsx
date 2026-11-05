@@ -10,6 +10,7 @@ import { Hints } from "../components/Hints.js";
 import { formatRelativeTime } from "../formatRelativeTime.js";
 import { stepColor, stepSummary, subscriberLabel } from "../runFormatting.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 type Run = ListRunsResponseDtoRunsItem;
 type Mode = "list" | "detail";
@@ -26,6 +27,7 @@ export function WorkflowRunsScreen({
   environmentId: string;
   workflowId: string;
 }) {
+  const listLimit = useListLimit();
   const state = useAsyncData(async () => {
     const response = await listWorkflowRuns(workflowId, {
       limit: 50,
@@ -48,7 +50,7 @@ export function WorkflowRunsScreen({
 
   if (mode === "detail" && selectedRun) {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>Run {selectedRun.publicId}</Text>
         <Text>subscriber: {subscriberLabel(selectedRun.subscriber)}</Text>
         <Text>status: {selectedRun.status}</Text>
@@ -78,7 +80,7 @@ export function WorkflowRunsScreen({
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>Runs</Text>
       <AsyncBoundary state={state}>
         {(runs) =>
@@ -86,7 +88,7 @@ export function WorkflowRunsScreen({
             <Text dimColor>No runs yet.</Text>
           ) : (
             <SelectInput
-              limit={10}
+              limit={listLimit}
               items={runs.map((run) => ({
                 label: runRowLabel(run),
                 value: run.publicId,

@@ -9,6 +9,7 @@ import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
 import TextInput from "../components/TextInput.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 const ACCOUNT_VALUE = "__account__";
 
@@ -28,6 +29,7 @@ export function WorkspacesScreen({
     environment: EnvironmentSummary,
   ) => void;
 }) {
+  const listLimit = useListLimit();
   const state = useAsyncData(async () => {
     const response = await getWorkspaces();
     return response.data;
@@ -98,7 +100,7 @@ export function WorkspacesScreen({
 
   if (mode === "offer-setup" && created) {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>Created {created.workspace.name}</Text>
         <Text>
           Set it up now? Connect an email provider and send your first email.
@@ -110,7 +112,7 @@ export function WorkspacesScreen({
 
   if (mode === "creating" || mode === "submitting") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>New workspace</Text>
         {error.length > 0 && <Text color="red">{error}</Text>}
         {mode === "submitting" ? (
@@ -131,13 +133,13 @@ export function WorkspacesScreen({
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>Workspaces</Text>
       <AsyncBoundary state={state}>
         {(workspaces) => (
           <Box flexDirection="column">
             <SelectInput
-              limit={10}
+              limit={listLimit}
               items={[
                 ...workspaces.map((workspace) => ({
                   label: `${workspace.name}  (${workspace.slug})`,

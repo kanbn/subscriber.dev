@@ -158,7 +158,7 @@ export function IntegrationDetailScreen({
   if (editing && state.status === "ready") {
     const data = state.data;
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>Edit integration: {type}</Text>
         <Text dimColor>
           Leave secret fields blank to keep the current ones.
@@ -246,7 +246,7 @@ export function IntegrationDetailScreen({
   };
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>Integration: {type}</Text>
       <AsyncBoundary state={state}>
         {(data) => (

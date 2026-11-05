@@ -17,6 +17,7 @@ import { ConfirmPrompt } from "../components/ConfirmPrompt.js";
 import { Hints } from "../components/Hints.js";
 import TextInput from "../components/TextInput.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 interface Trigger {
   source: string;
@@ -70,6 +71,7 @@ export function WorkflowTriggersScreen({
   pickList?: TriggerList;
   onSetUp: (source: string, list: TriggerList) => void;
 }) {
+  const listLimit = useListLimit();
   const [refreshKey, setRefreshKey] = useState(0);
   const state = useAsyncData(async () => {
     const [workflow, sources] = await Promise.all([
@@ -152,7 +154,7 @@ export function WorkflowTriggersScreen({
   ) => sources.find((s) => s.source === name);
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>Triggers and exit conditions</Text>
       <Text dimColor>
         Start this workflow when a connected integration reports an event, and
@@ -248,13 +250,13 @@ export function WorkflowTriggersScreen({
                   : [...mode.selected, event],
               });
             return (
-              <Box flexDirection="column">
+              <Box flexDirection="column" flexGrow={1}>
                 <Text>
                   {source.name} events that {LIST_TEXT[mode.list].verb} this
                   workflow:
                 </Text>
                 <SelectInput
-                  limit={12}
+                  limit={listLimit}
                   items={[
                     ...source.events.map((e) => ({
                       label: `${mode.selected.includes(e.name) ? "[x]" : "[ ]"} ${e.label}`,
@@ -304,7 +306,7 @@ export function WorkflowTriggersScreen({
               })),
           );
           return (
-            <Box flexDirection="column">
+            <Box flexDirection="column" flexGrow={1}>
               {rows.length === 0 && (
                 <Text dimColor>
                   None yet. Without triggers, it only runs when triggered via

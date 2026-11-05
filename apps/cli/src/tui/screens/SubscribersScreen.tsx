@@ -14,6 +14,7 @@ import { Hints } from "../components/Hints.js";
 import { SubscriberFieldsForm } from "../components/SubscriberFieldsForm.js";
 import TextInput from "../components/TextInput.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 type Mode = "list" | "creating" | "searching";
 
@@ -24,6 +25,7 @@ export function SubscribersScreen({
   environmentId: string;
   onSelect: (subscriberId: string) => void;
 }) {
+  const listLimit = useListLimit();
   const [search, setSearch] = useState("");
   const state = useAsyncData(async () => {
     const response = await listSubscribers({
@@ -71,7 +73,7 @@ export function SubscribersScreen({
 
   if (mode === "creating") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>New subscriber</Text>
         <SubscriberFieldsForm
           initialValues={{}}
@@ -86,7 +88,7 @@ export function SubscribersScreen({
 
   if (mode === "searching") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>Subscribers</Text>
         <Box>
           <Text>Search: </Text>
@@ -102,7 +104,7 @@ export function SubscribersScreen({
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>
         Subscribers{search.length > 0 ? ` (search: "${search}")` : ""}
       </Text>
@@ -112,7 +114,7 @@ export function SubscribersScreen({
             <Text dimColor>No subscribers found.</Text>
           ) : (
             <SelectInput
-              limit={10}
+              limit={listLimit}
               items={subscribers.map((subscriber) => ({
                 label:
                   subscriber.email ??

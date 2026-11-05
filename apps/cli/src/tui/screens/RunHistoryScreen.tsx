@@ -10,9 +10,9 @@ import { Hints } from "../components/Hints.js";
 import { formatRelativeTime } from "../formatRelativeTime.js";
 import { stepColor, stepSummary, subscriberLabel } from "../runFormatting.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 type Run = ListEnvironmentRunsResponseDtoRunsItem;
-type Mode = "list" | "detail";
 
 function runRowLabel(run: Run): string {
   const triggered = formatRelativeTime(run.triggeredAt as string);
@@ -20,42 +20,47 @@ function runRowLabel(run: Run): string {
 }
 
 export function RunHistoryScreen({ environmentId }: { environmentId: string }) {
-  const state = useAsyncData(async () => {
-    const response = await listEnvironmentRuns({ limit: 50 });
-    if (response.status !== 200) {
-      throw new Error("Environment not found.");
-    }
-    return response.data.runs;
-  }, [environmentId]);
+  const listLimit = useListLimit();
+  const state = useAsyncData(
+    async () => {
+      const response = await listEnvironmentRuns({ limit: 50 });
+      if (response.status !== 200) {
+        throw new Error("Environment not found.");
+      }
+      return response.data.runs;
+    },
+    [environmentId],
+    { pollMs: 5000 },
+  );
 
-  const [mode, setMode] = useState<Mode>("list");
   const [selectedRun, setSelectedRun] = useState<Run | null>(null);
 
   useInput((input) => {
-    if (mode === "detail" && (input === "b" || input === "B")) {
-      setMode("list");
+    if (selectedRun && (input === "b" || input === "B")) {
       setSelectedRun(null);
     }
   });
 
-  if (mode === "detail" && selectedRun) {
+  if (selectedRun) {
+    const run =
+      (state.status === "ready"
+        ? state.data.find((r) => r.publicId === selectedRun.publicId)
+        : undefined) ?? selectedRun;
     return (
-      <Box flexDirection="column">
-        <Text bold>Run {selectedRun.publicId}</Text>
-        <Text>workflow: {selectedRun.workflow.name}</Text>
-        <Text>subscriber: {subscriberLabel(selectedRun.subscriber)}</Text>
-        <Text>status: {selectedRun.status}</Text>
-        <Text>
-          triggered: {formatRelativeTime(selectedRun.triggeredAt as string)}
-        </Text>
+      <Box flexDirection="column" flexGrow={1}>
+        <Text bold>Run {run.publicId}</Text>
+        <Text>workflow: {run.workflow.name}</Text>
+        <Text>subscriber: {subscriberLabel(run.subscriber)}</Text>
+        <Text>status: {run.status}</Text>
+        <Text>triggered: {formatRelativeTime(run.triggeredAt as string)}</Text>
         <Text>
           completed:{" "}
-          {selectedRun.completedAt
-            ? formatRelativeTime(selectedRun.completedAt as string)
+          {run.completedAt
+            ? formatRelativeTime(run.completedAt as string)
             : "—"}
         </Text>
         <Text bold>Steps:</Text>
-        {selectedRun.steps.map((step) => (
+        {run.steps.map((step) => (
           <Text key={step.stepOrder} color={stepColor(step.status)}>
             {" "}
             {step.stepOrder}. {step.type} — {step.status}
@@ -71,15 +76,17 @@ export function RunHistoryScreen({ environmentId }: { environmentId: string }) {
   }
 
   return (
-    <Box flexDirection="column">
-      <Text bold>Run History</Text>
+    <Box flexDirection="column" flexGrow={1}>
+      <Text bold>
+        Run History <Text dimColor>· updates every 5s</Text>
+      </Text>
       <AsyncBoundary state={state}>
         {(runs) =>
           runs.length === 0 ? (
             <Text dimColor>No runs yet.</Text>
           ) : (
             <SelectInput
-              limit={10}
+              limit={listLimit}
               items={runs.map((run) => ({
                 label: runRowLabel(run),
                 value: run.publicId,
@@ -88,7 +95,6 @@ export function RunHistoryScreen({ environmentId }: { environmentId: string }) {
                 const run = runs.find((r) => r.publicId === item.value);
                 if (run) {
                   setSelectedRun(run);
-                  setMode("detail");
                 }
               }}
             />

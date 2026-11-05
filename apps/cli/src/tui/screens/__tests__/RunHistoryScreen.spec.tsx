@@ -149,4 +149,35 @@ describe("RunHistoryScreen detail", () => {
     });
     expect(lastFrame()).toContain("alice@example.com");
   });
+
+  it("polls for new runs and keeps the list through a failed refresh", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    listRunsMock([testRun]);
+    const { lastFrame, unmount } = render(
+      <RunHistoryScreen environmentId="test-environment-1" />,
+    );
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Test Signup");
+    });
+
+    vi.mocked(listEnvironmentRuns).mockRejectedValueOnce(new Error("offline"));
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(lastFrame()).toContain("Test Signup");
+
+    listRunsMock([
+      {
+        ...testRun,
+        publicId: "test-run-2",
+        workflow: { ...testRun.workflow, name: "Trial Started" },
+      },
+      testRun,
+    ]);
+    await vi.advanceTimersByTimeAsync(5000);
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Trial Started");
+    });
+
+    unmount();
+    vi.useRealTimers();
+  });
 });
