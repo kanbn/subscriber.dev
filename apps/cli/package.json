@@ -20,7 +20,7 @@
     "node": ">=22.12"
   },
   "scripts": {
-    "build": "rm -rf dist && esbuild src/index.ts --bundle --platform=node --format=esm --target=node22 --jsx=automatic --outfile=dist/index.js --external:commander --external:date-fns --external:ink --external:ink-select-input --external:ink-text-input --external:react",
+    "build": "rm -rf dist && esbuild src/index.ts --bundle --platform=node --format=esm --target=node22 --jsx=automatic --define:__CLI_VERSION__=\\\"$npm_package_version\\\" --outfile=dist/index.js --external:commander --external:date-fns --external:ink --external:ink-select-input --external:ink-text-input --external:react",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc --watch --preserveWatchOutput",
     "format": "prettier --check . --ignore-path ../../.gitignore",
