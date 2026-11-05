@@ -1,6 +1,6 @@
 import { Text } from "ink";
 import { render } from "ink-testing-library";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type * as UpdateCheck from "../../updateCheck.js";
 import { useUpdateAvailable } from "../useUpdateAvailable.js";
@@ -15,6 +15,10 @@ function Probe({ version }: { version: string }) {
 }
 
 describe("useUpdateAvailable", () => {
+  beforeEach(() => {
+    vi.stubEnv("CI", "");
+  });
+
   it("checks npm as soon as it opens", async () => {
     const { lastFrame } = render(<Probe version="0.1.2" />);
     await vi.waitFor(() => {
