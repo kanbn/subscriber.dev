@@ -23,13 +23,13 @@ const CLI_VERSION =
   typeof __CLI_VERSION__ === "string" ? __CLI_VERSION__ : "dev";
 
 setCliVersion(CLI_VERSION);
-notifyIfOutdated(CLI_VERSION);
 
 if (process.argv.length <= 2) {
   ensureLoggedIn();
   const { runTui } = await import("./tui/index.js");
-  runTui();
+  runTui(CLI_VERSION);
 } else {
+  notifyIfOutdated(CLI_VERSION);
   const program = new Command();
 
   program

@@ -22,9 +22,11 @@ import { WorkflowRunsScreen } from "./screens/WorkflowRunsScreen.js";
 import { WorkflowsScreen } from "./screens/WorkflowsScreen.js";
 import { WorkflowTriggersScreen } from "./screens/WorkflowTriggersScreen.js";
 import { WorkspacesScreen } from "./screens/WorkspacesScreen.js";
+import { useUpdateAvailable } from "./useUpdateAvailable.js";
 
-export function App() {
+export function App({ version = "dev" }: { version?: string }) {
   const { exit } = useApp();
+  const update = useUpdateAvailable(version);
   const { rows } = useWindowSize();
   const [stack, setStack] = useState<Screen[]>([{ kind: "workspaces" }]);
 
@@ -48,8 +50,16 @@ export function App() {
 
   return (
     <Box flexDirection="column" padding={1} minHeight={rows}>
-      <Text color="cyan" bold>
-        subscriber.dev
+      <Text>
+        <Text color="cyan" bold>
+          subscriber.dev
+        </Text>
+        {update && (
+          <Text color="yellow">
+            {"  "}update available {version} → {update}: npm i -g
+            @subscriber.dev/cli
+          </Text>
+        )}
       </Text>
 
       {screen.kind === "workspaces" && (

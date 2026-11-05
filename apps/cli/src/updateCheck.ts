@@ -8,15 +8,35 @@ const CACHE_PATH = join(
   "subscriber",
   "update-check.json",
 );
-const DAY_MS = 24 * 60 * 60 * 1000;
+export const CHECK_EVERY_MS = 60 * 60 * 1000;
 
 export const isNewer = (latest: string, current: string) =>
   latest.localeCompare(current, undefined, { numeric: true }) > 0;
 
+export const skipUpdateCheck = (current: string) =>
+  current === "dev" || !!process.env.CI;
+
+export async function fetchLatest(): Promise<string | undefined> {
+  try {
+    const response = await fetch(
+      "https://registry.npmjs.org/@subscriber.dev/cli/latest",
+      { signal: AbortSignal.timeout(1500) },
+    );
+    const { version } = (await response.json()) as { version?: string };
+    mkdirSync(dirname(CACHE_PATH), { recursive: true });
+    writeFileSync(
+      CACHE_PATH,
+      JSON.stringify({ checkedAt: Date.now(), latest: version }),
+    );
+    return version;
+  } catch {
+    return undefined;
+  }
+}
+
 export function notifyIfOutdated(current: string): void {
   if (
-    current === "dev" ||
-    process.env.CI ||
+    skipUpdateCheck(current) ||
     !process.stderr.isTTY ||
     process.argv.includes("--json")
   )
@@ -33,18 +53,7 @@ export function notifyIfOutdated(current: string): void {
       `update available ${current} → ${cache.latest}: npm i -g @subscriber.dev/cli`,
     );
   }
-  if (Date.now() - (cache.checkedAt ?? 0) < DAY_MS) return;
-
-  void fetch("https://registry.npmjs.org/@subscriber.dev/cli/latest", {
-    signal: AbortSignal.timeout(1500),
-  })
-    .then((response) => response.json() as Promise<{ version?: string }>)
-    .then(({ version }) => {
-      mkdirSync(dirname(CACHE_PATH), { recursive: true });
-      writeFileSync(
-        CACHE_PATH,
-        JSON.stringify({ checkedAt: Date.now(), latest: version }),
-      );
-    })
-    .catch(() => undefined);
+  if (Date.now() - (cache.checkedAt ?? 0) >= CHECK_EVERY_MS) {
+    void fetchLatest();
+  }
 }
