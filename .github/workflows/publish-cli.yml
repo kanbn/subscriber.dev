@@ -54,4 +54,4 @@ jobs:
         working-directory: apps/cli
         run: |
           pnpm pack
-          npm publish subscriber.dev-cli-*.tgz --provenance --access public
+          npm publish subscriber.dev-cli-*.tgz
