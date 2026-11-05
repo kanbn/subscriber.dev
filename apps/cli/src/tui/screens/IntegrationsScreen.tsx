@@ -24,10 +24,7 @@ import {
   providerFields,
   ProviderForm,
 } from "../components/ProviderForm.js";
-import {
-  MANUAL_KEY_LABEL,
-  StripeIntegrationForm,
-} from "../components/StripeIntegrationForm.js";
+import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
 import {
   cloudflareIntegrationBody,
   providerIntegrationBody,
@@ -271,7 +268,7 @@ export function IntegrationsScreen({
             : "Create a restricted key in Stripe with Customers: Read. Next you'll see the webhook URL and events to add in Stripe."}
         </Text>
         <StripeIntegrationForm
-          keyLabel={stripeWebhook === "manual" ? MANUAL_KEY_LABEL : undefined}
+          manual={stripeWebhook === "manual"}
           onSubmit={handleCreateStripe}
           onCancel={() => setStripeWebhook(null)}
         />

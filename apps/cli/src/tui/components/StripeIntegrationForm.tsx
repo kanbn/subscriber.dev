@@ -9,10 +9,6 @@ export interface StripeIntegrationValues {
   webhookSecret: string;
 }
 
-const AUTOMATIC_KEY_LABEL =
-  "Stripe restricted key (Customers: Read, Webhook Endpoints: Write)";
-export const MANUAL_KEY_LABEL = "Stripe restricted key (Customers: Read)";
-
 type FieldKey = keyof StripeIntegrationValues;
 
 const SUBMIT_VALUE = "__submit__";
@@ -24,17 +20,22 @@ export function StripeIntegrationForm({
   onSubmit,
   onCancel,
   editing = false,
-  keyLabel = AUTOMATIC_KEY_LABEL,
+  manual = false,
   withSecret = false,
 }: {
   onSubmit: (values: StripeIntegrationValues) => Promise<string | undefined>;
   onCancel: () => void;
   editing?: boolean;
-  keyLabel?: string;
+  manual?: boolean;
   withSecret?: boolean;
 }) {
   const fields: { key: FieldKey; label: string }[] = [
-    { key: "apiKey", label: keyLabel },
+    {
+      key: "apiKey",
+      label: manual
+        ? "Stripe restricted key (Customers: Read)"
+        : "Stripe restricted key (Customers: Read, Webhook Endpoints: Write)",
+    },
     ...(withSecret
       ? [{ key: "webhookSecret" as const, label: "Webhook signing secret" }]
       : []),
