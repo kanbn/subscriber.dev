@@ -75,7 +75,7 @@ export function BillingScreen({ workspace }: { workspace: WorkspaceSummary }) {
   });
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>{workspace.name} — Billing</Text>
       <AsyncBoundary state={state}>
         {(data) => (

@@ -10,6 +10,7 @@ import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
 import { WorkflowCreateForm } from "../components/WorkflowCreateForm.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 type Mode = "list" | "creating";
 
@@ -22,6 +23,7 @@ export function WorkflowsScreen({
   workflowType: "automation" | "broadcast";
   onSelect: (workflowId: string) => void;
 }) {
+  const listLimit = useListLimit();
   const state = useAsyncData(async () => {
     const response = await listWorkflows({
       limit: 100,
@@ -75,7 +77,7 @@ export function WorkflowsScreen({
 
   if (mode === "creating") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>
           New {workflowType === "broadcast" ? "broadcast" : "workflow"}
         </Text>
@@ -89,7 +91,7 @@ export function WorkflowsScreen({
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>{title}</Text>
       <AsyncBoundary state={state}>
         {(workflows) =>
@@ -100,7 +102,7 @@ export function WorkflowsScreen({
             </Text>
           ) : (
             <SelectInput
-              limit={10}
+              limit={listLimit}
               items={workflows.map((workflow) => ({
                 label: `${workflow.name}  (${workflow.key})  [${workflow.status}]`,
                 value: workflow.publicId,

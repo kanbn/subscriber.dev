@@ -8,6 +8,7 @@ export type AsyncState<T> =
 export function useAsyncData<T>(
   fetcher: () => Promise<T>,
   deps: unknown[],
+  { pollMs }: { pollMs?: number } = {},
 ): AsyncState<T> {
   const [state, setState] = useState<AsyncState<T>>({ status: "loading" });
 
@@ -15,21 +16,29 @@ export function useAsyncData<T>(
     let cancelled = false;
     setState({ status: "loading" });
 
-    fetcher()
-      .then((data) => {
-        if (!cancelled) setState({ status: "ready", data });
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          setState({
-            status: "error",
-            message: err instanceof Error ? err.message : String(err),
-          });
-        }
-      });
+    const load = () =>
+      fetcher()
+        .then((data) => {
+          if (!cancelled) setState({ status: "ready", data });
+        })
+        .catch((err: unknown) => {
+          if (cancelled) return;
+          // A failed refresh keeps the data already on screen.
+          setState((prev) =>
+            prev.status === "ready"
+              ? prev
+              : {
+                  status: "error",
+                  message: err instanceof Error ? err.message : String(err),
+                },
+          );
+        });
+    void load();
+    const timer = pollMs ? setInterval(() => void load(), pollMs) : undefined;
 
     return () => {
       cancelled = true;
+      clearInterval(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);

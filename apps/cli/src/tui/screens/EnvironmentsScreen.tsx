@@ -13,6 +13,7 @@ import { AsyncBoundary } from "../components/AsyncBoundary.js";
 import { Hints } from "../components/Hints.js";
 import TextInput from "../components/TextInput.js";
 import { useAsyncData } from "../useAsyncData.js";
+import { useListLimit } from "../useListLimit.js";
 
 type Mode = "list" | "creating" | "submitting";
 
@@ -27,6 +28,7 @@ export function EnvironmentsScreen({
   onSelect: (environment: EnvironmentSummary) => void;
   onSelectBilling?: () => void;
 }) {
+  const listLimit = useListLimit();
   const billing = useAsyncData(async () => {
     const response = await getBilling(workspace.publicId);
     return (response.status as number) === 200;
@@ -84,7 +86,7 @@ export function EnvironmentsScreen({
 
   if (mode === "creating" || mode === "submitting") {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" flexGrow={1}>
         <Text bold>{workspace.name} — New environment</Text>
         {error.length > 0 && <Text color="red">{error}</Text>}
         {mode === "submitting" ? (
@@ -105,7 +107,7 @@ export function EnvironmentsScreen({
   }
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>{workspace.name} — Environments</Text>
       <AsyncBoundary state={state}>
         {(environments) =>
@@ -113,7 +115,7 @@ export function EnvironmentsScreen({
             <Text dimColor>No environments in this workspace.</Text>
           ) : (
             <SelectInput
-              limit={10}
+              limit={listLimit}
               items={[
                 ...environments.map((environment) => ({
                   label: `${environment.name}  (${environment.slug})`,

@@ -18,13 +18,13 @@ export function AnalyticsScreen({ environmentId }: { environmentId: string }) {
   }, [environmentId]);
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>Analytics</Text>
       <AsyncBoundary state={state}>
         {(data) => {
           const successRate = data.sends.successRate;
           return (
-            <Box flexDirection="column">
+            <Box flexDirection="column" flexGrow={1}>
               <Text bold>Subscribers:</Text>
               <Text> total: {data.subscribers.total}</Text>
               <Text>

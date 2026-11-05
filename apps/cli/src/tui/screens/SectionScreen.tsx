@@ -32,7 +32,7 @@ export function SectionScreen({
   const incomplete = setup.status === "ready" && !setup.data.complete;
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" flexGrow={1}>
       <Text bold>
         {workspace.name} / {environment.name}
       </Text>

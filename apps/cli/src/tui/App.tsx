@@ -1,4 +1,4 @@
-import { Box, Text, useApp, useInput } from "ink";
+import { Box, Text, useApp, useInput, useWindowSize } from "ink";
 import { useState } from "react";
 
 import { setEnvironmentId } from "@subscriber.dev/api-client/environment";
@@ -25,6 +25,7 @@ import { WorkspacesScreen } from "./screens/WorkspacesScreen.js";
 
 export function App() {
   const { exit } = useApp();
+  const { rows } = useWindowSize();
   const [stack, setStack] = useState<Screen[]>([{ kind: "workspaces" }]);
 
   const push = (screen: Screen) => setStack((s) => [...s, screen]);
@@ -46,7 +47,7 @@ export function App() {
   );
 
   return (
-    <Box flexDirection="column" padding={1}>
+    <Box flexDirection="column" padding={1} minHeight={rows}>
       <Text color="cyan" bold>
         subscriber.dev
       </Text>
