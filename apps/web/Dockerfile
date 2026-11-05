@@ -30,7 +30,7 @@ COPY . .
  
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
 # Assuming "@acme/nextjs" is the name entered in the project's package.json: { name: "@acme/nextjs" }
-RUN turbo prune --scope=${PROJECT} --scope=@subscriber.dev/db --docker
+RUN turbo prune --scope=${PROJECT} --docker
  
 # 3. Build the project
 FROM base AS builder
@@ -56,14 +56,7 @@ COPY --from=pruner /app/out/full/ .
 
 RUN pnpm build --filter=${PROJECT}
 
-# 4. Migrations
-FROM node:${NODE_VERSION}-alpine AS migrate
-WORKDIR /db
-COPY packages/db/drizzle.config.ts ./drizzle.config.ts
-COPY packages/db/migrations/ ./migrations/
-RUN npm init -y >/dev/null && npm install --no-audit --no-fund drizzle-kit@0.31.11 drizzle-orm@0.45.3 pg@8.23.1
-
-# 5. Final image - runner stage to run the application
+# 4. Final image - runner stage to run the application
 FROM node:${NODE_VERSION}-alpine AS runner
 ARG APP_DIRNAME
 
@@ -79,7 +72,6 @@ ENV HOSTNAME=0.0.0.0
 COPY --chown=nextjs:nodejs --from=builder /app/apps/${APP_DIRNAME}/.next/standalone/ ./
 COPY --chown=nextjs:nodejs --from=builder /app/apps/${APP_DIRNAME}/.next/static/ ./apps/${APP_DIRNAME}/.next/static/
 COPY --chown=nextjs:nodejs --from=builder /app/apps/${APP_DIRNAME}/public/ ./apps/${APP_DIRNAME}/public/
-COPY --chown=nextjs:nodejs --from=migrate /db/ ./migrate/
 COPY --chown=nextjs:nodejs apps/${APP_DIRNAME}/bootstrap.cjs ./bootstrap.cjs
 USER nextjs
 

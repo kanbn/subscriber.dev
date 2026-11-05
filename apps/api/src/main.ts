@@ -3,14 +3,21 @@ import "reflect-metadata";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import type { Request } from "express";
 import { NestFactory } from "@nestjs/core";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { ZodValidationPipe } from "nestjs-zod";
 import { PostHogInterceptor } from "posthog-node/nestjs";
+
+import { createDrizzleClient } from "@subscriber.dev/db/client";
 
 import { AppModule } from "./app.module.js";
 import { writeOpenApiDocuments } from "./openapi.js";
 import { posthog } from "./posthog.js";
 
 async function bootstrap() {
+  if (process.env.POSTGRES_URL)
+    await migrate(createDrizzleClient(), {
+      migrationsFolder: "../../packages/db/migrations",
+    });
   const app = await NestFactory.create(AppModule, { rawBody: true });
   app.enableShutdownHooks(["SIGINT"]);
   (app as NestExpressApplication).set(

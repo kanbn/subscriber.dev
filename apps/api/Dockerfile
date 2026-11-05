@@ -50,6 +50,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
 
 COPY --from=builder --chown=nestjs:nodejs /prod/api ./apps/api
+COPY --from=builder --chown=nestjs:nodejs /app/packages/db/migrations ./packages/db/migrations
 
 USER nestjs
 
