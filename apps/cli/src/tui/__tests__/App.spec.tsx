@@ -111,23 +111,28 @@ describe("App navigation", () => {
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Test Workspace");
     });
+    await tick();
     stdin.write("\r");
 
     // Environments screen -> select the only environment
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("Staging");
     });
+    await tick();
     stdin.write("\r");
 
     // Section screen -> "Subscribers" is the first item
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("Subscribers");
+    });
     await tick();
-    expect(lastFrame()).toContain("Subscribers");
     stdin.write("\r");
 
     // Subscribers screen -> select the only subscriber
     await vi.waitFor(() => {
       expect(lastFrame()).toContain("test@example.com");
     });
+    await tick();
     stdin.write("\r");
 
     // Subscriber detail screen
@@ -136,6 +141,7 @@ describe("App navigation", () => {
     });
 
     // Escape pops back one level, to the subscribers list
+    await tick();
     stdin.write("\u001B");
     await vi.waitFor(() => {
       expect(lastFrame()).not.toContain("publicId: test-subscriber-1");
