@@ -55,29 +55,32 @@ export const upsertBilling = async (
   return row;
 };
 
-export const getProductionEnvironment = async (
-  db: dbClient,
-  workspaceId: number,
-) =>
-  db.query.environments.findFirst({
-    where: and(
-      eq(environments.workspaceId, workspaceId),
-      eq(environments.slug, "prod"),
-    ),
-  });
+export const listEnvironmentIds = async (db: dbClient, workspaceId: number) =>
+  (
+    await db
+      .select({ id: environments.id })
+      .from(environments)
+      .where(
+        and(
+          eq(environments.workspaceId, workspaceId),
+          isNull(environments.deletedAt),
+        ),
+      )
+  ).map((row) => row.id);
 
 export const countSendsSince = async (
   db: dbClient,
-  environmentId: number,
+  workspaceId: number,
   since: Date,
 ) => {
   const [row] = await db
     .select({ count: count() })
     .from(workflowRunSteps)
     .innerJoin(workflowRuns, eq(workflowRunSteps.runId, workflowRuns.id))
+    .innerJoin(environments, eq(workflowRuns.environmentId, environments.id))
     .where(
       and(
-        eq(workflowRuns.environmentId, environmentId),
+        eq(environments.workspaceId, workspaceId),
         gte(workflowRunSteps.sentAt, since),
       ),
     );
@@ -86,16 +89,17 @@ export const countSendsSince = async (
 
 export const countDistinctEmailedSince = async (
   db: dbClient,
-  environmentId: number,
+  workspaceId: number,
   since: Date,
 ) => {
   const [row] = await db
     .select({ count: countDistinct(workflowRuns.subscriberId) })
     .from(workflowRunSteps)
     .innerJoin(workflowRuns, eq(workflowRunSteps.runId, workflowRuns.id))
+    .innerJoin(environments, eq(workflowRuns.environmentId, environments.id))
     .where(
       and(
-        eq(workflowRuns.environmentId, environmentId),
+        eq(environments.workspaceId, workspaceId),
         gte(workflowRunSteps.sentAt, since),
       ),
     );
@@ -104,15 +108,17 @@ export const countDistinctEmailedSince = async (
 
 export const subscriberPosition = async (
   db: dbClient,
-  environmentId: number,
+  workspaceId: number,
   subscriberId: number,
 ) => {
   const [row] = await db
     .select({ count: count() })
     .from(subscribers)
+    .innerJoin(environments, eq(subscribers.environmentId, environments.id))
     .where(
       and(
-        eq(subscribers.environmentId, environmentId),
+        eq(environments.workspaceId, workspaceId),
+        isNull(environments.deletedAt),
         isNull(subscribers.deletedAt),
         lte(subscribers.id, subscriberId),
       ),

@@ -33,7 +33,7 @@ export class BillingTools {
   @Tool({
     name: "get_billing",
     description:
-      "Get a workspace's plan and usage. Billed subscribers are opted-in subscribers in production, or distinct subscribers emailed this period if more. Free: 1,000 subscribers and 10,000 sends a month, then further sends are skipped, not sent. Paid: over the plan's limit for 3 days moves the workspace up one plan (movesUpOn), and past `ceiling` (one plan up) sends to newer subscribers are skipped until the user upgrades. Plans also adjust to fit at each renewal.",
+      "Get a workspace's plan and usage. Billed subscribers are opted-in subscribers across all environments, or distinct subscribers emailed this period if more. Free: 1,000 subscribers and 10,000 sends a month, then further sends are skipped, not sent. Paid: over the plan's limit for 3 days moves the workspace up one plan (movesUpOn), and past `ceiling` (one plan up) sends to newer subscribers are skipped until the user upgrades. Plans also adjust to fit at each renewal.",
     parameters: z.object({ workspaceId: z.string() }),
     annotations: { readOnlyHint: true },
   })

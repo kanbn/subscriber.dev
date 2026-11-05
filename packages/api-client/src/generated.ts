@@ -140,7 +140,7 @@ export const BillingResponseDtoInterval = {
 } as const;
 
 export type BillingResponseDtoUsage = {
-  /** Subscribers billed on: opted-in subscribers in production, or distinct subscribers emailed this period if that's more. */
+  /** Subscribers billed on: opted-in subscribers across all environments, or distinct subscribers emailed this period if that's more. */
   subscribers: number;
   subscriberLimit: number;
   /** Email and webhook steps sent this calendar month (UTC). */
