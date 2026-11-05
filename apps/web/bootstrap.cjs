@@ -1,5 +1,4 @@
-// The standalone server skips next.config.js, so write __ENV.js and migrate here.
-const { spawnSync } = require("child_process");
+// The standalone server skips next.config.js, so write __ENV.js here.
 const { writeFileSync } = require("fs");
 const path = require("path");
 
@@ -10,16 +9,6 @@ writeFileSync(
   path.join(__dirname, "apps", "web", "public", "__ENV.js"),
   `window.__ENV = ${JSON.stringify(publicEnv)};`,
 );
-
-if (process.env.POSTGRES_URL) {
-  const migrateDir = path.join(__dirname, "migrate");
-  const result = spawnSync(
-    process.execPath,
-    [path.join(migrateDir, "node_modules", "drizzle-kit", "bin.cjs"), "migrate"],
-    { cwd: migrateDir, stdio: "inherit" },
-  );
-  if (result.status !== 0) process.exit(result.status ?? 1);
-}
 
 const drainMs = 10_000;
 const on = process.on.bind(process);
