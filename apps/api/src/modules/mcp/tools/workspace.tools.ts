@@ -42,13 +42,14 @@ export class WorkspaceTools {
     const user = requireMcpUser(rawRequest);
     const db = requireMcpDb(rawRequest);
 
-    const result = await this.workspaceService.createWorkspace(db, user.id, {
-      name: args.name,
-    });
+    const { workspaceId, ...result } =
+      await this.workspaceService.createWorkspace(db, user.id, {
+        name: args.name,
+      });
     track("workspace_created", {
       via: "mcp",
       userId: user.id,
-      workspaceId: result.workspace.id,
+      workspaceId,
     });
     return result;
   }

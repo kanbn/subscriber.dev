@@ -2843,9 +2843,6 @@
       "WorkspaceDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "number"
-          },
           "publicId": {
             "type": "string"
           },
@@ -2867,7 +2864,6 @@
           }
         },
         "required": [
-          "id",
           "publicId",
           "name",
           "slug",
@@ -2893,9 +2889,6 @@
           "workspace": {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "number"
-              },
               "publicId": {
                 "type": "string"
               },
@@ -2907,7 +2900,6 @@
               }
             },
             "required": [
-              "id",
               "publicId",
               "name",
               "slug"
@@ -2916,9 +2908,6 @@
           "environment": {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "number"
-              },
               "publicId": {
                 "type": "string"
               },
@@ -2930,7 +2919,6 @@
               }
             },
             "required": [
-              "id",
               "publicId",
               "name",
               "slug"
@@ -2970,9 +2958,6 @@
             "items": {
               "type": "object",
               "properties": {
-                "id": {
-                  "type": "number"
-                },
                 "publicId": {
                   "type": "string"
                 },
@@ -2984,7 +2969,6 @@
                 }
               },
               "required": [
-                "id",
                 "publicId",
                 "name",
                 "slug"
@@ -3012,9 +2996,6 @@
       "EnvironmentDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "number"
-          },
           "publicId": {
             "type": "string"
           },
@@ -3026,7 +3007,6 @@
           }
         },
         "required": [
-          "id",
           "publicId",
           "name",
           "slug"

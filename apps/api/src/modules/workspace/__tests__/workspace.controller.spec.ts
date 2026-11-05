@@ -44,7 +44,6 @@ describe("createEnvironment", () => {
       publicId: "ws_abc",
     });
     mockWorkspaceService.createEnvironment.mockResolvedValue({
-      id: 5,
       publicId: "env_abc",
       name: "Staging",
       slug: "staging",
@@ -57,7 +56,6 @@ describe("createEnvironment", () => {
     );
 
     expect(result).toEqual({
-      id: 5,
       publicId: "env_abc",
       name: "Staging",
       slug: "staging",

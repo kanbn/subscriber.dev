@@ -60,9 +60,12 @@ describe("WorkflowsScreen", () => {
       expect(lastFrame()).toContain("Test Signup");
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 0));
     stdin.write("\r");
 
-    expect(onSelect).toHaveBeenCalledWith("test-workflow-1");
+    await vi.waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith("test-workflow-1");
+    });
   });
 
   it("shows an empty-state hint when there are no workflows", async () => {

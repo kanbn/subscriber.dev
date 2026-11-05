@@ -2,7 +2,6 @@ import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
 export const WorkspaceSchema = z.object({
-  id: z.number(),
   publicId: z.string(),
   name: z.string(),
   slug: z.string(),
@@ -10,7 +9,6 @@ export const WorkspaceSchema = z.object({
 });
 
 export const EnvironmentSchema = z.object({
-  id: z.number(),
   publicId: z.string(),
   name: z.string(),
   slug: z.string(),

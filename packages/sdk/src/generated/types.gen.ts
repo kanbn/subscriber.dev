@@ -43,7 +43,6 @@ export type AgentResponse = {
 };
 
 export type Workspace = {
-    id: number;
     publicId: string;
     name: string;
     slug: string;
@@ -56,13 +55,11 @@ export type CreateWorkspaceRequest = {
 
 export type CreateWorkspaceResponse = {
     workspace: {
-        id: number;
         publicId: string;
         name: string;
         slug: string;
     };
     environment: {
-        id: number;
         publicId: string;
         name: string;
         slug: string;
@@ -78,7 +75,6 @@ export type UpdateWorkspaceRequest = {
 
 export type ListEnvironmentsResponse = {
     environments: Array<{
-        id: number;
         publicId: string;
         name: string;
         slug: string;
@@ -90,7 +86,6 @@ export type CreateEnvironmentRequest = {
 };
 
 export type Environment = {
-    id: number;
     publicId: string;
     name: string;
     slug: string;
