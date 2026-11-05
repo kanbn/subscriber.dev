@@ -85,26 +85,27 @@ export async function processRunStepJob(
 
     try {
       JSON.parse(payload);
-      const response = await fetch(config.url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: payload,
-        redirect: "error",
-        signal: AbortSignal.timeout(10_000),
-      });
-      if (!response.ok) {
-        throw new Error(`Webhook responded with ${response.status}`);
-      }
-      await workflowRunRepo.updateRunStepStatus(db, runStep.id, "sent");
     } catch (error) {
       await workflowRunRepo.updateRunStepStatus(
         db,
         runStep.id,
         "failed",
-        error instanceof Error ? error.message : "Unknown error",
+        error instanceof Error ? error.message : "Invalid JSON body",
       );
-      throw error;
+      await workflowRunRepo.completeRunIfAllStepsTerminal(db, run.id);
+      return;
     }
+    const response = await fetch(config.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      redirect: "error",
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) {
+      throw new Error(`Webhook responded with ${response.status}`);
+    }
+    await workflowRunRepo.updateRunStepStatus(db, runStep.id, "sent");
   } else {
     await workflowRunRepo.updateRunStepStatus(
       db,
@@ -136,6 +137,7 @@ export async function handleRunStepJobFailed(
           "failed",
           error.message,
         );
+        await workflowRunRepo.completeRunIfAllStepsTerminal(db, runStep.runId);
       }
     } catch (recordError) {
       logger.error(

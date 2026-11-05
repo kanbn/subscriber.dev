@@ -370,12 +370,7 @@ describe("process", () => {
     );
 
     expect(sendRawEmail).toHaveBeenCalledTimes(2);
-    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
-      expect.anything(),
-      1,
-      "failed",
-      "Fallback provider down too",
-    );
+    expect(workflowRunRepo.updateRunStepStatus).not.toHaveBeenCalled();
   });
 
   it("always appends a working unsubscribe link, even when the template doesn't reference {{unsubscribeUrl}}", async () => {
@@ -600,17 +595,12 @@ describe("process", () => {
     );
   });
 
-  it("marks the run-step failed and rethrows when sending fails", async () => {
+  it("leaves the run-step pending and rethrows when sending fails, so BullMQ retries it", async () => {
     vi.mocked(sendRawEmail).mockRejectedValue(new Error("SMTP down"));
 
     await expect(processor.process(makeJob())).rejects.toThrow("SMTP down");
 
-    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
-      expect.anything(),
-      1,
-      "failed",
-      "SMTP down",
-    );
+    expect(workflowRunRepo.updateRunStepStatus).not.toHaveBeenCalled();
   });
 
   it("marks the run-step failed when no integration is configured for the environment", async () => {
@@ -685,7 +675,7 @@ describe("webhook steps", () => {
     );
   });
 
-  it("marks the run-step failed and rethrows on a non-2xx response", async () => {
+  it("leaves the run-step pending and rethrows on a non-2xx response, so BullMQ retries it", async () => {
     vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue(
       mockWebhookRunStep as any,
     );
@@ -695,12 +685,7 @@ describe("webhook steps", () => {
       "Webhook responded with 500",
     );
 
-    expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
-      expect.anything(),
-      2,
-      "failed",
-      "Webhook responded with 500",
-    );
+    expect(workflowRunRepo.updateRunStepStatus).not.toHaveBeenCalled();
   });
 
   it("marks the run-step failed without making a network call when the rendered body isn't valid JSON", async () => {
@@ -712,7 +697,7 @@ describe("webhook steps", () => {
       },
     } as any);
 
-    await expect(processor.process(makeJob(2))).rejects.toThrow();
+    await processor.process(makeJob(2));
 
     expect(fetch).not.toHaveBeenCalled();
     expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
@@ -743,9 +728,10 @@ describe("unsupported step types", () => {
 });
 
 describe("onFailed", () => {
-  it("marks the run-step failed once BullMQ has exhausted retries", async () => {
+  it("marks the run-step failed and completes the run once BullMQ has exhausted retries", async () => {
     vi.mocked(workflowRunRepo.getRunStepByBullJobId).mockResolvedValue({
       id: 1,
+      runId: 5,
       status: "pending",
     } as any);
 
@@ -759,6 +745,10 @@ describe("onFailed", () => {
       1,
       "failed",
       "boom",
+    );
+    expect(workflowRunRepo.completeRunIfAllStepsTerminal).toHaveBeenCalledWith(
+      expect.anything(),
+      5,
     );
   });
 
