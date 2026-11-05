@@ -50,9 +50,13 @@ describe("EnvironmentsScreen", () => {
       expect(lastFrame()).toContain("Staging");
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     stdin.write("\r");
 
-    expect(onSelect).toHaveBeenCalledWith(testEnvironment);
+    await vi.waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith(testEnvironment);
+    });
   });
 
   it("shows an empty-state hint when there are no environments", async () => {

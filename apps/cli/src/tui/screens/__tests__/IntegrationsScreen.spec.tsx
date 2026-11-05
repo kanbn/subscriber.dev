@@ -81,9 +81,13 @@ describe("IntegrationsScreen", () => {
       expect(lastFrame()).toContain("smtp");
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     stdin.write("\r");
 
-    expect(onSelect).toHaveBeenCalledWith("smtp");
+    await vi.waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith("smtp");
+    });
   });
 
   it("shows an empty-state hint when there are none", async () => {
