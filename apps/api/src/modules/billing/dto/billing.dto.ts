@@ -25,7 +25,7 @@ export const BillingResponseSchema = z.object({
     subscribers: z
       .number()
       .describe(
-        "Subscribers billed on: opted-in subscribers in production, or distinct subscribers emailed this period if that's more.",
+        "Subscribers billed on: opted-in subscribers across all environments, or distinct subscribers emailed this period if that's more.",
       ),
     subscriberLimit: z.number(),
     sendsThisMonth: z

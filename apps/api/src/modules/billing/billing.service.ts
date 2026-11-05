@@ -93,42 +93,45 @@ export class BillingService {
 
   async billedCount(
     db: dbClient,
-    environmentId: number,
+    workspaceId: number,
     periodStart: Date | null,
   ) {
     const [optedIn, emailed] = await Promise.all([
-      this.countSubscribers(db, environmentId),
+      this.countSubscribers(db, workspaceId),
       billingRepo.countDistinctEmailedSince(
         db,
-        environmentId,
+        workspaceId,
         periodStart ?? startOfMonthUtc(),
       ),
     ]);
     return Math.max(optedIn, emailed);
   }
 
-  async countSubscribers(db: dbClient, environmentId: number) {
+  async countSubscribers(db: dbClient, workspaceId: number) {
     const since = new Date();
-    const [all, optedOut] = await Promise.all([
-      subscriberRepo.getSubscriberCounts(db, environmentId, since),
-      subscriberRepo.getOptedOutCounts(db, environmentId, since),
-    ]);
-    return Math.max(0, all.total - optedOut.total);
+    const counts = await Promise.all(
+      (await billingRepo.listEnvironmentIds(db, workspaceId)).map(
+        async (environmentId) => {
+          const [all, optedOut] = await Promise.all([
+            subscriberRepo.getSubscriberCounts(db, environmentId, since),
+            subscriberRepo.getOptedOutCounts(db, environmentId, since),
+          ]);
+          return Math.max(0, all.total - optedOut.total);
+        },
+      ),
+    );
+    return counts.reduce((sum, n) => sum + n, 0);
   }
 
   async getBilling(db: dbClient, workspaceId: number) {
     this.requireEnabled();
-    const [billing, production] = await Promise.all([
-      billingRepo.getBillingForWorkspace(db, workspaceId),
-      billingRepo.getProductionEnvironment(db, workspaceId),
+    const { paid, plan } = this.activePlan(
+      await billingRepo.getBillingForWorkspace(db, workspaceId),
+    );
+    const [subscribers, sendsThisMonth] = await Promise.all([
+      this.billedCount(db, workspaceId, paid?.currentPeriodStart ?? null),
+      billingRepo.countSendsSince(db, workspaceId, startOfMonthUtc()),
     ]);
-    const { paid, plan } = this.activePlan(billing);
-    const [subscribers, sendsThisMonth] = production
-      ? await Promise.all([
-          this.billedCount(db, production.id, paid?.currentPeriodStart ?? null),
-          billingRepo.countSendsSince(db, production.id, startOfMonthUtc()),
-        ])
-      : [0, 0];
     const atRenewal =
       paid && !paid.cancelAtPeriodEnd ? renewalPlan(subscribers) : plan;
     const movesUpOn =
@@ -312,12 +315,9 @@ export class BillingService {
     const billing = await billingRepo.getBillingByCustomerId(db, customerId);
     if (!billing?.stripeSubscriptionId) return;
 
-    const production = await billingRepo.getProductionEnvironment(
-      db,
-      billing.workspaceId,
+    const target = renewalPlan(
+      await this.countSubscribers(db, billing.workspaceId),
     );
-    if (!production) return;
-    const target = renewalPlan(await this.countSubscribers(db, production.id));
     if (!target) {
       this.logger.warn(
         `Workspace ${billing.workspaceId} is past the largest plan`,
@@ -387,14 +387,9 @@ export class BillingService {
     for (const billing of await billingRepo.listPaidBilling(db)) {
       const { paid, plan } = this.activePlan(billing);
       if (!paid || paid.cancelAtPeriodEnd || plan.monthly === 0) continue;
-      const production = await billingRepo.getProductionEnvironment(
-        db,
-        paid.workspaceId,
-      );
-      if (!production) continue;
       const billed = await this.billedCount(
         db,
-        production.id,
+        paid.workspaceId,
         paid.currentPeriodStart,
       );
 
@@ -448,7 +443,7 @@ export class BillingService {
   ): Promise<string | null> {
     if (!this.isEnabled()) return null;
     const environment = await billingRepo.getEnvironmentById(db, environmentId);
-    if (!environment || environment.slug !== "prod") return null;
+    if (!environment) return null;
     const { plan } = this.activePlan(
       await billingRepo.getBillingForWorkspace(db, environment.workspaceId),
     );
@@ -456,7 +451,7 @@ export class BillingService {
     if (plan.monthly === 0) {
       const sent = await billingRepo.countSendsSince(
         db,
-        environmentId,
+        environment.workspaceId,
         startOfMonthUtc(now),
       );
       if (sent >= FREE_SENDS_PER_MONTH)
@@ -464,7 +459,7 @@ export class BillingService {
     }
     const position = await billingRepo.subscriberPosition(
       db,
-      environmentId,
+      environment.workspaceId,
       subscriberId,
     );
     if (position <= ceilingFor(plan)) return null;
@@ -481,7 +476,7 @@ export class BillingService {
   ) {
     if (!this.isEnabled()) return;
     const environment = await billingRepo.getEnvironmentById(db, environmentId);
-    if (!environment || environment.slug !== "prod") return;
+    if (!environment) return;
     const { plan } = this.activePlan(
       await billingRepo.getBillingForWorkspace(db, environment.workspaceId),
     );
