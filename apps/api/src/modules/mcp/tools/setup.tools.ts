@@ -65,13 +65,20 @@ export class SetupTools {
             "They don't have a workspace yet. Ask what to call it, usually their company or product, and call create_workspace. It comes with a Production environment. Then call get_setup_status again with that environment's id.",
         };
       }
-      const environments =
+      const workspace =
         workspaces.length === 1
-          ? await this.workspaceService.listEnvironmentsForWorkspace(
+          ? await this.workspaceService.getWorkspaceForUser(
               db,
-              workspaces[0].id,
+              user.id,
+              workspaces[0].publicId,
             )
-          : [];
+          : undefined;
+      const environments = workspace
+        ? await this.workspaceService.listEnvironmentsForWorkspace(
+            db,
+            workspace.id,
+          )
+        : [];
       if (environments.length !== 1) {
         return {
           complete: false,

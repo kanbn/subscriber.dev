@@ -73,13 +73,14 @@ export class WorkspaceController {
     const db = createDrizzleClient();
     const userRecord = await this.userService.getUser(db, user.id);
 
-    const result = await this.workspaceService.createWorkspace(db, user.id, {
-      name: input.name,
-    });
+    const { workspaceId, ...result } =
+      await this.workspaceService.createWorkspace(db, user.id, {
+        name: input.name,
+      });
     track("workspace_created", {
       via: "api",
       userId: user.id,
-      workspaceId: result.workspace.id,
+      workspaceId,
     });
     return result;
   }

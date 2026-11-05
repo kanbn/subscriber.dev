@@ -48,14 +48,13 @@ export class WorkspaceService {
     });
 
     return {
+      workspaceId: workspace.id,
       workspace: {
-        id: workspace.id,
         publicId: workspace.publicId,
         name: workspace.name,
         slug: workspace.slug,
       },
       environment: {
-        id: environment.id,
         publicId: environment.publicId,
         name: environment.name,
         slug: environment.slug,
@@ -114,7 +113,6 @@ export class WorkspaceService {
     if (!environment) throw new Error("Failed to create environment");
 
     return {
-      id: environment.id,
       publicId: environment.publicId,
       name: environment.name,
       slug: environment.slug,
@@ -124,7 +122,6 @@ export class WorkspaceService {
   async listEnvironmentsForWorkspace(db: dbClient, workspaceId: number) {
     return await db
       .select({
-        id: environments.id,
         publicId: environments.publicId,
         name: environments.name,
         slug: environments.slug,
@@ -153,7 +150,6 @@ export class WorkspaceService {
       })
       .where(eq(workspaces.id, workspaceId))
       .returning({
-        id: workspaces.id,
         publicId: workspaces.publicId,
         name: workspaces.name,
         slug: workspaces.slug,
@@ -165,7 +161,6 @@ export class WorkspaceService {
   async getWorkspacesByUserId(db: dbClient, userId: number) {
     const result = await db
       .select({
-        id: workspaces.id,
         publicId: workspaces.publicId,
         name: workspaces.name,
         slug: workspaces.slug,

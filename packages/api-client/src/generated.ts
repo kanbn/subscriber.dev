@@ -51,7 +51,6 @@ export interface AgentResponseDto {
 }
 
 export interface WorkspaceDto {
-  id: number;
   publicId: string;
   name: string;
   slug: string;
@@ -67,14 +66,12 @@ export interface CreateWorkspaceDto {
 }
 
 export type CreateWorkspaceResponseDtoWorkspace = {
-  id: number;
   publicId: string;
   name: string;
   slug: string;
 };
 
 export type CreateWorkspaceResponseDtoEnvironment = {
-  id: number;
   publicId: string;
   name: string;
   slug: string;
@@ -91,7 +88,6 @@ export interface UpdateWorkspaceDto {
 }
 
 export type ListEnvironmentsResponseDtoEnvironmentsItem = {
-  id: number;
   publicId: string;
   name: string;
   slug: string;
@@ -110,7 +106,6 @@ export interface CreateEnvironmentDto {
 }
 
 export interface EnvironmentDto {
-  id: number;
   publicId: string;
   name: string;
   slug: string;

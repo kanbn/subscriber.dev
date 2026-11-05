@@ -28,7 +28,6 @@ describe("createEnvironment", () => {
     });
 
     expect(result).toEqual({
-      id: 5,
       publicId: "env_abc",
       name: "Staging",
       slug: "staging",
