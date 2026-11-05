@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
@@ -31,7 +30,7 @@ function InterfaceTabs({
   onMode: (mode: Interface) => void;
 }) {
   return (
-    <div className="border-border text-muted-foreground flex gap-4 border-b px-4 py-1.5">
+    <div className="flex gap-4 border-b border-border px-4 py-1.5 text-muted-foreground">
       {INTERFACES.map((option) => (
         <button
           key={option}
@@ -39,7 +38,7 @@ function InterfaceTabs({
           onClick={() => onMode(option)}
           className={
             option === mode
-              ? "text-foreground font-semibold"
+              ? "font-semibold text-foreground"
               : "hover:text-foreground"
           }
         >
@@ -288,7 +287,7 @@ function StripeTimeline() {
   return (
     <pre
       ref={ref}
-      className="border-border bg-background-50 overflow-x-auto border p-4 leading-relaxed"
+      className="overflow-x-auto border border-border bg-background-50 p-4 leading-relaxed"
     >
       <Comment>{"jane@acme.com · trial-onboarding\n\n"}</Comment>
       {TIMELINE.map(([day, what, result, tone], i) => (
@@ -362,7 +361,7 @@ function StepTerminal({
   }
 
   return (
-    <div ref={ref} className="border-border bg-background-50 border">
+    <div ref={ref} className="border border-border bg-background-50">
       <InterfaceTabs mode={mode} onMode={onMode} />
       <pre className="min-h-[6.5em] overflow-x-auto p-4 leading-relaxed max-sm:whitespace-pre-wrap">
         {runs.map((run, i) => (
@@ -395,7 +394,7 @@ function HowItWorks() {
           </span>
           <div className="min-w-0">
             <p className="font-semibold">{step.title}</p>
-            <p className="text-muted-foreground mt-1 max-w-[60ch]">
+            <p className="mt-1 max-w-[60ch] text-muted-foreground">
               {step.detail.split(/(\{\{[^}]+\}\})/).map((part, i) =>
                 part.startsWith("{{") ? (
                   <span
@@ -439,7 +438,7 @@ function RunExplained() {
   );
 
   return (
-    <div className="border-border bg-background-50 border">
+    <div className="border border-border bg-background-50">
       <InterfaceTabs mode={mode} onMode={setMode} />
       <pre className="overflow-x-auto p-4 leading-relaxed max-sm:whitespace-pre-wrap">
         <span hidden={mode !== "mcp"}>
@@ -601,8 +600,8 @@ function Pricing() {
 
   return (
     <>
-      <div className="border-border bg-background-50 border">
-        <div className="border-border text-muted-foreground flex gap-4 border-b px-4 py-1.5">
+      <div className="border border-border bg-background-50">
+        <div className="flex gap-4 border-b border-border px-4 py-1.5 text-muted-foreground">
           {BILLING.map((option) => (
             <button
               key={option}
@@ -611,13 +610,13 @@ function Pricing() {
               aria-pressed={option === billing}
               className={
                 option === billing
-                  ? "text-foreground font-semibold"
+                  ? "font-semibold text-foreground"
                   : "hover:text-foreground"
               }
             >
               {option}
               {option === "annual" && (
-                <span className="text-muted-foreground font-normal opacity-60">
+                <span className="font-normal text-muted-foreground opacity-60">
                   {" "}
                   (2 months free)
                 </span>
@@ -705,78 +704,26 @@ const CTA = () => (
 );
 
 const BROADCAST = {
+  id: "k3x9vq2m7tpa",
   matched: 32_480,
-  sent: 31_992,
+  sent: 31_884,
   bounced: 486,
-  unsubscribed: 96,
-  failed: 2,
+  hardBounced: 401,
+  softBounced: 85,
+  skipped: 86,
+  failed: 24,
 };
-const PROGRESS_WIDTH = 24;
-const PROGRESS_MS = 6000;
-
-function BroadcastProgress({ label }: { label: ReactNode }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [done, setDone] = useState(1);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let timer: ReturnType<typeof setInterval>;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry?.isIntersecting) return;
-      observer.disconnect();
-      const start = performance.now();
-      setDone(0);
-      timer = setInterval(() => {
-        const t = Math.min(1, (performance.now() - start) / PROGRESS_MS);
-        setDone(t);
-        if (t === 1) clearInterval(timer);
-      }, 100);
-    });
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-      clearInterval(timer);
-    };
-  }, []);
-
-  const sent = Math.round(BROADCAST.sent * done);
-  const bounced = Math.round(BROADCAST.bounced * done);
-  const unsubscribed = Math.round(BROADCAST.unsubscribed * done);
-  const failed = done > 0.6 ? BROADCAST.failed : 0;
-  // Bounces are a subset of sent, so pending simply counts down to zero.
-  const pending = Math.round(BROADCAST.matched * (1 - done));
-  const filled = Math.round(done * PROGRESS_WIDTH);
-  const n = (value: number) => value.toLocaleString("en-US");
-  const rate = sent ? ((unsubscribed / sent) * 100).toFixed(1) : "0.0";
-
-  return (
-    <span ref={ref}>
-      {label}
-      {`\n  ${"sent".padEnd(14)}`}
-      <Ok>{"█".repeat(filled)}</Ok>
-      <Comment>{"░".repeat(PROGRESS_WIDTH - filled)}</Comment>
-      {`  ${n(sent)}\n  ${"pending".padEnd(14)}${n(pending)}\n  ${"bounced".padEnd(14)}${n(bounced)} · failed ${failed}\n  ${"unsubscribed".padEnd(14)}${n(unsubscribed)} (${rate}%)\n\n`}
-      {done < 1 ? (
-        <Comment>… sending · pause or cancel any time</Comment>
-      ) : (
-        <Ok>{`✓ done · ${n(BROADCAST.sent)} sent`}</Ok>
-      )}
-    </span>
-  );
-}
+const n = (value: number) => value.toLocaleString("en-US");
+const successRate = (
+  (BROADCAST.sent / (BROADCAST.sent + BROADCAST.failed)) *
+  100
+).toFixed(1);
 
 function BroadcastTerminal() {
   const [mode, setMode] = useState<Interface>("mcp");
-  const n = (value: number) => value.toLocaleString("en-US");
-  const unsubscribeRate = (
-    (BROADCAST.unsubscribed / BROADCAST.sent) *
-    100
-  ).toFixed(1);
 
   return (
-    <div className="border-border bg-background-50 border">
+    <div className="border border-border bg-background-50">
       <InterfaceTabs mode={mode} onMode={setMode} />
       <pre className="overflow-x-auto p-4 leading-relaxed max-sm:whitespace-pre-wrap">
         <span hidden={mode !== "mcp"}>
@@ -791,7 +738,7 @@ function BroadcastTerminal() {
           <Comment>● subscriber · get_broadcast</Comment>
           {"\n\n"}
           <Ok>{`✓ done: ${n(BROADCAST.sent)} sent`}</Ok>
-          {`, ${n(BROADCAST.bounced)} bounced, ${n(BROADCAST.unsubscribed)} unsubscribed (${unsubscribeRate}%), ${BROADCAST.failed} failed.`}
+          {`, ${n(BROADCAST.bounced)} bounced, ${BROADCAST.skipped} skipped, ${BROADCAST.failed} failed (${successRate}% success rate).`}
         </span>
         <span hidden={mode !== "api"}>
           <Comment>
@@ -802,19 +749,20 @@ function BroadcastTerminal() {
           <Prompt />
           {`curl -X POST $API/broadcast -H "x-api-key: $KEY" \\\n  -d '{"audience":{"type":"optedIn"},"sendOverHours":48}'\n`}
           <Comment>
-            {'{ "broadcastId": "k3x9vq2m7tpa", "status": "queued" }\n\n'}
+            {`{ "broadcastId": "${BROADCAST.id}", "status": "queued" }\n\n`}
           </Comment>
           <Prompt />
-          {'curl $API/broadcasts/k3x9vq2m7tpa -H "x-api-key: $KEY"\n'}
+          {`curl $API/broadcasts/${BROADCAST.id} -H "x-api-key: $KEY"\n`}
           <Comment>
             {`{
   "status": "completed",
   "matchedCount": ${BROADCAST.matched},
   "sentCount": ${BROADCAST.sent},
-  "pendingCount": 0,
   "bouncedCount": ${BROADCAST.bounced},
-  "unsubscribedCount": ${BROADCAST.unsubscribed},
-  "failedCount": ${BROADCAST.failed}
+  "skippedCount": ${BROADCAST.skipped},
+  "failedCount": ${BROADCAST.failed},
+  "pendingCount": 0,
+  …
 }`}
           </Comment>
         </span>
@@ -823,19 +771,21 @@ function BroadcastTerminal() {
           {
             "subscriber workflows broadcast p7d2nx9c4kwe \\\n  --audience opted-in.json --send-over-hours 48\n"
           }
-          <Ok>{"✓ broadcast queued: k3x9vq2m7tpa\n\n"}</Ok>
-          <Prompt />
-          {"subscriber workflows broadcast-status p7d2nx9c4kwe k3x9vq2m7tpa\n"}
           <Comment>
-            {`{
-  status: 'completed',
-  matchedCount: ${BROADCAST.matched},
-  sentCount: ${BROADCAST.sent},
-  pendingCount: 0,
-  bouncedCount: ${BROADCAST.bounced},
-  unsubscribedCount: ${BROADCAST.unsubscribed},
-  failedCount: ${BROADCAST.failed}
-}`}
+            {`{ broadcastId: '${BROADCAST.id}', status: 'queued' }\n\n`}
+          </Comment>
+          <Prompt />
+          {"subscriber workflows broadcasts p7d2nx9c4kwe --json\n"}
+          <Comment>
+            {`[
+  {
+    "publicId": "${BROADCAST.id}",
+    "status": "completed",
+    "matchedCount": ${BROADCAST.matched},
+    "sendOverHours": 48,
+    …
+  }
+]`}
           </Comment>
         </span>
         <span hidden={mode !== "tui"}>
@@ -846,16 +796,25 @@ function BroadcastTerminal() {
           {"changelog"}
           <Comment>{"  ›  "}</Comment>
           {"b broadcast\n"}
-          <Comment>{"  audience     "}</Comment>
+          <Comment>{"  audience   "}</Comment>
           {"All opted-in subscribers\n"}
-          <Comment>{"  send window  "}</Comment>
+          <Comment>{"  send over  "}</Comment>
           {"48 hours\n"}
-          <Ok>{"✓ broadcast queued\n\n"}</Ok>
-          {"h broadcasts\n"}
-          <BroadcastProgress
-            key={mode}
-            label={<Comment>{"● changelog · k3x9vq2m7tpa"}</Comment>}
-          />
+          <Ok>{`Broadcast queued: ${BROADCAST.id}\n\n`}</Ok>
+          {"h broadcasts"}
+          <Comment>{"  ›  "}</Comment>
+          {`completed — ${BROADCAST.matched} matched — triggered 2 days ago\n\n`}
+          <span className="font-semibold">Broadcast</span>
+          {`\nstatus: completed\nmatched: ${BROADCAST.matched}\nsend window: spread over 48h\n`}
+          <span className="font-semibold">Step outcomes:</span>
+          {"\n"}
+          <Ok>{` sent: ${BROADCAST.sent}\n`}</Ok>
+          {` failed: ${BROADCAST.failed}\n skipped: ${BROADCAST.skipped}\n`}
+          <Comment>{" pending: 0\n"}</Comment>
+          {` bounced: ${BROADCAST.bounced} (hard ${BROADCAST.hardBounced}, soft ${BROADCAST.softBounced})\n success rate: ${successRate}%\n\n`}
+          <Comment>
+            p pause · r resume · c cancel · s set up missing · b back · q quit
+          </Comment>
         </span>
       </pre>
     </div>
@@ -929,7 +888,7 @@ function Marketing() {
               Lifecycle email <br />
               from your terminal.
             </h1>
-            <p className="text-muted-foreground mx-auto mt-3 max-w-[42ch] sm:mx-0">
+            <p className="mx-auto mt-3 max-w-[42ch] text-muted-foreground sm:mx-0">
               The open source <RotatingCompetitor /> alternative, built for
               developers and AI agents.
             </p>
@@ -943,7 +902,7 @@ function Marketing() {
         </header>
       </div>
 
-      <div className="border-border text-muted-foreground border-t px-4 py-3 text-center text-[12px] sm:px-8">
+      <div className="border-t border-border px-4 py-3 text-center text-[12px] text-muted-foreground sm:px-8">
         <span aria-hidden className="opacity-50">
           /*{" "}
         </span>
@@ -973,7 +932,7 @@ function Marketing() {
       </Section>
 
       <Section title="emails that stop when they convert">
-        <p className="text-muted-foreground mb-4 max-w-[60ch]">
+        <p className="mb-4 max-w-[60ch] text-muted-foreground">
           Start a workflow on one event and stop it on another, so nobody gets
           &quot;your trial ends soon&quot; after they&apos;ve paid.
         </p>
@@ -981,14 +940,14 @@ function Marketing() {
         <div className="mt-4">
           <StripeTimeline />
         </div>
-        <p className="text-muted-foreground mt-3">
+        <p className="mt-3 text-muted-foreground">
           {STRIPE_EVENTS.length} Stripe events, from trial_started to
           payment_failed. More integrations on the way.
         </p>
       </Section>
 
       <Section title="broadcasts">
-        <p className="text-muted-foreground mb-4 max-w-[60ch]">
+        <p className="mb-4 max-w-[60ch] text-muted-foreground">
           One-off sends to everyone, or anyone matching a tag or attribute.
           Preview the audience first, spread sends over hours to protect your
           sending reputation, and pause or cancel while it&apos;s going out.
@@ -1004,14 +963,14 @@ function Marketing() {
                 <span className="text-muted-foreground">› </span>
                 {title}
               </p>
-              <p className="text-muted-foreground mt-1">{detail}</p>
+              <p className="mt-1 text-muted-foreground">{detail}</p>
             </div>
           ))}
         </div>
       </Section>
 
       <Section title="every run, explained">
-        <p className="text-muted-foreground mb-4 max-w-[60ch]">
+        <p className="mb-4 max-w-[60ch] text-muted-foreground">
           Ask why someone did or didn&apos;t get an email. Every run keeps what
           was sent, what was skipped and why.
         </p>
@@ -1022,17 +981,17 @@ function Marketing() {
         id="pricing"
         title="priced by subscribers. send as much as you like."
       >
-        <p className="text-muted-foreground mb-4 max-w-[60ch]">
+        <p className="mb-4 max-w-[60ch] text-muted-foreground">
           Only subscribers who can receive email count. Free includes 10,000
           sends a month; paid plans don&apos;t limit sends. Emails go out
           through your own provider, at its prices.
         </p>
         <Pricing />
-        <p className="text-muted-foreground mt-3">
+        <p className="mt-3 text-muted-foreground">
           self-hosting: community (free) · business ($999/yr) · enterprise (
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="hover:text-foreground underline underline-offset-4"
+            className="underline underline-offset-4 hover:text-foreground"
           >
             talk to us
           </a>
@@ -1041,19 +1000,19 @@ function Marketing() {
       </Section>
 
       <Section title="faq">
-        <div className="divide-border border-border divide-y border-y">
+        <div className="divide-y divide-border border-y border-border">
           {FAQS.map(([question, answer, link]) => (
             <details key={question} className="group py-3">
               <summary className="flex cursor-pointer list-none gap-3 [&::-webkit-details-marker]:hidden">
-                <span className="text-muted-foreground w-3 group-open:hidden">
+                <span className="w-3 text-muted-foreground group-open:hidden">
                   +
                 </span>
-                <span className="text-muted-foreground hidden w-3 group-open:inline">
+                <span className="hidden w-3 text-muted-foreground group-open:inline">
                   −
                 </span>
                 {question}
               </summary>
-              <p className="text-muted-foreground mt-2 max-w-[70ch] pl-6">
+              <p className="mt-2 max-w-[70ch] pl-6 text-muted-foreground">
                 {answer}
                 {link && (
                   <>
@@ -1073,7 +1032,7 @@ function Marketing() {
       </Section>
 
       <Section title="start in one command">
-        <p className="text-muted-foreground mb-6">
+        <p className="mb-6 text-muted-foreground">
           Free up to 1,000 subscribers · your provider · your agent
         </p>
         <div className="flex flex-col items-start gap-3">
