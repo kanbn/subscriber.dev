@@ -203,6 +203,7 @@ export function IntegrationDetailScreen({
         ) : type === "stripe" ? (
           <StripeIntegrationForm
             editing
+            withSecret
             onSubmit={(values) =>
               handleSave(stripeIntegrationBody(values, { editing: true }))
             }
@@ -267,7 +268,14 @@ export function IntegrationDetailScreen({
           return (
             <Box flexDirection="column" marginTop={1}>
               <Text bold>Recent events</Text>
-              {events.length === 0 ? (
+              {!state.data.webhookStatus ? (
+                <Text color="yellow">
+                  No webhook yet, so Stripe can&apos;t send events. In Stripe,
+                  add an endpoint for the webhookUrl above with the
+                  eventsToEnable, then press e and paste its signing secret. Or
+                  press e and save a key with Webhook Endpoints: Write.
+                </Text>
+              ) : events.length === 0 ? (
                 <Text dimColor>
                   None yet. Add triggers to your workflows, and events show up
                   here as they happen in Stripe.

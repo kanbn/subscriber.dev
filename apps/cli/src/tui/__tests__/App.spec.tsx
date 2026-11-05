@@ -208,7 +208,7 @@ describe("App navigation", () => {
     vi.mocked(upsertIntegration).mockResolvedValue({
       status: 200,
       headers: new Headers(),
-      data: {},
+      data: { webhookStatus: "automatic" },
     } as never);
 
     const { lastFrame, stdin } = render(<App />);
@@ -237,12 +237,12 @@ describe("App navigation", () => {
     await press("\r");
 
     await vi.waitFor(() =>
-      expect(lastFrame()).toContain("New Stripe integration"),
+      expect(lastFrame()).toContain("Let subscriber.dev add it"),
     );
+    await press("\r");
     await press("\r");
     await press("rk_test_1");
     await press("\r");
-    await press(DOWN);
     await press(DOWN);
     await press("\r");
 

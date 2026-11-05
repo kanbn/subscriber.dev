@@ -24,7 +24,10 @@ import {
   providerFields,
   ProviderForm,
 } from "../components/ProviderForm.js";
-import { StripeIntegrationForm } from "../components/StripeIntegrationForm.js";
+import {
+  MANUAL_KEY_LABEL,
+  StripeIntegrationForm,
+} from "../components/StripeIntegrationForm.js";
 import {
   cloudflareIntegrationBody,
   providerIntegrationBody,
@@ -87,6 +90,9 @@ export function IntegrationsScreen({
       : "list";
   });
   const cancelCreate = onCancelCreate ?? (() => setMode("list"));
+  const [stripeWebhook, setStripeWebhook] = useState<
+    "automatic" | "manual" | null
+  >(null);
 
   useInput((input) => {
     if (mode !== "list") return;
@@ -130,6 +136,12 @@ export function IntegrationsScreen({
       }
       if (response.status !== 200) {
         return "Failed to create integration.";
+      }
+      if (
+        stripeWebhook === "automatic" &&
+        !(response.data as { webhookStatus?: unknown }).webhookStatus
+      ) {
+        return "That key can't create webhooks. Add Webhook Endpoints: Write to it and save again, or go back and add the webhook yourself.";
       }
       onSelect("stripe");
       return undefined;
@@ -221,18 +233,47 @@ export function IntegrationsScreen({
     );
   }
 
+  if (mode === "creating-stripe" && !stripeWebhook) {
+    return (
+      <Box flexDirection="column">
+        <Text bold>New Stripe integration</Text>
+        <Text dimColor>
+          Stripe sends events to subscriber.dev through a webhook. How should it
+          be added?
+        </Text>
+        <SelectInput
+          items={[
+            {
+              label: "Let subscriber.dev add it (recommended)",
+              value: "automatic" as const,
+            },
+            { label: "Add it in Stripe myself", value: "manual" as const },
+            { label: "Cancel", value: "cancel" as const },
+          ]}
+          onSelect={(item) =>
+            item.value === "cancel"
+              ? cancelCreate()
+              : setStripeWebhook(item.value)
+          }
+        />
+        <Hints text="↑↓ navigate · Enter select" />
+      </Box>
+    );
+  }
+
   if (mode === "creating-stripe") {
     return (
       <Box flexDirection="column">
         <Text bold>New Stripe integration</Text>
         <Text dimColor>
-          Create a restricted key in Stripe with Customers: Read and Webhook
-          Endpoints: Write, and subscriber.dev adds the webhook for you. Choose
-          which events start a workflow from the workflow's triggers.
+          {stripeWebhook === "automatic"
+            ? "Create a restricted key in Stripe with Customers: Read and Webhook Endpoints: Write, and subscriber.dev adds the webhook for you."
+            : "Create a restricted key in Stripe with Customers: Read. Next you'll see the webhook URL and events to add in Stripe."}
         </Text>
         <StripeIntegrationForm
+          keyLabel={stripeWebhook === "manual" ? MANUAL_KEY_LABEL : undefined}
           onSubmit={handleCreateStripe}
-          onCancel={cancelCreate}
+          onCancel={() => setStripeWebhook(null)}
         />
         <Hints text="↑↓ navigate · Enter select/edit" />
       </Box>
