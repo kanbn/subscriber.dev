@@ -27,7 +27,7 @@ const NEXT_ACTIONS: Record<NonNullable<SetupResponse["next"]>, string> = {
 };
 
 const COMPLETE_ACTION =
-  "Setup is done. Offer any suggestions that aren't done yet: a postal address for the footer with update_workspace, and Stripe with set_integration so workflows can start on trials and payments.";
+  "Setup is done. Offer any suggestions that aren't done yet: a postal address for the footer with update_workspace, and Stripe with set_integration so workflows can start on trials and payments. If Stripe is connected but has no webhook yet, call get_integration for stripe and walk them through its nextStep.";
 
 @Injectable()
 export class SetupTools {

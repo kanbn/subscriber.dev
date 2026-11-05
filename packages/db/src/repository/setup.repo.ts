@@ -11,7 +11,10 @@ import {
 export const getSetupFacts = async (db: dbClient, environmentId: number) => {
   const [integrations, [workflowCount], [sentEmail]] = await Promise.all([
     db
-      .select({ type: environmentIntegrations.type })
+      .select({
+        type: environmentIntegrations.type,
+        config: environmentIntegrations.config,
+      })
       .from(environmentIntegrations)
       .where(eq(environmentIntegrations.environmentId, environmentId)),
     db
@@ -38,6 +41,9 @@ export const getSetupFacts = async (db: dbClient, environmentId: number) => {
   ]);
   return {
     integrationTypes: integrations.map((row) => row.type),
+    stripeWebhook: integrations.some(
+      (row) => row.type === "stripe" && !!row.config.webhookStatus,
+    ),
     workflowCount: workflowCount?.count ?? 0,
     hasSentEmail: sentEmail !== undefined,
   };

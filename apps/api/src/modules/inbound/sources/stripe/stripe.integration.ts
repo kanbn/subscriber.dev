@@ -151,7 +151,7 @@ export const stripeIntegration: ConfigurableIntegration<
       ? {}
       : {
           nextStep:
-            "If Stripe isn't sending events yet, save an API key that also has Webhook Endpoints: Write and subscriber.dev adds the webhook for you. Or add a webhook endpoint in Stripe for webhookUrl with the eventsToEnable, and save its signing secret as webhookSecret.",
+            "Stripe has no webhook for subscriber.dev yet, so no Stripe events arrive and Stripe triggers and exit conditions won't run. Save an API key that also has Webhook Endpoints: Write and subscriber.dev adds the webhook for you, or add a webhook endpoint in Stripe for webhookUrl with the eventsToEnable and save its signing secret as webhookSecret.",
         }),
   }),
 };

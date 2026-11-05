@@ -21,6 +21,7 @@ describe("getSetup", () => {
   it("points a new environment at connecting an email provider", async () => {
     vi.mocked(setupRepo.getSetupFacts).mockResolvedValue({
       integrationTypes: ["stripe"],
+      stripeWebhook: true,
       workflowCount: 0,
       hasSentEmail: false,
     });
@@ -45,6 +46,7 @@ describe("getSetup", () => {
 
     vi.mocked(setupRepo.getSetupFacts).mockResolvedValue({
       integrationTypes: ["resend"],
+      stripeWebhook: false,
       workflowCount: 0,
       hasSentEmail: false,
     });
@@ -52,6 +54,7 @@ describe("getSetup", () => {
 
     vi.mocked(setupRepo.getSetupFacts).mockResolvedValue({
       integrationTypes: ["resend"],
+      stripeWebhook: false,
       workflowCount: 1,
       hasSentEmail: false,
     });
@@ -59,11 +62,28 @@ describe("getSetup", () => {
 
     vi.mocked(setupRepo.getSetupFacts).mockResolvedValue({
       integrationTypes: ["resend"],
+      stripeWebhook: false,
       workflowCount: 1,
       hasSentEmail: true,
     });
     const setup = await service.getSetup(db, 1);
     expect(setup.complete).toBe(true);
     expect(setup.next).toBe(null);
+  });
+
+  it("keeps Stripe open until it has a webhook", async () => {
+    vi.mocked(setupRepo.getSetupFacts).mockResolvedValue({
+      integrationTypes: ["resend", "stripe"],
+      stripeWebhook: false,
+      workflowCount: 1,
+      hasSentEmail: true,
+    });
+
+    const stripe = (await service.getSetup(db, 1)).suggestions.find(
+      (suggestion) => suggestion.key === "stripe",
+    );
+
+    expect(stripe).toMatchObject({ done: false });
+    expect(stripe?.title).toMatch(/no webhook/);
   });
 });
