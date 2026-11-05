@@ -35,7 +35,11 @@ describe("getSetup", () => {
     expect(setup.next).toBe("email_provider");
     expect(setup.suggestions).toEqual([
       expect.objectContaining({ key: "postal_address", done: false }),
-      expect.objectContaining({ key: "stripe", done: true }),
+      {
+        key: "stripe",
+        title: "Connect Stripe to start workflows from billing events",
+        done: true,
+      },
     ]);
   });
 

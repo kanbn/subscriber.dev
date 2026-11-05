@@ -9,17 +9,7 @@ export interface StripeIntegrationValues {
   webhookSecret: string;
 }
 
-const FIELDS = [
-  {
-    key: "apiKey",
-    label: "Stripe restricted key (Customers: Read, Webhook Endpoints: Write)",
-  },
-  {
-    key: "webhookSecret",
-    label: "Webhook signing secret (only if you add the webhook yourself)",
-  },
-] as const;
-type FieldKey = (typeof FIELDS)[number]["key"];
+type FieldKey = keyof StripeIntegrationValues;
 
 const SUBMIT_VALUE = "__submit__";
 const CANCEL_VALUE = "__cancel__";
@@ -30,11 +20,26 @@ export function StripeIntegrationForm({
   onSubmit,
   onCancel,
   editing = false,
+  manual = false,
+  withSecret = false,
 }: {
   onSubmit: (values: StripeIntegrationValues) => Promise<string | undefined>;
   onCancel: () => void;
   editing?: boolean;
+  manual?: boolean;
+  withSecret?: boolean;
 }) {
+  const fields: { key: FieldKey; label: string }[] = [
+    {
+      key: "apiKey",
+      label: manual
+        ? "Stripe restricted key (Customers: Read)"
+        : "Stripe restricted key (Customers: Read, Webhook Endpoints: Write)",
+    },
+    ...(withSecret
+      ? [{ key: "webhookSecret" as const, label: "Webhook signing secret" }]
+      : []),
+  ];
   const [values, setValues] = useState<StripeIntegrationValues>({
     apiKey: "",
     webhookSecret: "",
@@ -66,7 +71,7 @@ export function StripeIntegrationForm({
   if (mode === "editing-text" && editingField) {
     return (
       <Box>
-        <Text>{FIELDS.find((f) => f.key === editingField)!.label}: </Text>
+        <Text>{fields.find((f) => f.key === editingField)!.label}: </Text>
         <TextInput
           value={values[editingField]}
           onChange={(value) =>
@@ -88,7 +93,7 @@ export function StripeIntegrationForm({
       {error.length > 0 && <Text color="red">{error}</Text>}
       <SelectInput
         items={[
-          ...FIELDS.map((field) => ({
+          ...fields.map((field) => ({
             label: `${field.label}: ${preview(field.key)}`,
             value: field.key as string,
           })),

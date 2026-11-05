@@ -286,6 +286,7 @@ describe("IntegrationDetailScreen stripe", () => {
         type: "stripe",
         events: { trial_started: "trial-start" },
         webhookUrl: "https://api.example.com/webhooks/stripe/tok",
+        webhookStatus: "automatic",
         priority: 3,
         updatedAt: "2026-01-01T00:00:00.000Z",
       },
@@ -331,5 +332,35 @@ describe("IntegrationDetailScreen stripe", () => {
       "customer.subscription.created → processed: Triggered trial-start",
     );
     expect(lastFrame()).toContain("e edit");
+  });
+
+  it("says what to do when Stripe has no webhook yet", async () => {
+    vi.mocked(getIntegration).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: {
+        type: "stripe",
+        webhookUrl: "https://api.example.com/webhooks/stripe/tok",
+        priority: 3,
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      },
+    } as never);
+    vi.mocked(listInboundEvents).mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      data: { events: [], limit: 10, offset: 0 },
+    } as never);
+
+    const { lastFrame } = render(
+      <IntegrationDetailScreen
+        environmentId="test-environment-1"
+        type="stripe"
+        onDeleted={vi.fn()}
+      />,
+    );
+
+    await vi.waitFor(() => {
+      expect(lastFrame()).toContain("No webhook yet");
+    });
   });
 });

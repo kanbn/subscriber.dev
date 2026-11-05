@@ -41,9 +41,10 @@ export class SetupService {
       },
       {
         key: "stripe" as const,
-        title: facts.integrationTypes.includes("stripe")
-          ? "Finish connecting Stripe: it has no webhook yet, so no Stripe events reach subscriber.dev"
-          : "Connect Stripe to start workflows from billing events",
+        title:
+          facts.integrationTypes.includes("stripe") && !facts.stripeWebhook
+            ? "Finish connecting Stripe: it has no webhook yet, so no Stripe events reach subscriber.dev"
+            : "Connect Stripe to start workflows from billing events",
         done: facts.stripeWebhook,
       },
     ];
