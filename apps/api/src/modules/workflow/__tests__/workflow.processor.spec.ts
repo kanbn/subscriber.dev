@@ -49,7 +49,9 @@ vi.mock("@subscriber.dev/db/repository/environmentIntegrations.repo", () => ({
 }));
 
 vi.mock("@subscriber.dev/db/repository/workspace.repo", () => ({
-  getPostalAddressForEnvironment: vi.fn(() => Promise.resolve(null)),
+  getFooterForEnvironment: vi.fn(() =>
+    Promise.resolve({ postalAddress: null, sender: "k3x9q2m7p1ab" }),
+  ),
 }));
 
 vi.mock("../../../common/encryption.js", () => ({
@@ -419,7 +421,11 @@ describe("process", () => {
       await branded.process(makeJob());
 
       const [, , , html, options] = vi.mocked(sendRawEmail).mock.calls[0]!;
-      expect(html.includes('href="https://subscriber.dev"')).toBe(expected);
+      expect(
+        html.includes(
+          'href="https://subscriber.dev/?utm_source=powered-by&amp;utm_medium=email&amp;utm_campaign=k3x9q2m7p1ab"',
+        ),
+      ).toBe(expected);
       expect(options?.text?.includes("Powered by subscriber.dev")).toBe(
         expected,
       );
@@ -427,9 +433,10 @@ describe("process", () => {
   );
 
   it("puts the workspace's postal address in the footer", async () => {
-    vi.mocked(
-      workspaceRepo.getPostalAddressForEnvironment,
-    ).mockResolvedValueOnce("Acme <Inc>,\n1 Market Street\n\nSan Francisco");
+    vi.mocked(workspaceRepo.getFooterForEnvironment).mockResolvedValueOnce({
+      postalAddress: "Acme <Inc>,\n1 Market Street\n\nSan Francisco",
+      sender: "k3x9q2m7p1ab",
+    });
 
     await processor.process(makeJob());
 

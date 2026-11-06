@@ -14,7 +14,9 @@ vi.mock("@subscriber.dev/db/repository/workflow.repo", () => ({
 }));
 
 vi.mock("@subscriber.dev/db/repository/workspace.repo", () => ({
-  getPostalAddressForEnvironment: vi.fn(() => Promise.resolve(null)),
+  getFooterForEnvironment: vi.fn(() =>
+    Promise.resolve({ postalAddress: null, sender: null }),
+  ),
 }));
 
 vi.mock("../sendEmailStep.js", async (importOriginal) => ({

@@ -46,11 +46,11 @@ export class EmailTestService {
   constructor(private readonly billing: BillingService) {}
 
   private async footer(db: dbClient, environmentId: number) {
-    const [poweredBy, postalAddress] = await Promise.all([
+    const [poweredBy, footer] = await Promise.all([
       this.billing.showsPoweredBy(db, environmentId),
-      workspaceRepo.getPostalAddressForEnvironment(db, environmentId),
+      workspaceRepo.getFooterForEnvironment(db, environmentId),
     ]);
-    return { poweredBy, postalAddress };
+    return { poweredBy, ...footer };
   }
 
   async preview(
