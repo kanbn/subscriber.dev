@@ -8,7 +8,7 @@ import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo
 import * as workspaceRepo from "@subscriber.dev/db/repository/workspace.repo";
 import {
   formatPostalAddress,
-  POWERED_BY_URL,
+  poweredByUrl,
   renderSubscriberEmail,
 } from "@subscriber.dev/email";
 import {
@@ -95,10 +95,10 @@ export async function sendEmailStep(
   );
   const email = await renderEmail(stepConfig, baseContext, unsubscribeUrl, {
     poweredBy,
-    postalAddress: await workspaceRepo.getPostalAddressForEnvironment(
+    ...(await workspaceRepo.getFooterForEnvironment(
       db,
       subscriber.environmentId,
-    ),
+    )),
   });
   const headers = await buildListUnsubscribeHeaders(subscriber);
 
@@ -142,6 +142,8 @@ export interface EmailContent {
 export interface EmailFooter {
   poweredBy?: boolean;
   postalAddress?: string | null;
+  /** Workspace publicId, sent as utm_campaign on the Powered by link. */
+  sender?: string | null;
 }
 
 function escapeHtml(value: string): string {
@@ -156,7 +158,7 @@ export async function renderEmail(
   content: EmailContent,
   baseContext: Record<string, unknown>,
   unsubscribeUrl: string | null | undefined,
-  { poweredBy = false, postalAddress }: EmailFooter = {},
+  { poweredBy = false, postalAddress, sender }: EmailFooter = {},
 ): Promise<{ subject: string; html: string; text: string }> {
   const context = { ...baseContext, unsubscribeUrl };
   const subject = await renderTemplate(content.subject, context);
@@ -178,7 +180,7 @@ export async function renderEmail(
       ? `<p style="font-size:12px;color:#666;">${escapeHtml(address)}</p>`
       : "",
     poweredBy
-      ? `<p style="font-size:12px;color:#666;">Powered by <a href="${POWERED_BY_URL}">subscriber.dev</a></p>`
+      ? `<p style="font-size:12px;color:#666;">Powered by <a href="${escapeHtml(poweredByUrl(sender))}">subscriber.dev</a></p>`
       : "",
   ].join("");
   const useLayout =
@@ -192,6 +194,7 @@ export async function renderEmail(
         unsubscribeUrl: footerUnsubscribeUrl,
         postalAddress,
         poweredBy,
+        sender,
       })
     : bareHtml;
   const text = convert(bareHtml, { wordwrap: false });

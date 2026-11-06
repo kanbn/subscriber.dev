@@ -11,7 +11,7 @@ vi.mock("@subscriber.dev/db/repository/setup.repo", () => ({
 }));
 
 vi.mock("@subscriber.dev/db/repository/workspace.repo", () => ({
-  getPostalAddressForEnvironment: vi.fn(),
+  getFooterForEnvironment: vi.fn(),
 }));
 
 const db = {} as dbClient;
@@ -25,9 +25,10 @@ describe("getSetup", () => {
       workflowCount: 0,
       hasSentEmail: false,
     });
-    vi.mocked(workspaceRepo.getPostalAddressForEnvironment).mockResolvedValue(
-      null,
-    );
+    vi.mocked(workspaceRepo.getFooterForEnvironment).mockResolvedValue({
+      postalAddress: null,
+      sender: "k3x9q2m7p1ab",
+    });
 
     const setup = await service.getSetup(db, 1);
 
@@ -44,9 +45,10 @@ describe("getSetup", () => {
   });
 
   it("moves on step by step, and completes once an email has sent", async () => {
-    vi.mocked(workspaceRepo.getPostalAddressForEnvironment).mockResolvedValue(
-      "1 Market Street",
-    );
+    vi.mocked(workspaceRepo.getFooterForEnvironment).mockResolvedValue({
+      postalAddress: "1 Market Street",
+      sender: "k3x9q2m7p1ab",
+    });
 
     vi.mocked(setupRepo.getSetupFacts).mockResolvedValue({
       integrationTypes: ["resend"],

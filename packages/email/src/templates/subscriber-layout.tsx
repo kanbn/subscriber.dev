@@ -34,7 +34,15 @@ export const defaultSubscriberLayoutTheme: SubscriberLayoutTheme = {
   backgroundColor: "#ffffff",
 };
 
-export const POWERED_BY_URL = "https://subscriber.dev";
+// UTM tags show which senders' emails bring people to subscriber.dev.
+export const poweredByUrl = (sender?: string | null) => {
+  const params = new URLSearchParams({
+    utm_source: "powered-by",
+    utm_medium: "email",
+    ...(sender ? { utm_campaign: sender } : {}),
+  });
+  return `https://subscriber.dev/?${params.toString()}`;
+};
 
 export const formatPostalAddress = (address: string | null | undefined) =>
   (address ?? "")
@@ -49,6 +57,7 @@ export interface SubscriberLayoutProps {
   unsubscribeUrl?: string;
   postalAddress?: string | null;
   poweredBy?: boolean;
+  sender?: string | null;
   theme?: SubscriberLayoutTheme;
 }
 
@@ -79,6 +88,7 @@ export const SubscriberLayout = ({
   unsubscribeUrl,
   postalAddress,
   poweredBy,
+  sender,
   theme = defaultSubscriberLayoutTheme,
 }: SubscriberLayoutProps) => {
   const address = formatPostalAddress(postalAddress);
@@ -140,7 +150,7 @@ export const SubscriberLayout = ({
             >
               Powered by{" "}
               <Link
-                href={POWERED_BY_URL}
+                href={poweredByUrl(sender)}
                 style={{ color: theme.mutedColor, textDecoration: "underline" }}
               >
                 subscriber.dev

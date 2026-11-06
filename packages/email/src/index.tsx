@@ -4,6 +4,6 @@ export type { SmtpConfig } from "./sendEmail.js";
 export { sendEmail, sendRawEmail, verifySmtpConnection } from "./sendEmail.js";
 export {
   formatPostalAddress,
-  POWERED_BY_URL,
+  poweredByUrl,
   renderSubscriberEmail,
 } from "./templates/subscriber-layout.js";

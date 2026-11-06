@@ -10,9 +10,9 @@ import { INTEGRATION_PROVIDERS } from "../integrations/providers/index.js";
 @Injectable()
 export class SetupService {
   async getSetup(db: dbClient, environmentId: number): Promise<SetupResponse> {
-    const [facts, postalAddress] = await Promise.all([
+    const [facts, { postalAddress }] = await Promise.all([
       setupRepo.getSetupFacts(db, environmentId),
-      workspaceRepo.getPostalAddressForEnvironment(db, environmentId),
+      workspaceRepo.getFooterForEnvironment(db, environmentId),
     ]);
     const steps = [
       {
