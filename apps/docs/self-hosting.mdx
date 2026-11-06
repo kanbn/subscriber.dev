@@ -32,6 +32,16 @@ The api container runs database migrations when it starts.
 
 `GET /health` on the API returns `200` when it can reach Postgres and Redis, and `503` when it can't. Docker Compose uses it as the API's healthcheck, and you can point an uptime monitor at it.
 
+## Upgrading
+
+Each [release](https://github.com/kanbn/subscriber.dev/releases) publishes `web` and `api` images tagged with its version, and `docker-compose.yml` pins the latest one. To upgrade, pull the new release and restart:
+
+```bash
+git pull
+docker compose pull
+docker compose up -d
+```
+
 ## Configuration
 
 These settings go in `.env`.

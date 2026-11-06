@@ -3,6 +3,7 @@ name: Docker
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   workflow_dispatch:
 
 concurrency:
@@ -15,6 +16,7 @@ env:
 
 jobs:
   build:
+    if: github.ref_type == 'branch'
     strategy:
       fail-fast: false
       matrix:
@@ -105,4 +107,30 @@ jobs:
           docker buildx imagetools inspect "$IMAGE:$SHA"
         env:
           IMAGE: ${{ env.IMAGE_PREFIX }}/${{ matrix.app }}
+          SHA: ${{ github.sha }}
+
+  release:
+    if: github.ref_type == 'tag'
+    strategy:
+      matrix:
+        app: [web, api]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log into ${{ env.REGISTRY }}
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag the release image
+        run: docker buildx imagetools create -t "$IMAGE:${TAG#v}" "$IMAGE:$SHA"
+        env:
+          IMAGE: ${{ env.IMAGE_PREFIX }}/${{ matrix.app }}
+          TAG: ${{ github.ref_name }}
           SHA: ${{ github.sha }}
