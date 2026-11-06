@@ -69,7 +69,7 @@ const contentStyles = (theme: SubscriberLayoutTheme) => `
   .content blockquote { margin: 0 0 14px; padding-left: 16px; border-left: 3px solid ${theme.borderColor}; color: ${theme.mutedColor}; }
   .content code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background-color: #f4f4f5; padding: 2px 4px; border-radius: 4px; }
   @media only screen and (max-width: 600px) {
-    .container { padding: 24px 12px !important; }
+    .container > tbody > tr > td { padding: 24px 12px !important; }
   }
 `;
 
