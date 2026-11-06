@@ -12,7 +12,10 @@ import {
 
 import type { BillingService } from "../../billing/billing.service.js";
 import { decrypt } from "../../../common/encryption.js";
+import { fetchPublic } from "../publicFetch.js";
 import { WorkflowProcessor } from "../workflow.processor.js";
+
+vi.mock("../publicFetch.js", () => ({ fetchPublic: vi.fn() }));
 
 vi.mock("@subscriber.dev/db/client", () => ({
   createDrizzleClient: vi.fn().mockReturnValue({}),
@@ -645,29 +648,24 @@ describe("webhook steps", () => {
     },
   };
 
-  beforeEach(() => {
-    vi.stubGlobal("fetch", vi.fn());
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it("POSTs the rendered JSON payload and marks the run-step sent on a 2xx response", async () => {
     vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue(
       mockWebhookRunStep as any,
     );
-    vi.mocked(fetch).mockResolvedValue({ ok: true, status: 200 } as any);
+    vi.mocked(fetchPublic).mockResolvedValue({ ok: true, status: 200 } as any);
 
     await processor.process(makeJob(2));
 
-    expect(fetch).toHaveBeenCalledWith("https://discord.com/api/webhooks/xyz", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: '{"content": "alice@example.com just signed up!"}',
-      redirect: "error",
-      signal: expect.any(AbortSignal),
-    });
+    expect(fetchPublic).toHaveBeenCalledWith(
+      "https://discord.com/api/webhooks/xyz",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: '{"content": "alice@example.com just signed up!"}',
+        redirect: "error",
+        signal: expect.any(AbortSignal),
+      },
+    );
     expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
       expect.anything(),
       2,
@@ -679,7 +677,7 @@ describe("webhook steps", () => {
     vi.mocked(workflowRunRepo.getRunStepById).mockResolvedValue(
       mockWebhookRunStep as any,
     );
-    vi.mocked(fetch).mockResolvedValue({ ok: false, status: 500 } as any);
+    vi.mocked(fetchPublic).mockResolvedValue({ ok: false, status: 500 } as any);
 
     await expect(processor.process(makeJob(2))).rejects.toThrow(
       "Webhook responded with 500",
@@ -699,7 +697,7 @@ describe("webhook steps", () => {
 
     await processor.process(makeJob(2));
 
-    expect(fetch).not.toHaveBeenCalled();
+    expect(fetchPublic).not.toHaveBeenCalled();
     expect(workflowRunRepo.updateRunStepStatus).toHaveBeenCalledWith(
       expect.anything(),
       2,
