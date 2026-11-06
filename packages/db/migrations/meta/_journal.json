@@ -218,6 +218,13 @@
       "when": 1793567475854,
       "tag": "20261101211115_PartialSubscriberUniques",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1793966229616,
+      "tag": "20261106115709_AddPoweredByToWorkspaces",
+      "breakpoints": true
     }
   ]
 }

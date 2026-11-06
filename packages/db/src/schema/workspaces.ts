@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  boolean,
   index,
   pgEnum,
   pgTable,
@@ -29,6 +30,7 @@ export const workspaces = pgTable("workspaces", {
   name: varchar("name", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
   postalAddress: text("postalAddress"),
+  poweredBy: boolean("poweredBy").notNull().default(true),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
   deletedAt: timestamp("deletedAt"),

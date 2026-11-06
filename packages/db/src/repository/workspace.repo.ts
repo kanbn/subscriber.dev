@@ -14,3 +14,15 @@ export const getPostalAddressForEnvironment = async (
     .where(eq(environments.id, environmentId));
   return row?.postalAddress ?? null;
 };
+
+export const getPoweredByForEnvironment = async (
+  db: dbClient,
+  environmentId: number,
+) => {
+  const [row] = await db
+    .select({ poweredBy: workspaces.poweredBy })
+    .from(environments)
+    .innerJoin(workspaces, eq(environments.workspaceId, workspaces.id))
+    .where(eq(environments.id, environmentId));
+  return row?.poweredBy ?? true;
+};

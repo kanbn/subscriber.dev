@@ -139,12 +139,12 @@ export class WorkspaceService {
     db: dbClient,
     workspaceId: number,
     userId: number,
-    data: { postalAddress: string | null },
+    data: { postalAddress?: string | null; poweredBy?: boolean },
   ) {
     const [workspace] = await db
       .update(workspaces)
       .set({
-        postalAddress: data.postalAddress,
+        ...data,
         updatedBy: userId,
         updatedAt: new Date(),
       })
@@ -154,6 +154,7 @@ export class WorkspaceService {
         name: workspaces.name,
         slug: workspaces.slug,
         postalAddress: workspaces.postalAddress,
+        poweredBy: workspaces.poweredBy,
       });
     return workspace;
   }
@@ -165,6 +166,7 @@ export class WorkspaceService {
         name: workspaces.name,
         slug: workspaces.slug,
         postalAddress: workspaces.postalAddress,
+        poweredBy: workspaces.poweredBy,
       })
       .from(workspaces)
       .innerJoin(

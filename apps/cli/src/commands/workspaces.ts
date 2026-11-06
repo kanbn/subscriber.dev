@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { Option } from "commander";
 
 import {
   createWorkspace,
@@ -44,22 +45,35 @@ export function registerWorkspacesCommand(program: Command): void {
   workspaces
     .command("update")
     .description("Update the current workspace")
-    .requiredOption(
+    .option(
       "--postal-address <address>",
       'postal address shown in every email footer. Use "" to remove it',
+    )
+    .addOption(
+      new Option(
+        "--powered-by <on|off>",
+        'show "Powered by subscriber.dev" in email footers (paid plans can turn it off)',
+      ).choices(["on", "off"]),
     )
     .option("--workspace <workspaceId>", "workspace to update")
     .option("--json", "output as JSON")
     .action(
       run(
         async (opts: {
-          postalAddress: string;
+          postalAddress?: string;
+          poweredBy?: "on" | "off";
           workspace?: string;
           json?: boolean;
         }) => {
           ensureLoggedIn();
+          if (opts.postalAddress === undefined && !opts.poweredBy) {
+            console.error("Pass --postal-address or --powered-by.");
+            process.exitCode = 1;
+            return;
+          }
           const response = await updateWorkspace(requireWorkspaceId(opts), {
             postalAddress: opts.postalAddress,
+            poweredBy: opts.poweredBy ? opts.poweredBy === "on" : undefined,
           });
           if (response.status === 404) {
             console.error("Workspace not found.");

@@ -110,6 +110,7 @@ export class WorkspaceController {
 
     return this.workspaceService.updateWorkspace(db, workspace.id, user.id, {
       postalAddress: input.postalAddress,
+      poweredBy: input.poweredBy,
     });
   }
 

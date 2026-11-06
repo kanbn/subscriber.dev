@@ -13,6 +13,7 @@ import type { BillingInterval, Plan } from "@subscriber.dev/shared";
 import type { Stripe } from "@subscriber.dev/stripe";
 import * as billingRepo from "@subscriber.dev/db/repository/billing.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
+import * as workspaceRepo from "@subscriber.dev/db/repository/workspace.repo";
 import {
   FREE_SENDS_PER_MONTH,
   parseLookupKey,
@@ -457,7 +458,10 @@ export class BillingService {
     const { paid } = this.activePlan(
       await billingRepo.getBillingForWorkspace(db, environment.workspaceId),
     );
-    return !paid;
+    return (
+      !paid ||
+      (await workspaceRepo.getPoweredByForEnvironment(db, environmentId))
+    );
   }
 
   async skipSendReason(

@@ -47,6 +47,7 @@ export type Workspace = {
     name: string;
     slug: string;
     postalAddress: string | null;
+    poweredBy: boolean;
 };
 
 export type CreateWorkspaceRequest = {
@@ -70,7 +71,11 @@ export type UpdateWorkspaceRequest = {
     /**
      * The business's physical postal address, shown in every email's footer. Shown on one line; line breaks become commas. Send null or an empty string to remove it.
      */
-    postalAddress: string | null;
+    postalAddress?: string | null;
+    /**
+     * Whether emails end with a small "Powered by subscriber.dev" line. Paid plans can turn it off; the free plan always shows it.
+     */
+    poweredBy?: boolean;
 };
 
 export type ListEnvironmentsResponse = {
