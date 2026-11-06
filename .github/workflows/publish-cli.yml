@@ -1,4 +1,4 @@
-name: Publish CLI
+name: Publish packages
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
       - apps/cli/**
       - packages/api-client/**
       - packages/shared/**
+      - packages/sdk/**
   workflow_dispatch:
 
 permissions:
@@ -15,6 +16,12 @@ permissions:
 
 jobs:
   publish:
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - { dir: apps/cli, name: "@subscriber.dev/cli" }
+          - { dir: packages/sdk, name: "@subscriber.dev/sdk" }
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,10 +39,10 @@ jobs:
 
       - name: Check the version is new
         id: version
-        working-directory: apps/cli
+        working-directory: ${{ matrix.package.dir }}
         run: |
           version=$(node -p "require('./package.json').version")
-          if npm view "@subscriber.dev/cli@$version" version >/dev/null 2>&1; then
+          if npm view "${{ matrix.package.name }}@$version" version >/dev/null 2>&1; then
             echo "$version is already on npm, nothing to publish"
           else
             echo "publish=true" >> "$GITHUB_OUTPUT"
@@ -47,11 +54,11 @@ jobs:
 
       - name: Test and build
         if: steps.version.outputs.publish
-        run: pnpm turbo run test build --filter=@subscriber.dev/cli
+        run: pnpm turbo run test build --filter=${{ matrix.package.name }}
 
       - name: Publish
         if: steps.version.outputs.publish
-        working-directory: apps/cli
+        working-directory: ${{ matrix.package.dir }}
         run: |
           pnpm pack
-          npm publish subscriber.dev-cli-*.tgz
+          npm publish ./*.tgz
