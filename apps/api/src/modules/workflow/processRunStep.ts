@@ -5,6 +5,7 @@ import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 
 import type { WorkflowStepJobData } from "./workflow.constants.js";
+import { fetchPublic } from "./publicFetch.js";
 import { sendEmailStep } from "./sendEmailStep.js";
 import { renderTemplate } from "./workflow.template.js";
 
@@ -95,7 +96,7 @@ export async function processRunStepJob(
       await workflowRunRepo.completeRunIfAllStepsTerminal(db, run.id);
       return;
     }
-    const response = await fetch(config.url, {
+    const response = await fetchPublic(config.url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: payload,
