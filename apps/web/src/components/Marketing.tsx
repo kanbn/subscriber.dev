@@ -161,6 +161,40 @@ export const Ok = ({ children }: { children: ReactNode }) => (
   <span className="text-emerald-600 dark:text-emerald-400">{children}</span>
 );
 
+const STATUS_URL = "https://sub.openstatus.dev";
+const STATUSES: Record<string, [string, string]> = {
+  operational: [
+    "all systems operational",
+    "text-emerald-600 dark:text-emerald-400",
+  ],
+  degraded_performance: ["degraded performance", "text-amber-500"],
+  partial_outage: ["partial outage", "text-amber-500"],
+  major_outage: ["major outage", "text-red-500"],
+  under_maintenance: ["under maintenance", "text-sky-500"],
+};
+
+function SystemStatus() {
+  const [status, setStatus] = useState<[string, string]>();
+
+  useEffect(() => {
+    fetch("https://api.openstatus.dev/public/status/sub")
+      .then((res) => res.json() as Promise<{ status: string }>)
+      .then(({ status }) => setStatus(STATUSES[status]))
+      .catch(() => undefined);
+  }, []);
+
+  if (!status) return null;
+  const [label, color] = status;
+  return (
+    <a href={STATUS_URL} className="hover:text-foreground">
+      <span aria-hidden className={`${color} animate-pulse`}>
+        *
+      </span>{" "}
+      {label}
+    </a>
+  );
+}
+
 const FOOTER: [string, [string, string][]][] = [
   [
     "product",
@@ -268,7 +302,10 @@ export function MarketingLayout({
               </div>
             ))}
           </div>
-          <p className="mt-8 flex justify-between">
+          <div className="mt-8">
+            <SystemStatus />
+          </div>
+          <p className="mt-4 flex justify-between">
             <span>© {new Date().getFullYear()} Open Engineering</span>
             <span className="flex gap-4">
               <a href="/llms.txt" className="hover:text-foreground">
