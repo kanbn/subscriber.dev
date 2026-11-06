@@ -7,24 +7,36 @@ import {
   workspaceMembers,
   workspaces,
 } from "@subscriber.dev/db/schema";
-import { generateSlug } from "@subscriber.dev/shared/utils";
+import { generateSlug, generateUID } from "@subscriber.dev/shared/utils";
+
+import { isUniqueViolation } from "../../common/isUniqueViolation.js";
 
 @Injectable()
 export class WorkspaceService {
   async createWorkspace(db: dbClient, userId: number, data: { name: string }) {
-    console.log("name");
-    const slug = generateSlug(data.name);
+    // Slugs are globally unique, so a taken name (or one with no usable
+    // characters) gets the workspace's publicId appended instead of failing.
+    const publicId = generateUID();
+    const baseSlug = generateSlug(data.name);
+    const insertWorkspace = (slug: string) =>
+      db
+        .insert(workspaces)
+        .values({
+          publicId,
+          name: data.name,
+          slug,
+          createdBy: userId,
+          updatedBy: userId,
+        })
+        .returning();
 
-    // Create workspace
-    const [workspace] = await db
-      .insert(workspaces)
-      .values({
-        name: data.name,
-        slug,
-        createdBy: userId,
-        updatedBy: userId,
-      })
-      .returning();
+    let workspace;
+    try {
+      [workspace] = await insertWorkspace(baseSlug || publicId);
+    } catch (error) {
+      if (!baseSlug || !isUniqueViolation(error)) throw error;
+      [workspace] = await insertWorkspace(`${baseSlug}-${publicId}`);
+    }
 
     // Create default environment
     const [environment] = await db
