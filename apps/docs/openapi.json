@@ -4289,13 +4289,17 @@
                 "type": "null"
               }
             ]
+          },
+          "poweredBy": {
+            "type": "boolean"
           }
         },
         "required": [
           "publicId",
           "name",
           "slug",
-          "postalAddress"
+          "postalAddress",
+          "poweredBy"
         ]
       },
       "CreateWorkspaceRequest": {
@@ -4372,11 +4376,12 @@
                 "type": "null"
               }
             ]
+          },
+          "poweredBy": {
+            "description": "Whether emails end with a small \"Powered by subscriber.dev\" line. Paid plans can turn it off; the free plan always shows it.",
+            "type": "boolean"
           }
-        },
-        "required": [
-          "postalAddress"
-        ]
+        }
       },
       "ListEnvironmentsResponse": {
         "type": "object",

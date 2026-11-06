@@ -57,7 +57,7 @@ export class WorkspaceTools {
   @Tool({
     name: "update_workspace",
     description:
-      "Set the workspace's postal address, shown in the footer of every email it sends. Marketing email usually includes the sender's physical address, so if list_workspaces shows postalAddress as null, offer to add one before sending broadcasts.",
+      "Set the workspace's postal address, shown in the footer of every email it sends, or turn the \"Powered by subscriber.dev\" footer line off on a paid plan. Marketing email usually includes the sender's physical address, so if list_workspaces shows postalAddress as null, offer to add one before sending broadcasts.",
     parameters: UpdateWorkspaceSchema.extend({ workspaceId: z.string() }),
   })
   async updateWorkspace(
@@ -79,6 +79,7 @@ export class WorkspaceTools {
 
     return this.workspaceService.updateWorkspace(db, workspace.id, user.id, {
       postalAddress: args.postalAddress,
+      poweredBy: args.poweredBy,
     });
   }
 

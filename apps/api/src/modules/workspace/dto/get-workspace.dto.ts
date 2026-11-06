@@ -6,6 +6,7 @@ export const WorkspaceSchema = z.object({
   name: z.string(),
   slug: z.string(),
   postalAddress: z.string().nullable(),
+  poweredBy: z.boolean(),
 });
 
 export const EnvironmentSchema = z.object({
