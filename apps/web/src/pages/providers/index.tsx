@@ -22,11 +22,8 @@ export default function Providers() {
           email providers and costs
         </h1>
         <p className="text-muted-foreground mt-3 max-w-[60ch]">
-          subscriber.dev doesn&apos;t send email itself. Connect a provider
-          and pay them directly for what you send, with no markup from us.
-          Resend, Postmark, Amazon SES and Cloudflare Email are built in, and
-          any SMTP server works. Need your data in the EU? Scaleway is the
-          closest thing to SES there.
+          Send through your own provider and pay them directly, with no
+          markup from us.
         </p>
       </div>
 
@@ -41,23 +38,7 @@ export default function Providers() {
           ])}
         />
         <p className="text-muted-foreground mt-3 max-w-[70ch]">
-          Built-in providers pick up bounces and spam complaints and opt
-          those people out automatically; over SMTP they aren&apos;t picked
-          up. Cloudflare Email needs the $5 Workers Paid plan. Prices from
-          each
-          provider&apos;s pricing page, checked {CHECKED}:{" "}
-          {PROVIDERS.map((p, i) => (
-            <span key={p.name}>
-              {i > 0 && ", "}
-              <a
-                href={p.url}
-                className="hover:text-foreground underline underline-offset-4"
-              >
-                {p.name}
-              </a>
-            </span>
-          ))}
-          .
+          Prices from each provider&apos;s pricing page, checked {CHECKED}.
         </p>
       </Section>
 
@@ -77,12 +58,6 @@ export default function Providers() {
             `$${p.example + PLAN.price}/mo`,
           ])}
         />
-        <p className="text-muted-foreground mt-3 max-w-[70ch]">
-          Postmark is estimated from its overage rate; a larger plan may
-          cost less. Cloudflare includes the $5 Workers Paid plan, and
-          Scaleway&apos;s €10 is converted to dollars. Providers also charge
-          for extras such as dedicated IPs.
-        </p>
       </Section>
     </MarketingLayout>
   );

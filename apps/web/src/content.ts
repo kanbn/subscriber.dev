@@ -33,7 +33,7 @@ export const FAQS: [
   ],
   [
     "which email providers can I use?",
-    "Resend, Postmark, Amazon SES and Cloudflare Email are built in, with bounces and spam complaints handled automatically. Anything else with SMTP works too, such as SendGrid or Mailgun. You pay your provider directly, usually a few dollars a month.",
+    "Resend, Postmark, Amazon SES and Cloudflare Email are built in, with bounces and spam complaints handled automatically. Anything else with SMTP works too, such as SendGrid or Mailgun. You pay your provider directly at their own rates, with no markup on sending.",
     ["/providers", "compare providers and costs"],
   ],
   [
@@ -121,7 +121,7 @@ export const PROVIDERS: {
     name: "Cloudflare Email",
     url: "https://developers.cloudflare.com/email-service/platform/pricing/",
     region: "global",
-    price: "$0.35 per 1k after 3k",
+    price: "$5/mo + $0.35 per 1k after 3k",
     example: 18,
     builtIn: true,
   },

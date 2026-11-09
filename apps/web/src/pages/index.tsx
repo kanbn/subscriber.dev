@@ -1,17 +1,14 @@
 import Head from "next/head";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { InteractiveAt } from "~/components/AsciiAt";
 import {
   Comment,
   CONTACT_EMAIL,
-  CopyCommand,
-  DOCS_URL,
   FitTable,
-  LOGIN_COMMAND,
   MarketingLayout,
   MCP_ADD_COMMAND,
-  MCP_URL,
   Ok,
   Prompt,
   Section,
@@ -19,8 +16,8 @@ import {
 } from "~/components/Marketing";
 import { FAQS, PLANS, STRIPE_EVENTS } from "~/content";
 
-type Interface = "mcp" | "api" | "cli" | "tui";
-const INTERFACES: Interface[] = ["mcp", "api", "cli", "tui"];
+type Interface = "mcp" | "cli" | "tui";
+const INTERFACES: Interface[] = ["mcp", "cli", "tui"];
 
 function InterfaceTabs({
   mode,
@@ -52,7 +49,6 @@ function InterfaceTabs({
 type Script =
   | { chat: [prompt: string, tool: string, result: string] }
   | { shell: string; output?: string[] }
-  | { code: string }
   | { tui: string[] };
 
 interface Step {
@@ -68,25 +64,21 @@ const STEPS: Step[] = [
       "From your agent or your terminal. A browser opens once to confirm, and that's the only time you'll need it.",
     scripts: {
       mcp: {
-        shell: `claude mcp add --transport http subscriber ${MCP_URL}`,
+        shell: MCP_ADD_COMMAND,
         output: [
           "→ opening browser to sign in…",
           "✓ connected as you@company.com",
         ],
       },
-      api: {
-        shell: 'subscriber keys create "production"',
-        output: ["✓ sk_env_•••• · store it as SUBSCRIBER_API_KEY"],
-      },
       cli: {
-        shell: "subscriber login",
+        shell: "npm install -g @subscriber.dev/cli && subscriber login",
         output: [
           "→ opening browser to sign in…",
           "✓ logged in as you@company.com",
         ],
       },
       tui: {
-        shell: "subscriber",
+        shell: "npm install -g @subscriber.dev/cli && subscriber",
         output: [
           "→ opening browser to sign in…",
           "✓ signed in, opening the TUI",
@@ -101,10 +93,6 @@ const STEPS: Step[] = [
     scripts: {
       mcp: {
         chat: ["connect Resend", "set_integration", "resend connected"],
-      },
-      api: {
-        shell: `curl -X PATCH https://api.subscriber.dev/integrations/resend \\
-  -H "x-api-key: $KEY" -d '{…}'`,
       },
       cli: { shell: "subscriber integrations set resend --body '{…}'" },
       tui: { tui: ["Integrations", "n new", "Resend"] },
@@ -122,10 +110,6 @@ const STEPS: Step[] = [
           "onboarding is live",
         ],
       },
-      api: {
-        shell: `curl -X POST https://api.subscriber.dev/workflows \\
-  -H "x-api-key: $KEY" -d @onboarding.json`,
-      },
       cli: { shell: "subscriber workflows create --file onboarding.json" },
       tui: { tui: ["Workflows", "n new"] },
     },
@@ -133,7 +117,7 @@ const STEPS: Step[] = [
   {
     title: "trigger it",
     detail:
-      "Usually from your app's code with one API call, or let an integration like Stripe trigger it. Your agent and the CLI can too.",
+      "Usually from your app's code with the TypeScript SDK or one API call, or let an integration like Stripe trigger it. Your agent and the CLI can too.",
     scripts: {
       mcp: {
         chat: [
@@ -141,14 +125,6 @@ const STEPS: Step[] = [
           "trigger_workflow",
           "run started",
         ],
-      },
-      api: {
-        code: `// in your app, e.g. after signup
-await fetch(\`https://api.subscriber.dev/workflows/trigger\`, {
-  method: "POST",
-  headers: { "x-api-key": KEY, "content-type": "application/json" },
-  body: JSON.stringify({ key: "welcome", subscriber: { email: user.email } }),
-});`,
       },
       cli: {
         shell: "subscriber workflows trigger welcome --email jane@acme.com",
@@ -188,8 +164,6 @@ function typedScript(script: Script) {
     script.output?.forEach((line, i, lines) =>
       add(`\n${line}`, i === lines.length - 1 ? "green" : "muted", 0, 450),
     );
-  } else if ("code" in script) {
-    add(script.code, "plain", 9);
   } else {
     add("$ ", "green", 0);
     add("subscriber", "plain", 40);
@@ -213,10 +187,6 @@ const EXIT_STEP: Step = {
         "update_workflow",
         "trial-onboarding exits on stripe/trial_converted",
       ],
-    },
-    api: {
-      shell: `curl -X PATCH $API/workflows/${TRIAL_WORKFLOW_ID} -H "x-api-key: $KEY" \\
-  -d '{"exitConditions":[{"source":"stripe","event":"trial_converted"}]}'`,
     },
     cli: {
       shell: `subscriber workflows update ${TRIAL_WORKFLOW_ID} --file exit.json`,
@@ -452,24 +422,6 @@ function RunExplained() {
           }
           <Ok>Working as intended.</Ok>
         </span>
-        <span hidden={mode !== "api"}>
-          <Prompt />
-          {'curl "$API/workflows/runs?limit=1" -H "x-api-key: $KEY"\n'}
-          <Comment>
-            {`{ "runs": [{
-    "publicId": "${RUN.id}",
-    "status": "cancelled",
-    "workflow": { "key": "trial-onboarding", … },
-    "subscriber": { "email": "${RUN.email}", … },
-    "steps": [
-      { "stepOrder": 0, "status": "sent", … },
-      { "stepOrder": 1, "status": "sent", … },
-      { "stepOrder": 2, "status": "cancelled",
-        "errorMessage": "${RUN.reason}", … }
-    ]
-}] }`}
-          </Comment>
-        </span>
         <span hidden={mode !== "cli"}>
           <Prompt />
           {"subscriber workflows run-history --limit 1\n"}
@@ -689,18 +641,18 @@ const WHY: [title: string, detail: string][] = [
   ],
   [
     "event-driven",
-    "Events from your integrations start workflows, and exit conditions stop them the moment someone converts. Stripe today, more on the way.",
+    "Events from your integrations start workflows, and exit conditions stop them the moment someone converts.",
   ],
   ["open source", "AGPL-3.0 and self-hostable, so you're never locked in."],
 ];
 
-const CTA = () => (
-  <div className="flex flex-wrap items-center justify-center gap-4 sm:justify-start">
-    <CopyCommand command={LOGIN_COMMAND} />
-    <a href={DOCS_URL} className="text-muted-foreground hover:text-foreground">
-      read the docs
-    </a>
-  </div>
+const SignUp = () => (
+  <Link
+    href="/auth"
+    className="bg-foreground px-4 py-2 font-semibold text-background hover:opacity-90"
+  >
+    get started free
+  </Link>
 );
 
 const BROADCAST = {
@@ -739,32 +691,6 @@ function BroadcastTerminal() {
           {"\n\n"}
           <Ok>{`✓ done: ${n(BROADCAST.sent)} sent`}</Ok>
           {`, ${n(BROADCAST.bounced)} bounced, ${BROADCAST.skipped} skipped, ${BROADCAST.failed} failed (${successRate}% success rate).`}
-        </span>
-        <span hidden={mode !== "api"}>
-          <Comment>
-            {
-              "# changelog workflow\n# API=https://api.subscriber.dev/workflows/p7d2nx9c4kwe\n"
-            }
-          </Comment>
-          <Prompt />
-          {`curl -X POST $API/broadcast -H "x-api-key: $KEY" \\\n  -d '{"audience":{"type":"optedIn"},"sendOverHours":48}'\n`}
-          <Comment>
-            {`{ "broadcastId": "${BROADCAST.id}", "status": "queued" }\n\n`}
-          </Comment>
-          <Prompt />
-          {`curl $API/broadcasts/${BROADCAST.id} -H "x-api-key: $KEY"\n`}
-          <Comment>
-            {`{
-  "status": "completed",
-  "matchedCount": ${BROADCAST.matched},
-  "sentCount": ${BROADCAST.sent},
-  "bouncedCount": ${BROADCAST.bounced},
-  "skippedCount": ${BROADCAST.skipped},
-  "failedCount": ${BROADCAST.failed},
-  "pendingCount": 0,
-  …
-}`}
-          </Comment>
         </span>
         <span hidden={mode !== "cli"}>
           <Prompt />
@@ -893,7 +819,7 @@ function Marketing() {
               developers and AI agents.
             </p>
             <div className="mt-8">
-              <CTA />
+              <SignUp />
             </div>
           </div>
           <div className="order-1 flex justify-center sm:order-2 sm:pr-16">
@@ -927,7 +853,7 @@ function Marketing() {
         </span>
       </div>
 
-      <Section title="how it works">
+      <Section title="send your first email in minutes">
         <HowItWorks />
       </Section>
 
@@ -946,7 +872,7 @@ function Marketing() {
         </p>
       </Section>
 
-      <Section title="broadcasts">
+      <Section title="broadcast to anyone, pause any time">
         <p className="mb-4 max-w-[60ch] text-muted-foreground">
           One-off sends to everyone, or anyone matching a tag or attribute.
           Preview the audience first, spread sends over hours to protect your
@@ -955,7 +881,7 @@ function Marketing() {
         <BroadcastTerminal />
       </Section>
 
-      <Section title="why subscriber.dev">
+      <Section title="what makes it different">
         <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
           {WHY.map(([title, detail]) => (
             <div key={title}>
@@ -977,14 +903,10 @@ function Marketing() {
         <RunExplained />
       </Section>
 
-      <Section
-        id="pricing"
-        title="priced by subscribers. send as much as you like."
-      >
+      <Section id="pricing" title="priced by subscribers, not sends">
         <p className="mb-4 max-w-[60ch] text-muted-foreground">
           Only subscribers who can receive email count. Free includes 10,000
-          sends a month; paid plans don&apos;t limit sends. Emails go out
-          through your own provider, at its prices.
+          sends a month; paid plans don&apos;t limit sends.
         </p>
         <Pricing />
         <p className="mt-3 text-muted-foreground">
@@ -1031,16 +953,11 @@ function Marketing() {
         </div>
       </Section>
 
-      <Section title="start in one command">
+      <Section title="ready to send?">
         <p className="mb-6 text-muted-foreground">
           Free up to 1,000 subscribers · your provider · your agent
         </p>
-        <div className="flex flex-col items-start gap-3">
-          <Comment># from your terminal</Comment>
-          <CopyCommand command={LOGIN_COMMAND} />
-          <Comment># from your agent</Comment>
-          <CopyCommand command={MCP_ADD_COMMAND} />
-        </div>
+        <SignUp />
       </Section>
     </MarketingLayout>
   );
