@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
+import * as setupRepo from "@subscriber.dev/db/repository/setup.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 import * as workspaceRepo from "@subscriber.dev/db/repository/workspace.repo";
@@ -12,6 +13,7 @@ import {
 
 import type { BillingService } from "../../billing/billing.service.js";
 import { decrypt } from "../../../common/encryption.js";
+import { track } from "../../../posthog.js";
 import { fetchPublic } from "../publicFetch.js";
 import { WorkflowProcessor } from "../workflow.processor.js";
 
@@ -52,7 +54,16 @@ vi.mock("@subscriber.dev/db/repository/workspace.repo", () => ({
   getFooterForEnvironment: vi.fn(() =>
     Promise.resolve({ postalAddress: null, sender: "k3x9q2m7p1ab" }),
   ),
+  getOwnerForEnvironment: vi.fn(() =>
+    Promise.resolve({ workspaceId: 3, userId: 7 }),
+  ),
 }));
+
+vi.mock("@subscriber.dev/db/repository/setup.repo", () => ({
+  hasSentEmail: vi.fn(() => Promise.resolve(true)),
+}));
+
+vi.mock("../../../posthog.js", () => ({ track: vi.fn() }));
 
 vi.mock("../../../common/encryption.js", () => ({
   decrypt: vi.fn(),
@@ -184,6 +195,19 @@ describe("process", () => {
       expect.anything(),
       5,
     );
+  });
+
+  it("tracks first_email_sent only for the environment's first send", async () => {
+    await processor.process(makeJob());
+    expect(track).not.toHaveBeenCalled();
+
+    vi.mocked(setupRepo.hasSentEmail).mockResolvedValueOnce(false);
+    await processor.process(makeJob());
+    expect(track).toHaveBeenCalledWith("first_email_sent", {
+      via: "workflow",
+      workspaceId: 3,
+      userId: 7,
+    });
   });
 
   it("passes the SMTP integration's replyTo through to the send", async () => {

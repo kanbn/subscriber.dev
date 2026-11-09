@@ -34,6 +34,7 @@ import {
   RequiresScope,
 } from "../../common/environmentKey.js";
 import { AuthGuard } from "../../common/guards/auth.guard.js";
+import { track } from "../../posthog.js";
 import { WorkspaceService } from "../workspace/workspace.service.js";
 import { BillingService } from "./billing.service.js";
 import {
@@ -104,13 +105,19 @@ export class BillingController {
     @Body() input: CreateCheckoutDto,
   ): Promise<BillingLinkResponseDto> {
     const { db, workspace } = await this.workspace(user.id, workspaceId);
-    return this.billingService.createCheckoutLink(
+    const link = await this.billingService.createCheckoutLink(
       db,
       workspace,
       user,
       input.plan,
       input.interval,
     );
+    track(
+      "checkout_started",
+      { via: "api", userId: user.id, workspaceId: workspace.id },
+      { plan: input.plan, interval: input.interval, kind: link.kind },
+    );
+    return link;
   }
 
   @Post("portal")

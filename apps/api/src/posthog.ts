@@ -8,7 +8,11 @@ export const track = (
     via,
     userId,
     workspaceId,
-  }: { via: "api" | "mcp"; userId?: number | null; workspaceId: number },
+  }: {
+    via: "api" | "mcp" | "stripe" | "workflow";
+    userId?: number | null;
+    workspaceId: number;
+  },
   properties: Record<string, unknown> = {},
 ) =>
   posthog?.capture({
