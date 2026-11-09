@@ -24,6 +24,8 @@ import {
 } from "@subscriber.dev/shared";
 import { createStripeClient } from "@subscriber.dev/stripe";
 
+import { track } from "../../posthog.js";
+
 const FREE_PLAN = PLANS[0];
 const CHEAPEST_PAID = PLANS[1];
 const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
@@ -326,6 +328,18 @@ export class BillingService {
           : null,
       cancelAtPeriodEnd: sub.cancel_at_period_end || sub.cancel_at !== null,
     });
+    const wasActive = ACTIVE_STATUSES.includes(billing.status ?? "");
+    const isActive = ACTIVE_STATUSES.includes(sub.status);
+    if (wasActive !== isActive)
+      track(
+        isActive ? "subscription_started" : "subscription_ended",
+        {
+          via: "stripe",
+          userId: await workspaceRepo.getOwner(db, billing.workspaceId),
+          workspaceId: billing.workspaceId,
+        },
+        { plan: parsed?.plan.key, interval: parsed?.interval },
+      );
   }
 
   private async adjustAtRenewal(

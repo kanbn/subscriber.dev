@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import type { dbClient } from "@subscriber.dev/db/client";
 
+import { track } from "../../../posthog.js";
 import { BillingService } from "../../billing/billing.service.js";
 import { CreateCheckoutSchema } from "../../billing/dto/billing.dto.js";
 import { WorkspaceService } from "../../workspace/workspace.service.js";
@@ -64,13 +65,19 @@ export class BillingTools {
       rawRequest,
       args.workspaceId,
     );
-    return this.billingService.createCheckoutLink(
+    const link = await this.billingService.createCheckoutLink(
       db,
       workspace,
       user,
       args.plan,
       args.interval,
     );
+    track(
+      "checkout_started",
+      { via: "mcp", userId: user.id, workspaceId: workspace.id },
+      { plan: args.plan, interval: args.interval, kind: link.kind },
+    );
+    return link;
   }
 
   @Tool({

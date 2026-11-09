@@ -3,6 +3,7 @@ import { convert } from "html-to-text";
 import type { dbClient } from "@subscriber.dev/db/client";
 import type { WorkflowChannels } from "@subscriber.dev/db/schema";
 import * as environmentIntegrationsRepo from "@subscriber.dev/db/repository/environmentIntegrations.repo";
+import * as setupRepo from "@subscriber.dev/db/repository/setup.repo";
 import * as subscriberRepo from "@subscriber.dev/db/repository/subscriber.repo";
 import * as workflowRunRepo from "@subscriber.dev/db/repository/workflowRun.repo";
 import * as workspaceRepo from "@subscriber.dev/db/repository/workspace.repo";
@@ -18,6 +19,7 @@ import {
 
 import type { EmailLayout } from "./dto/create-workflow.dto.js";
 import { decrypt } from "../../common/encryption.js";
+import { track } from "../../posthog.js";
 import { INTEGRATION_PROVIDERS } from "../integrations/providers/index.js";
 import { renderTemplate } from "./workflow.template.js";
 
@@ -114,6 +116,7 @@ export async function sendEmailStep(
         replyTo: workflow?.channels?.email?.replyTo,
       },
     );
+    const first = !(await setupRepo.hasSentEmail(db, subscriber.environmentId));
     await workflowRunRepo.updateRunStepStatus(
       db,
       runStep.id,
@@ -121,6 +124,13 @@ export async function sendEmailStep(
       undefined,
       providerMessageId,
     );
+    if (first) {
+      const owner = await workspaceRepo.getOwnerForEnvironment(
+        db,
+        subscriber.environmentId,
+      );
+      if (owner) track("first_email_sent", { via: "workflow", ...owner });
+    }
   } catch (error) {
     if (!(error instanceof NoEmailIntegrationError)) throw error;
     await workflowRunRepo.updateRunStepStatus(

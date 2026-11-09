@@ -8,8 +8,24 @@ import {
   workflows,
 } from "@subscriber.dev/db/schema";
 
+export const hasSentEmail = async (db: dbClient, environmentId: number) => {
+  const [row] = await db
+    .select({ id: workflowRunSteps.id })
+    .from(workflowRunSteps)
+    .innerJoin(workflowRuns, eq(workflowRunSteps.runId, workflowRuns.id))
+    .where(
+      and(
+        eq(workflowRuns.environmentId, environmentId),
+        eq(workflowRunSteps.type, "email"),
+        eq(workflowRunSteps.status, "sent"),
+      ),
+    )
+    .limit(1);
+  return row !== undefined;
+};
+
 export const getSetupFacts = async (db: dbClient, environmentId: number) => {
-  const [integrations, [workflowCount], [sentEmail]] = await Promise.all([
+  const [integrations, [workflowCount], sentEmail] = await Promise.all([
     db
       .select({
         type: environmentIntegrations.type,
@@ -26,18 +42,7 @@ export const getSetupFacts = async (db: dbClient, environmentId: number) => {
           isNull(workflows.deletedAt),
         ),
       ),
-    db
-      .select({ id: workflowRunSteps.id })
-      .from(workflowRunSteps)
-      .innerJoin(workflowRuns, eq(workflowRunSteps.runId, workflowRuns.id))
-      .where(
-        and(
-          eq(workflowRuns.environmentId, environmentId),
-          eq(workflowRunSteps.type, "email"),
-          eq(workflowRunSteps.status, "sent"),
-        ),
-      )
-      .limit(1),
+    hasSentEmail(db, environmentId),
   ]);
   return {
     integrationTypes: integrations.map((row) => row.type),
@@ -45,6 +50,6 @@ export const getSetupFacts = async (db: dbClient, environmentId: number) => {
       (row) => row.type === "stripe" && !!row.config.webhookStatus,
     ),
     workflowCount: workflowCount?.count ?? 0,
-    hasSentEmail: sentEmail !== undefined,
+    hasSentEmail: sentEmail,
   };
 };
