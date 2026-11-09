@@ -268,6 +268,9 @@ export function MarketingLayout({
             <a href={GITHUB_URL} className="hover:text-foreground">
               github
             </a>
+            <Link href="/auth" className="text-foreground hover:opacity-80">
+              sign in
+            </Link>
           </div>
         </nav>
 

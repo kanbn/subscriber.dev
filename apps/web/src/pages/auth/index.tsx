@@ -4,7 +4,15 @@ import { useEffect, useState } from "react";
 
 import { authClient } from "@subscriber.dev/auth/client";
 
-import { Comment, MarketingLayout, Ok, Prompt } from "~/components/Marketing";
+import {
+  Comment,
+  CopyCommand,
+  LOGIN_COMMAND,
+  MarketingLayout,
+  MCP_ADD_COMMAND,
+  Ok,
+  Prompt,
+} from "~/components/Marketing";
 
 // Where the CLI (`subscriber login`, via ?user_code=) and MCP clients (via a
 // signed OAuth query) send people to sign in. Signing in creates the account.
@@ -50,8 +58,41 @@ export default function AuthPage() {
   }
   return (
     <Shell>
-      <Approve email={session.user.email} initialCode={userCode} />
+      {userCode ? (
+        <Approve email={session.user.email} initialCode={userCode} />
+      ) : (
+        <Welcome email={session.user.email} />
+      )}
     </Shell>
+  );
+}
+
+function Welcome({ email }: { email: string }) {
+  return (
+    <>
+      <p className="mb-6">
+        <Ok>✓ </Ok>
+        you&apos;re in as <span className="font-semibold">{email}</span>. now
+        connect your agent or terminal, and set everything up from there.
+      </p>
+      <div className="flex flex-col items-start gap-3">
+        <Comment># from your agent</Comment>
+        <CopyCommand command={MCP_ADD_COMMAND} />
+        <p className="text-muted-foreground">
+          then ask it to &quot;set up subscriber.dev&quot;
+        </p>
+        <Comment># from your terminal</Comment>
+        <CopyCommand command={LOGIN_COMMAND} />
+      </div>
+      <details className="mt-10">
+        <summary className="text-muted-foreground hover:text-foreground cursor-pointer">
+          have a code from your terminal?
+        </summary>
+        <div className="mt-4">
+          <Approve email={email} initialCode="" />
+        </div>
+      </details>
+    </>
   );
 }
 
