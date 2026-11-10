@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "dev.subscriber/subscriber",
+  "title": "subscriber.dev",
+  "description": "Lifecycle email for your app. Onboarding and trial emails that stop when users convert.",
+  "version": "0.1.0",
+  "icons": [
+    {
+      "src": "https://subscriber.dev/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"]
+    },
+    {
+      "src": "https://subscriber.dev/apple-touch-icon.png",
+      "mimeType": "image/png",
+      "sizes": ["180x180"]
+    }
+  ],
+  "websiteUrl": "https://subscriber.dev/?utm_source=mcp-registry&utm_medium=directory",
+  "repository": {
+    "url": "https://github.com/kanbn/subscriber.dev",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.subscriber.dev"
+    }
+  ]
+}
