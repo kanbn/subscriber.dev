@@ -146,7 +146,13 @@ export function registerIntegrationsCommand(program: Command): void {
             body as unknown as UpsertIntegrationDto,
           );
           if (response.status === 400) {
-            console.error("Invalid config or failed verification.");
+            const message = (response.data as { message?: unknown } | undefined)
+              ?.message;
+            console.error(
+              typeof message === "string"
+                ? message
+                : "Invalid config or failed verification.",
+            );
             process.exitCode = 1;
             return;
           }

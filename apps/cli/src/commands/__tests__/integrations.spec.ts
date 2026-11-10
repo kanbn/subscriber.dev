@@ -222,6 +222,27 @@ describe("integrations set", () => {
 
     process.exitCode = undefined;
   });
+
+  it("prints the API's reason on a 400", async () => {
+    vi.mocked(upsertIntegration).mockResolvedValue({
+      status: 400,
+      headers: new Headers(),
+      data: { message: "localhost isn't a public SMTP server" },
+    } as never);
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    await buildProgram().parseAsync(
+      ["integrations", "set", "smtp", "--body", "{}"],
+      { from: "user" },
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "localhost isn't a public SMTP server",
+    );
+    process.exitCode = undefined;
+  });
 });
 
 describe("integrations set-primary", () => {
