@@ -295,6 +295,7 @@ export function InteractiveAt() {
       aria-hidden
       className="cursor-grab touch-none select-none text-[8px] leading-[1.15] active:cursor-grabbing sm:text-[11px]"
       onPointerDown={(e) => {
+        if (e.button !== 0) return;
         const m = motion.current;
         e.currentTarget.setPointerCapture(e.pointerId);
         m.dragging = true;
@@ -334,7 +335,7 @@ export function InteractiveAt() {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
           m.velocity = 0;
       }}
-      onPointerCancel={() => {
+      onLostPointerCapture={() => {
         motion.current.dragging = false;
       }}
       onPointerLeave={() => {
